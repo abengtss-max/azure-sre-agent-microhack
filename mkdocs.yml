@@ -6,6 +6,7 @@ site_author: Aetherion AirOps Reliability Engineering
 docs_dir: docs
 # Internal prerequisites page is kept in the repo but not published to the site.
 exclude_docs: |
+  facilitator/
   getting-started/prerequisites.md
 site_url: https://abengtss-max.github.io/azure-sre-agent-microhack/
 repo_url: https://github.com/abengtss-max/azure-sre-agent-microhack
@@ -123,3 +124,4 @@ nav:
       - Commands: reference/commands.md
       - Troubleshooting: reference/troubleshooting.md
       - Glossary: reference/glossary.md
+
