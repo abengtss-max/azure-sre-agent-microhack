@@ -16,47 +16,12 @@ Azure Activity Log and GitHub history.*
 
 ## Executive view
 
-The business-level picture: traffic enters through the API front door, flows to the
-Aetherion AirOps services and their data stores, and the **Azure SRE Agent** watches
-and recovers across all of it — grounded in monitoring, source control and your
-runbooks.
+[![Aetherion AirOps — executive view: business flow and the Azure SRE Agent](../assets/architecture/aetherion-executive.png){ .arch-diagram loading=lazy }](../assets/architecture/aetherion-executive.png)
 
-```mermaid
-flowchart TB
-    OPS[Ops Centers · Airports · Partners] --> FRONT[API front door]
-    FRONT --> APP["Aetherion AirOps services<br/>booking · crew · flight-ops · baggage · telemetry"]
-    APP --> DATA[("Operational data<br/>PostgreSQL · Redis")]
-    SRE[Azure SRE Agent] -. watches &amp; recovers .-> FRONT
-    SRE -. watches &amp; recovers .-> APP
-    SRE -. watches &amp; recovers .-> DATA
-    SRE --- SIG[Monitor · Logs · GitHub · Knowledge]
-```
-
-## Request and data flow
-
-```mermaid
-flowchart LR
-    U[Ops Centers / Airports / Partner APIs] --> APIM[Azure API Management]
-    APIM --> FO[flight-ops svc]
-    APIM --> CS[crew-scheduling svc]
-    APIM --> BK[booking &amp; check-in svc]
-    APIM --> BAG[baggage svc]
-    APIM --> TEL[telemetry-ingest svc]
-    subgraph AKS[Azure Kubernetes Service · namespace aetherion]
-      FO
-      CS
-      BK
-      BAG
-      TEL
-      K6[k6 load generator]
-    end
-    CS --> SQL[(Azure Database for PostgreSQL)]
-    BK --> SQL
-    BK --> REDIS[(Azure Managed Redis)]
-    TEL --> SQL
-    AKS -. metrics/logs .-> AI[Application Insights + Log Analytics]
-    AI -. data source .-> GRAF[Azure Managed Grafana]
-```
+*The business-level picture: traffic enters through the API front door, flows to
+the Aetherion AirOps services and their data, and the **Azure SRE Agent** watches
+and recovers across every tier — grounded in monitoring, source control and your
+runbooks. **Click to open full size.***
 
 ## Where faults hide
 
