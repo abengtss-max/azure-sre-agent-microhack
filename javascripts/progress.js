@@ -238,7 +238,12 @@
     if (isHome()) {
       var acts = document.querySelector(".md-content .grid.cards");
       if (acts && !document.querySelector(".aet-steps-wrap")) {
-        acts.parentNode.insertBefore(addFooter(makeSteps(set, null, "Your MicroHack progress")), acts);
+        // Place the progress bar above the "The five acts" heading (if present),
+        // so the order reads: journey -> progress -> heading -> act cards.
+        var anchor = acts;
+        var prev = acts.previousElementSibling;
+        if (prev && prev.tagName === "H2") anchor = prev;
+        anchor.parentNode.insertBefore(addFooter(makeSteps(set, null, "Your MicroHack progress")), anchor);
       }
       document.querySelectorAll('.md-content .grid.cards a[href*="challenges/"]').forEach(function (a) {
         var m = a.getAttribute("href").match(/(\d{2})-/);
