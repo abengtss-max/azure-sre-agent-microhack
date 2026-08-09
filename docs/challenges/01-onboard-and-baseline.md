@@ -34,7 +34,7 @@ operational baseline, and schedule a proactive daily health check.
 
 1. **Verify platform health** — read the Operations Center once; this green board is your healthy reference for the day.
 2. **Verify observability** — open Grafana and confirm AKS and Application Insights data is flowing.
-3. **Connect the SRE Agent** — scope it to the resource group at **Reader** + **Review**, and confirm a write action prompts for approval.
+3. **Connect the SRE Agent** — scope it to the resource group at **Reader** + **Review**, connect its GitHub integration to **your fork of `aetherion-airops-platform`** (the application source — you'll use it for change correlation in Challenge 3), and confirm a write action prompts for approval.
 4. **Generate the operational baseline** — have the agent produce a baseline for the `aetherion` namespace, then validate 2–3 of its numbers against the Ops Center and Grafana.
 5. **Enable proactive monitoring** — schedule the baseline health check to re-run each morning so drift is caught before it becomes an incident.
 

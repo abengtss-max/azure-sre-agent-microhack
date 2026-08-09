@@ -23,12 +23,26 @@ winget install --id Git.Git --exact --accept-source-agreements --accept-package-
 
 After installs complete, restart your terminal so the commands are available on PATH.
 
-## 2. Clone the repository
+## 2. Get the two repositories
+
+You use **two** repositories in this MicroHack:
+
+**a) Clone the lab repo** — it drives the hack (challenges + scripts):
 
 ```powershell
-git clone https://github.com/abengtss-max/sreagentmicrohack.git
-cd sreagentmicrohack
+git clone https://github.com/abengtss-max/azure-sre-agent-microhack.git
+cd azure-sre-agent-microhack
 ```
+
+**b) Fork the application repo** — this is the Aetherion AirOps *application*
+source that the Azure SRE Agent connects to for change correlation. Fork it to
+**your own account** so the agent can read its history and open pull requests:
+
+1. Open <https://github.com/abengtss-max/aetherion-airops-platform>
+2. Click **Fork** (keep the default name).
+
+You'll connect the SRE Agent to **your fork** in Challenge 1. Never connect the
+agent to the lab repo — it contains the challenge material.
 
 ## 3. Check you have access
 

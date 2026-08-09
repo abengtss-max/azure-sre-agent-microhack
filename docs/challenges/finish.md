@@ -32,7 +32,7 @@
 
 - **Use it for real:** [Azure SRE Agent overview](https://learn.microsoft.com/en-us/azure/sre-agent/overview) · [Permissions & run modes](https://learn.microsoft.com/en-us/azure/sre-agent/permissions) · [Skills](https://learn.microsoft.com/en-us/azure/sre-agent/skills)
 - **Go deeper on this build:** [Architecture](../reference/architecture.md) · [Service catalog](../reference/service-catalog.md) · [Commands](../reference/commands.md)
-- **Found it useful?** Star the repo and share feedback on [GitHub](https://github.com/abengtss-max/sreagentmicrohack).
+- **Found it useful?** Star the repo and share feedback on [GitHub](https://github.com/abengtss-max/azure-sre-agent-microhack).
 
 ---
 
