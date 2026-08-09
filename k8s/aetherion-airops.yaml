@@ -1,0 +1,272 @@
+# Aetherion AirOps workloads on AKS.
+#
+# Image and connection values are patched by scripts/03-deploy-app.ps1:
+#   - image: ${ACR_LOGIN_SERVER}/aetherion-airops:latest
+#   - Secret "aetherion-secrets" (DB/Redis/App Insights) is created from Bicep outputs.
+#
+# All six services run from the SAME image, differentiated by the ROLE env var.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: aetherion
+  labels:
+    app.kubernetes.io/part-of: aetherion-airops
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aetherion-config
+  namespace: aetherion
+data:
+  PGDATABASE: "aetherion"
+  PGPORT: "5432"
+  REDIS_PORT: "10000"
+  REDIS_TLS: "true"
+  PG_POOL_MAX: "5"
+---
+# ---------------- gateway (Ops Center GUI + aggregator) ----------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway
+  namespace: aetherion
+  labels: { app: gateway, tier: edge }
+spec:
+  replicas: 2
+  selector: { matchLabels: { app: gateway } }
+  template:
+    metadata:
+      labels: { app: gateway, tier: edge }
+    spec:
+      containers:
+        - name: gateway
+          image: REPLACE_ACR/aetherion-airops:latest
+          ports: [{ containerPort: 8080 }]
+          env:
+            - { name: ROLE, value: "gateway" }
+            - { name: FAULT_MODE, value: "none" }
+            - name: APPLICATIONINSIGHTS_CONNECTION_STRING
+              valueFrom: { secretKeyRef: { name: aetherion-secrets, key: APPLICATIONINSIGHTS_CONNECTION_STRING } }
+          readinessProbe: { httpGet: { path: /health/ready, port: 8080 }, initialDelaySeconds: 5, periodSeconds: 10 }
+          livenessProbe: { httpGet: { path: /health/live, port: 8080 }, initialDelaySeconds: 10, periodSeconds: 10 }
+          resources: { requests: { cpu: "100m", memory: "128Mi" }, limits: { cpu: "500m", memory: "256Mi" } }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway
+  namespace: aetherion
+spec:
+  type: LoadBalancer
+  selector: { app: gateway }
+  ports: [{ port: 80, targetPort: 8080 }]
+---
+# ---------------- flight-ops ----------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flight-ops
+  namespace: aetherion
+  labels: { app: flight-ops, tier: service }
+spec:
+  replicas: 2
+  # Recreate so a `crash` fault takes the service fully down (the flight board
+  # goes dark). Under the default RollingUpdate, maxUnavailable rounds to 0 and
+  # the old healthy pods keep serving because the crashing pods never go Ready.
+  strategy: { type: Recreate }
+  selector: { matchLabels: { app: flight-ops } }
+  template:
+    metadata:
+      labels: { app: flight-ops, tier: service }
+    spec:
+      containers:
+        - name: flight-ops
+          image: REPLACE_ACR/aetherion-airops:latest
+          ports: [{ containerPort: 8080 }]
+          envFrom: [{ configMapRef: { name: aetherion-config } }]
+          env:
+            - { name: ROLE, value: "flight-ops" }
+            - { name: FAULT_MODE, value: "none" }
+            - { name: PGHOST, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: PGHOST } } }
+            - { name: PGUSER, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: PGUSER } } }
+            - { name: PGPASSWORD, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: PGPASSWORD } } }
+            - { name: APPLICATIONINSIGHTS_CONNECTION_STRING, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: APPLICATIONINSIGHTS_CONNECTION_STRING } } }
+          readinessProbe: { httpGet: { path: /health/ready, port: 8080 }, initialDelaySeconds: 5, periodSeconds: 10 }
+          livenessProbe: { httpGet: { path: /health/live, port: 8080 }, initialDelaySeconds: 10, periodSeconds: 10 }
+          resources: { requests: { cpu: "100m", memory: "128Mi" }, limits: { cpu: "500m", memory: "256Mi" } }
+---
+apiVersion: v1
+kind: Service
+metadata: { name: flight-ops, namespace: aetherion }
+spec:
+  selector: { app: flight-ops }
+  ports: [{ port: 80, targetPort: 8080 }]
+---
+# ---------------- crew-scheduling ----------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crew-scheduling
+  namespace: aetherion
+  labels: { app: crew-scheduling, tier: service }
+spec:
+  replicas: 2
+  selector: { matchLabels: { app: crew-scheduling } }
+  template:
+    metadata:
+      labels: { app: crew-scheduling, tier: service }
+    spec:
+      containers:
+        - name: crew-scheduling
+          image: REPLACE_ACR/aetherion-airops:latest
+          ports: [{ containerPort: 8080 }]
+          envFrom: [{ configMapRef: { name: aetherion-config } }]
+          env:
+            - { name: ROLE, value: "crew-scheduling" }
+            - { name: FAULT_MODE, value: "none" }
+            - { name: PGHOST, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: PGHOST } } }
+            - { name: PGUSER, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: PGUSER } } }
+            - { name: PGPASSWORD, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: PGPASSWORD } } }
+            - { name: APPLICATIONINSIGHTS_CONNECTION_STRING, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: APPLICATIONINSIGHTS_CONNECTION_STRING } } }
+          readinessProbe: { httpGet: { path: /health/ready, port: 8080 }, initialDelaySeconds: 5, periodSeconds: 10 }
+          livenessProbe: { httpGet: { path: /health/live, port: 8080 }, initialDelaySeconds: 10, periodSeconds: 10 }
+          resources: { requests: { cpu: "100m", memory: "128Mi" }, limits: { cpu: "500m", memory: "256Mi" } }
+---
+apiVersion: v1
+kind: Service
+metadata: { name: crew-scheduling, namespace: aetherion }
+spec:
+  selector: { app: crew-scheduling }
+  ports: [{ port: 80, targetPort: 8080 }]
+---
+# ---------------- booking & check-in ----------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: booking
+  namespace: aetherion
+  labels: { app: booking, tier: service }
+spec:
+  replicas: 2
+  selector: { matchLabels: { app: booking } }
+  template:
+    metadata:
+      labels: { app: booking, tier: service }
+    spec:
+      containers:
+        - name: booking
+          image: REPLACE_ACR/aetherion-airops:latest
+          ports: [{ containerPort: 8080 }]
+          envFrom: [{ configMapRef: { name: aetherion-config } }]
+          env:
+            - { name: ROLE, value: "booking" }
+            - { name: FAULT_MODE, value: "none" }
+            - { name: PGHOST, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: PGHOST } } }
+            - { name: PGUSER, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: PGUSER } } }
+            - { name: PGPASSWORD, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: PGPASSWORD } } }
+            - { name: REDIS_HOST, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: REDIS_HOST } } }
+            - { name: REDIS_PASSWORD, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: REDIS_PASSWORD } } }
+            - { name: APPLICATIONINSIGHTS_CONNECTION_STRING, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: APPLICATIONINSIGHTS_CONNECTION_STRING } } }
+          readinessProbe: { httpGet: { path: /health/ready, port: 8080 }, initialDelaySeconds: 5, periodSeconds: 10 }
+          livenessProbe: { httpGet: { path: /health/live, port: 8080 }, initialDelaySeconds: 10, periodSeconds: 10 }
+          resources: { requests: { cpu: "100m", memory: "128Mi" }, limits: { cpu: "500m", memory: "256Mi" } }
+---
+apiVersion: v1
+kind: Service
+metadata: { name: booking, namespace: aetherion }
+spec:
+  selector: { app: booking }
+  ports: [{ port: 80, targetPort: 8080 }]
+---
+# ---------------- baggage ----------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: baggage
+  namespace: aetherion
+  labels: { app: baggage, tier: service }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: baggage } }
+  template:
+    metadata:
+      labels: { app: baggage, tier: service }
+    spec:
+      containers:
+        - name: baggage
+          image: REPLACE_ACR/aetherion-airops:latest
+          ports: [{ containerPort: 8080 }]
+          env:
+            - { name: ROLE, value: "baggage" }
+            - { name: FAULT_MODE, value: "none" }
+            - { name: APPLICATIONINSIGHTS_CONNECTION_STRING, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: APPLICATIONINSIGHTS_CONNECTION_STRING } } }
+          readinessProbe: { httpGet: { path: /health/ready, port: 8080 }, initialDelaySeconds: 5, periodSeconds: 10 }
+          livenessProbe: { httpGet: { path: /health/live, port: 8080 }, initialDelaySeconds: 10, periodSeconds: 10 }
+          resources: { requests: { cpu: "50m", memory: "96Mi" }, limits: { cpu: "300m", memory: "192Mi" } }
+---
+apiVersion: v1
+kind: Service
+metadata: { name: baggage, namespace: aetherion }
+spec:
+  selector: { app: baggage }
+  ports: [{ port: 80, targetPort: 8080 }]
+---
+# ---------------- telemetry-ingest ----------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: telemetry-ingest
+  namespace: aetherion
+  labels: { app: telemetry-ingest, tier: service }
+spec:
+  replicas: 2
+  selector: { matchLabels: { app: telemetry-ingest } }
+  template:
+    metadata:
+      labels: { app: telemetry-ingest, tier: service }
+    spec:
+      containers:
+        - name: telemetry-ingest
+          image: REPLACE_ACR/aetherion-airops:latest
+          ports: [{ containerPort: 8080 }]
+          envFrom: [{ configMapRef: { name: aetherion-config } }]
+          env:
+            - { name: ROLE, value: "telemetry-ingest" }
+            - { name: FAULT_MODE, value: "none" }
+            - { name: PGHOST, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: PGHOST } } }
+            - { name: PGUSER, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: PGUSER } } }
+            - { name: PGPASSWORD, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: PGPASSWORD } } }
+            - { name: APPLICATIONINSIGHTS_CONNECTION_STRING, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: APPLICATIONINSIGHTS_CONNECTION_STRING } } }
+          readinessProbe: { httpGet: { path: /health/ready, port: 8080 }, initialDelaySeconds: 5, periodSeconds: 10 }
+          livenessProbe: { httpGet: { path: /health/live, port: 8080 }, initialDelaySeconds: 10, periodSeconds: 10 }
+          resources: { requests: { cpu: "100m", memory: "128Mi" }, limits: { cpu: "400m", memory: "256Mi" } }
+---
+apiVersion: v1
+kind: Service
+metadata: { name: telemetry-ingest, namespace: aetherion }
+spec:
+  selector: { app: telemetry-ingest }
+  ports: [{ port: 80, targetPort: 8080 }]
+---
+# ---------------- Horizontal Pod Autoscalers ----------------
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata: { name: crew-scheduling, namespace: aetherion }
+spec:
+  scaleTargetRef: { apiVersion: apps/v1, kind: Deployment, name: crew-scheduling }
+  minReplicas: 2
+  maxReplicas: 6
+  metrics:
+    - type: Resource
+      resource: { name: cpu, target: { type: Utilization, averageUtilization: 70 } }
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata: { name: booking, namespace: aetherion }
+spec:
+  scaleTargetRef: { apiVersion: apps/v1, kind: Deployment, name: booking }
+  minReplicas: 2
+  maxReplicas: 6
+  metrics:
+    - type: Resource
+      resource: { name: cpu, target: { type: Utilization, averageUtilization: 70 } }

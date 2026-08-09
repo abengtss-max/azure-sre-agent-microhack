@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aetherion AirOps — Global Operations Center</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">✈</span>
+      <div>
+        <h1>Aetherion AirOps</h1>
+        <span class="tagline">Global Operations Center</span>
+      </div>
+    </div>
+    <div class="status-pill" id="overall">
+      <span class="dot" id="overallDot"></span>
+      <span id="overallText">Connecting…</span>
+    </div>
+    <div class="clock" id="clock">--:--:--</div>
+  </header>
+
+  <!-- Executive operations ribbon -->
+  <section class="ribbon" id="ribbon">
+    <div class="ribbon-item"><span class="rv" id="rbFlights">—</span><span class="rl">Flights Active</span></div>
+    <div class="ribbon-item"><span class="rv" id="rbPax">—</span><span class="rl">Passengers In Transit</span></div>
+    <div class="ribbon-item"><span class="rv" id="rbAirports">—</span><span class="rl">Airports Connected</span></div>
+    <div class="ribbon-item"><span class="rv" id="rbAircraft">—</span><span class="rl">Aircraft Tracked</span></div>
+    <div class="ribbon-item"><span class="rv" id="rbIncidents">—</span><span class="rl">Active Incidents</span></div>
+    <div class="ribbon-item"><span class="rv" id="rbSla">—</span><span class="rl">SLA (24h)</span></div>
+  </section>
+
+  <main>
+    <!-- Primary "react" row: overall risk + live service health, above the fold -->
+    <section class="primary">
+      <div class="panel risk" id="riskPanel">
+        <h2>Operational Risk</h2>
+        <div class="risk-level" id="riskLevel">—</div>
+        <div class="risk-score"><span id="riskScore">0</span><span class="risk-max">/100</span></div>
+        <div class="gauge"><div class="gauge-fill" id="gaugeFill"></div></div>
+        <p class="hint">Composite 0&ndash;100 score of platform risk, computed live from service outages and latency. <b>LOW</b> = healthy, <b>MEDIUM/HIGH</b> = act now.</p>
+      </div>
+      <div class="panel health-panel">
+        <h2>Service Health</h2>
+        <p class="hint">Live status of the five core platform services — this is your first signal when something breaks.</p>
+        <section class="tiles" id="tiles"></section>
+      </div>
+    </section>
+
+    <!-- Operational health metrics -->
+    <h3 class="section-label">Operational Metrics</h3>
+    <section class="metrics" id="metrics">
+      <div class="metric"><span class="mv" id="mP95">—</span><span class="ml">P95 Latency</span></div>
+      <div class="metric"><span class="mv" id="mErr">—</span><span class="ml">Error Rate</span></div>
+      <div class="metric"><span class="mv" id="mRpm">—</span><span class="ml">Requests / min</span></div>
+      <div class="metric"><span class="mv" id="mAvail">—</span><span class="ml">Availability</span></div>
+    </section>
+
+    <!-- Incidents + business impact -->
+    <section class="panels">
+      <div class="panel">
+        <h2>Active Incidents</h2>
+        <ul class="incidents" id="incidents"><li class="muted">No active incidents.</li></ul>
+      </div>
+      <div class="panel impact">
+        <h2>Business Impact</h2>
+        <p class="hint">Estimated impact while services are degraded.</p>
+        <div class="impact-grid">
+          <div><span class="iv" id="impRevenue">$0</span><span class="il">Est. Revenue Impact</span></div>
+          <div><span class="iv" id="impPax">0</span><span class="il">Passengers Impacted</span></div>
+          <div><span class="iv" id="impFlights">0</span><span class="il">Flights Delayed</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Global operations map (context / situational awareness) -->
+    <section class="panel map-panel">
+      <h2>Global Flight Operations</h2>
+      <p class="hint">Live network traffic. Highlighted corridors are bound to platform services and change color with real service health.</p>
+      <div class="map-wrap">
+        <svg id="map" viewBox="0 0 1000 440" preserveAspectRatio="xMidYMid meet" aria-label="Global flight map"></svg>
+      </div>
+      <div class="map-legend">
+        <span><i class="lg green"></i> Nominal</span>
+        <span><i class="lg amber"></i> Degraded</span>
+        <span><i class="lg red"></i> Disrupted</span>
+        <span class="legend-note">Colored corridors = monitored services · faint routes = ambient traffic</span>
+      </div>
+    </section>
+
+    <!-- Feed + flight board -->
+    <section class="panels">
+      <div class="panel">
+        <h2>Operations Feed</h2>
+        <ul class="feed" id="feed"></ul>
+      </div>
+      <div class="panel">
+        <h2>Live Flight Board</h2>
+        <table id="flightBoard">
+          <thead><tr><th>Flight</th><th>From</th><th>To</th><th>Status</th></tr></thead>
+          <tbody id="flightRows"><tr><td colspan="4">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Detailed service latency table -->
+    <section class="full">
+      <div class="panel">
+        <h2>Service Health Detail</h2>
+        <table>
+          <thead><tr><th>Service</th><th>State</th><th>Latency</th></tr></thead>
+          <tbody id="healthRows"><tr><td colspan="3">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>Aetherion AirOps — fictional MicroHack environment</span>
+    <span id="pollInfo">polling every 2s</span>
+  </footer>
+
+  <script src="/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aetherion AirOps &middot; Azure SRE Agent MicroHack</title>
+  <meta name="description" content="Hands-on MicroHack: use the Azure SRE Agent to detect, diagnose and resolve live incidents on the Aetherion AirOps aviation platform." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="nav">
+    <div class="wrap">
+      <div class="brand"><span class="dot"></span> Aetherion AirOps</div>
+      <nav>
+        <a href="#start">Get started</a>
+        <a href="#workflow">Workflow</a>
+        <a href="#challenges">Challenges</a>
+        <a href="#knowledge">Knowledge base</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <!-- HERO -->
+    <div class="hero">
+      <div class="eyebrow">Azure SRE Agent &middot; MicroHack</div>
+      <h1>Keep Aetherion AirOps flying.</h1>
+      <p class="lead">
+        Aetherion AirOps is a Tier&nbsp;0 aviation operations platform &mdash; flight ops,
+        crew scheduling, reservations, baggage and telemetry &mdash; running on Azure
+        Kubernetes Service behind API Management. In this MicroHack you injected incidents
+        one at a time and use the <strong>Azure SRE Agent</strong> to detect, diagnose and
+        resolve them, grounded in real runbooks.
+      </p>
+      <div class="cta">
+        <a class="btn primary" href="#start">Start the MicroHack</a>
+        <a class="btn" href="#challenges">Jump to challenges</a>
+      </div>
+    </div>
+
+    <!-- GET STARTED -->
+    <section id="start">
+      <h2>Get started</h2>
+      <p class="sub">Everything you need before challenge&nbsp;1.</p>
+
+      <div class="grid two">
+        <div class="card">
+          <h3>1. Open the Ops Center</h3>
+          <p>Your live dashboard shows service health, an operational-risk gauge, a flight
+             map, incidents and business impact. Your facilitator shares the exact HTTPS URL
+             (it looks like <code>https://sreagenthack-XXXXX.&lt;region&gt;.cloudapp.azure.com</code>).</p>
+        </div>
+        <div class="card">
+          <h3>2. Connect the SRE Agent</h3>
+          <p>In the Azure portal, attach the <code>aetherion-sre-agent</code> to the
+             resource group. Begin in <strong>Reader</strong> (read-only), then switch to
+             <strong>Review</strong> (approval-gated) when you are ready to let it act.</p>
+        </div>
+        <div class="card">
+          <h3>3. Open Grafana</h3>
+          <p>Azure Managed Grafana is wired to Azure Monitor / Application Insights for
+             metrics, traces and logs. Use it to corroborate what the agent tells you.</p>
+        </div>
+        <div class="card">
+          <h3>4. Have the repo handy</h3>
+          <p>The <code>start-challenge</code> / <code>check-challenge</code> scripts live in
+             the repo under <code>scripts/</code>. Run them from a terminal with
+             <code>kubectl</code> pointed at the <code>aetherion-aks</code> cluster.</p>
+        </div>
+      </div>
+
+      <div class="note" style="margin-top:16px">
+        The SRE Agent is <strong>never simulated</strong>. The scripts only inject faults and
+        grade your fix &mdash; the detection and diagnosis are genuinely the agent's job.
+      </div>
+    </section>
+
+    <!-- WORKFLOW -->
+    <section id="workflow">
+      <h2>Self-serve workflow</h2>
+      <p class="sub">Two commands drive every challenge. Progress unlocks linearly.</p>
+
+      <div class="grid two">
+        <div class="card">
+          <h3><code>start-challenge N</code></h3>
+          <p>Injects the incident for challenge <em>N</em> &mdash; the root cause stays hidden.
+             You get a customer-style alert, nothing more.</p>
+          <pre><code>./scripts/start-challenge.ps1 1</code></pre>
+        </div>
+        <div class="card">
+          <h3><code>check-challenge N</code></h3>
+          <p>Grades your remediation against live cluster / APIM state. Passing unlocks the
+             next challenge. Symptom-only or "wait it out" fixes will not pass.</p>
+          <pre><code>./scripts/check-challenge.ps1 1</code></pre>
+        </div>
+      </div>
+
+      <div class="note warn" style="margin-top:16px">
+        Do <strong>not</strong> read the fault-injection scripts while a challenge is open &mdash;
+        that spoils the diagnosis. Let the SRE Agent find the root cause.
+      </div>
+    </section>
+
+    <!-- CHALLENGES -->
+    <section id="challenges">
+      <h2>The challenges</h2>
+      <p class="sub">One continuous storyline &mdash; work top to bottom. Challenges 2 and 3 are
+         a single ongoing incident seen in three phases; each fault persists until you truly fix it.</p>
+
+      <details class="challenge" open>
+        <summary>
+          <span class="num">1</span>
+          <span>
+            <div class="title">Welcome &amp; Operational Baseline</div>
+            <div class="meta">Connect read-only, learn the estate, then capture a healthy baseline</div>
+          </span>
+          <span class="pill config">Config</span>
+        </summary>
+        <div class="body">
+          <p>You are the new reliability team for a global airline platform. Connect the SRE
+             Agent in <strong>Reader</strong> + <strong>Review</strong>, let it enumerate the
+             estate, and confirm a write request asks for approval. Then record a full healthy
+             readout &mdash; deployments, replica counts and typical check-in latency &mdash; so
+             you can spot deviations later.</p>
+          <div class="label">Objective</div>
+          <p>Agent connected read-only, all services healthy, Grafana open, baseline captured.</p>
+          <div class="label">Run</div>
+          <pre><code>./scripts/start-challenge.ps1 1
+./scripts/check-challenge.ps1 1   # self-attest</code></pre>
+        </div>
+      </details>
+
+      <details class="challenge">
+        <summary>
+          <span class="num">2</span>
+          <span>
+            <div class="title">Detect &amp; Investigate the Check-In Degradation</div>
+            <div class="meta">Detect the symptom, then read-only root-cause analysis</div>
+          </span>
+          <span class="pill fault">Fault</span>
+        </summary>
+        <div class="body">
+          <p>Online check-in slows as a passenger surge builds. Capture evidence that booking
+             latency is abnormal versus your baseline &mdash; and change nothing. Then correlate
+             latency with CPU and replica count to separate added, load-independent latency from
+             genuine capacity pressure and form an evidence-backed hypothesis.</p>
+          <div class="label">Success</div>
+          <p>Symptom documented with evidence and a defensible root-cause hypothesis; no change made.</p>
+          <div class="label">Run</div>
+          <pre><code>./scripts/start-challenge.ps1 2
+./scripts/check-challenge.ps1 2   # self-attest</code></pre>
+        </div>
+      </details>
+
+      <details class="challenge">
+        <summary>
+          <span class="num">3</span>
+          <span>
+            <div class="title">Controlled Recovery &amp; the Deployment That Changed Everything</div>
+            <div class="meta">Governed remediation, then correlate a total failure with a change</div>
+          </span>
+          <span class="pill fault">Fault</span>
+        </summary>
+        <div class="body">
+          <p>Get the agent's plan first, then apply the least-disruptive fix via on-behalf-of
+             approval or a narrow role &mdash; clear the added latency and let autoscaling absorb
+             load. Then the flight board goes dark: correlate the failure with rollout and
+             repository history and apply a reversible rollback, not a rebuild.</p>
+          <div class="label">Success</div>
+          <p>Booking healthy at baseline latency and flight-ops serving data again; every write governed.</p>
+          <div class="label">Run</div>
+          <pre><code>./scripts/start-challenge.ps1 3
+./scripts/check-challenge.ps1 3</code></pre>
+        </div>
+      </details>
+
+      <details class="challenge">
+        <summary>
+          <span class="num">4</span>
+          <span>
+            <div class="title">Give the Agent Aetherion's Operational Knowledge</div>
+            <div class="meta">Grounding turns generic advice into your guardrails</div>
+          </span>
+          <span class="pill fault">Fault</span>
+        </summary>
+        <div class="body">
+          <p>Crew scheduling starves its connection pool. Load the <a href="#knowledge">knowledge
+             base</a> so the agent cites the sanctioned fix &mdash; scale, never delete the database.</p>
+          <div class="label">Success</div>
+          <p>crew-scheduling healthy; the database was never touched.</p>
+          <div class="label">Run</div>
+          <pre><code>./scripts/start-challenge.ps1 4
+./scripts/check-challenge.ps1 4</code></pre>
+        </div>
+      </details>
+
+      <details class="challenge">
+        <summary>
+          <span class="num">5</span>
+          <span>
+            <div class="title">Build a Specialist &amp; Encode a Reusable Skill</div>
+            <div class="meta">A custom subagent, and a skill that encodes the sanctioned recovery</div>
+          </span>
+          <span class="pill config">Config</span>
+        </summary>
+        <div class="body">
+          <p>Create a scoped subagent for AKS triage of the aetherion namespace and invoke it
+             with <code>/agent</code>. Then author a skill that encodes the crew-scheduling
+             pool-relief recovery &mdash; scale, never delete the database, keep writes under
+             approval. Understand subagent (invoked) vs skill (auto-loaded).</p>
+          <div class="label">Run</div>
+          <pre><code>./scripts/start-challenge.ps1 5
+./scripts/check-challenge.ps1 5   # self-attest</code></pre>
+        </div>
+      </details>
+
+      <details class="challenge">
+        <summary>
+          <span class="num">6</span>
+          <span>
+            <div class="title">Cost-Aware Operating Model &amp; Autonomous Recovery</div>
+            <div class="meta">Govern the agent's consumption, then let it recover a bounded incident</div>
+          </span>
+          <span class="pill fault">Fault</span>
+        </summary>
+        <div class="body">
+          <p>Review the agent's consumption by thread type and purpose and write a balanced
+             operating model &mdash; cost, isolation, RBAC and ownership; balanced, not cheapest.
+             Then the baggage service returns errors on a slice of traffic: grant a bounded
+             autonomous posture and let the agent recover it end-to-end while you supervise.
+             Don't fix it by hand.</p>
+          <div class="label">Success</div>
+          <p>A defensible operating model, and baggage healthy again &mdash; remediated autonomously within guardrails.</p>
+          <div class="label">Run</div>
+          <pre><code>./scripts/start-challenge.ps1 6
+./scripts/check-challenge.ps1 6</code></pre>
+        </div>
+      </details>
+
+      <details class="challenge">
+        <summary>
+          <span class="num">7</span>
+          <span>
+            <div class="title">Final Incident: Restore Global Check-In Before Peak Departure</div>
+            <div class="meta">Multiple faults at once under a surge</div>
+          </span>
+          <span class="pill boss">Boss</span>
+        </summary>
+        <div class="body">
+          <p>A dark flight board, degraded crew and check-in, and a throttling front door &mdash;
+             all at once, under load. Triage by business tier, remediate within guardrails, and
+             verify every service.</p>
+          <div class="label">Success</div>
+          <p>Every service healthy and API Management serving 200s again.</p>
+          <div class="label">Run</div>
+          <pre><code>./scripts/start-challenge.ps1 7
+./scripts/check-challenge.ps1 7</code></pre>
+        </div>
+      </details>
+
+      <details class="challenge">
+        <summary>
+          <span class="num">8</span>
+          <span>
+            <div class="title">Boarding Resumes: Brief Airline Leadership</div>
+            <div class="meta">Two artifacts: a leadership briefing and a technical handover</div>
+          </span>
+          <span class="pill config">Config</span>
+        </summary>
+        <div class="body">
+          <p>Draft the incident summary from the agent's action plans, then edit for two
+             audiences and feed lessons learned back into the agent's knowledge.</p>
+          <div class="label">Run</div>
+          <pre><code>./scripts/start-challenge.ps1 8
+./scripts/check-challenge.ps1 8   # self-attest</code></pre>
+        </div>
+      </details>
+    </section>
+
+    <!-- KNOWLEDGE -->
+    <section id="knowledge">
+      <h2>Knowledge base</h2>
+      <p class="sub">Ground the SRE Agent in these runbooks. They mirror the repo <code>knowledge/</code> folder.</p>
+      <div class="grid three">
+        <div class="card"><h3>Architecture</h3><p>Topology, services, dependencies, health model and the HTTPS front door.</p></div>
+        <div class="card"><h3>Ops guide</h3><p>Day-to-day operations, dashboards and how to read the risk signals.</p></div>
+        <div class="card"><h3>Platform standards</h3><p>Guardrails &mdash; connection pools, autoscaling and rate-limit conventions.</p></div>
+        <div class="card"><h3>Runbook &middot; AKS</h3><p>Restarting, rolling back and inspecting workloads on the cluster.</p></div>
+        <div class="card"><h3>Runbook &middot; APIM</h3><p>Diagnosing 429s, rate-limit policies and restoring product defaults.</p></div>
+        <div class="card"><h3>Runbook &middot; Database</h3><p>PostgreSQL connection-pool guardrails and remediation steps.</p></div>
+      </div>
+    </section>
+  </div>
+
+  <footer>
+    Aetherion AirOps is a fictional teaching platform for the Azure SRE Agent MicroHack.
+    Fault injection is confined to the challenge scripts and never runs on the customer dashboard.
+  </footer>
+</body>
+</html>

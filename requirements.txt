@@ -1,0 +1,3 @@
+# Documentation site toolchain (Material for MkDocs).
+# Install with: pip install -r requirements.txt
+mkdocs-material>=9.5

@@ -1,0 +1,20 @@
+{
+  "name": "aetherion-airops",
+  "version": "1.0.0",
+  "description": "Aetherion AirOps - multi-role aviation operations microservice + Ops Center GUI for the Azure SRE Agent MicroHack",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "applicationinsights": "^2.9.5",
+    "express": "^4.19.2",
+    "pg": "^8.12.0",
+    "redis": "^4.7.0"
+  },
+  "license": "MIT"
+}

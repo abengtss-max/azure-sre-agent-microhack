@@ -1,0 +1,125 @@
+site_name: Azure SRE Agent MicroHack
+site_description: >-
+  Hands-on MicroHack: use the Azure SRE Agent to detect, investigate and recover
+  live incidents on the Aetherion AirOps Tier-0 aviation platform.
+site_author: Aetherion AirOps Reliability Engineering
+docs_dir: docs
+# Internal prerequisites page is kept in the repo but not published to the site.
+exclude_docs: |
+  getting-started/prerequisites.md
+site_url: https://abengtss-max.github.io/azure-sre-agent-microhack/
+repo_url: https://github.com/abengtss-max/azure-sre-agent-microhack
+repo_name: abengtss-max/azure-sre-agent-microhack
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  custom_dir: overrides
+  language: en
+  palette:
+    # Dark (Fluent neutral grey) is the default; light is available via the toggle.
+    - scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-night
+        name: Switch to light mode
+    - scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
+  font:
+    text: Inter
+    code: JetBrains Mono
+  logo: assets/sre-agent-logo.png
+  favicon: assets/favicon.png
+  icon:
+    repo: fontawesome/brands/github
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.indexes
+    - navigation.top
+    - navigation.footer
+    - navigation.tracking
+    - navigation.instant
+    - navigation.instant.progress
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.code.copy
+    - content.code.annotate
+    - content.tooltips
+
+extra_css:
+  - stylesheets/extra.css
+
+extra_javascript:
+  - javascripts/progress.js
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets:
+      auto_append:
+        - includes/abbreviations.md
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+
+plugins:
+  - search
+
+nav:
+  - Home: index.md
+  - Get started:
+      - 1 · The scenario: getting-started/overview.md
+      - 2 · Set up the environment: getting-started/environment.md
+      - 3 · Meet the SRE Agent: getting-started/sre-agent-fundamentals.md
+      - 4 · Azure portal walkthrough: getting-started/portal-walkthrough.md
+  - Challenges:
+      - Act I · Foundation:
+          - 01 · Onboard & Baseline: challenges/01-onboard-and-baseline.md
+      - Act II · Human-Guided Operations:
+          - 02 · Detect & Investigate: challenges/02-detect-and-investigate.md
+          - 03 · Controlled Recovery & Change Correlation: challenges/03-controlled-recovery.md
+          - 04 · Ground the Agent: challenges/04-ground-the-agent.md
+      - Act III · Agent Engineering:
+          - 05 · Engineer the Agent (Subagent + Skill): challenges/05-engineer-the-agent.md
+      - Act IV · Autonomous & Cost:
+          - 06 · Autonomous Recovery & Cost Governance: challenges/06-autonomous-and-cost.md
+      - Act V · Major Incident:
+          - 07 · Final Major Incident: challenges/07-major-incident.md
+          - 08 · Leadership Briefing: challenges/08-leadership-briefing.md
+      - Finish: challenges/finish.md
+  - Reference:
+      - Architecture: reference/architecture.md
+      - Service Catalog: reference/service-catalog.md
+      - Integrations: reference/integrations.md
+      - Commands: reference/commands.md
+      - Troubleshooting: reference/troubleshooting.md
+      - Glossary: reference/glossary.md

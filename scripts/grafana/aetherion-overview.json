@@ -1,0 +1,362 @@
+{
+  "uid": "aetherion-overview",
+  "title": "Aetherion AirOps \u2014 Environment Overview",
+  "tags": ["aetherion", "microhack"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "editable": true,
+  "refresh": "30s",
+  "time": { "from": "now-1h", "to": "now" },
+  "templating": { "list": [] },
+  "annotations": { "list": [] },
+  "panels": [
+    {
+      "id": 1,
+      "type": "row",
+      "title": "Application (API Management \u2192 AKS gateway)",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "collapsed": false
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "Request rate (requests / interval)",
+      "description": "Total incoming requests recorded by Application Insights.",
+      "datasource": { "type": "grafana-azure-monitor-datasource", "uid": "__DS_UID__" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 1 },
+      "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 20, "lineWidth": 2 }, "unit": "short" }, "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi" } },
+      "targets": [
+        {
+          "refId": "A",
+          "queryType": "Azure Monitor",
+          "datasource": { "type": "grafana-azure-monitor-datasource", "uid": "__DS_UID__" },
+          "subscription": "__SUB_ID__",
+          "azureMonitor": {
+            "resources": [ { "subscription": "__SUB_ID__", "resourceGroup": "__RG__", "resourceName": "__APPI__", "metricNamespace": "microsoft.insights/components" } ],
+            "metricNamespace": "microsoft.insights/components",
+            "metricName": "requests/count",
+            "aggregation": "Count",
+            "timeGrain": "auto"
+          }
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "Server response time (avg ms)",
+      "description": "Average server-side request duration.",
+      "datasource": { "type": "grafana-azure-monitor-datasource", "uid": "__DS_UID__" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 1 },
+      "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 10, "lineWidth": 2 }, "unit": "ms" }, "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi" } },
+      "targets": [
+        {
+          "refId": "A",
+          "queryType": "Azure Monitor",
+          "datasource": { "type": "grafana-azure-monitor-datasource", "uid": "__DS_UID__" },
+          "subscription": "__SUB_ID__",
+          "azureMonitor": {
+            "resources": [ { "subscription": "__SUB_ID__", "resourceGroup": "__RG__", "resourceName": "__APPI__", "metricNamespace": "microsoft.insights/components" } ],
+            "metricNamespace": "microsoft.insights/components",
+            "metricName": "requests/duration",
+            "aggregation": "Average",
+            "timeGrain": "auto"
+          }
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "Failed requests",
+      "description": "Requests that returned a failure result code.",
+      "datasource": { "type": "grafana-azure-monitor-datasource", "uid": "__DS_UID__" },
+      "gridPos": { "h": 6, "w": 8, "x": 0, "y": 9 },
+      "fieldConfig": { "defaults": { "unit": "short", "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color": "red", "value": 1 } ] } }, "overrides": [] },
+      "options": { "colorMode": "background", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false } },
+      "targets": [
+        {
+          "refId": "A",
+          "queryType": "Azure Monitor",
+          "datasource": { "type": "grafana-azure-monitor-datasource", "uid": "__DS_UID__" },
+          "subscription": "__SUB_ID__",
+          "azureMonitor": {
+            "resources": [ { "subscription": "__SUB_ID__", "resourceGroup": "__RG__", "resourceName": "__APPI__", "metricNamespace": "microsoft.insights/components" } ],
+            "metricNamespace": "microsoft.insights/components",
+            "metricName": "requests/failed",
+            "aggregation": "Count",
+            "timeGrain": "auto"
+          }
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "AKS node CPU %",
+      "description": "Average CPU utilisation across AKS worker nodes.",
+      "datasource": { "type": "grafana-azure-monitor-datasource", "uid": "__DS_UID__" },
+      "gridPos": { "h": 6, "w": 8, "x": 8, "y": 9 },
+      "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 10, "lineWidth": 2 }, "unit": "percent", "min": 0, "max": 100 }, "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi" } },
+      "targets": [
+        {
+          "refId": "A",
+          "queryType": "Azure Monitor",
+          "datasource": { "type": "grafana-azure-monitor-datasource", "uid": "__DS_UID__" },
+          "subscription": "__SUB_ID__",
+          "azureMonitor": {
+            "resources": [ { "subscription": "__SUB_ID__", "resourceGroup": "__RG__", "resourceName": "__AKS__", "metricNamespace": "microsoft.containerservice/managedclusters" } ],
+            "metricNamespace": "microsoft.containerservice/managedclusters",
+            "metricName": "node_cpu_usage_percentage",
+            "aggregation": "Average",
+            "timeGrain": "auto"
+          }
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "AKS node memory %",
+      "description": "Average working-set memory across AKS worker nodes.",
+      "datasource": { "type": "grafana-azure-monitor-datasource", "uid": "__DS_UID__" },
+      "gridPos": { "h": 6, "w": 8, "x": 16, "y": 9 },
+      "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 10, "lineWidth": 2 }, "unit": "percent", "min": 0, "max": 100 }, "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi" } },
+      "targets": [
+        {
+          "refId": "A",
+          "queryType": "Azure Monitor",
+          "datasource": { "type": "grafana-azure-monitor-datasource", "uid": "__DS_UID__" },
+          "subscription": "__SUB_ID__",
+          "azureMonitor": {
+            "resources": [ { "subscription": "__SUB_ID__", "resourceGroup": "__RG__", "resourceName": "__AKS__", "metricNamespace": "microsoft.containerservice/managedclusters" } ],
+            "metricNamespace": "microsoft.containerservice/managedclusters",
+            "metricName": "node_memory_working_set_percentage",
+            "aggregation": "Average",
+            "timeGrain": "auto"
+          }
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "Running pods",
+      "description": "Number of pods in the Running phase across the cluster.",
+      "datasource": { "type": "grafana-azure-monitor-datasource", "uid": "__DS_UID__" },
+      "gridPos": { "h": 6, "w": 24, "x": 0, "y": 15 },
+      "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 20, "lineWidth": 2 }, "unit": "short" }, "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi" } },
+      "targets": [
+        {
+          "refId": "A",
+          "queryType": "Azure Monitor",
+          "datasource": { "type": "grafana-azure-monitor-datasource", "uid": "__DS_UID__" },
+          "subscription": "__SUB_ID__",
+          "azureMonitor": {
+            "resources": [ { "subscription": "__SUB_ID__", "resourceGroup": "__RG__", "resourceName": "__AKS__", "metricNamespace": "microsoft.containerservice/managedclusters" } ],
+            "metricNamespace": "microsoft.containerservice/managedclusters",
+            "metricName": "kube_pod_status_phase",
+            "aggregation": "Total",
+            "timeGrain": "auto",
+            "dimensionFilters": [ { "dimension": "phase", "operator": "eq", "filters": ["Running"] } ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "type": "row",
+      "title": "Data tier (PostgreSQL) & API gateway (API Management)",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 21 },
+      "collapsed": false
+    },
+    {
+      "id": 9,
+      "type": "timeseries",
+      "title": "PostgreSQL active connections",
+      "description": "Open connections to the Flexible Server. The key signal for the crew-scheduling connection-pool exhaustion challenge.",
+      "datasource": { "type": "grafana-azure-monitor-datasource", "uid": "__DS_UID__" },
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 22 },
+      "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 20, "lineWidth": 2 }, "unit": "short" }, "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi" } },
+      "targets": [
+        {
+          "refId": "A",
+          "queryType": "Azure Monitor",
+          "datasource": { "type": "grafana-azure-monitor-datasource", "uid": "__DS_UID__" },
+          "subscription": "__SUB_ID__",
+          "azureMonitor": {
+            "resources": [ { "subscription": "__SUB_ID__", "resourceGroup": "__RG__", "resourceName": "__PG__", "metricNamespace": "microsoft.dbforpostgresql/flexibleservers" } ],
+            "metricNamespace": "microsoft.dbforpostgresql/flexibleservers",
+            "metricName": "active_connections",
+            "aggregation": "Average",
+            "timeGrain": "auto"
+          }
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "type": "timeseries",
+      "title": "PostgreSQL CPU %",
+      "description": "Database CPU utilisation.",
+      "datasource": { "type": "grafana-azure-monitor-datasource", "uid": "__DS_UID__" },
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 22 },
+      "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 10, "lineWidth": 2 }, "unit": "percent", "min": 0, "max": 100 }, "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi" } },
+      "targets": [
+        {
+          "refId": "A",
+          "queryType": "Azure Monitor",
+          "datasource": { "type": "grafana-azure-monitor-datasource", "uid": "__DS_UID__" },
+          "subscription": "__SUB_ID__",
+          "azureMonitor": {
+            "resources": [ { "subscription": "__SUB_ID__", "resourceGroup": "__RG__", "resourceName": "__PG__", "metricNamespace": "microsoft.dbforpostgresql/flexibleservers" } ],
+            "metricNamespace": "microsoft.dbforpostgresql/flexibleservers",
+            "metricName": "cpu_percent",
+            "aggregation": "Average",
+            "timeGrain": "auto"
+          }
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "type": "timeseries",
+      "title": "APIM requests by gateway response code",
+      "description": "Requests split by response category. 4xx spikes reveal the API Management throttling / rate-limit challenge (HTTP 429).",
+      "datasource": { "type": "grafana-azure-monitor-datasource", "uid": "__DS_UID__" },
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 22 },
+      "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 20, "lineWidth": 2, "stacking": { "mode": "normal" } }, "unit": "short" }, "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi" } },
+      "targets": [
+        {
+          "refId": "A",
+          "queryType": "Azure Monitor",
+          "datasource": { "type": "grafana-azure-monitor-datasource", "uid": "__DS_UID__" },
+          "subscription": "__SUB_ID__",
+          "azureMonitor": {
+            "resources": [ { "subscription": "__SUB_ID__", "resourceGroup": "__RG__", "resourceName": "__APIM__", "metricNamespace": "microsoft.apimanagement/service" } ],
+            "metricNamespace": "microsoft.apimanagement/service",
+            "metricName": "Requests",
+            "aggregation": "Total",
+            "timeGrain": "auto",
+            "dimensionFilters": [ { "dimension": "GatewayResponseCodeCategory", "operator": "eq", "filters": [] } ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "type": "row",
+      "title": "Application Insights \u2014 live telemetry (Log Analytics, ~1\u20132 min freshness)",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 30 },
+      "collapsed": false
+    },
+    {
+      "id": 13,
+      "type": "timeseries",
+      "title": "Requests vs failures (per minute)",
+      "description": "Live request volume and failed requests straight from Application Insights telemetry.",
+      "datasource": { "type": "grafana-azure-monitor-datasource", "uid": "__DS_UID__" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 31 },
+      "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 15, "lineWidth": 2 }, "unit": "short" }, "overrides": [ { "matcher": { "id": "byName", "options": "Failed" }, "properties": [ { "id": "color", "value": { "mode": "fixed", "fixedColor": "red" } } ] } ] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi" } },
+      "targets": [
+        {
+          "refId": "A",
+          "queryType": "Azure Log Analytics",
+          "datasource": { "type": "grafana-azure-monitor-datasource", "uid": "__DS_UID__" },
+          "azureLogAnalytics": {
+            "resources": [ "__LAW_ID__" ],
+            "resultFormat": "time_series",
+            "query": "AppRequests | where $__timeFilter(TimeGenerated) | summarize Requests=count(), Failed=countif(Success == false) by bin(TimeGenerated, 1m) | order by TimeGenerated asc"
+          }
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "type": "timeseries",
+      "title": "Request duration percentiles (p50 / p95 / p99)",
+      "description": "Server-side latency distribution from Application Insights. p95/p99 spikes reveal the latency-injection challenges.",
+      "datasource": { "type": "grafana-azure-monitor-datasource", "uid": "__DS_UID__" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 31 },
+      "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 10, "lineWidth": 2 }, "unit": "ms" }, "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi" } },
+      "targets": [
+        {
+          "refId": "A",
+          "queryType": "Azure Log Analytics",
+          "datasource": { "type": "grafana-azure-monitor-datasource", "uid": "__DS_UID__" },
+          "azureLogAnalytics": {
+            "resources": [ "__LAW_ID__" ],
+            "resultFormat": "time_series",
+            "query": "AppRequests | where $__timeFilter(TimeGenerated) | summarize p50=percentile(DurationMs,50), p95=percentile(DurationMs,95), p99=percentile(DurationMs,99) by bin(TimeGenerated, 1m) | order by TimeGenerated asc"
+          }
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "type": "timeseries",
+      "title": "Exceptions per minute",
+      "description": "Application exceptions from Application Insights. Lights up during the error / crash challenges.",
+      "datasource": { "type": "grafana-azure-monitor-datasource", "uid": "__DS_UID__" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 39 },
+      "fieldConfig": { "defaults": { "custom": { "drawStyle": "bars", "fillOpacity": 60, "lineWidth": 1 }, "unit": "short", "color": { "mode": "fixed", "fixedColor": "red" } }, "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "single" } },
+      "targets": [
+        {
+          "refId": "A",
+          "queryType": "Azure Log Analytics",
+          "datasource": { "type": "grafana-azure-monitor-datasource", "uid": "__DS_UID__" },
+          "azureLogAnalytics": {
+            "resources": [ "__LAW_ID__" ],
+            "resultFormat": "time_series",
+            "query": "AppExceptions | where $__timeFilter(TimeGenerated) | summarize Exceptions=count() by bin(TimeGenerated, 1m) | order by TimeGenerated asc"
+          }
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "type": "table",
+      "title": "Top failing operations (last selected window)",
+      "description": "Which endpoints are failing right now \u2014 the fastest way to point learners at the broken service.",
+      "datasource": { "type": "grafana-azure-monitor-datasource", "uid": "__DS_UID__" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 39 },
+      "fieldConfig": { "defaults": { "custom": { "align": "auto" } }, "overrides": [] },
+      "options": { "showHeader": true },
+      "targets": [
+        {
+          "refId": "A",
+          "queryType": "Azure Log Analytics",
+          "datasource": { "type": "grafana-azure-monitor-datasource", "uid": "__DS_UID__" },
+          "azureLogAnalytics": {
+            "resources": [ "__LAW_ID__" ],
+            "resultFormat": "table",
+            "query": "AppRequests | where $__timeFilter(TimeGenerated) | summarize Total=count(), Failed=countif(Success == false) by OperationName | where Failed > 0 | order by Failed desc | take 10"
+          }
+        }
+      ]
+    },
+    {
+      "id": 17,
+      "type": "text",
+      "title": "Need the per-second live stream?",
+      "description": "Log Analytics panels above refresh every ~1\u20132 min. For the true sub-second stream, open Application Insights Live Metrics.",
+      "gridPos": { "h": 3, "w": 24, "x": 0, "y": 47 },
+      "options": {
+        "mode": "markdown",
+        "content": "### \ud83d\udd34 Live Metrics (sub-second stream)\nThe panels above are near-real-time (~1\u20132 min). For the instant-by-instant view as you inject a fault, open **[Application Insights \u2192 Live Metrics](https://portal.azure.com/#@__TENANT__/resource/subscriptions/__SUB_ID__/resourceGroups/__RG__/providers/Microsoft.Insights/components/__APPI__/quickPulse)** in the Azure portal."
+      }
+    }
+  ]
+}
