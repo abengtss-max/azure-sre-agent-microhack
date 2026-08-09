@@ -1429,17 +1429,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#inside-the-azure-sre-agent" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Inside the Azure SRE Agent
-      
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -1666,17 +1655,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#inside-the-azure-sre-agent" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Inside the Azure SRE Agent
-      
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -1765,27 +1743,6 @@ whole estate.</p>
 <li><strong>Azure Managed <abbr title="Dashboarding tool used here to visualise AKS and Application Insights metrics.">Grafana</abbr></strong> — metrics, traces and autoscaling correlation.</li>
 <li><strong>Azure <abbr title="Azure's record of control-plane changes (who changed what, and when).">Activity Log</abbr> + GitHub</strong> — change history for incident correlation.</li>
 </ul>
-<h2 id="inside-the-azure-sre-agent">Inside the Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent<a class="headerlink" href="#inside-the-azure-sre-agent" title="Permanent link">&para;</a></h2>
-<p>The agent is more than a chat box: it operates in three complementary modes
-(interactive, alert-driven, scheduled), routes work to tier specialists, grounds
-itself in your knowledge and code, remembers past incidents, and can produce
-artifacts from an isolated sandbox.</p>
-<pre class="mermaid"><code>flowchart LR
-    KNOW[Knowledge base] --&gt; AGENT
-    GH[GitHub repo] --&gt; AGENT
-    MON[Azure Monitor · App Insights · Log Analytics] --&gt; AGENT
-    subgraph AGENT[Azure SRE Agent]
-      CHAT[Interactive chat]
-      RESP[Alert-driven response plans]
-      SCHED[Scheduled proactive tasks]
-      SUBS[Sub-agents: AKS / APIM / DB]
-      SKILLS[Skills: versioned runbooks]
-      MEM[Memory &amp;amp; session insights]
-      SANDBOX[Python sandbox: reports/PDF]
-    end
-    AGENT --&gt;|"read: investigate"| ESTATE[APIM · AKS · PostgreSQL · Redis]
-    AGENT --&gt;|"write: remediate — RBAC + approval"| ESTATE</code></pre>
-<p>See the <a href="../service-catalog/">service catalog</a> for the per-service breakdown.</p>
 
 
 
