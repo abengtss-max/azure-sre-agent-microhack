@@ -1408,17 +1408,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#request-and-data-flow" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Request and data flow
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#where-faults-hide" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1656,17 +1645,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#request-and-data-flow" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Request and data flow
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#where-faults-hide" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1731,40 +1709,11 @@ observability and the Azure <abbr title="Site Reliability Engineering — runnin
 </em><em>Click the diagram to open it full size.</em><em> The agent runs governed remediation back into <abbr title="Azure API Management — the API &quot;front door&quot; that authenticates and rate-limits traffic to the services.">APIM</abbr> and <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr>, correlating change via
 Azure <abbr title="Azure's record of control-plane changes (who changed what, and when).">Activity Log</abbr> and GitHub history.</em></p>
 <h2 id="executive-view">Executive view<a class="headerlink" href="#executive-view" title="Permanent link">&para;</a></h2>
-<p>The business-level picture: traffic enters through the API <abbr title="The single public entry point (API Management) through which all client traffic passes.">front door</abbr>, flows to the
-Aetherion AirOps services and their data stores, and the <strong>Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent</strong> watches
-and recovers across all of it — grounded in monitoring, source control and your
-runbooks.</p>
-<pre class="mermaid"><code>flowchart TB
-    OPS[Ops Centers · Airports · Partners] --&gt; FRONT[API front door]
-    FRONT --&gt; APP["Aetherion AirOps services&lt;br/&gt;booking · crew · flight-ops · baggage · telemetry"]
-    APP --&gt; DATA[("Operational data&lt;br/&gt;PostgreSQL · Redis")]
-    SRE[Azure SRE Agent] -. watches &amp;amp; recovers .-&gt; FRONT
-    SRE -. watches &amp;amp; recovers .-&gt; APP
-    SRE -. watches &amp;amp; recovers .-&gt; DATA
-    SRE --- SIG[Monitor · Logs · GitHub · Knowledge]</code></pre>
-<h2 id="request-and-data-flow">Request and data flow<a class="headerlink" href="#request-and-data-flow" title="Permanent link">&para;</a></h2>
-<pre class="mermaid"><code>flowchart LR
-    U[Ops Centers / Airports / Partner APIs] --&gt; APIM[Azure API Management]
-    APIM --&gt; FO[flight-ops svc]
-    APIM --&gt; CS[crew-scheduling svc]
-    APIM --&gt; BK[booking &amp;amp; check-in svc]
-    APIM --&gt; BAG[baggage svc]
-    APIM --&gt; TEL[telemetry-ingest svc]
-    subgraph AKS[Azure Kubernetes Service · namespace aetherion]
-      FO
-      CS
-      BK
-      BAG
-      TEL
-      K6[k6 load generator]
-    end
-    CS --&gt; SQL[(Azure Database for PostgreSQL)]
-    BK --&gt; SQL
-    BK --&gt; REDIS[(Azure Managed Redis)]
-    TEL --&gt; SQL
-    AKS -. metrics/logs .-&gt; AI[Application Insights + Log Analytics]
-    AI -. data source .-&gt; GRAF[Azure Managed Grafana]</code></pre>
+<p><a href="../../assets/architecture/aetherion-executive.png"><img alt="Aetherion AirOps — executive view: business flow and the Azure SRE Agent" class="arch-diagram" loading="lazy" src="../../assets/architecture/aetherion-executive.png" /></a></p>
+<p><em>The business-level picture: traffic enters through the API <abbr title="The single public entry point (API Management) through which all client traffic passes.">front door</abbr>, flows to
+the Aetherion AirOps services and their data, and the </em><em>Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent</em><em> watches
+and recovers across every tier — grounded in monitoring, source control and your
+runbooks. </em><em>Click to open full size.</em>**</p>
 <h2 id="where-faults-hide">Where faults hide<a class="headerlink" href="#where-faults-hide" title="Permanent link">&para;</a></h2>
 <p>The symptom almost always appears at the <strong>edge</strong> (<abbr title="Azure API Management — the API &quot;front door&quot; that authenticates and rate-limits traffic to the services.">APIM</abbr> 5xx or timeouts), but the
 root cause can live in any tier. The hack deliberately rotates incidents across
