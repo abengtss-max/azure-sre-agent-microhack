@@ -41,8 +41,12 @@ source that the Azure SRE Agent connects to for change correlation. Fork it to
 1. Open <https://github.com/abengtss-max/aetherion-airops-platform>
 2. Click **Fork** (keep the default name).
 
-You'll connect the SRE Agent to **your fork** in Challenge 1. Never connect the
-agent to the lab repo — it contains the challenge material.
+You'll connect the SRE Agent to **your fork** in Challenge 1.
+
+!!! danger "Connect the agent to your fork — never to the lab repo"
+    **Never connect the Azure SRE Agent to the lab repo — it contains the
+    challenge material** and would spoil every investigation. Connect the agent
+    **only to your fork of `aetherion-airops-platform`**.
 
 ## 3. Check you have access
 
