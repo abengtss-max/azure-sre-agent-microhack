@@ -1,0 +1,559 @@
+/* ==========================================================================
+   Aetherion AirOps — Microsoft / Azure branded theme for Material for MkDocs.
+   Follows Fluent guidance: neutral surfaces, Azure Blue (#0078D4) as the single
+   brand accent, semantic status colors used sparingly.
+   ========================================================================== */
+
+:root {
+  /* Microsoft / Azure brand palette (Fluent). Neutral surfaces, Azure Blue accent. */
+  --aet-bg:        #1b1a19;
+  --aet-surface:   #242322;
+  --aet-elevated:  #2d2c2b;
+  --aet-border:    rgba(255, 255, 255, 0.09);
+  --aet-azure:     #0078d4;
+  --aet-azure-dk:  #005a9e;
+  --aet-healthy:   #54b054;
+  --aet-warning:   #f7a845;
+  --aet-critical:  #e4626f;
+  --aet-info:      #50b0ff;
+  --aet-text:      #f3f2f1;
+  --aet-muted:     #c8c6c4;
+
+  /* Brand the Material "custom" primary/accent slots with Azure Blue. */
+  --md-primary-fg-color:        var(--aet-azure);
+  --md-primary-fg-color--light: #2b94e8;
+  --md-primary-fg-color--dark:  var(--aet-azure-dk);
+  --md-accent-fg-color:         #2b88d8;
+}
+
+/* ---- Dark scheme (default) tuned to the Ops Center ----------------------- */
+[data-md-color-scheme="slate"] {
+  --md-default-bg-color:      var(--aet-bg);
+  --md-default-fg-color:      var(--aet-text);
+  --md-default-fg-color--light:  rgba(243, 242, 241, 0.72);
+  --md-default-fg-color--lighter: rgba(243, 242, 241, 0.42);
+  --md-code-bg-color:         #201f1e;
+  --md-code-fg-color:         #e8e6e4;
+  --md-typeset-a-color:       var(--aet-info);
+}
+
+[data-md-color-scheme="slate"] .md-header,
+[data-md-color-scheme="slate"] .md-tabs {
+  background: var(--aet-elevated);
+  border-bottom: 1px solid var(--aet-border);
+}
+
+[data-md-color-scheme="slate"] .md-nav__item .md-nav__link--active {
+  color: var(--aet-info);
+}
+
+/* ---- Light scheme (default) — classic Microsoft docs on white ------------ */
+[data-md-color-scheme="default"] {
+  --md-default-bg-color:      #ffffff;
+  --md-default-fg-color:      #201f1e;
+  --md-code-bg-color:         #f3f2f1;
+  --md-code-fg-color:         #24292f;
+  --md-typeset-a-color:       var(--aet-azure);
+  --aet-border:               rgba(0, 0, 0, 0.10);
+}
+
+[data-md-color-scheme="default"] .md-nav__item .md-nav__link--active {
+  color: var(--aet-azure);
+}
+
+/* Hero adapts to a light neutral panel with the Azure top accent. */
+[data-md-color-scheme="default"] .aet-hero {
+  background: #faf9f8;
+  color: #201f1e;
+}
+[data-md-color-scheme="default"] .aet-hero p {
+  color: #4b4a49;
+}
+
+/* Cards get a subtle neutral fill so they lift off the white page. */
+[data-md-color-scheme="default"] .md-typeset .grid.cards > ul > li {
+  background: #faf9f8;
+}
+
+/* Flow pills read as darker Azure text on white for contrast. */
+[data-md-color-scheme="default"] .aet-flow span {
+  color: var(--aet-azure-dk);
+}
+
+/* ---- Section labels (the five Acts) read as small caps ------------------- */
+.md-nav__item--section > .md-nav__link {
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  font-size: .68rem;
+  color: var(--aet-muted);
+}
+
+/* ---- Full-width architecture diagram ------------------------------------ */
+.md-typeset img.arch-diagram {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  margin: 1rem 0 1.2rem;
+  border: 1px solid var(--aet-border);
+  border-radius: 8px;
+}
+
+/* ---- Challenge storyboard hero panel ------------------------------------ */
+.md-typeset img.story-panel {
+  display: block;
+  width: 100%;
+  max-width: 760px;
+  height: auto;
+  margin: 1rem auto 1.4rem;
+  border: 1px solid var(--aet-border);
+  border-radius: 8px;
+}
+
+/* ---- Grid cards on the homepage ----------------------------------------- */
+.md-typeset .grid.cards > ul > li {
+  border: 1px solid var(--aet-border);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.02);
+}
+.md-typeset .grid.cards > ul > li:hover {
+  border-color: var(--aet-azure);
+  box-shadow: none;
+}
+
+/* ---- "Why this matters" value cards — Azure-blue icon chips ------------- */
+.md-typeset .why-cards.grid.cards .twemoji {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  margin-right: .45rem;
+  border-radius: 8px;
+  background: rgba(0, 120, 212, 0.12);
+  color: var(--aet-azure);
+  vertical-align: -0.55rem;
+}
+.md-typeset .why-cards.grid.cards .twemoji svg {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+/* ---- Unify informational admonitions to the Azure brand accent ---------- */
+/* Semantic types (success/warning/danger/failure) keep their status colors. */
+.md-typeset .admonition.note,     .md-typeset details.note,
+.md-typeset .admonition.abstract, .md-typeset details.abstract,
+.md-typeset .admonition.info,     .md-typeset details.info,
+.md-typeset .admonition.tip,      .md-typeset details.tip,
+.md-typeset .admonition.example,  .md-typeset details.example,
+.md-typeset .admonition.question, .md-typeset details.question,
+.md-typeset .admonition.quote,    .md-typeset details.quote {
+  border-color: var(--aet-azure);
+}
+.md-typeset .note > .admonition-title,     .md-typeset .note > summary,
+.md-typeset .abstract > .admonition-title, .md-typeset .abstract > summary,
+.md-typeset .info > .admonition-title,     .md-typeset .info > summary,
+.md-typeset .tip > .admonition-title,      .md-typeset .tip > summary,
+.md-typeset .example > .admonition-title,  .md-typeset .example > summary,
+.md-typeset .question > .admonition-title, .md-typeset .question > summary,
+.md-typeset .quote > .admonition-title,    .md-typeset .quote > summary {
+  background-color: rgba(0, 120, 212, 0.1);
+}
+.md-typeset .note > .admonition-title::before,     .md-typeset .note > summary::before,
+.md-typeset .abstract > .admonition-title::before, .md-typeset .abstract > summary::before,
+.md-typeset .info > .admonition-title::before,     .md-typeset .info > summary::before,
+.md-typeset .tip > .admonition-title::before,      .md-typeset .tip > summary::before,
+.md-typeset .example > .admonition-title::before,  .md-typeset .example > summary::before,
+.md-typeset .question > .admonition-title::before, .md-typeset .question > summary::before,
+.md-typeset .quote > .admonition-title::before,    .md-typeset .quote > summary::before {
+  background-color: var(--aet-azure);
+}
+
+/* ---- Hero block on the homepage ----------------------------------------- */
+.aet-hero {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.2rem 2rem;
+  border: 1px solid var(--aet-border);
+  border-top: 3px solid var(--aet-azure);
+  border-radius: 8px;
+  padding: 2.2rem 2rem;
+  margin: 0 0 1.4rem;
+  color: var(--aet-text);
+  background: var(--aet-surface);
+}
+.aet-hero-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: .6rem;
+  flex: 0 0 auto;
+  width: 150px;
+  padding-right: 1.8rem;
+  border-right: 1px solid var(--aet-border);
+}
+.aet-hero .aet-hero-logo {
+  display: block;
+  width: 88px;
+  height: 88px;
+  margin: 0;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.28));
+}
+.aet-hero-tagline {
+  font-size: .78rem;
+  line-height: 1.35;
+  font-weight: 700;
+  color: var(--md-default-fg-color--light);
+}
+.aet-hero-brand > p {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .6rem;
+}
+.aet-hero-copy {
+  flex: 1 1 320px;
+  min-width: 280px;
+}
+.aet-hero .aet-eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: .72rem;
+  color: var(--aet-azure);
+  font-weight: 700;
+}
+.aet-hero h1 {
+  margin: .2rem 0 .4rem;
+  font-weight: 800;
+}
+.aet-hero p {
+  color: var(--aet-muted);
+  max-width: 62ch;
+}
+@media (max-width: 599px) {
+  .aet-hero-brand {
+    width: 100%;
+    padding: 0 0 1rem;
+    border-right: none;
+    border-bottom: 1px solid var(--aet-border);
+  }
+  .aet-hero-brand > p {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: left;
+    gap: .9rem;
+  }
+  .aet-hero .aet-hero-logo { width: 56px; height: 56px; }
+}
+
+/* ---- Progression strip --------------------------------------------------- */
+.aet-flow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .35rem .5rem;
+  align-items: center;
+  font-weight: 600;
+  margin: 1.1rem 0 1.8rem;
+}
+.aet-flow span {
+  padding: .34rem .8rem;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(0, 120, 212, 0.16), rgba(0, 120, 212, 0.08));
+  border: 1px solid rgba(0, 120, 212, 0.28);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  font-size: .74rem;
+  letter-spacing: .4px;
+  text-transform: uppercase;
+  transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+}
+.aet-flow span:hover {
+  transform: translateY(-1px);
+  border-color: var(--aet-azure);
+  box-shadow: 0 3px 8px rgba(0, 120, 212, 0.22);
+}
+.aet-flow em {
+  color: var(--aet-azure);
+  opacity: .55;
+  font-style: normal;
+  font-weight: 700;
+}
+
+/* ---- Status badges (soft progression) ----------------------------------- */
+.aet-badge {
+  display: inline-block;
+  padding: .12rem .55rem;
+  border-radius: 999px;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .3px;
+  vertical-align: middle;
+}
+.aet-badge.not-started { background: rgba(200,198,196,.16); color: var(--aet-muted); }
+.aet-badge.in-progress { background: rgba(247,168,69,.16);  color: var(--aet-warning); }
+.aet-badge.validate    { background: rgba(80,176,255,.16);  color: var(--aet-info); }
+.aet-badge.complete    { background: rgba(84,176,84,.16);   color: var(--aet-healthy); }
+/* Neutral phase badge — single accent, no status connotation. */
+.aet-badge.phase       { background: rgba(0,120,212,.14);   color: var(--aet-info); }
+[data-md-color-scheme="default"] .aet-badge.phase { color: var(--aet-azure-dk); }
+
+/* ---- Hero scope / duration meta ----------------------------------------- */
+.aet-hero .aet-meta {
+  margin: .1rem 0 1.1rem;
+  font-size: .8rem;
+  font-weight: 600;
+  letter-spacing: .3px;
+  color: var(--aet-muted);
+}
+
+/* ---- Severity chips reused from the Ops Center --------------------------- */
+.aet-sev { font-weight: 700; padding: .1rem .5rem; border-radius: 6px; font-size: .74rem; }
+.aet-sev.sev1 { background: rgba(228,98,111,.16);  color: var(--aet-critical); }
+.aet-sev.sev2 { background: rgba(247,168,69,.16); color: var(--aet-warning); }
+.aet-sev.sev3 { background: rgba(80,176,255,.16); color: var(--aet-info); }
+
+/* ---- Interactive progress (segmented) + complete button ----------------- */
+.aet-steps-wrap {
+  margin: 1rem 0 1.4rem;
+  padding: .9rem 1rem;
+  border: 1px solid var(--aet-border);
+  border-radius: 8px;
+  background: var(--aet-surface);
+}
+[data-md-color-scheme="default"] .aet-steps-wrap { background: #faf9f8; }
+.aet-steps-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  margin-bottom: .55rem;
+  font-size: .78rem;
+  font-weight: 700;
+}
+.aet-steps-label { text-transform: uppercase; letter-spacing: .5px; color: var(--md-default-fg-color--light); }
+.aet-steps-count { color: var(--aet-azure); font-variant-numeric: tabular-nums; }
+.aet-steps { display: flex; gap: .4rem; }
+.aet-step {
+  flex: 1 1 0;
+  height: 1.55rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  font-size: .72rem;
+  font-weight: 800;
+  background: rgba(0, 120, 212, .10);
+  color: var(--md-default-fg-color--light);
+  border: 1px solid transparent;
+  transition: background .3s ease, color .3s ease, border-color .3s ease;
+}
+.aet-step.is-current {
+  background: rgba(0, 120, 212, .18);
+  color: var(--aet-azure);
+  border-color: var(--aet-azure);
+}
+.aet-step.is-done {
+  background: var(--aet-healthy);
+  color: #fff;
+  border-color: var(--aet-healthy);
+}
+.aet-progress-reset {
+  display: inline-block;
+  margin-top: .7rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  font-size: .72rem;
+  color: var(--md-default-fg-color--light);
+  text-decoration: underline;
+}
+.aet-progress-reset:hover { color: var(--aet-azure); }
+.aet-steps-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: .7rem;
+}
+.aet-steps-foot .aet-progress-reset { margin-top: 0; }
+.aet-steps-hint { font-size: .72rem; color: var(--md-default-fg-color--light); }
+.aet-steps-done {
+  margin-top: .7rem;
+  padding: .5rem .75rem;
+  border-radius: 6px;
+  background: rgba(84, 176, 84, .14);
+  color: var(--aet-healthy);
+  font-weight: 800;
+  font-size: .82rem;
+  text-align: center;
+}
+.aet-steps-wrap.is-complete { border-color: var(--aet-healthy); }
+/* ---- First-run onboarding coach-mark ------------------------------------ */
+.aet-coach {
+  display: flex;
+  gap: .6rem;
+  margin: 0 0 1.2rem;
+  padding: .8rem 1rem;
+  border: 1px solid var(--aet-border);
+  border-left: 3px solid var(--aet-azure);
+  border-radius: 8px;
+  background: rgba(0, 120, 212, .06);
+  font-size: .85rem;
+}
+.aet-coach-close {
+  margin-left: .35rem;
+  border: 1px solid var(--aet-azure);
+  background: var(--aet-azure);
+  color: #fff;
+  font-weight: 700;
+  font-size: .72rem;
+  padding: .18rem .6rem;
+  border-radius: 5px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+@media (prefers-reduced-motion: reduce) {
+  .aet-step, .aet-progress-fill, .aet-complete-btn { transition: none !important; }
+}
+
+/* ---- Unmissable 100% completion celebration ----------------------------- */
+.aet-celebrate {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, .45);
+  animation: aet-fade .2s ease;
+}
+.aet-celebrate-card {
+  position: relative;
+  z-index: 2;
+  width: 380px;
+  max-width: 92vw;
+  text-align: center;
+  background: var(--md-default-bg-color);
+  color: var(--md-default-fg-color);
+  border: 1px solid var(--aet-border);
+  border-top: 4px solid var(--aet-healthy);
+  border-radius: 12px;
+  padding: 1.6rem 1.4rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, .4);
+  animation: aet-pop .3s cubic-bezier(.2, .9, .3, 1.2);
+}
+.aet-celebrate-emoji { font-size: 3rem; line-height: 1; }
+.aet-celebrate-title { margin-top: .4rem; font-weight: 800; font-size: 1.15rem; }
+.aet-celebrate-sub { margin-top: .3rem; font-size: .85rem; color: var(--md-default-fg-color--light); }
+.aet-celebrate-close {
+  margin-top: 1.1rem;
+  padding: .5rem 1.1rem;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+  background: var(--aet-azure);
+  color: #fff;
+  font-weight: 700;
+  font-size: .8rem;
+}
+.aet-confetti { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 1; }
+.aet-confetti span {
+  position: absolute;
+  top: -14px;
+  width: 9px;
+  height: 14px;
+  border-radius: 2px;
+  animation: aet-fall 2.8s linear forwards;
+}
+@keyframes aet-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes aet-pop { from { opacity: 0; transform: scale(.9); } to { opacity: 1; transform: scale(1); } }
+@keyframes aet-fall { to { transform: translateY(106vh) rotate(720deg); opacity: .9; } }
+@media (prefers-reduced-motion: reduce) {
+  .aet-confetti { display: none; }
+  .aet-celebrate, .aet-celebrate-card { animation: none; }
+}
+
+.aet-complete { margin: .2rem 0 1rem; }
+.aet-complete-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .55rem 1rem;
+  border: 2px solid var(--aet-azure);
+  border-radius: 8px;
+  background: var(--aet-azure);
+  color: #fff;
+  font-weight: 800;
+  font-size: .82rem;
+  cursor: pointer;
+  transition: background .15s, border-color .15s, filter .15s;
+}
+.aet-complete-btn:hover { filter: brightness(1.06); }
+.aet-complete-btn.is-done {
+  background: var(--aet-healthy);
+  border-color: var(--aet-healthy);
+  color: #fff;
+}
+.aet-complete-btn .aet-check { font-size: 1rem; line-height: 1; }
+
+/* ---- Side-nav: completed challenge turns bold green with a check --------- */
+.md-nav__link.aet-nav-done {
+  color: var(--aet-healthy) !important;
+  font-weight: 700;
+}
+.md-nav__link.aet-nav-done::before {
+  content: "\2713";
+  margin-right: .4rem;
+  font-weight: 900;
+  color: var(--aet-healthy);
+}
+
+/* ---- Soft-locked challenges (azure lock icon) --------------------------- */
+:root {
+  --aet-lock-svg: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0,0,24,24'%3E%3Cpath%20d='M12,17A2,2,0,0,0,14,15A2,2,0,0,0,12,13A2,2,0,0,0,10,15A2,2,0,0,0,12,17M18,8A2,2,0,0,1,20,10V20A2,2,0,0,1,18,22H6A2,2,0,0,1,4,20V10A2,2,0,0,1,6,8H7V6A5,5,0,0,1,12,1A5,5,0,0,1,17,6V8H18M12,3A3,3,0,0,0,9,6V8H15V6A3,3,0,0,0,12,3Z'/%3E%3C/svg%3E");
+}
+.md-nav__link.aet-nav-locked { opacity: .72; }
+.md-nav__link.aet-nav-locked::before {
+  content: "";
+  flex: 0 0 auto;
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  min-width: 15px;
+  margin-right: .4rem;
+  vertical-align: -.15em;
+  background-color: var(--aet-azure);
+  -webkit-mask: var(--aet-lock-svg) center / contain no-repeat;
+          mask: var(--aet-lock-svg) center / contain no-repeat;
+}
+.aet-locked-note {
+  display: flex;
+  align-items: flex-start;
+  gap: .6rem;
+  margin: 1rem 0 1.2rem;
+  padding: .8rem 1rem;
+  border: 1px solid var(--aet-border);
+  border-left: 3px solid var(--aet-azure);
+  border-radius: 8px;
+  background: rgba(0, 120, 212, .08);
+  font-size: .85rem;
+}
+.aet-lock-ico {
+  flex: 0 0 auto;
+  width: 1.2rem;
+  height: 1.2rem;
+  margin-top: .05rem;
+  background-color: var(--aet-azure);
+  -webkit-mask: var(--aet-lock-svg) center / contain no-repeat;
+          mask: var(--aet-lock-svg) center / contain no-repeat;
+}
+.aet-check-inline {
+  display: inline-block;
+  margin-left: .4rem;
+  color: var(--aet-healthy);
+  font-weight: 900;
+}
