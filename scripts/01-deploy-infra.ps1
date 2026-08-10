@@ -42,18 +42,22 @@ foreach ($d in $deletedApim) {
 
 $deploymentName = "aetherion-infra-$([DateTime]::UtcNow.ToString('yyyyMMddHHmmss'))"
 
-# Resolve the current stable AKS version for this region so we never pin a
-# version that is preview/newest (glitchy) or later deprecated. Prefer Azure's
-# recommended default; fall back to the highest GA (non-preview) version.
+# Resolve the current stable AKS version for this region as a FULL patch version
+# (e.g. 1.35.6, not just 1.35). Passing the exact patch is what the portal does and
+# removes any ambiguity in how the control plane resolves a minor-only version.
 Write-Host "Resolving current stable AKS version in $Location..." -ForegroundColor Cyan
-$aksVersion = az aks get-versions -l $Location --query "values[?isDefault].version | [0]" -o tsv 2>$null
-if ([string]::IsNullOrWhiteSpace($aksVersion)) {
-    $gaVersions = az aks get-versions -l $Location --query "values[?isPreview==null].version" -o tsv 2>$null
-    if ($gaVersions) {
-        $aksVersion = ($gaVersions -split "\s+" | Where-Object { $_ } | Sort-Object { [version]$_ } -Descending | Select-Object -First 1)
+$aksVersion = $null
+$verJson = az aks get-versions -l $Location -o json 2>$null | ConvertFrom-Json
+if ($verJson) {
+    $line = $verJson.values | Where-Object { $_.isDefault } | Select-Object -First 1
+    if (-not $line) {
+        $line = $verJson.values | Where-Object { -not $_.isPreview } | Sort-Object { [version]$_.version } -Descending | Select-Object -First 1
+    }
+    if ($line -and $line.patchVersions) {
+        $aksVersion = $line.patchVersions.PSObject.Properties.Name | Sort-Object { [version]$_ } -Descending | Select-Object -First 1
     }
 }
-if ([string]::IsNullOrWhiteSpace($aksVersion)) { $aksVersion = '1.33' }
+if ([string]::IsNullOrWhiteSpace($aksVersion)) { $aksVersion = '1.35.6' }
 Write-Host "  AKS version: $aksVersion" -ForegroundColor Gray
 
 Write-Host "Deploying infrastructure (a few minutes; APIM Consumption tier provisions fast)..." -ForegroundColor Cyan
