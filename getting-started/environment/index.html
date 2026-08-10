@@ -1818,11 +1818,11 @@ observability and the Azure <abbr title="Site Reliability Engineering — runnin
 </tr>
 <tr>
 <td>Compute</td>
-<td><abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> cluster <code>aetherion-aks</code>, namespace <code>aetherion</code> — 6 microservices + k6 load generator</td>
+<td><abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> cluster <code>aetherion-aks</code>, namespace <code>aetherion</code> — 6 microservices + in-cluster Redis cache</td>
 </tr>
 <tr>
 <td>Data</td>
-<td>Azure Database for PostgreSQL Flexible Server · Azure Managed Redis</td>
+<td>Azure Database for PostgreSQL Flexible Server · in-cluster Redis cache</td>
 </tr>
 <tr>
 <td>Observability</td>
@@ -1872,7 +1872,7 @@ all tiles green.</p>
 <tr>
 <td>Redis cache</td>
 <td>Low-latency cache for booking/check-in read patterns</td>
-<td>Azure Managed Redis</td>
+<td>In-cluster <code>redis</code> container in <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr></td>
 </tr>
 <tr>
 <td>Dashboards</td>
@@ -1897,7 +1897,7 @@ all tiles green.</p>
 <tr>
 <td>Load generator</td>
 <td>Produces synthetic traffic during the workshop</td>
-<td><abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> deployment <code>k6-load</code></td>
+<td>Azure Container Instance in a separate resource group (not monitored by the agent)</td>
 </tr>
 <tr>
 <td>Change history</td>
@@ -1912,7 +1912,8 @@ all tiles green.</p>
 </tbody>
 </table>
 <p>Microservices: <code>gateway</code>, <code>flight-ops</code>, <code>crew-scheduling</code>, <code>booking</code>, <code>baggage</code>,
-<code>telemetry-ingest</code> (plus <code>k6-load</code> for workshop traffic generation).</p>
+<code>telemetry-ingest</code>. Synthetic workshop traffic is generated externally by the load
+generator (see the table above).</p>
 </details>
 
 

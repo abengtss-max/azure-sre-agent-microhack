@@ -1723,7 +1723,7 @@ configuration. All services run in the <abbr title="Azure Kubernetes Service —
 <tr>
 <td>Compute</td>
 <td><abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> <code>aetherion-aks</code></td>
-<td>Hosts all microservices + k6 load generator</td>
+<td>Hosts all microservices + in-cluster Redis</td>
 </tr>
 <tr>
 <td>Relational data</td>
@@ -1732,7 +1732,7 @@ configuration. All services run in the <abbr title="Azure Kubernetes Service —
 </tr>
 <tr>
 <td>Cache</td>
-<td>Azure Managed Redis</td>
+<td>In-cluster <code>redis</code> container (<abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr>)</td>
 <td>Booking/check-in session and cache tier</td>
 </tr>
 <tr>
