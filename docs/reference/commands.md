@@ -15,6 +15,7 @@ repository root, signed in with `az login` and the correct subscription selected
 | `./scripts/03b-setup-https.ps1` | Configures HTTPS on the gateway (Let's Encrypt) |
 | `./scripts/04-validate.ps1 -ResourceGroup rg-aetherion` | Validates the estate is healthy and generating traffic |
 | `./scripts/provision-environment.ps1` | End-to-end provisioning wrapper |
+| `./scripts/provision-environment.ps1 -UniqueSuffix` | Same, but provisions into a uniquely named resource group (e.g. `rg-aetherion-microhack-a7c3`) so you can run **multiple microhacks in one subscription** |
 
 ## Running the hack
 
