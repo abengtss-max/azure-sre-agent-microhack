@@ -1733,8 +1733,16 @@ repository root, signed in with <code>az login</code> and the correct subscripti
 <td>Restores a clean, healthy baseline between runs</td>
 </tr>
 <tr>
-<td><code>./scripts/99-teardown.ps1 -ResourceGroup rg-aetherion</code></td>
-<td>Deletes the resource group — the single biggest cost saver</td>
+<td><code>./scripts/99-teardown.ps1</code></td>
+<td>Lists the microhack(s) in your subscription and lets you pick which to delete — removes the hack resource group <strong>and</strong> its <code>-loadgen</code> pair</td>
+</tr>
+<tr>
+<td><code>./scripts/99-teardown.ps1 -ResourceGroup &lt;rg&gt;</code></td>
+<td>Deletes a specific microhack (and its <code>-loadgen</code> pair) non-interactively</td>
+</tr>
+<tr>
+<td><code>./scripts/99-teardown.ps1 -All</code></td>
+<td>Deletes every Aetherion microhack in the subscription</td>
 </tr>
 </tbody>
 </table>

@@ -1691,9 +1691,10 @@ commanded a Tier-0 major incident, and briefed leadership. That's the full
 <h3 id="tear-down-the-environment">Tear down the environment<a class="headerlink" href="#tear-down-the-environment" title="Permanent link">&para;</a></h3>
 <div class="admonition warning">
 <p class="admonition-title">Do this to stop Azure charges</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="n">99-teardown</span><span class="p">.</span><span class="n">ps1</span> <span class="n">-ResourceGroup</span> <span class="n">rg-aetherion-microhack</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="n">99-teardown</span><span class="p">.</span><span class="n">ps1</span>
 </code></pre></div>
-<p>This removes the resource group — the single biggest cost saver. See
+<p>Pick your microhack from the list; it removes the resource group <strong>and</strong> its
+load-generator pair — the single biggest cost saver. See
 <a href="../../reference/commands/#teardown">Teardown</a> for the reset-vs-delete options.</p>
 </div>
 <h3 id="where-to-go-next">Where to go next<a class="headerlink" href="#where-to-go-next" title="Permanent link">&para;</a></h3>
