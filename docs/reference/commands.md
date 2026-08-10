@@ -23,13 +23,13 @@ repository root, signed in with `az login` and the correct subscription selected
 |---------|--------------|
 | `./scripts/start-challenge.ps1 <n>` | Sets up and briefs challenge `n` |
 | `./scripts/check-challenge.ps1 <n>` | Validates your work for challenge `n` |
-| `./scripts/reset-environment.ps1` | Restores a clean, healthy baseline between runs |
+| `./scripts/reset-environment.ps1` | Restores a clean, healthy baseline between runs (add `-ResetProgress` to also re-lock challenges for a fresh run) |
 
 ## Teardown
 
 | Command | What it does |
 |---------|--------------|
-| `./scripts/reset-environment.ps1` | Restores a clean, healthy baseline between runs |
+| `./scripts/reset-environment.ps1` | Restores a clean, healthy baseline between runs (add `-ResetProgress` to also re-lock challenges for a fresh run) |
 | `./scripts/99-teardown.ps1` | Lists the microhack(s) in your subscription and lets you pick which to delete — removes the hack resource group **and** its `-loadgen` pair |
 | `./scripts/99-teardown.ps1 -ResourceGroup <rg>` | Deletes a specific microhack (and its `-loadgen` pair) non-interactively |
 | `./scripts/99-teardown.ps1 -All` | Deletes every Aetherion microhack in the subscription |
