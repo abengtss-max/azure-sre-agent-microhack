@@ -22,10 +22,11 @@
 
 !!! warning "Do this to stop Azure charges"
     ```powershell
-    ./scripts/99-teardown.ps1 -ResourceGroup rg-aetherion-microhack
+    ./scripts/99-teardown.ps1
     ```
 
-    This removes the resource group — the single biggest cost saver. See
+    Pick your microhack from the list; it removes the resource group **and** its
+    load-generator pair — the single biggest cost saver. See
     [Teardown](../reference/commands.md#teardown) for the reset-vs-delete options.
 
 ### Where to go next

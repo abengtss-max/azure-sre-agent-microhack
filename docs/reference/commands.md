@@ -29,4 +29,6 @@ repository root, signed in with `az login` and the correct subscription selected
 | Command | What it does |
 |---------|--------------|
 | `./scripts/reset-environment.ps1` | Restores a clean, healthy baseline between runs |
-| `./scripts/99-teardown.ps1 -ResourceGroup rg-aetherion` | Deletes the resource group — the single biggest cost saver |
+| `./scripts/99-teardown.ps1` | Lists the microhack(s) in your subscription and lets you pick which to delete — removes the hack resource group **and** its `-loadgen` pair |
+| `./scripts/99-teardown.ps1 -ResourceGroup <rg>` | Deletes a specific microhack (and its `-loadgen` pair) non-interactively |
+| `./scripts/99-teardown.ps1 -All` | Deletes every Aetherion microhack in the subscription |
