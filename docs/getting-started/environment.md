@@ -83,8 +83,8 @@ observability and the Azure SRE Agent (dashed purple); alerting is shown in red.
 | Layer | Resources |
 |-------|-----------|
 | Edge | Azure API Management (subscription-key auth, rate limiting) |
-| Compute | AKS cluster `aetherion-aks`, namespace `aetherion` — 6 microservices + k6 load generator |
-| Data | Azure Database for PostgreSQL Flexible Server · Azure Managed Redis |
+| Compute | AKS cluster `aetherion-aks`, namespace `aetherion` — 6 microservices + in-cluster Redis cache |
+| Data | Azure Database for PostgreSQL Flexible Server · in-cluster Redis cache |
 | Observability | Application Insights `aetherion-appi` · Log Analytics `aetherion-law` · Azure Managed Grafana |
 | Agent | Azure SRE Agent `aetherion-sre-agent` |
 
@@ -111,17 +111,18 @@ Re-run the check on its own at any time:
 | Operations Center GUI | Live service health, risk gauge, flight map, incidents, business impact | `https://sreagenthack-XXXXX.<region>.cloudapp.azure.com/` |
 | API front door | Partner/mobile entry point, subscription-key auth, rate limiting | `<apim-gateway-url>/aetherion/api/status` |
 | PostgreSQL database | System of record for bookings, crews, and telemetry writes | Azure Database for PostgreSQL Flexible Server |
-| Redis cache | Low-latency cache for booking/check-in read patterns | Azure Managed Redis |
+| Redis cache | Low-latency cache for booking/check-in read patterns | In-cluster `redis` container in AKS |
 | Dashboards | Metrics, traces, log visualizations | Azure Managed Grafana |
 | App telemetry | Requests, dependencies, exceptions, app map | Application Insights `aetherion-appi` |
 | Logs | Container and node logs/metrics | Log Analytics `aetherion-law` |
 | Compute | All microservices | AKS `aetherion-aks`, namespace `aetherion` |
-| Load generator | Produces synthetic traffic during the workshop | AKS deployment `k6-load` |
+| Load generator | Produces synthetic traffic during the workshop | Azure Container Instance in a separate resource group (not monitored by the agent) |
 | Change history | Resource and deployment changes | Azure Activity Log + GitHub repo |
 | Azure SRE Agent | Investigate, plan, and remediate — with approval, or bounded autonomy | Azure portal → `aetherion-sre-agent` |
 
 Microservices: `gateway`, `flight-ops`, `crew-scheduling`, `booking`, `baggage`,
-`telemetry-ingest` (plus `k6-load` for workshop traffic generation).
+`telemetry-ingest`. Synthetic workshop traffic is generated externally by the load
+generator (see the table above).
 
 </details>
 

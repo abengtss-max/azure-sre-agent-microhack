@@ -44,6 +44,13 @@ try {
 az group delete --name $ResourceGroup --yes --no-wait
 Write-Host "Deletion started (running in background). Resources will be gone shortly." -ForegroundColor Green
 
+# The k6 load generator lives in a separate resource group; tear it down too.
+$loadGenRg = "$ResourceGroup-loadgen"
+if ((az group exists --name $loadGenRg 2>$null) -eq 'true') {
+    Write-Host "Deleting load-gen resource group '$loadGenRg'..." -ForegroundColor Cyan
+    az group delete --name $loadGenRg --yes --no-wait
+}
+
 if (Test-Path $envFile) {
     Remove-Item $envFile -Force
     Write-Host "Removed local state file." -ForegroundColor Gray

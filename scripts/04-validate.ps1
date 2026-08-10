@@ -51,9 +51,10 @@ Check "All app deployments available" {
     return $true
 }
 
-Check "k6 load generator running" {
-    $ready = kubectl get deploy k6-load -n $ns -o jsonpath='{.status.availableReplicas}' 2>$null
-    return (-not [string]::IsNullOrWhiteSpace($ready) -and [int]$ready -ge 1)
+Check "k6 load generator running (ACI, external RG)" {
+    $lgRg = "$($state.resourceGroup)-loadgen"
+    $st = az container show -g $lgRg -n aetherion-k6 --query "instanceView.state" -o tsv 2>$null
+    return ($st -eq 'Running')
 }
 
 Check "Gateway reachable directly (HTTP 200 on /api/status)" {

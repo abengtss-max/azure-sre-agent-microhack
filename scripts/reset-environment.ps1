@@ -12,8 +12,8 @@ foreach ($s in $services) {
 }
 
 # Return the load generator to its normal level (challenges 2 & 7 set surge).
-kubectl set env deploy/k6-load -n $ns MODE=normal VUS=25 2>$null | Out-Null
-Write-Host "  k6-load -> normal (25 VUs)" -ForegroundColor Gray
+& (Join-Path $PSScriptRoot "deploy-loadgen.ps1") -Mode normal 2>$null | Out-Null
+Write-Host "  k6 load -> normal (25 VUs)" -ForegroundColor Gray
 
 if (Test-Path $envFile) {
     $state = Get-Content $envFile -Raw | ConvertFrom-Json

@@ -57,7 +57,8 @@ dependencies
 
 ## Load generator
 
-A k6 deployment (`k6-load`) drives continuous traffic through APIM. Modes:
+A k6 **Azure Container Instance** (in a separate, un-monitored resource group)
+drives continuous traffic through the public APIM gateway. Modes:
 - `normal` - steady baseline traffic.
 - `surge` - ramped spike used to exercise autoscaling and expose bottlenecks.
-Switch with `kubectl set env deploy/k6-load -n aetherion MODE=surge`.
+Switch with `./scripts/deploy-loadgen.ps1 -Mode surge` (`-Mode normal` to reset).

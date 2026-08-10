@@ -64,16 +64,8 @@ $state | Add-Member -NotePropertyName gatewayIp -NotePropertyValue $gwIp -Force
 $state | Add-Member -NotePropertyName apimSubscriptionKey -NotePropertyValue $apiKey -Force
 $state | ConvertTo-Json -Depth 5 | Set-Content -Path $envFile -Encoding UTF8
 
-Write-Host "Starting k6 load generator (normal mode)..." -ForegroundColor Cyan
-$k6ScriptPath = Join-Path $repoRoot "load/k6-load.js"
-kubectl create configmap k6-script -n $ns `
-    --from-file="k6-load.js=$k6ScriptPath" `
-    --dry-run=client -o yaml | kubectl apply -f -
-kubectl apply -f (Join-Path $repoRoot "load/k6.yaml")
-kubectl set env deploy/k6-load -n $ns `
-    BASE_URL="$($state.apimGatewayUrl)/aetherion" `
-    API_KEY="$apiKey" `
-    MODE="normal"
+Write-Host "Starting k6 load generator on ACI (outside the monitored resource group)..." -ForegroundColor Cyan
+& (Join-Path $PSScriptRoot "deploy-loadgen.ps1") -ResourceGroup $rg -Location $state.location -Mode normal
 
 Write-Host "Application deployed and load started." -ForegroundColor Green
 Write-Host "  Ops Center (direct): http://$gwIp/" -ForegroundColor Gray

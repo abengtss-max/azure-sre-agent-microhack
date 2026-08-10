@@ -19,9 +19,9 @@ configuration. All services run in the AKS namespace `aetherion`.
 | Resource | Name / type | Purpose |
 |----------|-------------|---------|
 | API front door | Azure API Management | Partner/mobile entry, subscription-key auth, rate limiting |
-| Compute | AKS `aetherion-aks` | Hosts all microservices + k6 load generator |
+| Compute | AKS `aetherion-aks` | Hosts all microservices + in-cluster Redis |
 | Relational data | Azure Database for PostgreSQL Flexible Server | Crew, booking and telemetry data |
-| Cache | Azure Managed Redis | Booking/check-in session and cache tier |
+| Cache | In-cluster `redis` container (AKS) | Booking/check-in session and cache tier |
 | App telemetry | Application Insights `aetherion-appi` | Requests, dependencies, exceptions |
 | Logs | Log Analytics `aetherion-law` | Container and node logs, KQL |
 | Dashboards | Azure Managed Grafana | Metrics, traces, autoscaling correlation |

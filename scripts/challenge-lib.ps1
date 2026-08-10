@@ -84,8 +84,7 @@ function Invoke-Fault([string]$Service, [string]$Fault) {
 }
 
 function Set-Load([string]$Mode) {
-    $vus = if ($Mode -eq 'surge') { '120' } else { '25' }
-    kubectl set env deploy/k6-load -n $script:NS MODE=$Mode VUS=$vus 2>$null | Out-Null
+    & (Join-Path $PSScriptRoot "deploy-loadgen.ps1") -Mode $Mode 2>$null | Out-Null
 }
 
 # ---------------------------------------------------------------------------
