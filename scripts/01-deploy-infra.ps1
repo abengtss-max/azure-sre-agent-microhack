@@ -9,8 +9,7 @@ param(
     [int]$AksNodeCount = 2,
     [string]$AksNodeVmSize = "Standard_D4s_v5",
     [ValidateSet("Consumption", "Developer")]
-    [string]$ApimSkuName = "Consumption",
-    [string]$RedisLocation = ""
+    [string]$ApimSkuName = "Consumption"
 )
 
 $ErrorActionPreference = "Stop"
@@ -56,7 +55,6 @@ $outputsJson = az deployment group create `
         aksNodeCount=$AksNodeCount `
         aksNodeVmSize=$AksNodeVmSize `
         apimSkuName=$ApimSkuName `
-        redisLocation=$(if ([string]::IsNullOrWhiteSpace($RedisLocation)) { $Location } else { $RedisLocation }) `
     --query properties.outputs -o json
 
 if ($LASTEXITCODE -ne 0) {

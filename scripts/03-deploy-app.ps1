@@ -14,9 +14,6 @@ Write-Host "Getting AKS credentials..." -ForegroundColor Cyan
 az aks get-credentials --resource-group $rg --name $state.aksName --overwrite-existing | Out-Null
 
 Write-Host "Fetching connection secrets..." -ForegroundColor Cyan
-$subId = az account show --query id -o tsv
-$redisDbId = "/subscriptions/$subId/resourceGroups/$rg/providers/Microsoft.Cache/redisEnterprise/$($state.redisName)/databases/default"
-$redisKey = az rest --method post --uri "https://management.azure.com$redisDbId/listKeys?api-version=2025-05-01-preview" --query primaryKey -o tsv
 $appiConn = az resource show --resource-group $rg --name $state.appInsightsName `
     --resource-type "Microsoft.Insights/components" --query "properties.ConnectionString" -o tsv
 
@@ -27,8 +24,8 @@ kubectl create secret generic aetherion-secrets -n $ns `
     --from-literal=PGHOST=$($state.pgFqdn) `
     --from-literal=PGUSER=$($state.pgAdminLogin) `
     --from-literal=PGPASSWORD=$($state.pgAdminPassword) `
-    --from-literal=REDIS_HOST=$($state.redisHostName) `
-    --from-literal=REDIS_PASSWORD=$redisKey `
+    --from-literal=REDIS_HOST=redis `
+    --from-literal=REDIS_PASSWORD="" `
     --from-literal=APPLICATIONINSIGHTS_CONNECTION_STRING=$appiConn `
     --dry-run=client -o yaml | kubectl apply -f -
 

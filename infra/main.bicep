@@ -8,9 +8,6 @@ param namePrefix string = 'aetherion'
 @description('Azure region for all resources.')
 param location string = resourceGroup().location
 
-@description('Azure region for Azure Managed Redis. Defaults to the main location; override when the main region is out of Managed Redis capacity.')
-param redisLocation string = location
-
 @description('PostgreSQL administrator login name.')
 param pgAdminLogin string = 'aetherionadmin'
 
@@ -51,7 +48,6 @@ var aksName = '${namePrefix}-aks'
 var lawName = '${namePrefix}-law'
 var appiName = '${namePrefix}-appi'
 var pgName = toLower('${namePrefix}-pg-${suffix}')
-var redisName = toLower('${namePrefix}-redis-${suffix}')
 var apimName = toLower('${namePrefix}-apim-${suffix}')
 var grafanaName = take(toLower('${namePrefix}graf${suffix}'), 23)
 
@@ -95,6 +91,7 @@ resource aks 'Microsoft.ContainerService/managedClusters@2024-05-01' = {
   identity: { type: 'SystemAssigned' }
   properties: {
     dnsPrefix: '${namePrefix}-aks'
+    kubernetesVersion: '1.33'
     enableRBAC: true
     agentPoolProfiles: [
       {
@@ -158,25 +155,6 @@ resource pgFirewallAzure 'Microsoft.DBforPostgreSQL/flexibleServers/firewallRule
   properties: {
     startIpAddress: '0.0.0.0'
     endIpAddress: '0.0.0.0'
-  }
-}
-
-resource redis 'Microsoft.Cache/redisEnterprise@2025-05-01-preview' = {
-  name: redisName
-  location: redisLocation
-  sku: {
-    name: 'Balanced_B1'
-  }
-}
-
-resource redisDb 'Microsoft.Cache/redisEnterprise/databases@2025-05-01-preview' = {
-  parent: redis
-  name: 'default'
-  properties: {
-    clientProtocol: 'Encrypted'
-    port: 10000
-    clusteringPolicy: 'EnterpriseCluster'
-    evictionPolicy: 'NoEviction'
   }
 }
 
@@ -338,9 +316,6 @@ output aksNodeResourceGroup string = aks.properties.nodeResourceGroup
 output pgServerName string = pg.name
 output pgFqdn string = pg.properties.fullyQualifiedDomainName
 output pgAdminLogin string = pgAdminLogin
-output redisName string = redis.name
-output redisHostName string = redis.properties.hostName
-output redisPort int = redisDb.properties.port
 output apimName string = apim.name
 output apimGatewayUrl string = apim.properties.gatewayUrl
 output appInsightsName string = appi.name

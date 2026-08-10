@@ -16,7 +16,6 @@ param(
     [string]$AksNodeVmSize = "Standard_D4s_v5",
     [ValidateSet("Consumption", "Developer")]
     [string]$ApimSkuName = "Consumption",
-    [string]$RedisLocation = "",
     [switch]$SkipProviders,
     [switch]$SkipValidate,
     [switch]$NoBanner,
@@ -109,8 +108,7 @@ Write-Step $step $totalSteps "Deploying infrastructure (a few minutes)"
     -NamePrefix $NamePrefix `
     -AksNodeCount $AksNodeCount `
     -AksNodeVmSize $AksNodeVmSize `
-    -ApimSkuName $ApimSkuName `
-    -RedisLocation $RedisLocation
+    -ApimSkuName $ApimSkuName
 if ($LASTEXITCODE -ne 0) { throw "Infrastructure deployment failed." }
 
 # --- Step 3: build & push image ----------------------------------------------

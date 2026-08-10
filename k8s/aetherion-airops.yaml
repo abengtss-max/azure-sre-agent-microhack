@@ -20,9 +20,40 @@ metadata:
 data:
   PGDATABASE: "aetherion"
   PGPORT: "5432"
-  REDIS_PORT: "10000"
-  REDIS_TLS: "true"
+  REDIS_PORT: "6379"
+  REDIS_TLS: "false"
   PG_POOL_MAX: "5"
+---
+# ---------------- redis (in-cluster cache) ----------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  namespace: aetherion
+  labels: { app: redis, tier: data }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: redis } }
+  template:
+    metadata:
+      labels: { app: redis, tier: data }
+    spec:
+      containers:
+        - name: redis
+          image: redis:7-alpine
+          ports: [{ containerPort: 6379 }]
+          readinessProbe: { tcpSocket: { port: 6379 }, initialDelaySeconds: 3, periodSeconds: 10 }
+          livenessProbe: { tcpSocket: { port: 6379 }, initialDelaySeconds: 10, periodSeconds: 10 }
+          resources: { requests: { cpu: "50m", memory: "64Mi" }, limits: { cpu: "250m", memory: "256Mi" } }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  namespace: aetherion
+spec:
+  selector: { app: redis }
+  ports: [{ port: 6379, targetPort: 6379 }]
 ---
 # ---------------- gateway (Ops Center GUI + aggregator) ----------------
 apiVersion: apps/v1
