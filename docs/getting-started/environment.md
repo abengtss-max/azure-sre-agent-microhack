@@ -10,14 +10,12 @@ platform on Azure, then hands you straight to Challenge 1.
 | PowerShell | 7.0 | required |
 | Azure CLI | 2.60 | required |
 | kubectl | any recent | required |
-| Docker Desktop | any recent | required |
 | Git | any recent | required |
 
 ```powershell
 winget install --id Microsoft.PowerShell --exact --accept-source-agreements --accept-package-agreements
 winget install --id Microsoft.AzureCLI --exact --accept-source-agreements --accept-package-agreements
 winget install --id Kubernetes.kubectl --exact --accept-source-agreements --accept-package-agreements
-winget install --id Docker.DockerDesktop --exact --accept-source-agreements --accept-package-agreements
 winget install --id Git.Git --exact --accept-source-agreements --accept-package-agreements
 ```
 

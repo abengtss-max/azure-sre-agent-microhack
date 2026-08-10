@@ -99,7 +99,7 @@ Common overrides:
 ```powershell
 # PowerShell — override any default
 ./scripts/provision-environment.ps1 -ResourceGroup rg-aetherion -Location eastus `
-    -ApimSkuName Developer -AksNodeCount 3 -NoLaunch
+    -ApimSkuName Developer -AksNodeCount 2 -NoLaunch
 
 # Useful switches: -SkipProviders  -SkipValidate  -NoBanner  -NoLaunch
 ```

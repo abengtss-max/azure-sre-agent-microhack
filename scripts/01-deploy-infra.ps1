@@ -6,7 +6,7 @@ param(
     [Parameter(Mandatory = $true)][string]$ResourceGroup,
     [string]$Location = "swedencentral",
     [string]$NamePrefix = "aetherion",
-    [int]$AksNodeCount = 3,
+    [int]$AksNodeCount = 2,
     [string]$AksNodeVmSize = "Standard_D4s_v5",
     [ValidateSet("Consumption", "Developer")]
     [string]$ApimSkuName = "Consumption",

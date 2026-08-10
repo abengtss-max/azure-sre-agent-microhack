@@ -18,3 +18,7 @@ site/
 Thumbs.db
 
 .publish-cache/
+
+# Compiled Bicep ARM output
+infra/main.json
+publish/overlays/infra/main.json

@@ -9,5 +9,5 @@ param apimPublisherEmail = 'sre-team@aetherion.example'
 param apimPublisherName = 'Aetherion AirOps SRE'
 // Consumption = provisions in ~1-2 min (recommended for the workshop). Developer = 30-45 min.
 param apimSkuName = 'Consumption'
-param aksNodeCount = 3
+param aksNodeCount = 2
 param aksNodeVmSize = 'Standard_D4s_v5'

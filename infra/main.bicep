@@ -33,7 +33,7 @@ param gatewayBackendUrl string = 'http://aetherion-gateway.invalid'
 @description('Number of AKS worker nodes.')
 @minValue(1)
 @maxValue(5)
-param aksNodeCount int = 3
+param aksNodeCount int = 2
 
 @description('VM size for AKS worker nodes.')
 param aksNodeVmSize string = 'Standard_D4s_v5'
