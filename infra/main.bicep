@@ -35,6 +35,9 @@ param aksNodeCount int = 2
 @description('VM size for AKS worker nodes.')
 param aksNodeVmSize string = 'Standard_D4s_v5'
 
+@description('Kubernetes version for AKS. The deploy script resolves the current stable (default) GA version at runtime and passes it in, so this literal is only a fallback.')
+param kubernetesVersion string = '1.33'
+
 @description('APIM SKU. Consumption provisions in ~1-2 min (best for a disposable workshop); Developer takes 30-45 min.')
 @allowed([
   'Consumption'
@@ -91,7 +94,7 @@ resource aks 'Microsoft.ContainerService/managedClusters@2024-05-01' = {
   identity: { type: 'SystemAssigned' }
   properties: {
     dnsPrefix: '${namePrefix}-aks'
-    kubernetesVersion: '1.33'
+    kubernetesVersion: kubernetesVersion
     enableRBAC: true
     agentPoolProfiles: [
       {

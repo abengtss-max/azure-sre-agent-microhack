@@ -41,24 +41,50 @@ foreach ($d in $deletedApim) {
 }
 
 $deploymentName = "aetherion-infra-$([DateTime]::UtcNow.ToString('yyyyMMddHHmmss'))"
+
+# Resolve the current stable AKS version for this region so we never pin a
+# version that is preview/newest (glitchy) or later deprecated. Prefer Azure's
+# recommended default; fall back to the highest GA (non-preview) version.
+Write-Host "Resolving current stable AKS version in $Location..." -ForegroundColor Cyan
+$aksVersion = az aks get-versions -l $Location --query "values[?isDefault].version | [0]" -o tsv 2>$null
+if ([string]::IsNullOrWhiteSpace($aksVersion)) {
+    $gaVersions = az aks get-versions -l $Location --query "values[?isPreview==null].version" -o tsv 2>$null
+    if ($gaVersions) {
+        $aksVersion = ($gaVersions -split "\s+" | Where-Object { $_ } | Sort-Object { [version]$_ } -Descending | Select-Object -First 1)
+    }
+}
+if ([string]::IsNullOrWhiteSpace($aksVersion)) { $aksVersion = '1.33' }
+Write-Host "  AKS version: $aksVersion" -ForegroundColor Gray
+
 Write-Host "Deploying infrastructure (a few minutes; APIM Consumption tier provisions fast)..." -ForegroundColor Cyan
 
-$outputsJson = az deployment group create `
-    --name $deploymentName `
-    --resource-group $ResourceGroup `
-    --template-file $bicep `
-    --parameters `
-        namePrefix=$NamePrefix `
-        location=$Location `
-        pgAdminPassword=$pgPassword `
-        deployerObjectId=$deployerObjectId `
-        aksNodeCount=$AksNodeCount `
-        aksNodeVmSize=$AksNodeVmSize `
-        apimSkuName=$ApimSkuName `
-    --query properties.outputs -o json
-
-if ($LASTEXITCODE -ne 0) {
-    throw "Deployment failed. Review the error above."
+# Retry once on transient failures (e.g. AKS 'ControlPlaneNotFound' or short-lived
+# capacity blips). The template is idempotent, so a retry reconciles cleanly.
+$maxAttempts = 2
+$outputsJson = $null
+for ($attempt = 1; $attempt -le $maxAttempts; $attempt++) {
+    $outputsJson = az deployment group create `
+        --name $deploymentName `
+        --resource-group $ResourceGroup `
+        --template-file $bicep `
+        --parameters `
+            namePrefix=$NamePrefix `
+            location=$Location `
+            pgAdminPassword=$pgPassword `
+            deployerObjectId=$deployerObjectId `
+            aksNodeCount=$AksNodeCount `
+            aksNodeVmSize=$AksNodeVmSize `
+            kubernetesVersion=$aksVersion `
+            apimSkuName=$ApimSkuName `
+        --query properties.outputs -o json
+    if ($LASTEXITCODE -eq 0) { break }
+    if ($attempt -lt $maxAttempts) {
+        Write-Host "Deployment attempt $attempt failed (often a transient control-plane/capacity error). Retrying in 20s..." -ForegroundColor Yellow
+        Start-Sleep -Seconds 20
+    }
+    else {
+        throw "Deployment failed after $maxAttempts attempts. Review the error above."
+    }
 }
 
 $outputs = $outputsJson | ConvertFrom-Json
