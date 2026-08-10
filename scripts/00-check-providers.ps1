@@ -17,7 +17,6 @@ $providers = @(
     "Microsoft.ContainerService",
     "Microsoft.ContainerRegistry",
     "Microsoft.DBforPostgreSQL",
-    "Microsoft.Cache",
     "Microsoft.ApiManagement",
     "Microsoft.OperationalInsights",
     "Microsoft.OperationsManagement",
