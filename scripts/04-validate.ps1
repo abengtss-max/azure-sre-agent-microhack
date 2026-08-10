@@ -75,8 +75,6 @@ Check "PostgreSQL reachable from booking pod (readiness ok)" {
 Write-Host ""
 if ($fail -eq 0) {
     Write-Host "All checks passed. Environment is healthy." -ForegroundColor Green
-    Write-Host "  Ops Center: http://$($state.gatewayIp)/" -ForegroundColor Gray
-    Write-Host "  Grafana:    $($state.grafanaEndpoint)" -ForegroundColor Gray
     exit 0
 } else {
     Write-Host "$fail check(s) failed. Inspect with: kubectl get pods -n $ns" -ForegroundColor Red

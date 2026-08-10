@@ -162,10 +162,8 @@ Write-Host "   ⏱  Total provisioning time: $([int]$elapsed.TotalMinutes) min" 
 Write-Host ""
 if (Test-Path $envFile) {
     $state = Get-Content $envFile -Raw | ConvertFrom-Json
-    if ($state.httpsUrl) {
-        Write-Host "  Ops Center : $($state.httpsUrl)" -ForegroundColor Gray
-    }
-    Write-Host "  Ops Center (direct HTTP): http://$($state.gatewayIp)/" -ForegroundColor Gray
+    $opsCenter = if ($state.httpsUrl) { $state.httpsUrl } else { "http://$($state.gatewayIp)/" }
+    Write-Host "  Ops Center : $opsCenter" -ForegroundColor Gray
     Write-Host "  API (APIM) : $($state.apimGatewayUrl)/aetherion/api/status" -ForegroundColor Gray
     Write-Host "  Grafana    : $($state.grafanaEndpoint)" -ForegroundColor Gray
     Write-Host "  Resource group: $($state.resourceGroup)" -ForegroundColor Gray

@@ -30,6 +30,17 @@ $pgPassword = "Aeth!" + [System.Guid]::NewGuid().ToString("N").Substring(0, 20) 
 Write-Host "Creating resource group '$ResourceGroup' in $Location..." -ForegroundColor Cyan
 az group create --name $ResourceGroup --location $Location | Out-Null
 
+# Self-heal: APIM soft-delete survives resource-group deletion and reserves the
+# service name, so a re-run (or a retry after a failed run) would fail with
+# 'ServiceAlreadyExistsInSoftDeletedState'. Purge any soft-deleted APIM matching
+# this environment's naming before deploying.
+$deletedApim = az apim deletedservice list --query "[?starts_with(name, '$NamePrefix-apim')].{name:name, location:location}" -o json 2>$null | ConvertFrom-Json
+foreach ($d in $deletedApim) {
+    $loc = ($d.location -replace '\s', '').ToLower()
+    Write-Host "Purging soft-deleted APIM '$($d.name)' in $loc..." -ForegroundColor Yellow
+    az apim deletedservice purge --service-name $d.name --location $loc --only-show-errors 2>$null | Out-Null
+}
+
 $deploymentName = "aetherion-infra-$([DateTime]::UtcNow.ToString('yyyyMMddHHmmss'))"
 Write-Host "Deploying infrastructure (a few minutes; APIM Consumption tier provisions fast)..." -ForegroundColor Cyan
 

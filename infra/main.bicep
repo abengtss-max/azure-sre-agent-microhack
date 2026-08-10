@@ -165,7 +165,7 @@ resource redis 'Microsoft.Cache/redisEnterprise@2025-05-01-preview' = {
   name: redisName
   location: redisLocation
   sku: {
-    name: 'Balanced_B0'
+    name: 'Balanced_B1'
   }
 }
 

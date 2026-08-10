@@ -1,0 +1,607 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.46.1.21595",
+      "templateHash": "2354566387032534156"
+    },
+    "description": "Aetherion AirOps - Azure SRE Agent MicroHack environment. Provisions AKS, ACR, APIM, PostgreSQL Flexible Server, Redis, Log Analytics, Application Insights and Managed Grafana. Teaching environment only - not production hardened."
+  },
+  "parameters": {
+    "namePrefix": {
+      "type": "string",
+      "defaultValue": "aetherion",
+      "minLength": 3,
+      "maxLength": 12,
+      "metadata": {
+        "description": "Prefix used for all resource names. Lowercase letters and numbers only."
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Azure region for all resources."
+      }
+    },
+    "redisLocation": {
+      "type": "string",
+      "defaultValue": "[parameters('location')]",
+      "metadata": {
+        "description": "Azure region for Azure Managed Redis. Defaults to the main location; override when the main region is out of Managed Redis capacity."
+      }
+    },
+    "pgAdminLogin": {
+      "type": "string",
+      "defaultValue": "aetherionadmin",
+      "metadata": {
+        "description": "PostgreSQL administrator login name."
+      }
+    },
+    "pgAdminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "PostgreSQL administrator password."
+      }
+    },
+    "deployerObjectId": {
+      "type": "string",
+      "metadata": {
+        "description": "Object ID (principal) of the person/service running the deployment. Used to grant Grafana Admin."
+      }
+    },
+    "apimPublisherEmail": {
+      "type": "string",
+      "defaultValue": "sre-team@aetherion.example",
+      "metadata": {
+        "description": "Publisher email for API Management."
+      }
+    },
+    "apimPublisherName": {
+      "type": "string",
+      "defaultValue": "Aetherion AirOps SRE",
+      "metadata": {
+        "description": "Publisher name for API Management."
+      }
+    },
+    "gatewayBackendUrl": {
+      "type": "string",
+      "defaultValue": "http://aetherion-gateway.invalid",
+      "metadata": {
+        "description": "Backend URL that APIM forwards to (the AKS gateway public IP). Updated after the app is deployed."
+      }
+    },
+    "aksNodeCount": {
+      "type": "int",
+      "defaultValue": 3,
+      "minValue": 1,
+      "maxValue": 5,
+      "metadata": {
+        "description": "Number of AKS worker nodes."
+      }
+    },
+    "aksNodeVmSize": {
+      "type": "string",
+      "defaultValue": "Standard_D4s_v5",
+      "metadata": {
+        "description": "VM size for AKS worker nodes."
+      }
+    },
+    "apimSkuName": {
+      "type": "string",
+      "defaultValue": "Consumption",
+      "allowedValues": [
+        "Consumption",
+        "Developer"
+      ],
+      "metadata": {
+        "description": "APIM SKU. Consumption provisions in ~1-2 min (best for a disposable workshop); Developer takes 30-45 min."
+      }
+    }
+  },
+  "variables": {
+    "suffix": "[uniqueString(resourceGroup().id)]",
+    "acrName": "[toLower(format('{0}acr{1}', parameters('namePrefix'), variables('suffix')))]",
+    "aksName": "[format('{0}-aks', parameters('namePrefix'))]",
+    "lawName": "[format('{0}-law', parameters('namePrefix'))]",
+    "appiName": "[format('{0}-appi', parameters('namePrefix'))]",
+    "pgName": "[toLower(format('{0}-pg-{1}', parameters('namePrefix'), variables('suffix')))]",
+    "redisName": "[toLower(format('{0}-redis-{1}', parameters('namePrefix'), variables('suffix')))]",
+    "apimName": "[toLower(format('{0}-apim-{1}', parameters('namePrefix'), variables('suffix')))]",
+    "grafanaName": "[take(toLower(format('{0}graf{1}', parameters('namePrefix'), variables('suffix'))), 23)]",
+    "acrPullRoleId": "7f951dda-4ed3-4680-a7ca-43fe172d538d",
+    "monitoringReaderRoleId": "43d0d8ad-25c7-4714-9337-8ba259a9fe05",
+    "grafanaAdminRoleId": "22926164-76b3-42b3-bc55-97df8dab3e41",
+    "openApiSpec": {
+      "openapi": "3.0.1",
+      "info": {
+        "title": "Aetherion AirOps API",
+        "version": "1.0"
+      },
+      "paths": {
+        "/api/status": {
+          "get": {
+            "operationId": "getStatus",
+            "summary": "Ops status",
+            "responses": {
+              "200": {
+                "description": "ok"
+              }
+            }
+          }
+        },
+        "/api/flights": {
+          "get": {
+            "operationId": "getFlights",
+            "summary": "Flight board",
+            "responses": {
+              "200": {
+                "description": "ok"
+              }
+            }
+          }
+        },
+        "/api/crew": {
+          "get": {
+            "operationId": "getCrew",
+            "summary": "Crew roster",
+            "responses": {
+              "200": {
+                "description": "ok"
+              }
+            }
+          }
+        },
+        "/api/book": {
+          "post": {
+            "operationId": "postBook",
+            "summary": "Create booking",
+            "responses": {
+              "200": {
+                "description": "ok"
+              }
+            }
+          }
+        },
+        "/api/bookings/count": {
+          "get": {
+            "operationId": "getBookingsCount",
+            "summary": "Booking count",
+            "responses": {
+              "200": {
+                "description": "ok"
+              }
+            }
+          }
+        },
+        "/api/baggage/throughput": {
+          "get": {
+            "operationId": "getBaggage",
+            "summary": "Baggage throughput",
+            "responses": {
+              "200": {
+                "description": "ok"
+              }
+            }
+          }
+        },
+        "/api/telemetry": {
+          "post": {
+            "operationId": "postTelemetry",
+            "summary": "Ingest telemetry",
+            "responses": {
+              "200": {
+                "description": "ok"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.OperationalInsights/workspaces",
+      "apiVersion": "2023-09-01",
+      "name": "[variables('lawName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "sku": {
+          "name": "PerGB2018"
+        },
+        "retentionInDays": 30,
+        "features": {
+          "enableLogAccessUsingOnlyResourcePermissions": true
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Insights/components",
+      "apiVersion": "2020-02-02",
+      "name": "[variables('appiName')]",
+      "location": "[parameters('location')]",
+      "kind": "web",
+      "properties": {
+        "Application_Type": "web",
+        "WorkspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('lawName'))]",
+        "IngestionMode": "LogAnalytics"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.OperationalInsights/workspaces', variables('lawName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.ContainerRegistry/registries",
+      "apiVersion": "2023-07-01",
+      "name": "[variables('acrName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "Basic"
+      },
+      "properties": {
+        "adminUserEnabled": false
+      }
+    },
+    {
+      "type": "Microsoft.ContainerService/managedClusters",
+      "apiVersion": "2024-05-01",
+      "name": "[variables('aksName')]",
+      "location": "[parameters('location')]",
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {
+        "dnsPrefix": "[format('{0}-aks', parameters('namePrefix'))]",
+        "enableRBAC": true,
+        "agentPoolProfiles": [
+          {
+            "name": "system",
+            "count": "[parameters('aksNodeCount')]",
+            "vmSize": "[parameters('aksNodeVmSize')]",
+            "mode": "System",
+            "osType": "Linux",
+            "type": "VirtualMachineScaleSets",
+            "enableAutoScaling": true,
+            "minCount": "[parameters('aksNodeCount')]",
+            "maxCount": "[add(parameters('aksNodeCount'), 2)]"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Authorization/roleAssignments",
+      "apiVersion": "2022-04-01",
+      "scope": "[resourceId('Microsoft.ContainerRegistry/registries', variables('acrName'))]",
+      "name": "[guid(resourceId('Microsoft.ContainerRegistry/registries', variables('acrName')), resourceId('Microsoft.ContainerService/managedClusters', variables('aksName')), variables('acrPullRoleId'))]",
+      "properties": {
+        "principalId": "[reference(resourceId('Microsoft.ContainerService/managedClusters', variables('aksName')), '2024-05-01').identityProfile.kubeletidentity.objectId]",
+        "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', variables('acrPullRoleId'))]",
+        "principalType": "ServicePrincipal"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ContainerRegistry/registries', variables('acrName'))]",
+        "[resourceId('Microsoft.ContainerService/managedClusters', variables('aksName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.DBforPostgreSQL/flexibleServers",
+      "apiVersion": "2024-08-01",
+      "name": "[variables('pgName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "Standard_B2s",
+        "tier": "Burstable"
+      },
+      "properties": {
+        "version": "16",
+        "administratorLogin": "[parameters('pgAdminLogin')]",
+        "administratorLoginPassword": "[parameters('pgAdminPassword')]",
+        "storage": {
+          "storageSizeGB": 32
+        },
+        "backup": {
+          "backupRetentionDays": 7,
+          "geoRedundantBackup": "Disabled"
+        },
+        "highAvailability": {
+          "mode": "Disabled"
+        },
+        "authConfig": {
+          "passwordAuth": "Enabled",
+          "activeDirectoryAuth": "Disabled"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.DBforPostgreSQL/flexibleServers/databases",
+      "apiVersion": "2024-08-01",
+      "name": "[format('{0}/{1}', variables('pgName'), 'aetherion')]",
+      "properties": {
+        "charset": "UTF8",
+        "collation": "en_US.utf8"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.DBforPostgreSQL/flexibleServers', variables('pgName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.DBforPostgreSQL/flexibleServers/firewallRules",
+      "apiVersion": "2024-08-01",
+      "name": "[format('{0}/{1}', variables('pgName'), 'AllowAllAzureServices')]",
+      "properties": {
+        "startIpAddress": "0.0.0.0",
+        "endIpAddress": "0.0.0.0"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.DBforPostgreSQL/flexibleServers', variables('pgName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Cache/redisEnterprise",
+      "apiVersion": "2025-05-01-preview",
+      "name": "[variables('redisName')]",
+      "location": "[parameters('redisLocation')]",
+      "sku": {
+        "name": "Balanced_B1"
+      }
+    },
+    {
+      "type": "Microsoft.Cache/redisEnterprise/databases",
+      "apiVersion": "2025-05-01-preview",
+      "name": "[format('{0}/{1}', variables('redisName'), 'default')]",
+      "properties": {
+        "clientProtocol": "Encrypted",
+        "port": 10000,
+        "clusteringPolicy": "EnterpriseCluster",
+        "evictionPolicy": "NoEviction"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Cache/redisEnterprise', variables('redisName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.ApiManagement/service",
+      "apiVersion": "2023-05-01-preview",
+      "name": "[variables('apimName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "[parameters('apimSkuName')]",
+        "capacity": "[if(equals(parameters('apimSkuName'), 'Consumption'), 0, 1)]"
+      },
+      "properties": {
+        "publisherEmail": "[parameters('apimPublisherEmail')]",
+        "publisherName": "[parameters('apimPublisherName')]"
+      }
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/apis",
+      "apiVersion": "2023-05-01-preview",
+      "name": "[format('{0}/{1}', variables('apimName'), 'aetherion')]",
+      "properties": {
+        "displayName": "Aetherion AirOps API",
+        "path": "aetherion",
+        "protocols": [
+          "https"
+        ],
+        "serviceUrl": "[parameters('gatewayBackendUrl')]",
+        "subscriptionRequired": true,
+        "format": "openapi+json",
+        "value": "[string(variables('openApiSpec'))]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service', variables('apimName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/products",
+      "apiVersion": "2023-05-01-preview",
+      "name": "[format('{0}/{1}', variables('apimName'), 'aetherion-ops')]",
+      "properties": {
+        "displayName": "Aetherion Operations",
+        "description": "Operational APIs for Aetherion AirOps.",
+        "subscriptionRequired": true,
+        "approvalRequired": false,
+        "state": "published"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service', variables('apimName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/products/apis",
+      "apiVersion": "2023-05-01-preview",
+      "name": "[format('{0}/{1}/{2}', variables('apimName'), 'aetherion-ops', 'aetherion')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', variables('apimName'), 'aetherion')]",
+        "[resourceId('Microsoft.ApiManagement/service/products', variables('apimName'), 'aetherion-ops')]"
+      ]
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/subscriptions",
+      "apiVersion": "2023-05-01-preview",
+      "name": "[format('{0}/{1}', variables('apimName'), 'aetherion-ops-sub')]",
+      "properties": {
+        "displayName": "Aetherion Ops Subscription",
+        "scope": "[resourceId('Microsoft.ApiManagement/service/products', variables('apimName'), 'aetherion-ops')]",
+        "state": "active"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service', variables('apimName'))]",
+        "[resourceId('Microsoft.ApiManagement/service/products', variables('apimName'), 'aetherion-ops')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Dashboard/grafana",
+      "apiVersion": "2023-09-01",
+      "name": "[variables('grafanaName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "Standard"
+      },
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {
+        "apiKey": "Enabled",
+        "publicNetworkAccess": "Enabled"
+      }
+    },
+    {
+      "type": "Microsoft.Authorization/roleAssignments",
+      "apiVersion": "2022-04-01",
+      "name": "[guid(resourceGroup().id, resourceId('Microsoft.Dashboard/grafana', variables('grafanaName')), variables('monitoringReaderRoleId'))]",
+      "properties": {
+        "principalId": "[reference(resourceId('Microsoft.Dashboard/grafana', variables('grafanaName')), '2023-09-01', 'full').identity.principalId]",
+        "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', variables('monitoringReaderRoleId'))]",
+        "principalType": "ServicePrincipal"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Dashboard/grafana', variables('grafanaName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Authorization/roleAssignments",
+      "apiVersion": "2022-04-01",
+      "scope": "[resourceId('Microsoft.Dashboard/grafana', variables('grafanaName'))]",
+      "name": "[guid(resourceGroup().id, parameters('deployerObjectId'), variables('grafanaAdminRoleId'))]",
+      "properties": {
+        "principalId": "[parameters('deployerObjectId')]",
+        "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', variables('grafanaAdminRoleId'))]",
+        "principalType": "User"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Dashboard/grafana', variables('grafanaName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Insights/actionGroups",
+      "apiVersion": "2023-01-01",
+      "name": "[format('{0}-incident-ag', parameters('namePrefix'))]",
+      "location": "global",
+      "properties": {
+        "groupShortName": "AetherIncid",
+        "enabled": true
+      }
+    },
+    {
+      "type": "Microsoft.Insights/metricAlerts",
+      "apiVersion": "2018-03-01",
+      "name": "[format('{0}-major-incident', parameters('namePrefix'))]",
+      "location": "global",
+      "properties": {
+        "description": "Sev1 major incident: Application Insights failed requests spiking (Challenge 7 cross-tier cascade). Triggers the SRE Agent response plan filtered to Sev1.",
+        "severity": 1,
+        "enabled": true,
+        "scopes": [
+          "[resourceId('Microsoft.Insights/components', variables('appiName'))]"
+        ],
+        "evaluationFrequency": "PT1M",
+        "windowSize": "PT5M",
+        "autoMitigate": true,
+        "criteria": {
+          "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria",
+          "allOf": [
+            {
+              "name": "FailedRequests",
+              "metricNamespace": "microsoft.insights/components",
+              "metricName": "requests/failed",
+              "operator": "GreaterThan",
+              "threshold": 25,
+              "timeAggregation": "Count",
+              "criterionType": "StaticThresholdCriterion"
+            }
+          ]
+        },
+        "actions": [
+          {
+            "actionGroupId": "[resourceId('Microsoft.Insights/actionGroups', format('{0}-incident-ag', parameters('namePrefix')))]"
+          }
+        ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Insights/components', variables('appiName'))]",
+        "[resourceId('Microsoft.Insights/actionGroups', format('{0}-incident-ag', parameters('namePrefix')))]"
+      ]
+    }
+  ],
+  "outputs": {
+    "acrName": {
+      "type": "string",
+      "value": "[variables('acrName')]"
+    },
+    "acrLoginServer": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.ContainerRegistry/registries', variables('acrName')), '2023-07-01').loginServer]"
+    },
+    "aksName": {
+      "type": "string",
+      "value": "[variables('aksName')]"
+    },
+    "aksNodeResourceGroup": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.ContainerService/managedClusters', variables('aksName')), '2024-05-01').nodeResourceGroup]"
+    },
+    "pgServerName": {
+      "type": "string",
+      "value": "[variables('pgName')]"
+    },
+    "pgFqdn": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.DBforPostgreSQL/flexibleServers', variables('pgName')), '2024-08-01').fullyQualifiedDomainName]"
+    },
+    "pgAdminLogin": {
+      "type": "string",
+      "value": "[parameters('pgAdminLogin')]"
+    },
+    "redisName": {
+      "type": "string",
+      "value": "[variables('redisName')]"
+    },
+    "redisHostName": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Cache/redisEnterprise', variables('redisName')), '2025-05-01-preview').hostName]"
+    },
+    "redisPort": {
+      "type": "int",
+      "value": "[reference(resourceId('Microsoft.Cache/redisEnterprise/databases', variables('redisName'), 'default'), '2025-05-01-preview').port]"
+    },
+    "apimName": {
+      "type": "string",
+      "value": "[variables('apimName')]"
+    },
+    "apimGatewayUrl": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.ApiManagement/service', variables('apimName')), '2023-05-01-preview').gatewayUrl]"
+    },
+    "appInsightsName": {
+      "type": "string",
+      "value": "[variables('appiName')]"
+    },
+    "logAnalyticsName": {
+      "type": "string",
+      "value": "[variables('lawName')]"
+    },
+    "logAnalyticsId": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('lawName'))]"
+    },
+    "grafanaName": {
+      "type": "string",
+      "value": "[variables('grafanaName')]"
+    },
+    "grafanaEndpoint": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Dashboard/grafana', variables('grafanaName')), '2023-09-01').endpoint]"
+    },
+    "incidentAlertName": {
+      "type": "string",
+      "value": "[format('{0}-major-incident', parameters('namePrefix'))]"
+    },
+    "incidentActionGroupName": {
+      "type": "string",
+      "value": "[format('{0}-incident-ag', parameters('namePrefix'))]"
+    }
+  }
+}
