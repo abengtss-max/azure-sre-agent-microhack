@@ -72,6 +72,17 @@ your browser.
 Defaults: resource group `rg-aetherion-microhack`, region `swedencentral`.
 Override with `-ResourceGroup`, `-Location`, or `-NamePrefix` if needed.
 
+!!! tip "Running more than one microhack in the same subscription?"
+    Add `-UniqueSuffix` to provision into a uniquely named resource group
+    (e.g. `rg-aetherion-microhack-a7c3`), so parallel runs don't collide:
+
+    ```powershell
+    ./scripts/provision-environment.ps1 -UniqueSuffix
+    ```
+
+    The script prints the final resource group name — scope the Azure SRE Agent
+    to **that** group.
+
 ## 5. What gets deployed
 
 [![Aetherion AirOps — Azure SRE Agent MicroHack environment architecture](../assets/architecture/aetherion-architecture.png){ .arch-diagram loading=lazy }](../assets/architecture/aetherion-architecture.png)
