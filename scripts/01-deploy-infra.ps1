@@ -65,6 +65,17 @@ foreach ($k in $outputs.PSObject.Properties.Name) {
 
 $state | ConvertTo-Json -Depth 5 | Set-Content -Path $envFile -Encoding UTF8
 Write-Host "Infrastructure deployed. State saved to $envFile" -ForegroundColor Green
+
+# Container Insights is enabled AFTER the cluster exists (not inline in Bicep) so
+# the AKS create stays fast and never hangs reconciling the monitoring addon.
+Write-Host "Enabling Container Insights on AKS..." -ForegroundColor Cyan
+az aks enable-addons --resource-group $ResourceGroup --name $state.aksName `
+    --addons monitoring --workspace-resource-id $state.logAnalyticsId --only-show-errors 2>$null
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "  Container Insights not enabled yet - enable later with:" -ForegroundColor Yellow
+    Write-Host "  az aks enable-addons -g $ResourceGroup -n $($state.aksName) -a monitoring --workspace-resource-id $($state.logAnalyticsId)" -ForegroundColor Gray
+}
+
 Write-Host "  ACR:     $($state.acrLoginServer)" -ForegroundColor Gray
 Write-Host "  AKS:     $($state.aksName)" -ForegroundColor Gray
 Write-Host "  APIM:    $($state.apimGatewayUrl)" -ForegroundColor Gray

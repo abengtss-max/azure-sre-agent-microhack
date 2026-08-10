@@ -109,14 +109,6 @@ resource aks 'Microsoft.ContainerService/managedClusters@2024-05-01' = {
         maxCount: aksNodeCount + 2
       }
     ]
-    addonProfiles: {
-      omsagent: {
-        enabled: true
-        config: {
-          logAnalyticsWorkspaceResourceID: law.id
-        }
-      }
-    }
   }
 }
 
