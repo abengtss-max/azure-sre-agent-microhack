@@ -1799,6 +1799,15 @@ validate, then opens the Operations Center, <abbr title="Dashboarding tool used 
 your browser.</p>
 <p>Defaults: resource group <code>rg-aetherion-microhack</code>, region <code>swedencentral</code>.
 Override with <code>-ResourceGroup</code>, <code>-Location</code>, or <code>-NamePrefix</code> if needed.</p>
+<div class="admonition tip">
+<p class="admonition-title">Running more than one microhack in the same subscription?</p>
+<p>Add <code>-UniqueSuffix</code> to provision into a uniquely named resource group
+(e.g. <code>rg-aetherion-microhack-a7c3</code>), so parallel runs don't collide:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="n">provision-environment</span><span class="p">.</span><span class="n">ps1</span> <span class="n">-UniqueSuffix</span>
+</code></pre></div>
+<p>The script prints the final resource group name — scope the Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent
+to <strong>that</strong> group.</p>
+</div>
 <h2 id="5-what-gets-deployed">5. What gets deployed<a class="headerlink" href="#5-what-gets-deployed" title="Permanent link">&para;</a></h2>
 <p><a href="../../assets/architecture/aetherion-architecture.png"><img alt="Aetherion AirOps — Azure SRE Agent MicroHack environment architecture" class="arch-diagram" loading="lazy" src="../../assets/architecture/aetherion-architecture.png" /></a></p>
 <p><em>Request/data flow runs left to right (solid blue); telemetry and control flow to
@@ -1839,7 +1848,7 @@ observability and the Azure <abbr title="Site Reliability Engineering — runnin
 reports a healthy, traffic-generating estate and the Operations Center loads with
 all tiles green.</p>
 <p>Re-run the check on its own at any time:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="n">04-validate</span><span class="p">.</span><span class="n">ps1</span> <span class="n">-ResourceGroup</span> <span class="n">rg-aetherion-microhack</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="n">04-validate</span><span class="p">.</span><span class="n">ps1</span> <span class="n">-ResourceGroup</span> <span class="n">rg-aetherion-microhack</span>
 </code></pre></div>
 <p><a class="md-button md-button--primary" href="../../challenges/01-onboard-and-baseline/">Start Challenge 1 →</a></p>
 <hr />
