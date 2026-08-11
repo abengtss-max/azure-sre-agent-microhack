@@ -1,6 +1,6 @@
 # Aetherion AirOps - tear down microhack environment(s).
 # Each microhack is a pair: the hack resource group plus its '<rg>-loadgen' group.
-# In a shared subscription there may be several (see provision -UniqueSuffix), so
+# In a shared subscription there may be several (each provision creates a suffixed RG), so
 # with no arguments this discovers them and lets you pick which to delete.
 #
 #   ./99-teardown.ps1                 # interactive: list + pick

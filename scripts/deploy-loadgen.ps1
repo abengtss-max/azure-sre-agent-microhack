@@ -12,7 +12,7 @@
 # Each call recreates the container instance with the requested profile.
 
 param(
-    # Hack resource group - defaults to the state file's value so it follows -UniqueSuffix.
+    # Hack resource group - defaults to the state file's value so it follows the provisioned RG.
     [string]$ResourceGroup = "",
     # Separate resource group for the load generator (NOT monitored by the agent).
     [string]$LoadGenResourceGroup = "",
@@ -30,7 +30,7 @@ if (-not (Test-Path $envFile)) { throw "State file not found. Run 03-deploy-app.
 $state = Get-Content $envFile -Raw | ConvertFrom-Json
 
 # Resolve the target from the state file when not passed explicitly, so surge/reset
-# always hit the correct (possibly -UniqueSuffix'd) environment - never a hardcoded name.
+# always hit the correct (suffixed) environment - never a hardcoded name.
 if ([string]::IsNullOrWhiteSpace($ResourceGroup)) { $ResourceGroup = $state.resourceGroup }
 if ([string]::IsNullOrWhiteSpace($Location)) { $Location = if ($state.location) { $state.location } else { "swedencentral" } }
 # Load-gen RG is derived from the hack RG so it's always paired but separate.

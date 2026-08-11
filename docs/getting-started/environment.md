@@ -69,19 +69,15 @@ preflight → deploy infrastructure → build & push images → deploy the app �
 validate, then opens the Operations Center, Grafana, and the resource group in
 your browser.
 
-Defaults: resource group `rg-aetherion-microhack`, region `swedencentral`.
-Override with `-ResourceGroup`, `-Location`, or `-NamePrefix` if needed.
+Each run provisions into a **uniquely named** resource group,
+`rg-aetherion-microhack-<suffix>` (for example `rg-aetherion-microhack-a7c3`), in
+`swedencentral`. The script **prints the exact name** when it finishes — use that
+name wherever these docs mention *your resource group*, and when you scope the
+Azure SRE Agent to it. Because every run is unique, multiple attendees can share a
+single subscription and you can safely re-provision without collisions.
 
-!!! tip "Running more than one microhack in the same subscription?"
-    Add `-UniqueSuffix` to provision into a uniquely named resource group
-    (e.g. `rg-aetherion-microhack-a7c3`), so parallel runs don't collide:
-
-    ```powershell
-    ./scripts/provision-environment.ps1 -UniqueSuffix
-    ```
-
-    The script prints the final resource group name — scope the Azure SRE Agent
-    to **that** group.
+Override the base name or region with `-ResourceGroup`, `-Location`, or
+`-NamePrefix` — the unique suffix is always appended.
 
 ## 5. What gets deployed
 
@@ -108,7 +104,7 @@ all tiles green.
 Re-run the check on its own at any time:
 
 ```powershell
-./scripts/04-validate.ps1 -ResourceGroup rg-aetherion-microhack
+./scripts/04-validate.ps1
 ```
 
 [Start Challenge 1 →](../challenges/01-onboard-and-baseline.md){ .md-button .md-button--primary }

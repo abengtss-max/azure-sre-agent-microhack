@@ -9,13 +9,12 @@ repository root, signed in with `az login` and the correct subscription selected
 | Command | What it does |
 |---------|--------------|
 | `./scripts/00-check-providers.ps1` | Verifies and registers required resource providers (idempotent) |
-| `./scripts/01-deploy-infra.ps1 -ResourceGroup rg-aetherion -Location eastus` | Provisions infrastructure via Bicep |
-| `./scripts/02-build-push-images.ps1 -ResourceGroup rg-aetherion` | Builds and pushes the app image to ACR |
-| `./scripts/03-deploy-app.ps1 -ResourceGroup rg-aetherion` | Deploys the app + k6 to AKS and wires APIM to the gateway |
+| `./scripts/01-deploy-infra.ps1 -ResourceGroup <your-rg> -Location eastus` | Provisions infrastructure via Bicep |
+| `./scripts/02-build-push-images.ps1 -ResourceGroup <your-rg>` | Builds and pushes the app image to ACR |
+| `./scripts/03-deploy-app.ps1 -ResourceGroup <your-rg>` | Deploys the app + k6 to AKS and wires APIM to the gateway |
 | `./scripts/03b-setup-https.ps1` | Configures HTTPS on the gateway (Let's Encrypt) |
-| `./scripts/04-validate.ps1 -ResourceGroup rg-aetherion` | Validates the estate is healthy and generating traffic |
-| `./scripts/provision-environment.ps1` | End-to-end provisioning wrapper |
-| `./scripts/provision-environment.ps1 -UniqueSuffix` | Same, but provisions into a uniquely named resource group (e.g. `rg-aetherion-microhack-a7c3`) so you can run **multiple microhacks in one subscription** |
+| `./scripts/04-validate.ps1` | Validates the estate is healthy and generating traffic (reads the resource group from local state) |
+| `./scripts/provision-environment.ps1` | End-to-end provisioning wrapper — always provisions into a **uniquely named** `rg-aetherion-microhack-<suffix>` and prints the name (safe for multiple microhacks in one subscription) |
 
 ## Running the hack
 

@@ -19,19 +19,17 @@ param(
     [switch]$SkipProviders,
     [switch]$SkipValidate,
     [switch]$NoBanner,
-    [switch]$NoLaunch,
-    [switch]$UniqueSuffix
+    [switch]$NoLaunch
 )
 
 $ErrorActionPreference = "Stop"
 $start = Get-Date
 $here = $PSScriptRoot
 
-# -UniqueSuffix: append a random 4-char suffix so multiple microhacks can share one subscription.
-if ($UniqueSuffix) {
-    $sfx = -join ((48..57) + (97..122) | Get-Random -Count 4 | ForEach-Object { [char]$_ })
-    $ResourceGroup = "$ResourceGroup-$sfx"
-}
+# Every run gets a unique 4-char suffix so multiple microhacks can safely share one
+# subscription. -ResourceGroup sets the base name; the suffix is always appended.
+$sfx = -join ((48..57) + (97..122) | Get-Random -Count 4 | ForEach-Object { [char]$_ })
+$ResourceGroup = "$ResourceGroup-$sfx"
 
 function Write-Step($n, $total, $text) {
     Write-Host ""

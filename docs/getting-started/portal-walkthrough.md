@@ -15,10 +15,15 @@ Everything in this hack uses the same defaults:
 
 | Setting | Value |
 |---------|-------|
-| Resource group | `rg-aetherion-microhack` |
+| Resource group | `rg-aetherion-microhack-<suffix>` (your unique name) |
 | Region | `swedencentral` |
 | AKS cluster | `aetherion-aks` (namespace `aetherion`) |
 | SRE Agent | `aetherion-sre-agent` |
+
+!!! note "Your resource group name is unique"
+    Provisioning always creates `rg-aetherion-microhack-<suffix>` (for example
+    `rg-aetherion-microhack-a7c3`) and **prints the exact name** at the end.
+    Wherever this guide says the resource group, use **your** suffixed name.
 
 ---
 
@@ -28,8 +33,9 @@ Everything in this hack uses the same defaults:
    the account that owns the subscription you provisioned.
 2. Confirm the correct directory/subscription: select your avatar (top-right) →
    **Switch directory** if you have more than one.
-3. In the top search bar, type `rg-aetherion-microhack` and open the resource
-   group. Pin it (the star icon) so it's one click away all day.
+3. In the top search bar, type your resource group name
+   (`rg-aetherion-microhack-<suffix>`) and open it. Pin it (the star icon) so it's
+   one click away all day.
 
 ---
 
@@ -70,7 +76,7 @@ Do this once, in Challenge 1.
 2. Select **Create**.
 3. On **Basics**, set:
     - **Subscription:** your subscription.
-    - **Resource group:** `rg-aetherion-microhack`.
+    - **Resource group:** your provisioned group (`rg-aetherion-microhack-<suffix>`).
     - **Name:** `aetherion-sre-agent`.
     - **Region:** the closest supported region (e.g. `swedencentral`).
 4. Leave the default **managed identity** option so the agent gets its own
@@ -87,7 +93,7 @@ Reference: [Create and set up](https://learn.microsoft.com/en-us/azure/sre-agent
 
 This lets the agent *see* the whole estate but change nothing.
 
-1. Open the **resource group** `rg-aetherion-microhack` → **Access control (IAM)**.
+1. Open your **resource group** (`rg-aetherion-microhack-<suffix>`) → **Access control (IAM)**.
 2. Select **Add** → **Add role assignment**.
 3. **Role:** search and pick **Reader**.
 4. **Members:** choose **Managed identity** → select the `aetherion-sre-agent`
