@@ -155,10 +155,7 @@ read-only check so the agent watches for drift on its own.
 
 - [Create and set up the SRE Agent](https://learn.microsoft.com/en-us/azure/sre-agent/create-and-set-up)
 - [Complete your setup](https://learn.microsoft.com/en-us/azure/sre-agent/complete-setup)
-- [Connect Log Analytics and Application Insights](https://learn.microsoft.com/en-us/azure/sre-agent/log-analytics-app-insights)
-- [Manage roles and permissions](https://learn.microsoft.com/en-us/azure/sre-agent/manage-permissions)
-- [Scheduled tasks](https://learn.microsoft.com/en-us/azure/sre-agent/scheduled-tasks)
-- [Azure portal walkthrough](../getting-started/portal-walkthrough.md) · [Architecture](../reference/architecture.md) · [Commands](../reference/commands.md)
+- [Tutorial: Create and edit scheduled tasks](https://learn.microsoft.com/en-us/azure/sre-agent/create-scheduled-task)
 
 !!! success "Up next — the first real symptom"
     Challenge 2 injects the first incident, so your board will go from green to
