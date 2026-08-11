@@ -100,12 +100,43 @@ operational baseline, and schedule a proactive daily health check.
           or the baseline will record the fault as "normal".
 
     ??? note "Task 5 · Put it on a schedule"
-        - Ask the agent to schedule the baseline, for example *"Schedule this
-          baseline to run every morning at 08:00 and alert me on drift from normal."*
-        - It creates an **agent scheduled task** (Automation), resolves the
-          timezone/cron, and sets the alert conditions.
-        - **Verify the thresholds** it chose — on a clean baseline the booking path
-          is sub-second, so an alert at "p95 > 3 s" would miss real latency.
+        You can schedule the baseline two ways — by asking in chat, or from the
+        **Scheduled tasks** page in the portal.
+
+        **Option A — ask the agent.** In the chat, say *"Schedule this baseline to
+        run every morning at 08:00 and alert me on drift from normal."* It creates
+        the scheduled task, resolves the timezone/cron, and sets the conditions.
+
+        **Option B — configure it in the portal, step by step:**
+
+        1. Open your **Azure SRE Agent** resource, then select **Scheduled tasks**
+           in the left sidebar.
+        2. Select **Create task** in the toolbar.
+        3. Fill in the form:
+            - **Task name** — e.g. `Daily baseline health check`.
+            - **Task details** — the instruction the agent runs each time, e.g.
+              *"Check the health of the `aetherion` namespace, compare replica
+              counts and check-in / booking latency against the recorded baseline,
+              and summarize any drift."*
+            - **Frequency** — `Daily` (`Weekly`, `Monthly`, or a `Custom cron` are
+              also available).
+            - **Time of day** — e.g. `8:00 AM`.
+        4. Review the optional fields:
+            - **Response custom agent** — leave empty to use the main agent.
+            - **Message grouping for updates** — "Use same thread" keeps each day's
+              results together.
+            - **Agent autonomy level** — the default is fine here; because the task
+              only asks the agent to check and summarize, it reports rather than
+              changing anything.
+        5. Select **Create task**. It appears in the list with status **On** and a
+           **next run** time.
+        6. After the first run, select the task name to open its **execution
+           history** — each run is a thread showing the plan, the tools used, and
+           the outcome. To change the schedule or wording later, select the task →
+           **Edit task** → **Save** (execution history is preserved).
+
+        **Verify the thresholds** it uses — on a clean baseline the booking path is
+        sub-second, so an alert at "p95 > 3 s" would miss real latency.
 
 ![Challenge 1 storyboard — Sam and Aria onboard the SRE Agent and read the baseline](../assets/storyboard/img-challenge-1.webp){ .story-panel loading=lazy }
 
