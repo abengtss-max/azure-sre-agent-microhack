@@ -2056,12 +2056,10 @@ separate steps — Create alone grants no access to your app.</p>
 <li><strong>Azure resources</strong> → set the scope to <strong>Resource group</strong>, select <strong>only your
    app resource group</strong>, and pick the <strong><abbr title="The built-in Azure role that grants read-only access — see everything, change nothing.">Reader</abbr></strong> permission level.</li>
 </ol>
-<div class="admonition danger">
+<div class="admonition warning">
 <p class="admonition-title">Scope the agent to the app resource group only</p>
-<p>Do <strong>not</strong> choose <em>Subscription</em> or <em>Management group</em> scope. A parallel
-resource group (<code>…-loadgen</code>) runs the hidden load generator that drives this
-lab; subscription-wide scope would expose it to the agent and muddy its view
-of the application. Resource-group scope keeps the agent focused on the app.</p>
+<p>Do <strong>not</strong> choose <em>Subscription</em> or <em>Management group</em> scope. Resource-group
+scope keeps the agent focused on just this application.</p>
 </div>
 <blockquote>
 <p><strong>Knowledge</strong> is connected later, in Challenge 4 — not here.</p>
