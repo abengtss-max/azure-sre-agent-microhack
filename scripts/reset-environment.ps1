@@ -1,6 +1,6 @@
 # Aetherion AirOps - reset all injected failures back to a clean, healthy baseline.
 #
-# Clears every app FAULT_MODE, removes the APIM throttle policy, and returns the
+# Resets every service profile, removes the APIM throttle policy, and returns the
 # load generator to normal, then verifies the platform reports healthy.
 # Use -ResetProgress to ALSO reset the linear challenge unlock gate
 # (aetherion-progress) back to 1 for a brand-new run.
@@ -12,13 +12,14 @@ param(
 $ErrorActionPreference = "Stop"
 $ns = "aetherion"
 $envFile = Join-Path $PSScriptRoot ".env.aetherion.json"
+. (Join-Path $PSScriptRoot 'lib-apim.ps1')
 $services = @("flight-ops", "crew-scheduling", "booking", "baggage", "telemetry-ingest", "gateway")
 
-Write-Host "Clearing FAULT_MODE on all services..." -ForegroundColor Cyan
+Write-Host "Resetting service profiles to standard..." -ForegroundColor Cyan
 foreach ($s in $services) {
     # Keep going if one deployment is missing; a partial estate should still reset.
-    kubectl set env deploy/$s -n $ns FAULT_MODE=none 2>$null | Out-Null
-    if ($LASTEXITCODE -eq 0) { Write-Host "  $s -> none" -ForegroundColor Gray }
+    kubectl set env deploy/$s -n $ns SVC_PROFILE=standard 2>$null | Out-Null
+    if ($LASTEXITCODE -eq 0) { Write-Host "  $s -> standard" -ForegroundColor Gray }
     else { Write-Host "  $s -> skipped (deployment not found)" -ForegroundColor DarkYellow }
 }
 
@@ -28,19 +29,11 @@ Write-Host "  k6 load -> normal (25 VUs)" -ForegroundColor Gray
 
 if (Test-Path $envFile) {
     $state = Get-Content $envFile -Raw | ConvertFrom-Json
-    $policy = @"
-<policies>
-  <inbound><base /></inbound>
-  <backend><base /></backend>
-  <outbound><base /></outbound>
-  <on-error><base /></on-error>
-</policies>
-"@
-    $tmp = Join-Path $env:TEMP "apim-reset-policy.xml"
-    $policy | Set-Content -Path $tmp -Encoding UTF8
+    $policy = '<policies><inbound><base /></inbound><backend><base /></backend><outbound><base /></outbound><on-error><base /></on-error></policies>'
     Write-Host "Restoring default APIM product policy..." -ForegroundColor Cyan
-    az apim product policy create --resource-group $state.resourceGroup --service-name $state.apimName `
-        --product-id aetherion-ops --policy-file $tmp --policy-format xml | Out-Null
+    if (-not (Set-AetherionApimProductPolicy -ResourceGroup $state.resourceGroup -ApimName $state.apimName -PolicyXml $policy)) {
+        Write-Host "  WARNING: APIM product policy reset failed (a throttle from Challenge 7 may persist)." -ForegroundColor Yellow
+    }
 }
 
 # Optionally reset the linear challenge unlock gate for a fresh run.

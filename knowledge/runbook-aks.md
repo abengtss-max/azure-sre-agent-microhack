@@ -25,28 +25,26 @@ kubectl get events -n aetherion --sort-by=.lastTimestamp
 
 ## Fault: crash (liveness failing, CrashLoopBackOff)
 
-- Cause in this env: `FAULT_MODE=crash` on the deployment.
-- Confirm: `kubectl get deploy/<svc> -n aetherion -o jsonpath='{.spec.template.spec.containers[0].env}'`.
-- Remediate: clear the fault -> `kubectl set env deploy/<svc> -n aetherion FAULT_MODE=none`.
+- Symptom: pods fail liveness/readiness, CrashLoopBackOff, the service tile goes dark.
+- Confirm: `kubectl describe deploy/<svc> -n aetherion`; check the recent rollout / change history.
+- Remediate (this teaching env): reset the service profile ->
+  `kubectl set env deploy/<svc> -n aetherion SVC_PROFILE=standard` (or run `reset-environment.ps1`).
 - If a real crash: `kubectl rollout undo deploy/<svc> -n aetherion`.
 
 ## Fault: memory pressure / OOM
 
-- Cause in this env: `FAULT_MODE=memory` grows heap until the pod is OOM-killed.
 - Symptom: restarts with reason `OOMKilled`, rising memory in Azure Monitor.
-- Remediate: clear `FAULT_MODE`; if real, raise memory limits or scale out.
+- Remediate (this teaching env): reset the service profile to `standard`; if real, raise memory limits or scale out.
 
 ## Fault: high latency
 
-- Cause in this env: `FAULT_MODE=latency` adds artificial delay.
 - Symptom: amber tiles, elevated request duration in Application Insights.
-- Remediate: clear `FAULT_MODE`; if real, check downstream + CPU, let HPA scale.
+- Remediate (this teaching env): reset the service profile to `standard`; if real, check downstream + CPU, let HPA scale.
 
 ## Fault: error rate
 
-- Cause in this env: `FAULT_MODE=error` returns HTTP 500 for a share of requests.
-- Symptom: failed requests in Application Insights, red/amber tile.
-- Remediate: clear `FAULT_MODE`; if real, `kubectl rollout undo`.
+- Symptom: failed requests (HTTP 500) in Application Insights, red/amber tile.
+- Remediate (this teaching env): reset the service profile to `standard`; if real, `kubectl rollout undo`.
 
 ## Guardrails (AKS-specific)
 

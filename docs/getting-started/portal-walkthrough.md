@@ -70,7 +70,8 @@ incident.
 
 ## D · Create the SRE Agent { #d-create-agent }
 
-Do this once, in Challenge 1.
+Do this once, in Challenge 1. **Creating** the agent and **setting it up** are two
+separate steps — Create alone grants no access to your app.
 
 1. In the portal search bar, type **Azure SRE Agent** and select it.
 2. Select **Create**.
@@ -79,8 +80,12 @@ Do this once, in Challenge 1.
     - **Resource group:** your provisioned group (`rg-aetherion-microhack-<suffix>`).
     - **Name:** `aetherion-sre-agent`.
     - **Region:** the closest supported region (e.g. `swedencentral`).
-4. Leave the default **managed identity** option so the agent gets its own
-   identity (you grant it roles later).
+    - **Application Insights:** choose **Create new**. The agent provisions its own
+      App Insights + Log Analytics for *its own* telemetry — this is separate from
+      the app's `aetherion-law` / `aetherion-appi`.
+    - **Model provider:** **Azure OpenAI** is a good default (lower cost, stays in
+      the EU data boundary).
+4. Leave the default **managed identity** option so the agent gets its own identity.
 5. Select **Review + create** → **Create** and wait for deployment to finish.
 6. Open the resource and confirm the chat/console loads.
 
@@ -89,9 +94,32 @@ Reference: [Create and set up](https://learn.microsoft.com/en-us/azure/sre-agent
 
 ---
 
+## D2 · Set up your agent — connect context { #d-setup }
+
+In the agent, run **Set up your agent** (**Full setup**) and connect three sources:
+
+1. **Code** → **GitHub** → sign in → add **your fork** of `aetherion-airops-platform`
+   (used for change correlation in Challenge 3).
+2. **Logs** → **Log Analytics Workspace** → pick the app's **`aetherion-law`**
+   (not the agent's own auto-created workspace).
+3. **Azure resources** → set the scope to **Resource group**, select **only your
+   app resource group**, and pick the **Reader** permission level.
+
+!!! danger "Scope the agent to the app resource group only"
+    Do **not** choose *Subscription* or *Management group* scope. A parallel
+    resource group (`…-loadgen`) runs the hidden load generator that drives this
+    lab; subscription-wide scope would expose it to the agent and muddy its view
+    of the application. Resource-group scope keeps the agent focused on the app.
+
+> **Knowledge** is connected later, in Challenge 4 — not here.
+
+---
+
 ## E · Give the agent read-only (Reader) access { #e-reader }
 
-This lets the agent *see* the whole estate but change nothing.
+The **Set up your agent** wizard (section D2) already grants this. Do it manually
+here only if you skipped the wizard's *Azure resources* step. Reader lets the agent
+*see* the resource group; in **Review** mode it still asks before any change.
 
 1. Open your **resource group** (`rg-aetherion-microhack-<suffix>`) → **Access control (IAM)**.
 2. Select **Add** → **Add role assignment**.
@@ -102,7 +130,13 @@ This lets the agent *see* the whole estate but change nothing.
 6. Back in the agent, ask it to *"list the resources in the resource group and
    summarise the application"* to confirm scope.
 
-Reference: [Permissions & run modes](https://learn.microsoft.com/en-us/azure/sre-agent/permissions)
+!!! note "Permissions vs. run mode"
+    Creating and setting up the agent grants its identity **Monitoring Contributor**
+    plus a reader bundle — so the identity is *not* strictly read-only. The
+    guarantee that it won't change anything without you comes from the **Review**
+    run mode (section F), not from the role.
+
+Reference: [Manage roles and permissions](https://learn.microsoft.com/en-us/azure/sre-agent/manage-permissions)
 
 ---
 

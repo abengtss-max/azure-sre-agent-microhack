@@ -75,7 +75,7 @@ spec:
           ports: [{ containerPort: 8080 }]
           env:
             - { name: ROLE, value: "gateway" }
-            - { name: FAULT_MODE, value: "none" }
+            - { name: SVC_PROFILE, value: "standard" }
             - name: APPLICATIONINSIGHTS_CONNECTION_STRING
               valueFrom: { secretKeyRef: { name: aetherion-secrets, key: APPLICATIONINSIGHTS_CONNECTION_STRING } }
           readinessProbe: { httpGet: { path: /health/ready, port: 8080 }, initialDelaySeconds: 5, periodSeconds: 10 }
@@ -117,7 +117,7 @@ spec:
           envFrom: [{ configMapRef: { name: aetherion-config } }]
           env:
             - { name: ROLE, value: "flight-ops" }
-            - { name: FAULT_MODE, value: "none" }
+            - { name: SVC_PROFILE, value: "standard" }
             - { name: PGHOST, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: PGHOST } } }
             - { name: PGUSER, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: PGUSER } } }
             - { name: PGPASSWORD, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: PGPASSWORD } } }
@@ -154,7 +154,7 @@ spec:
           envFrom: [{ configMapRef: { name: aetherion-config } }]
           env:
             - { name: ROLE, value: "crew-scheduling" }
-            - { name: FAULT_MODE, value: "none" }
+            - { name: SVC_PROFILE, value: "standard" }
             - { name: PGHOST, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: PGHOST } } }
             - { name: PGUSER, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: PGUSER } } }
             - { name: PGPASSWORD, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: PGPASSWORD } } }
@@ -191,7 +191,7 @@ spec:
           envFrom: [{ configMapRef: { name: aetherion-config } }]
           env:
             - { name: ROLE, value: "booking" }
-            - { name: FAULT_MODE, value: "none" }
+            - { name: SVC_PROFILE, value: "standard" }
             - { name: PGHOST, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: PGHOST } } }
             - { name: PGUSER, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: PGUSER } } }
             - { name: PGPASSWORD, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: PGPASSWORD } } }
@@ -229,7 +229,7 @@ spec:
           ports: [{ containerPort: 8080 }]
           env:
             - { name: ROLE, value: "baggage" }
-            - { name: FAULT_MODE, value: "none" }
+            - { name: SVC_PROFILE, value: "standard" }
             - { name: APPLICATIONINSIGHTS_CONNECTION_STRING, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: APPLICATIONINSIGHTS_CONNECTION_STRING } } }
           readinessProbe: { httpGet: { path: /health/ready, port: 8080 }, initialDelaySeconds: 5, periodSeconds: 10 }
           livenessProbe: { httpGet: { path: /health/live, port: 8080 }, initialDelaySeconds: 10, periodSeconds: 10 }
@@ -263,7 +263,7 @@ spec:
           envFrom: [{ configMapRef: { name: aetherion-config } }]
           env:
             - { name: ROLE, value: "telemetry-ingest" }
-            - { name: FAULT_MODE, value: "none" }
+            - { name: SVC_PROFILE, value: "standard" }
             - { name: PGHOST, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: PGHOST } } }
             - { name: PGUSER, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: PGUSER } } }
             - { name: PGPASSWORD, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: PGPASSWORD } } }

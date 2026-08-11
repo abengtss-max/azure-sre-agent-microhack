@@ -42,11 +42,10 @@ investigation — before you reach Challenge 7.
 4. **Design a cost-aware model** — name concrete reductions (consolidate workloads, delete unused pilots, right-size model choice, trim noisy plans/schedules) without losing reliability, ownership, RBAC, isolation or investigation quality.
 5. **Arm the Sev1 response plan** — bind the pre-provisioned `aetherion-major-incident` alert to the agent so the next major incident auto-triggers an investigation. Do this **now**, before Challenge 7.
 
-!!! question "Stuck? Full walkthrough available"
-    Give each task a genuine attempt before reaching for help — working it out
-    yourself is where the learning sticks. Only if you get truly stuck, the
-    [Azure portal walkthrough](../getting-started/portal-walkthrough.md) has the
-    exact click-by-click for every step.
+!!! question "Stuck? Give each task a genuine attempt first"
+    Working it out yourself is where the learning sticks. If you need the exact
+    clicks, the [Azure portal walkthrough](../getting-started/portal-walkthrough.md)
+    has a step for every action.
 
 ![Challenge 6 storyboard — Sam, Priya and Aria review autonomous recovery and cost governance](../assets/storyboard/img-challenge-6.webp){ .story-panel loading=lazy }
 
@@ -72,7 +71,7 @@ investigation — before you reach Challenge 7.
 
 !!! success "Verify your work"
 
-    Run this when you're done — it grades the real end state and unlocks the next challenge:
+    Run this when you're done. It grades the real end state:
 
     ```powershell
     ./scripts/check-challenge.ps1 6

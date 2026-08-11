@@ -38,11 +38,10 @@ risk.
 3. **Write the engineering RCA handover** — precise actions, verification, open risks, and change-correlation evidence (Activity Log + GitHub) for the next on-call.
 4. **Generate the executive PDF** — have the agent render the briefing (with an incident-timeline chart) via its built-in **Python sandbox**.
 
-!!! question "Stuck? Full walkthrough available"
-    Give each task a genuine attempt before reaching for help — working it out
-    yourself is where the learning sticks. Only if you get truly stuck, the
-    [Azure portal walkthrough](../getting-started/portal-walkthrough.md) has the
-    exact click-by-click for every step.
+!!! question "Stuck? Give each task a genuine attempt first"
+    Working it out yourself is where the learning sticks. If you need the exact
+    clicks, the [Azure portal walkthrough](../getting-started/portal-walkthrough.md)
+    has a step for every action.
 
 ![Challenge 8 storyboard — Sam and Elena brief airline leadership as boarding resumes](../assets/storyboard/img-challenge-8.webp){ .story-panel loading=lazy }
 

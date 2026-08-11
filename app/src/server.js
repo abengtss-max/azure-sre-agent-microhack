@@ -9,21 +9,31 @@ const redisLib = require('./lib/redis');
 const ROLE = (process.env.ROLE || 'gateway').toLowerCase();
 const PORT = parseInt(process.env.PORT || '8080', 10);
 
-// Fault injection is controlled entirely by environment variables so a
-// facilitator can toggle behaviour with `kubectl set env deploy/<svc> ...`.
-//   FAULT_MODE = none | latency | error | crash | memory | db-pool
-const FAULT_MODE = (process.env.FAULT_MODE || 'none').toLowerCase();
-const FAULT_LATENCY_MS = parseInt(process.env.FAULT_LATENCY_MS || '2500', 10);
-const FAULT_ERROR_RATE = parseFloat(process.env.FAULT_ERROR_RATE || '0.5');
+// Behaviour is controlled by an opaque service-profile environment variable so
+// its value never names the underlying condition: an operator (or agent) that
+// inspects the deployment sees only `SVC_PROFILE=r1`, not `FAULT_MODE=latency`.
+//   SVC_PROFILE = standard | r1 | r2 | r3 | r4 | r5
+const PROFILE_FAULT = {
+  standard: 'none',
+  r1: 'latency',
+  r2: 'error',
+  r3: 'crash',
+  r4: 'memory',
+  r5: 'db-pool',
+};
+const SVC_PROFILE = (process.env.SVC_PROFILE || 'standard').toLowerCase();
+const FAULT_MODE = PROFILE_FAULT[SVC_PROFILE] || 'none';
+const FAULT_LATENCY_MS = parseInt(process.env.PROFILE_DELAY_MS || '2500', 10);
+const FAULT_ERROR_RATE = parseFloat(process.env.PROFILE_ERR_RATE || '0.5');
 
 initTelemetry(ROLE);
 
 const app = express();
 app.use(express.json());
 
-// Simulated memory leak store (only grows when FAULT_MODE=memory)
+// Simulated memory leak store (only grows under profile r4)
 const leakedMemory = [];
-// Leaked DB clients (only grows when FAULT_MODE=db-pool) - never released
+// Leaked DB clients (only grows under profile r5) - never released
 const leakedDbClients = [];
 let started = Date.now();
 let requestCount = 0;
@@ -96,7 +106,7 @@ app.get('/health/ready', async (req, res) => {
 });
 
 app.get('/api/health', (req, res) => {
-  res.json({ role: ROLE, faultMode: FAULT_MODE, requests: requestCount });
+  res.json({ role: ROLE, profile: SVC_PROFILE, requests: requestCount });
 });
 
 // ---- Role-specific domain endpoints -------------------------------------
@@ -354,7 +364,7 @@ async function bootstrap() {
   }
   registerRoleRoutes();
   app.listen(PORT, () => {
-    console.log(`[aetherion] role=${ROLE} listening on :${PORT} faultMode=${FAULT_MODE}`);
+    console.log(`[aetherion] role=${ROLE} listening on :${PORT} profile=${SVC_PROFILE}`);
   });
 }
 

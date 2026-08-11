@@ -79,6 +79,23 @@ single subscription and you can safely re-provision without collisions.
 Override the base name or region with `-ResourceGroup`, `-Location`, or
 `-NamePrefix` — the unique suffix is always appended.
 
+!!! warning "Re-provisioning leaves the previous environment running"
+    Because each run creates a **new** suffixed resource group, re-provisioning
+    does **not** replace your earlier environment — the previous one keeps running
+    (and billing), and a stray copy can confuse the agent if you scope it to the
+    wrong one. If you re-provision, either reuse the environment you already have,
+    or tear down the old ones. The teardown script lists every
+    `rg-aetherion-microhack-*` environment (each with its paired `-loadgen` group)
+    and lets you pick which to delete:
+
+    ```powershell
+    ./scripts/99-teardown.ps1        # pick an environment to delete
+    ./scripts/99-teardown.ps1 -All   # delete all lab environments
+    ```
+
+    Always scope the Azure SRE Agent to your **current** resource group — the name
+    the provisioner printed when it finished.
+
 ## 5. What gets deployed
 
 [![Aetherion AirOps — Azure SRE Agent MicroHack environment architecture](../assets/architecture/aetherion-architecture.png){ .arch-diagram loading=lazy }](../assets/architecture/aetherion-architecture.png)

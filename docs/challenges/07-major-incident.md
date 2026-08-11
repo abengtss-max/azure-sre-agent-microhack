@@ -49,11 +49,10 @@ approved or bounded actions, and verify recovery service by service.
 5. **Localize the front door** — use the direct-vs-APIM comparison; treat the policy change as customer-facing.
 6. **Verify every service** — confirm each fix from telemetry, then the whole platform green.
 
-!!! question "Stuck? Full walkthrough available"
-    Give each task a genuine attempt before reaching for help — working it out
-    yourself is where the learning sticks. Only if you get truly stuck, the
-    [Azure portal walkthrough](../getting-started/portal-walkthrough.md) has the
-    exact click-by-click for every step.
+!!! question "Stuck? Give each task a genuine attempt first"
+    Working it out yourself is where the learning sticks. If you need the exact
+    clicks, the [Azure portal walkthrough](../getting-started/portal-walkthrough.md)
+    has a step for every action.
 
 ![Challenge 7 storyboard — Sam, Aria and Elena restore global check-in before peak departure](../assets/storyboard/img-challenge-7.webp){ .story-panel loading=lazy }
 
@@ -80,7 +79,7 @@ approved or bounded actions, and verify recovery service by service.
 
 !!! success "Verify your work"
 
-    Run this when you're done — it grades the real end state and unlocks the next challenge:
+    Run this when you're done. It grades the real end state:
 
     ```powershell
     ./scripts/check-challenge.ps1 7

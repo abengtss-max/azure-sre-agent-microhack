@@ -32,18 +32,21 @@ anything in production.
     ./scripts/start-challenge.ps1 2   # open the incident
     ```
 
+    Starting Challenge 2 injects the first incident, so your board moves from
+    green to degraded within a minute or two. That is expected — it's the symptom
+    you're here to investigate.
+
 ### Tasks
 
-1. **Confirm the symptom** — compare current check-in latency to your Challenge 1 baseline; trust the delta, not the feeling.
+1. **Confirm the symptom** — compare current check-in latency to your Challenge 1 baseline, and rely on the measured delta rather than a hunch.
 2. **Correlate read-only** — have the agent correlate `booking` request duration with CPU, replica count and request load.
 3. **Test the capacity theory** — if replicas scaled but latency stayed high while CPU isn't saturated, load alone doesn't explain it.
 4. **Record the hypothesis** — write the root cause, the ≥2 signals behind it, and the least-disruptive recovery you'd propose (don't perform it).
 
-!!! question "Stuck? Full walkthrough available"
-    Give each task a genuine attempt before reaching for help — working it out
-    yourself is where the learning sticks. Only if you get truly stuck, the
-    [Azure portal walkthrough](../getting-started/portal-walkthrough.md) has the
-    exact click-by-click for every step.
+!!! question "Stuck? Give each task a genuine attempt first"
+    Working it out yourself is where the learning sticks. If you need the exact
+    clicks, the [Azure portal walkthrough](../getting-started/portal-walkthrough.md)
+    has a step for every action.
 
 ![Challenge 2 storyboard — Sam and Aria detect and investigate the incident read-only](../assets/storyboard/img-challenge-2.webp){ .story-panel loading=lazy }
 
@@ -69,7 +72,7 @@ anything in production.
 
 !!! success "Verify your work"
 
-    Run this when you're done — it grades the real end state and unlocks the next challenge:
+    Run this when you're done. It grades the real end state:
 
     ```powershell
     ./scripts/check-challenge.ps1 2
@@ -79,12 +82,13 @@ anything in production.
 
 <details markdown="1"><summary>Hint</summary>
 
-Compare `booking` latency now against your recorded baseline — trust the delta, not
-the feeling. Correlate request duration with CPU and replicas over the same window,
-not latency alone. If the autoscaler added replicas and CPU isn't saturated yet
-latency stays high, the delay is being added independently of load — think about
-what adds a roughly constant delay per request. Detection is done when you can
-describe the symptom precisely and defend a hypothesis, not when it's fixed.
+Compare `booking` latency now against your recorded baseline and rely on the
+measured delta rather than a hunch. Correlate request duration with CPU and replicas
+over the same window, not latency alone. If the autoscaler added replicas and CPU
+isn't saturated yet latency stays high, the delay is being added independently of
+load — think about what adds a roughly constant delay per request. Detection is done
+when you can describe the symptom precisely and defend a hypothesis, not when it's
+fixed.
 </details>
 
 ### Reference

@@ -37,11 +37,10 @@ its guardrails intact.
 2. **Encode the skill** — capture the crew connection-pool relief from Challenge 4 as a reusable skill, keeping the guardrails (scale, never delete the database), and confirm it loads.
 3. **Know the difference** — a subagent is invoked and investigates; a skill auto-loads and encodes a procedure. You'll want both in the final incident.
 
-!!! question "Stuck? Full walkthrough available"
-    Give each task a genuine attempt before reaching for help — working it out
-    yourself is where the learning sticks. Only if you get truly stuck, the
-    [Azure portal walkthrough](../getting-started/portal-walkthrough.md) has the
-    exact click-by-click for every step.
+!!! question "Stuck? Give each task a genuine attempt first"
+    Working it out yourself is where the learning sticks. If you need the exact
+    clicks, the [Azure portal walkthrough](../getting-started/portal-walkthrough.md)
+    has a step for every action.
 
 ![Challenge 5 storyboard — Sam and Aria engineer a specialist subagent and reusable skill](../assets/storyboard/img-challenge-5.webp){ .story-panel loading=lazy }
 
@@ -60,7 +59,7 @@ its guardrails intact.
 
 !!! success "Verify your work"
 
-    Run this when you're done — it grades the real end state and unlocks the next challenge:
+    Run this when you're done. It grades the real end state:
 
     ```powershell
     ./scripts/check-challenge.ps1 5

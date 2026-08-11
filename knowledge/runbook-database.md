@@ -9,8 +9,8 @@
 This is the most common database incident in Aetherion AirOps.
 
 - **Where:** `crew-scheduling` uses a deliberately small pool (`PG_POOL_MAX=5`).
-- **Cause in this env:** `FAULT_MODE=db-pool` holds connections open so the pool
-  is exhausted and new requests to `/api/crew` time out.
+- **Cause in this env:** an injected service profile holds connections open so the
+  pool is exhausted and new requests to `/api/crew` time out.
 - **Symptoms:**
   - `crew-scheduling` readiness starts failing; tile goes amber then red.
   - Application Insights shows database dependency timeouts / long durations.
@@ -23,7 +23,7 @@ This is the most common database incident in Aetherion AirOps.
 2. **Scale before killing sessions.** Increase pool headroom by scaling replicas
    (each replica adds its own pool) or raise `PG_POOL_MAX`:
    `kubectl set env deploy/crew-scheduling -n aetherion PG_POOL_MAX=20`.
-3. If this env's injected fault: clear it -> `FAULT_MODE=none`.
+3. If this env's injected fault: reset the service profile -> `SVC_PROFILE=standard`.
 4. Only if truly stuck, and never as a first step, consider terminating idle
    backend sessions on the server side. Do **not** restart the database server.
 

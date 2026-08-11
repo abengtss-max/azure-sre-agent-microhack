@@ -61,7 +61,7 @@ Two front doors sit in front of the cluster:
 
 All services run from **one image** (`aetherion-airops:latest`) with behaviour
 selected by the `ROLE` environment variable. Each deployment carries a
-`FAULT_MODE` env var used only in this teaching environment to simulate incidents.
+`SVC_PROFILE` env var used only in this teaching environment to simulate incidents.
 
 | Service | ROLE | Key endpoints | Depends on |
 |---------|------|---------------|-----------|

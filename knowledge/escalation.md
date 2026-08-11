@@ -19,7 +19,7 @@
 **Safe to act (reversible, low blast radius):**
 - Restarting a pod, `rollout restart`/`undo` on a single deployment.
 - Scaling replicas or adjusting an HPA within configured bounds.
-- Clearing `FAULT_MODE` on a service (this teaching environment).
+- Resetting a service's profile to `standard` (this teaching environment).
 
 **Stop and escalate (get a human / Administrator approval):**
 - Anything touching PostgreSQL or Redis beyond app-side settings.

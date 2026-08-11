@@ -43,7 +43,19 @@ XML
   exit 0
 fi
 
-echo "Setting FAULT_MODE=$FAULT on deployment '$SERVICE'..."
-kubectl set env "deploy/$SERVICE" -n "$NS" "FAULT_MODE=$FAULT"
+# Map the internal fault name to the opaque service profile the app actually reads
+# (kept in sync with app/src/server.js): standard=none r1=latency r2=error
+# r3=crash r4=memory r5=db-pool. The deployment env never names the fault.
+case "$FAULT" in
+  none)    PROFILE=standard ;;
+  latency) PROFILE=r1 ;;
+  error)   PROFILE=r2 ;;
+  crash)   PROFILE=r3 ;;
+  memory)  PROFILE=r4 ;;
+  db-pool) PROFILE=r5 ;;
+  *)       PROFILE=standard ;;
+esac
+echo "Setting service profile '$PROFILE' on deployment '$SERVICE'..."
+kubectl set env "deploy/$SERVICE" -n "$NS" "SVC_PROFILE=$PROFILE"
 kubectl rollout status "deploy/$SERVICE" -n "$NS" --timeout=120s
 echo "Fault '$FAULT' injected into '$SERVICE'."

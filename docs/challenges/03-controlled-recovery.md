@@ -40,11 +40,10 @@ applying a reversible rollback — verifying both from telemetry.
 3. **Triage the flight board** — confirm the `flight-ops` failure mode from pod status and events (crash, bad image, or failed probe).
 4. **Correlate & roll back** — line the outage up with deployment/rollout and GitHub history, apply a reversible rollback, and verify the board updates again.
 
-!!! question "Stuck? Full walkthrough available"
-    Give each task a genuine attempt before reaching for help — working it out
-    yourself is where the learning sticks. Only if you get truly stuck, the
-    [Azure portal walkthrough](../getting-started/portal-walkthrough.md) has the
-    exact click-by-click for every step.
+!!! question "Stuck? Give each task a genuine attempt first"
+    Working it out yourself is where the learning sticks. If you need the exact
+    clicks, the [Azure portal walkthrough](../getting-started/portal-walkthrough.md)
+    has a step for every action.
 
 ![Challenge 3 storyboard — Sam, Aria and Elena run a controlled recovery and correlate the change](../assets/storyboard/img-challenge-3.webp){ .story-panel loading=lazy }
 
@@ -65,7 +64,7 @@ applying a reversible rollback — verifying both from telemetry.
 
 !!! success "Verify your work"
 
-    Run this when you're done — it grades the real end state and unlocks the next challenge:
+    Run this when you're done. It grades the real end state:
 
     ```powershell
     ./scripts/check-challenge.ps1 3

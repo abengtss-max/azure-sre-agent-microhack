@@ -6,8 +6,9 @@
 #   ./inject-failure.ps1 -Service flight-ops     -Fault crash
 #   ./inject-failure.ps1 -Service apim           -Fault throttle
 #
-# App fault modes (set via FAULT_MODE env on the deployment):
-#   none | latency | error | crash | memory | db-pool
+# App behaviour is controlled by an opaque service profile so the deployment env
+# never names the fault. The mapping (kept in sync with app/src/server.js) is:
+#   standard=none  r1=latency  r2=error  r3=crash  r4=memory  r5=db-pool
 # Special target 'apim' applies a restrictive rate-limit policy instead.
 
 param(
@@ -23,34 +24,29 @@ param(
 $ErrorActionPreference = "Stop"
 $ns = "aetherion"
 $envFile = Join-Path $PSScriptRoot ".env.aetherion.json"
+. (Join-Path $PSScriptRoot 'lib-apim.ps1')
 
 if ($Service -eq "apim") {
     if ($Fault -ne "throttle") { throw "For service 'apim', only -Fault throttle is supported." }
     if (-not (Test-Path $envFile)) { throw "State file not found. Deploy first." }
     $state = Get-Content $envFile -Raw | ConvertFrom-Json
 
-    $policy = @"
-<policies>
-  <inbound>
-    <base />
-    <rate-limit-by-key calls="5" renewal-period="60" counter-key="@(context.Subscription.Id)" />
-  </inbound>
-  <backend><base /></backend>
-  <outbound><base /></outbound>
-  <on-error><base /></on-error>
-</policies>
-"@
-    $tmp = Join-Path $env:TEMP "apim-throttle-policy.xml"
-    $policy | Set-Content -Path $tmp -Encoding UTF8
+    $policy = '<policies><inbound><base /><rate-limit-by-key calls="5" renewal-period="60" counter-key="@(context.Subscription.Id)" /></inbound><backend><base /></backend><outbound><base /></outbound><on-error><base /></on-error></policies>'
     Write-Host "Applying restrictive rate-limit (5 calls / 60s) on APIM product 'aetherion-ops'..." -ForegroundColor Yellow
-    az apim product policy create --resource-group $state.resourceGroup --service-name $state.apimName `
-        --product-id aetherion-ops --policy-file $tmp --policy-format xml
-    Write-Host "APIM throttle injected. Expect HTTP 429 under load." -ForegroundColor Green
+    if (Set-AetherionApimProductPolicy -ResourceGroup $state.resourceGroup -ApimName $state.apimName -PolicyXml $policy) {
+        Write-Host "APIM throttle injected. Expect HTTP 429 under load." -ForegroundColor Green
+    }
+    else {
+        throw "Failed to apply APIM throttle policy."
+    }
     return
 }
 
-Write-Host "Setting FAULT_MODE=$Fault on deployment '$Service'..." -ForegroundColor Yellow
-kubectl set env deploy/$Service -n $ns FAULT_MODE=$Fault
+# Map the internal fault name to the opaque profile the app actually reads.
+$profileFor = @{ 'none' = 'standard'; 'latency' = 'r1'; 'error' = 'r2'; 'crash' = 'r3'; 'memory' = 'r4'; 'db-pool' = 'r5' }
+$profile = $profileFor[$Fault]
+Write-Host "Setting service profile '$profile' on deployment '$Service'..." -ForegroundColor Yellow
+kubectl set env deploy/$Service -n $ns SVC_PROFILE=$profile
 if ($Fault -eq "crash") {
     # A crash fault fails liveness/readiness by design, so the rollout never
     # reaches Ready - don't block on `rollout status` (it would wait the full

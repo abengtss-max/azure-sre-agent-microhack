@@ -47,10 +47,16 @@ function Test-ServiceHealthy([string]$Service) {
 }
 
 function Get-FaultMode([string]$Service) {
+    # Read the opaque service profile and translate it back to the internal fault
+    # name so grading stays readable. The deployment only ever exposes the opaque
+    # SVC_PROFILE value (e.g. r1), never the fault name (e.g. latency).
     $v = kubectl get deploy $Service -n $script:NS `
-        -o jsonpath="{.spec.template.spec.containers[0].env[?(@.name=='FAULT_MODE')].value}" 2>$null
+        -o jsonpath="{.spec.template.spec.containers[0].env[?(@.name=='SVC_PROFILE')].value}" 2>$null
     if ([string]::IsNullOrWhiteSpace($v)) { return 'none' }
-    return $v.Trim()
+    $map = @{ 'standard' = 'none'; 'r1' = 'latency'; 'r2' = 'error'; 'r3' = 'crash'; 'r4' = 'memory'; 'r5' = 'db-pool' }
+    $key = $v.Trim().ToLower()
+    if ($map.ContainsKey($key)) { return $map[$key] }
+    return $key
 }
 
 function Get-PoolMax([string]$Service) {
@@ -314,13 +320,6 @@ function Start-AetherionChallenge([int]$Number) {
         throw "Unknown challenge '$Number'. Valid range: 1..$(Get-MaxChallenge)."
     }
     $ch = $script:Challenges[$Number]
-    $unlocked = Get-Unlocked
-    if ($Number -gt $unlocked) {
-        Write-Host ""
-        Write-Host "  Challenge $Number is locked." -ForegroundColor Yellow
-        Write-Host "  Finish challenge $unlocked first:  ./scripts/check-challenge.ps1 $unlocked" -ForegroundColor Gray
-        return
-    }
 
     Write-Host ""
     Write-Host "=== Challenge $Number : $($ch.Title) ===" -ForegroundColor Cyan
@@ -348,20 +347,14 @@ function Test-AetherionChallenge([int]$Number) {
     Write-Host "  $($result.Detail)" -ForegroundColor Gray
     Write-Host ""
     if ($result.Pass) {
-        $next = $Number + 1
-        $unlocked = Get-Unlocked
-        if ($next -gt $unlocked -and $script:Challenges.Contains($next)) { Set-Unlocked $next }
-
         Write-Host "  PASS - challenge $Number resolved." -ForegroundColor Green
-        if ($script:Challenges.Contains($next)) {
-            Write-Host "  Unlocked challenge $next : $($script:Challenges[$next].Title)" -ForegroundColor Green
-            Write-Host "  Start it with:  ./scripts/start-challenge.ps1 $next" -ForegroundColor Gray
-        } else {
+        if (-not $script:Challenges.Contains($Number + 1)) {
             Write-Host "  That was the final challenge - you have restored Aetherion AirOps. Well flown." -ForegroundColor Green
         }
         Write-Host ""
         return $true
-    } else {
+    }
+    else {
         Write-Host "  NOT YET - the incident is still active." -ForegroundColor Yellow
         Write-Host "  Keep investigating with your SRE Agent, then re-run this check." -ForegroundColor Gray
         Write-Host ""

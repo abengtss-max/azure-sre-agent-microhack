@@ -38,11 +38,10 @@ non-destructive remediation and verify service is restored.
 2. **Ground the agent** — load the `knowledge/` runbooks, then re-ask the remediation question and note how the advice changes.
 3. **Apply the sanctioned fix** — relieve the pool and stop the leak (never delete the database); verify crew scheduling recovers.
 
-!!! question "Stuck? Full walkthrough available"
-    Give each task a genuine attempt before reaching for help — working it out
-    yourself is where the learning sticks. Only if you get truly stuck, the
-    [Azure portal walkthrough](../getting-started/portal-walkthrough.md) has the
-    exact click-by-click for every step.
+!!! question "Stuck? Give each task a genuine attempt first"
+    Working it out yourself is where the learning sticks. If you need the exact
+    clicks, the [Azure portal walkthrough](../getting-started/portal-walkthrough.md)
+    has a step for every action.
 
 ![Challenge 4 storyboard — Marco, Sam and Aria ground the agent in Aetherion's runbooks](../assets/storyboard/img-challenge-4.webp){ .story-panel loading=lazy }
 
@@ -62,7 +61,7 @@ non-destructive remediation and verify service is restored.
 
 !!! success "Verify your work"
 
-    Run this when you're done — it grades the real end state and unlocks the next challenge:
+    Run this when you're done. It grades the real end state:
 
     ```powershell
     ./scripts/check-challenge.ps1 4
