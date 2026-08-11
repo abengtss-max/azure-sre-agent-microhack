@@ -48,96 +48,6 @@ operational baseline, and schedule a proactive daily health check.
 4. **Capture the baseline.** Ask the agent for a baseline of the `aetherion` namespace, then sanity-check a few of its numbers against the Ops Center and Grafana.
 5. **Put it on a schedule.** Have the agent re-run that health check every morning so drift shows up before it turns into an incident.
 
-!!! question "Stuck? Give each task a genuine attempt first"
-    Working it out yourself is where the learning sticks. If you want the exact
-    clicks, open the matching task below.
-
-    ??? note "Task 1 · Check the board"
-        - Open the **Operations Center** (the provisioner prints its URL, and it's
-          already in your browser tabs from setup).
-        - Confirm every service tile is **green**. Note the overall state and a
-          couple of latency numbers — this is your healthy reference for the day.
-
-    ??? note "Task 2 · Confirm telemetry is flowing"
-        - Open **Grafana** (Azure Managed Grafana, linked from your resource group).
-        - Check the **AKS** and **Application Insights** panels are showing live
-          data. If a panel looks empty, give it a minute to collect data points.
-
-    ??? note "Task 3 · Connect the agent"
-        **Create the agent.** Portal → search **Azure SRE Agent** → **Create**. On
-        **Basics** set your subscription, your **app resource group**
-        (`rg-aetherion-microhack-<suffix>`), a name (`aetherion-sre-agent`), and
-        region. For **Application Insights** choose **Create new** — the agent
-        provisions its own, separate from the app's. For **model provider**,
-        **Azure OpenAI** is a good default (lower cost, EU data boundary). Then
-        **Review + create** → **Create**.
-
-        **Set up your agent** is a separate step — **Create** alone grants no app
-        access. Choose **Full setup** and connect:
-
-        - **Code** → **GitHub** → sign in → add **your fork** of `aetherion-airops-platform`.
-        - **Logs** → **Log Analytics Workspace** → pick the app's **`aetherion-law`**
-          (not the agent's own auto-created workspace).
-        - **Azure resources** → **Resource group** → select **only your app
-          resource group** at the **Reader** level. Do **not** pick *Subscription*
-          or *Management group*.
-
-        **Keep Review mode** so the agent proposes actions and waits for approval.
-        Its identity is granted Monitoring Contributor plus a reader bundle at
-        setup, so the "won't change anything" guarantee comes from **Review mode**,
-        not from the role being read-only.
-
-        **Confirm scope.** Ask *"List the resources in my resource group and
-        summarize what this application does."* Then ask it to **restart a
-        deployment** — in Review mode it must ask for approval, not act.
-
-    ??? note "Task 4 · Capture the baseline"
-        - With the board green, paste the baseline prompt (just below this section)
-          into the agent chat.
-        - When it answers, spot-check **2–3 numbers** — replica counts and check-in
-          / booking latency — against the Ops Center tiles and Grafana.
-        - If the board was recently degraded, reset and let telemetry settle first,
-          or the baseline will record the fault as "normal".
-
-    ??? note "Task 5 · Put it on a schedule"
-        You can schedule the baseline two ways — by asking in chat, or from the
-        **Scheduled tasks** page in the portal.
-
-        **Option A — ask the agent.** In the chat, say *"Schedule this baseline to
-        run every morning at 08:00 and alert me on drift from normal."* It creates
-        the scheduled task, resolves the timezone/cron, and sets the conditions.
-
-        **Option B — configure it in the portal, step by step:**
-
-        1. Open your **Azure SRE Agent** resource, then select **Scheduled tasks**
-           in the left sidebar.
-        2. Select **Create task** in the toolbar.
-        3. Fill in the form:
-            - **Task name** — e.g. `Daily baseline health check`.
-            - **Task details** — the instruction the agent runs each time, e.g.
-              *"Check the health of the `aetherion` namespace, compare replica
-              counts and check-in / booking latency against the recorded baseline,
-              and summarize any drift."*
-            - **Frequency** — `Daily` (`Weekly`, `Monthly`, or a `Custom cron` are
-              also available).
-            - **Time of day** — e.g. `8:00 AM`.
-        4. Review the optional fields:
-            - **Response custom agent** — leave empty to use the main agent.
-            - **Message grouping for updates** — "Use same thread" keeps each day's
-              results together.
-            - **Agent autonomy level** — the default is fine here; because the task
-              only asks the agent to check and summarize, it reports rather than
-              changing anything.
-        5. Select **Create task**. It appears in the list with status **On** and a
-           **next run** time.
-        6. After the first run, select the task name to open its **execution
-           history** — each run is a thread showing the plan, the tools used, and
-           the outcome. To change the schedule or wording later, select the task →
-           **Edit task** → **Save** (execution history is preserved).
-
-        **Verify the thresholds** it uses — on a clean baseline the booking path is
-        sub-second, so an alert at "p95 > 3 s" would miss real latency.
-
 ![Challenge 1 storyboard — Sam and Aria onboard the SRE Agent and read the baseline](../assets/storyboard/img-challenge-1.webp){ .story-panel loading=lazy }
 
 ### Suggested Azure SRE Agent prompt
@@ -181,6 +91,96 @@ and cross-check replica counts and latency against the tiles and Grafana. Keep t
 baseline somewhere you can find it again mid-incident, and schedule the same
 read-only check so the agent watches for drift on its own.
 </details>
+
+!!! question "Stuck? Step-by-step for each task"
+    Give each task a genuine attempt first — and skim the hints above. When you
+    want the exact clicks, open the matching task below.
+
+    ??? note "Task 1 · Check the board"
+        - Open the **Operations Center** (the provisioner prints its URL, and it's
+          already in your browser tabs from setup).
+        - Confirm every service tile is **green**. Note the overall state and a
+          couple of latency numbers — this is your healthy reference for the day.
+
+    ??? note "Task 2 · Confirm telemetry is flowing"
+        - Open **Grafana** (Azure Managed Grafana, linked from your resource group).
+        - Check the **AKS** and **Application Insights** panels are showing live
+          data. If a panel looks empty, give it a minute to collect data points.
+
+    ??? note "Task 3 · Connect the agent"
+        **Create the agent.** Portal → search **Azure SRE Agent** → **Create**. On
+        **Basics** set your subscription, your **app resource group**
+        (`rg-aetherion-microhack-<suffix>`), a name (`aetherion-sre-agent`), and
+        region. For **Application Insights** choose **Create new** — the agent
+        provisions its own, separate from the app's. For **model provider**,
+        **Azure OpenAI** is a good default (lower cost, EU data boundary). Then
+        **Review + create** → **Create**.
+
+        **Set up your agent** is a separate step — **Create** alone grants no app
+        access. Choose **Full setup** and connect:
+
+        - **Code** → **GitHub** → sign in → add **your fork** of `aetherion-airops-platform`.
+        - **Logs** → **Log Analytics Workspace** → pick the app's **`aetherion-law`**
+          (not the agent's own auto-created workspace).
+        - **Azure resources** → **Resource group** → select **only your app
+          resource group** at the **Reader** level. Do **not** pick *Subscription*
+          or *Management group*.
+
+        **Keep Review mode** so the agent proposes actions and waits for approval.
+        Its identity is granted Monitoring Contributor plus a reader bundle at
+        setup, so the "won't change anything" guarantee comes from **Review mode**,
+        not from the role being read-only.
+
+        **Confirm scope.** Ask *"List the resources in my resource group and
+        summarize what this application does."* Then ask it to **restart a
+        deployment** — in Review mode it must ask for approval, not act.
+
+    ??? note "Task 4 · Capture the baseline"
+        - With the board green, paste the baseline prompt (the **Suggested Azure
+          SRE Agent prompt** above) into the agent chat.
+        - When it answers, spot-check **2–3 numbers** — replica counts and check-in
+          / booking latency — against the Ops Center tiles and Grafana.
+        - If the board was recently degraded, reset and let telemetry settle first,
+          or the baseline will record the fault as "normal".
+
+    ??? note "Task 5 · Put it on a schedule"
+        You can schedule the baseline two ways — by asking in chat, or from the
+        **Scheduled tasks** page in the portal.
+
+        **Option A — ask the agent.** In the chat, say *"Schedule this baseline to
+        run every morning at 08:00 and alert me on drift from normal."* It creates
+        the scheduled task, resolves the timezone/cron, and sets the conditions.
+
+        **Option B — configure it in the portal, step by step:**
+
+        1. Open your **Azure SRE Agent** resource, then select **Scheduled tasks**
+           in the left sidebar.
+        2. Select **Create task** in the toolbar.
+        3. Fill in the form:
+            - **Task name** — e.g. `Daily baseline health check`.
+            - **Task details** — the instruction the agent runs each time, e.g.
+              *"Check the health of the `aetherion` namespace, compare replica
+              counts and check-in / booking latency against the recorded baseline,
+              and summarize any drift."*
+            - **Frequency** — `Daily` (`Weekly`, `Monthly`, or a `Custom cron` are
+              also available).
+            - **Time of day** — e.g. `8:00 AM`.
+        4. Review the optional fields:
+            - **Response custom agent** — leave empty to use the main agent.
+            - **Message grouping for updates** — "Use same thread" keeps each day's
+              results together.
+            - **Agent autonomy level** — the default is fine here; because the task
+              only asks the agent to check and summarize, it reports rather than
+              changing anything.
+        5. Select **Create task**. It appears in the list with status **On** and a
+           **next run** time.
+        6. After the first run, select the task name to open its **execution
+           history** — each run is a thread showing the plan, the tools used, and
+           the outcome. To change the schedule or wording later, select the task →
+           **Edit task** → **Save** (execution history is preserved).
+
+        **Verify the thresholds** it uses — on a clean baseline the booking path is
+        sub-second, so an alert at "p95 > 3 s" would miss real latency.
 
 ### Reference
 
