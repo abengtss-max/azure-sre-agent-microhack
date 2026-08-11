@@ -1815,14 +1815,45 @@ deployment</strong> — in <abbr title="SRE Agent run mode where it proposes a p
 </details>
 <details class="note">
 <summary>Task 5 · Put it on a schedule</summary>
-<ul>
-<li>Ask the agent to schedule the baseline, for example <em>"Schedule this
-  baseline to run every morning at 08:00 and alert me on drift from normal."</em></li>
-<li>It creates an <strong>agent scheduled task</strong> (Automation), resolves the
-  timezone/cron, and sets the alert conditions.</li>
-<li><strong>Verify the thresholds</strong> it chose — on a clean baseline the booking path
-  is sub-second, so an alert at "p95 &gt; 3 s" would miss real latency.</li>
+<p>You can schedule the baseline two ways — by asking in chat, or from the
+<strong>Scheduled tasks</strong> page in the portal.</p>
+<p><strong>Option A — ask the agent.</strong> In the chat, say <em>"Schedule this baseline to
+run every morning at 08:00 and alert me on drift from normal."</em> It creates
+the scheduled task, resolves the timezone/cron, and sets the conditions.</p>
+<p><strong>Option B — configure it in the portal, step by step:</strong></p>
+<ol>
+<li>Open your <strong>Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent</strong> resource, then select <strong>Scheduled tasks</strong>
+   in the left sidebar.</li>
+<li>Select <strong>Create task</strong> in the toolbar.</li>
+<li>Fill in the form:<ul>
+<li><strong>Task name</strong> — e.g. <code>Daily baseline health check</code>.</li>
+<li><strong>Task details</strong> — the instruction the agent runs each time, e.g.
+  <em>"Check the health of the <code>aetherion</code> namespace, compare <abbr title="One running copy (pod) of a service; more replicas share the load.">replica</abbr>
+  counts and check-in / booking latency against the recorded baseline,
+  and summarize any drift."</em></li>
+<li><strong>Frequency</strong> — <code>Daily</code> (<code>Weekly</code>, <code>Monthly</code>, or a <code>Custom cron</code> are
+  also available).</li>
+<li><strong>Time of day</strong> — e.g. <code>8:00 AM</code>.</li>
 </ul>
+</li>
+<li>Review the optional fields:<ul>
+<li><strong>Response custom agent</strong> — leave empty to use the main agent.</li>
+<li><strong>Message grouping for updates</strong> — "Use same thread" keeps each day's
+  results together.</li>
+<li><strong>Agent autonomy level</strong> — the default is fine here; because the task
+  only asks the agent to check and summarize, it reports rather than
+  changing anything.</li>
+</ul>
+</li>
+<li>Select <strong>Create task</strong>. It appears in the list with status <strong>On</strong> and a
+   <strong>next run</strong> time.</li>
+<li>After the first run, select the task name to open its <strong>execution
+   history</strong> — each run is a thread showing the plan, the tools used, and
+   the outcome. To change the schedule or wording later, select the task →
+   <strong>Edit task</strong> → <strong>Save</strong> (execution history is preserved).</li>
+</ol>
+<p><strong>Verify the thresholds</strong> it uses — on a clean baseline the booking path is
+sub-second, so an alert at "p95 &gt; 3 s" would miss real latency.</p>
 </details>
 </div>
 <p><img alt="Challenge 1 storyboard — Sam and Aria onboard the SRE Agent and read the baseline" class="story-panel" loading="lazy" src="../../assets/storyboard/img-challenge-1.webp" /></p>
