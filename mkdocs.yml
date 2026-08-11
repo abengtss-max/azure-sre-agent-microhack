@@ -97,9 +97,7 @@ plugins:
 
 nav:
   - Home: index.md
-  - Set up:
-      - Prerequisites: getting-started/prerequisites.md
-      - Set up the environment: getting-started/environment.md
+  - Set up: getting-started/environment.md
   - Challenges:
       - Act I · Foundation:
           - 01 · Onboard & Baseline: challenges/01-onboard-and-baseline.md

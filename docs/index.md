@@ -24,7 +24,7 @@ fixes to bounded autonomy before peak departure.
 
 <p class="aet-meta">Self-paced · 5 acts · 8 challenges · ~4–5 hours</p>
 
-[Start here](getting-started/prerequisites.md){ .md-button .md-button--primary }
+[Start here](getting-started/environment.md){ .md-button .md-button--primary }
 </div>
 
 </div>
@@ -35,9 +35,8 @@ fixes to bounded autonomy before peak departure.
 
 ## Start here
 
-1. **[Check the prerequisites](getting-started/prerequisites.md)** — the tools and access you need (about 2 minutes).
-2. **[Set up the environment](getting-started/environment.md)** — one command provisions the whole estate.
-3. **[Begin Challenge 1](challenges/01-onboard-and-baseline.md)** — onboard the agent and capture a healthy baseline.
+1. **[Set up the environment](getting-started/environment.md)** — install the tools, then run one command to provision the whole estate.
+2. **[Begin Challenge 1](challenges/01-onboard-and-baseline.md)** — onboard the agent and capture a healthy baseline.
 
 New to the agent? Skim the optional primer **[Meet the SRE Agent](getting-started/sre-agent-fundamentals.md)** first — permissions, run modes, skills and subagents in a couple of minutes.
 
