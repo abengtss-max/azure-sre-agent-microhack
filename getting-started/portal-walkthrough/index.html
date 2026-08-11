@@ -1940,7 +1940,7 @@ and this page in another.</p>
 <tbody>
 <tr>
 <td>Resource group</td>
-<td><code>rg-aetherion-microhack</code></td>
+<td><code>rg-aetherion-microhack-&lt;suffix&gt;</code> (your unique name)</td>
 </tr>
 <tr>
 <td>Region</td>
@@ -1956,6 +1956,12 @@ and this page in another.</p>
 </tr>
 </tbody>
 </table>
+<div class="admonition note">
+<p class="admonition-title">Your resource group name is unique</p>
+<p>Provisioning always creates <code>rg-aetherion-microhack-&lt;suffix&gt;</code> (for example
+<code>rg-aetherion-microhack-a7c3</code>) and <strong>prints the exact name</strong> at the end.
+Wherever this guide says the resource group, use <strong>your</strong> suffixed name.</p>
+</div>
 <hr />
 <h2 id="a-sign-in">A · Sign in to the Azure portal<a class="headerlink" href="#a-sign-in" title="Permanent link">&para;</a></h2>
 <ol>
@@ -1963,8 +1969,9 @@ and this page in another.</p>
    the account that owns the subscription you provisioned.</li>
 <li>Confirm the correct directory/subscription: select your avatar (top-right) →
    <strong>Switch directory</strong> if you have more than one.</li>
-<li>In the top search bar, type <code>rg-aetherion-microhack</code> and open the resource
-   group. Pin it (the star icon) so it's one click away all day.</li>
+<li>In the top search bar, type your resource group name
+   (<code>rg-aetherion-microhack-&lt;suffix&gt;</code>) and open it. Pin it (the star icon) so it's
+   one click away all day.</li>
 </ol>
 <hr />
 <h2 id="b-ops-center">B · Open the Operations Center<a class="headerlink" href="#b-ops-center" title="Permanent link">&para;</a></h2>
@@ -1999,7 +2006,7 @@ incident.</p>
 <li>Select <strong>Create</strong>.</li>
 <li>On <strong>Basics</strong>, set:<ul>
 <li><strong>Subscription:</strong> your subscription.</li>
-<li><strong>Resource group:</strong> <code>rg-aetherion-microhack</code>.</li>
+<li><strong>Resource group:</strong> your provisioned group (<code>rg-aetherion-microhack-&lt;suffix&gt;</code>).</li>
 <li><strong>Name:</strong> <code>aetherion-sre-agent</code>.</li>
 <li><strong>Region:</strong> the closest supported region (e.g. <code>swedencentral</code>).</li>
 </ul>
@@ -2015,7 +2022,7 @@ incident.</p>
 <h2 id="e-reader">E · Give the agent read-only (<abbr title="The built-in Azure role that grants read-only access — see everything, change nothing.">Reader</abbr>) access<a class="headerlink" href="#e-reader" title="Permanent link">&para;</a></h2>
 <p>This lets the agent <em>see</em> the whole estate but change nothing.</p>
 <ol>
-<li>Open the <strong>resource group</strong> <code>rg-aetherion-microhack</code> → <strong>Access control (IAM)</strong>.</li>
+<li>Open your <strong>resource group</strong> (<code>rg-aetherion-microhack-&lt;suffix&gt;</code>) → <strong>Access control (IAM)</strong>.</li>
 <li>Select <strong>Add</strong> → <strong>Add role assignment</strong>.</li>
 <li><strong>Role:</strong> search and pick <strong><abbr title="The built-in Azure role that grants read-only access — see everything, change nothing.">Reader</abbr></strong>.</li>
 <li><strong>Members:</strong> choose <strong>Managed identity</strong> → select the <code>aetherion-sre-agent</code>

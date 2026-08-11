@@ -1671,15 +1671,15 @@ repository root, signed in with <code>az login</code> and the correct subscripti
 <td>Verifies and registers required resource providers (idempotent)</td>
 </tr>
 <tr>
-<td><code>./scripts/01-deploy-infra.ps1 -ResourceGroup rg-aetherion -Location eastus</code></td>
+<td><code>./scripts/01-deploy-infra.ps1 -ResourceGroup &lt;your-rg&gt; -Location eastus</code></td>
 <td>Provisions infrastructure via Bicep</td>
 </tr>
 <tr>
-<td><code>./scripts/02-build-push-images.ps1 -ResourceGroup rg-aetherion</code></td>
+<td><code>./scripts/02-build-push-images.ps1 -ResourceGroup &lt;your-rg&gt;</code></td>
 <td>Builds and pushes the app image to ACR</td>
 </tr>
 <tr>
-<td><code>./scripts/03-deploy-app.ps1 -ResourceGroup rg-aetherion</code></td>
+<td><code>./scripts/03-deploy-app.ps1 -ResourceGroup &lt;your-rg&gt;</code></td>
 <td>Deploys the app + k6 to <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> and wires <abbr title="Azure API Management — the API &quot;front door&quot; that authenticates and rate-limits traffic to the services.">APIM</abbr> to the gateway</td>
 </tr>
 <tr>
@@ -1687,16 +1687,12 @@ repository root, signed in with <code>az login</code> and the correct subscripti
 <td>Configures HTTPS on the gateway (Let's Encrypt)</td>
 </tr>
 <tr>
-<td><code>./scripts/04-validate.ps1 -ResourceGroup rg-aetherion</code></td>
-<td>Validates the estate is healthy and generating traffic</td>
+<td><code>./scripts/04-validate.ps1</code></td>
+<td>Validates the estate is healthy and generating traffic (reads the resource group from local state)</td>
 </tr>
 <tr>
 <td><code>./scripts/provision-environment.ps1</code></td>
-<td>End-to-end provisioning wrapper</td>
-</tr>
-<tr>
-<td><code>./scripts/provision-environment.ps1 -UniqueSuffix</code></td>
-<td>Same, but provisions into a uniquely named resource group (e.g. <code>rg-aetherion-microhack-a7c3</code>) so you can run <strong>multiple microhacks in one subscription</strong></td>
+<td>End-to-end provisioning wrapper — always provisions into a <strong>uniquely named</strong> <code>rg-aetherion-microhack-&lt;suffix&gt;</code> and prints the name (safe for multiple microhacks in one subscription)</td>
 </tr>
 </tbody>
 </table>
