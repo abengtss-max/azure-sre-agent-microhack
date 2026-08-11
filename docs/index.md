@@ -24,8 +24,7 @@ fixes to bounded autonomy before peak departure.
 
 <p class="aet-meta">Self-paced · 5 acts · 8 challenges · ~4–5 hours</p>
 
-[Set up the environment](getting-started/environment.md){ .md-button .md-button--primary }
-[Read the scenario](getting-started/overview.md){ .md-button }
+[Start here](getting-started/prerequisites.md){ .md-button .md-button--primary }
 </div>
 
 </div>
@@ -34,7 +33,15 @@ fixes to bounded autonomy before peak departure.
 <span>Observe</span> <em>→</em> <span>Detect</span> <em>→</em> <span>Investigate</span> <em>→</em> <span>Decide</span> <em>→</em> <span>Remediate</span> <em>→</em> <span>Verify</span> <em>→</em> <span>Learn</span>
 </div>
 
-## The five acts
+## Start here
+
+1. **[Check the prerequisites](getting-started/prerequisites.md)** — the tools and access you need (about 2 minutes).
+2. **[Set up the environment](getting-started/environment.md)** — one command provisions the whole estate.
+3. **[Begin Challenge 1](challenges/01-onboard-and-baseline.md)** — onboard the agent and capture a healthy baseline.
+
+New to the agent? Skim the optional primer **[Meet the SRE Agent](getting-started/sre-agent-fundamentals.md)** first — permissions, run modes, skills and subagents in a couple of minutes.
+
+## The journey
 
 <div class="grid cards" markdown>
 
@@ -42,38 +49,30 @@ fixes to bounded autonomy before peak departure.
 
     ---
 
-    **1.** [Onboard the agent and establish the baseline](challenges/01-onboard-and-baseline.md)
+    Onboard the SRE Agent in read-only mode and capture a healthy baseline.
 
 -   __Act II · Human-Guided Operations__ <span class="aet-badge phase">Respond</span>
 
     ---
 
-    **2.** [Detect and investigate without touching production](challenges/02-detect-and-investigate.md)<br>
-    **3.** [Controlled recovery and change correlation](challenges/03-controlled-recovery.md)<br>
-    **4.** [Give the agent operational knowledge](challenges/04-ground-the-agent.md)
+    Detect and investigate an incident read-only, recover under human approval, and ground the agent in Aetherion's runbooks.
 
 -   __Act III · Agent Engineering__ <span class="aet-badge phase">Extend</span>
 
     ---
 
-    **5.** [Engineer the agent: subagent + skill](challenges/05-engineer-the-agent.md)
+    Build a specialist subagent and a reusable recovery skill.
 
 -   __Act IV · Autonomous & Cost__ <span class="aet-badge phase">Automate</span>
 
     ---
 
-    **6.** [Autonomous recovery and cost governance](challenges/06-autonomous-and-cost.md)
+    Let the agent remediate autonomously within bounds, then govern the cost.
 
 -   __Act V · Major Incident__ <span class="aet-badge phase">Command</span>
 
     ---
 
-    **7.** [Final incident: restore global check-in](challenges/07-major-incident.md)<br>
-    **8.** [Boarding resumes: brief airline leadership](challenges/08-leadership-briefing.md)
+    Restore global check-in during a multi-service incident, then brief airline leadership.
 
 </div>
-
-## Before you begin
-
-- New to the agent? Read [SRE Agent fundamentals](getting-started/sre-agent-fundamentals.md) — permissions, run modes, skills and subagents in a couple of minutes.
-- Ready to build? [Set up the environment](getting-started/environment.md) with one command, then start Challenge 1.
