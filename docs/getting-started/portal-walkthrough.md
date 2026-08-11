@@ -105,11 +105,9 @@ In the agent, run **Set up your agent** (**Full setup**) and connect three sourc
 3. **Azure resources** → set the scope to **Resource group**, select **only your
    app resource group**, and pick the **Reader** permission level.
 
-!!! danger "Scope the agent to the app resource group only"
-    Do **not** choose *Subscription* or *Management group* scope. A parallel
-    resource group (`…-loadgen`) runs the hidden load generator that drives this
-    lab; subscription-wide scope would expose it to the agent and muddy its view
-    of the application. Resource-group scope keeps the agent focused on the app.
+!!! warning "Scope the agent to the app resource group only"
+    Do **not** choose *Subscription* or *Management group* scope. Resource-group
+    scope keeps the agent focused on just this application.
 
 > **Knowledge** is connected later, in Challenge 4 — not here.
 

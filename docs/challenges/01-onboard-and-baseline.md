@@ -42,54 +42,70 @@ operational baseline, and schedule a proactive daily health check.
 
 ### Tasks
 
-1. **Verify platform health.** Read the Operations Center once — this green board is your healthy reference for the day.
-2. **Verify observability.** Open Grafana and confirm AKS and Application Insights data is flowing.
-3. **Create and connect the SRE Agent.** Create the agent in your app resource group, then in **Set up your agent** connect three context sources: **Code** = your fork of `aetherion-airops-platform` (used for change correlation in Challenge 3); **Logs** = the app's `aetherion-law` Log Analytics workspace; **Azure resources** = your app resource group, scoped as **Resource group** only. Keep the agent in **Review** run mode. See the detailed steps below.
-4. **Generate the operational baseline.** With the platform healthy, have the agent produce a baseline for the `aetherion` namespace, then validate 2–3 of its numbers against the Ops Center and Grafana. If the board was recently degraded, reset and let telemetry settle first — otherwise the baseline captures the fault as "normal".
-5. **Enable proactive monitoring.** Schedule the baseline health check (an agent scheduled task) to re-run each morning so drift is caught before it becomes an incident, then check that the alert thresholds it chose are sensible.
+1. **Check the board.** Read the Operations Center once while it's green — that's your reference for the rest of the day.
+2. **Confirm telemetry is flowing.** Open Grafana and check that AKS and Application Insights are reporting.
+3. **Connect the agent.** Create the SRE Agent in your resource group and give it read access to your code, logs, and Azure resources, in Review mode.
+4. **Capture the baseline.** Ask the agent for a baseline of the `aetherion` namespace, then sanity-check a few of its numbers against the Ops Center and Grafana.
+5. **Put it on a schedule.** Have the agent re-run that health check every morning so drift shows up before it turns into an incident.
 
 !!! question "Stuck? Give each task a genuine attempt first"
-    Working it out yourself is where the learning sticks. If you need the exact
-    clicks, expand the detailed steps below.
+    Working it out yourself is where the learning sticks. If you want the exact
+    clicks, open the matching task below.
 
-<details markdown="1"><summary><strong>Detailed steps — create &amp; connect the agent (Task 3)</strong></summary>
+    ??? note "Task 1 · Check the board"
+        - Open the **Operations Center** (the provisioner prints its URL, and it's
+          already in your browser tabs from setup).
+        - Confirm every service tile is **green**. Note the overall state and a
+          couple of latency numbers — this is your healthy reference for the day.
 
-1. **Create the agent.** Azure portal → search **Azure SRE Agent** → **Create**.
-   On **Basics** set your subscription, your **app resource group**
-   (`rg-aetherion-microhack-<suffix>`), a name (`aetherion-sre-agent`), and region.
-   For **Application Insights** choose **Create new** — the agent provisions its
-   own App Insights + Log Analytics, separate from the app's. For **model
-   provider**, **Azure OpenAI** is a good default (lower cost, EU data boundary).
-   **Review + create** → **Create**.
-2. **Set up your agent** — a separate step; **Create** alone grants no app access.
-   Choose **Full setup** and add:
-     - **Code** → **GitHub** → sign in → add **your fork** of `aetherion-airops-platform`.
-     - **Logs** → **Log Analytics Workspace** → pick the app's **`aetherion-law`**
-       (not the agent's own auto-created workspace).
-     - **Azure resources** → **Resource group** → select **only your app resource
-       group**. Do **not** pick *Subscription* or *Management group* — that would
-       also expose the hidden load generator (`…-loadgen`) to the agent. Choose the
-       **Reader** permission level.
-3. **Keep Review mode.** Confirm the agent's run mode is **Review** so it proposes
-   actions and waits for approval. The identity is granted Monitoring Contributor
-   plus a reader bundle during setup, so the "won't change anything" guarantee
-   comes from **Review mode**, not from the role being read-only.
-4. **Confirm scope.** Ask: *"List the resources in my resource group and summarize
-   what this application does."* You should get a grounded summary. Then ask it to
-   **restart a deployment** — in Review mode it must ask for approval, not act.
+    ??? note "Task 2 · Confirm telemetry is flowing"
+        - Open **Grafana** (Azure Managed Grafana, linked from your resource group).
+        - Check the **AKS** and **Application Insights** panels are showing live
+          data. If a panel looks empty, give it a minute to collect data points.
 
-</details>
+    ??? note "Task 3 · Connect the agent"
+        **Create the agent.** Portal → search **Azure SRE Agent** → **Create**. On
+        **Basics** set your subscription, your **app resource group**
+        (`rg-aetherion-microhack-<suffix>`), a name (`aetherion-sre-agent`), and
+        region. For **Application Insights** choose **Create new** — the agent
+        provisions its own, separate from the app's. For **model provider**,
+        **Azure OpenAI** is a good default (lower cost, EU data boundary). Then
+        **Review + create** → **Create**.
 
-<details markdown="1"><summary><strong>Detailed steps — schedule the daily health check (Task 5)</strong></summary>
+        **Set up your agent** is a separate step — **Create** alone grants no app
+        access. Choose **Full setup** and connect:
 
-Ask the agent in chat to schedule your baseline, for example *"Schedule this
-baseline to run every morning at 08:00 and alert me on drift from normal."* It
-creates an **agent scheduled task** (Automation), resolves the timezone/cron, and
-sets alert conditions. **Verify and adjust** the thresholds it chose — on a clean
-baseline the booking path is sub-second, so an alert set at "p95 > 3 s" would miss
-real latency.
+        - **Code** → **GitHub** → sign in → add **your fork** of `aetherion-airops-platform`.
+        - **Logs** → **Log Analytics Workspace** → pick the app's **`aetherion-law`**
+          (not the agent's own auto-created workspace).
+        - **Azure resources** → **Resource group** → select **only your app
+          resource group** at the **Reader** level. Do **not** pick *Subscription*
+          or *Management group*.
 
-</details>
+        **Keep Review mode** so the agent proposes actions and waits for approval.
+        Its identity is granted Monitoring Contributor plus a reader bundle at
+        setup, so the "won't change anything" guarantee comes from **Review mode**,
+        not from the role being read-only.
+
+        **Confirm scope.** Ask *"List the resources in my resource group and
+        summarize what this application does."* Then ask it to **restart a
+        deployment** — in Review mode it must ask for approval, not act.
+
+    ??? note "Task 4 · Capture the baseline"
+        - With the board green, paste the baseline prompt (just below this section)
+          into the agent chat.
+        - When it answers, spot-check **2–3 numbers** — replica counts and check-in
+          / booking latency — against the Ops Center tiles and Grafana.
+        - If the board was recently degraded, reset and let telemetry settle first,
+          or the baseline will record the fault as "normal".
+
+    ??? note "Task 5 · Put it on a schedule"
+        - Ask the agent to schedule the baseline, for example *"Schedule this
+          baseline to run every morning at 08:00 and alert me on drift from normal."*
+        - It creates an **agent scheduled task** (Automation), resolves the
+          timezone/cron, and sets the alert conditions.
+        - **Verify the thresholds** it chose — on a clean baseline the booking path
+          is sub-second, so an alert at "p95 > 3 s" would miss real latency.
 
 ![Challenge 1 storyboard — Sam and Aria onboard the SRE Agent and read the baseline](../assets/storyboard/img-challenge-1.webp){ .story-panel loading=lazy }
 
