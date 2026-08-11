@@ -1562,6 +1562,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#d-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        D2 · Set up your agent — connect context
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#e-reader" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1770,6 +1781,17 @@
     <span class="md-ellipsis">
       
         D · Create the SRE Agent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#d-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        D2 · Set up your agent — connect context
       
     </span>
   </a>
@@ -2000,7 +2022,8 @@ incident.</p>
 </ol>
 <hr />
 <h2 id="d-create-agent">D · Create the <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent<a class="headerlink" href="#d-create-agent" title="Permanent link">&para;</a></h2>
-<p>Do this once, in Challenge 1.</p>
+<p>Do this once, in Challenge 1. <strong>Creating</strong> the agent and <strong>setting it up</strong> are two
+separate steps — Create alone grants no access to your app.</p>
 <ol>
 <li>In the portal search bar, type <strong>Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent</strong> and select it.</li>
 <li>Select <strong>Create</strong>.</li>
@@ -2009,18 +2032,45 @@ incident.</p>
 <li><strong>Resource group:</strong> your provisioned group (<code>rg-aetherion-microhack-&lt;suffix&gt;</code>).</li>
 <li><strong>Name:</strong> <code>aetherion-sre-agent</code>.</li>
 <li><strong>Region:</strong> the closest supported region (e.g. <code>swedencentral</code>).</li>
+<li><strong><abbr title="Azure application-performance monitoring — requests, dependencies, exceptions, latency.">Application Insights</abbr>:</strong> choose <strong>Create new</strong>. The agent provisions its own
+  App Insights + <abbr title="Azure service that stores and queries container and platform logs.">Log Analytics</abbr> for <em>its own</em> telemetry — this is separate from
+  the app's <code>aetherion-law</code> / <code>aetherion-appi</code>.</li>
+<li><strong>Model provider:</strong> <strong>Azure OpenAI</strong> is a good default (lower cost, stays in
+  the EU data boundary).</li>
 </ul>
 </li>
-<li>Leave the default <strong><abbr title="An Azure identity for a workload (here, the agent) so it can authenticate without stored secrets.">managed identity</abbr></strong> option so the agent gets its own
-   identity (you grant it roles later).</li>
+<li>Leave the default <strong><abbr title="An Azure identity for a workload (here, the agent) so it can authenticate without stored secrets.">managed identity</abbr></strong> option so the agent gets its own identity.</li>
 <li>Select <strong>Review + create</strong> → <strong>Create</strong> and wait for deployment to finish.</li>
 <li>Open the resource and confirm the chat/console loads.</li>
 </ol>
 <p>Reference: <a href="https://learn.microsoft.com/en-us/azure/sre-agent/create-and-set-up">Create and set up</a>
 · <a href="https://learn.microsoft.com/en-us/azure/sre-agent/complete-setup">Complete your setup</a></p>
 <hr />
+<h2 id="d-setup">D2 · Set up your agent — connect context<a class="headerlink" href="#d-setup" title="Permanent link">&para;</a></h2>
+<p>In the agent, run <strong>Set up your agent</strong> (<strong>Full setup</strong>) and connect three sources:</p>
+<ol>
+<li><strong>Code</strong> → <strong>GitHub</strong> → sign in → add <strong>your fork</strong> of <code>aetherion-airops-platform</code>
+   (used for change correlation in Challenge 3).</li>
+<li><strong>Logs</strong> → <strong><abbr title="Azure service that stores and queries container and platform logs.">Log Analytics</abbr> Workspace</strong> → pick the app's <strong><code>aetherion-law</code></strong>
+   (not the agent's own auto-created workspace).</li>
+<li><strong>Azure resources</strong> → set the scope to <strong>Resource group</strong>, select <strong>only your
+   app resource group</strong>, and pick the <strong><abbr title="The built-in Azure role that grants read-only access — see everything, change nothing.">Reader</abbr></strong> permission level.</li>
+</ol>
+<div class="admonition danger">
+<p class="admonition-title">Scope the agent to the app resource group only</p>
+<p>Do <strong>not</strong> choose <em>Subscription</em> or <em>Management group</em> scope. A parallel
+resource group (<code>…-loadgen</code>) runs the hidden load generator that drives this
+lab; subscription-wide scope would expose it to the agent and muddy its view
+of the application. Resource-group scope keeps the agent focused on the app.</p>
+</div>
+<blockquote>
+<p><strong>Knowledge</strong> is connected later, in Challenge 4 — not here.</p>
+</blockquote>
+<hr />
 <h2 id="e-reader">E · Give the agent read-only (<abbr title="The built-in Azure role that grants read-only access — see everything, change nothing.">Reader</abbr>) access<a class="headerlink" href="#e-reader" title="Permanent link">&para;</a></h2>
-<p>This lets the agent <em>see</em> the whole estate but change nothing.</p>
+<p>The <strong>Set up your agent</strong> wizard (section D2) already grants this. Do it manually
+here only if you skipped the wizard's <em>Azure resources</em> step. <abbr title="The built-in Azure role that grants read-only access — see everything, change nothing.">Reader</abbr> lets the agent
+<em>see</em> the resource group; in <strong>Review</strong> mode it still asks before any change.</p>
 <ol>
 <li>Open your <strong>resource group</strong> (<code>rg-aetherion-microhack-&lt;suffix&gt;</code>) → <strong>Access control (IAM)</strong>.</li>
 <li>Select <strong>Add</strong> → <strong>Add role assignment</strong>.</li>
@@ -2031,7 +2081,14 @@ incident.</p>
 <li>Back in the agent, ask it to <em>"list the resources in the resource group and
    summarise the application"</em> to confirm scope.</li>
 </ol>
-<p>Reference: <a href="https://learn.microsoft.com/en-us/azure/sre-agent/permissions">Permissions &amp; run modes</a></p>
+<div class="admonition note">
+<p class="admonition-title">Permissions vs. run mode</p>
+<p>Creating and setting up the agent grants its identity <strong>Monitoring Contributor</strong>
+plus a reader bundle — so the identity is <em>not</em> strictly read-only. The
+guarantee that it won't change anything without you comes from the <strong>Review</strong>
+run mode (section F), not from the role.</p>
+</div>
+<p>Reference: <a href="https://learn.microsoft.com/en-us/azure/sre-agent/manage-permissions">Manage roles and permissions</a></p>
 <hr />
 <h2 id="f-run-mode">F · Set the run mode (Review vs Autonomous)<a class="headerlink" href="#f-run-mode" title="Permanent link">&para;</a></h2>
 <ol>

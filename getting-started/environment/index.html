@@ -1797,6 +1797,21 @@ Azure <abbr title="Site Reliability Engineering — running services with softwa
 single subscription and you can safely re-provision without collisions.</p>
 <p>Override the base name or region with <code>-ResourceGroup</code>, <code>-Location</code>, or
 <code>-NamePrefix</code> — the unique suffix is always appended.</p>
+<div class="admonition warning">
+<p class="admonition-title">Re-provisioning leaves the previous environment running</p>
+<p>Because each run creates a <strong>new</strong> suffixed resource group, re-provisioning
+does <strong>not</strong> replace your earlier environment — the previous one keeps running
+(and billing), and a stray copy can confuse the agent if you scope it to the
+wrong one. If you re-provision, either reuse the environment you already have,
+or tear down the old ones. The teardown script lists every
+<code>rg-aetherion-microhack-*</code> environment (each with its paired <code>-loadgen</code> group)
+and lets you pick which to delete:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="n">99-teardown</span><span class="p">.</span><span class="n">ps1</span>        <span class="c"># pick an environment to delete</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="n">99-teardown</span><span class="p">.</span><span class="n">ps1</span> <span class="n">-All</span>   <span class="c"># delete all lab environments</span>
+</code></pre></div>
+<p>Always scope the Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent to your <strong>current</strong> resource group — the name
+the provisioner printed when it finished.</p>
+</div>
 <h2 id="5-what-gets-deployed">5. What gets deployed<a class="headerlink" href="#5-what-gets-deployed" title="Permanent link">&para;</a></h2>
 <p><a href="../../assets/architecture/aetherion-architecture.png"><img alt="Aetherion AirOps — Azure SRE Agent MicroHack environment architecture" class="arch-diagram" loading="lazy" src="../../assets/architecture/aetherion-architecture.png" /></a></p>
 <p><em>Request/data flow runs left to right (solid blue); telemetry and control flow to
@@ -1837,7 +1852,7 @@ observability and the Azure <abbr title="Site Reliability Engineering — runnin
 reports a healthy, traffic-generating estate and the Operations Center loads with
 all tiles green.</p>
 <p>Re-run the check on its own at any time:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="n">04-validate</span><span class="p">.</span><span class="n">ps1</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="n">04-validate</span><span class="p">.</span><span class="n">ps1</span>
 </code></pre></div>
 <p><a class="md-button md-button--primary" href="../../challenges/01-onboard-and-baseline/">Start Challenge 1 →</a></p>
 <hr />
