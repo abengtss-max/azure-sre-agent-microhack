@@ -1,9 +1,10 @@
 # =============================================================================
 # Aetherion AirOps - start a challenge
 # -----------------------------------------------------------------------------
-# Injects the fault(s) for the given challenge (root cause stays hidden) and
-# tells you how to verify your fix. Progress is gated: you can only start a
-# challenge once the previous one has been completed.
+# Sets up the given challenge: for the incident challenges (2-7) it injects the
+# fault(s) with the root cause hidden; for Challenge 1 it just prints the mission
+# briefing (no fault - the board stays green). It then tells you how to verify
+# with check-challenge.ps1. Challenges can be started in any order.
 #
 # Usage:
 #   ./scripts/start-challenge.ps1 1
