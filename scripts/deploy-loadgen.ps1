@@ -12,24 +12,29 @@
 # Each call recreates the container instance with the requested profile.
 
 param(
-    # Hack resource group - source of the gateway URL + APIM key (from state file).
-    [string]$ResourceGroup = "rg-aetherion-microhack",
+    # Hack resource group - defaults to the state file's value so it follows -UniqueSuffix.
+    [string]$ResourceGroup = "",
     # Separate resource group for the load generator (NOT monitored by the agent).
     [string]$LoadGenResourceGroup = "",
-    [string]$Location = "swedencentral",
+    [string]$Location = "",
     [ValidateSet("normal", "surge")]
     [string]$Mode = "normal",
     [int]$Vus = 0
 )
 
 $ErrorActionPreference = "Stop"
-# Load-gen RG is derived from the hack RG so it's always paired but separate.
-if ([string]::IsNullOrWhiteSpace($LoadGenResourceGroup)) { $LoadGenResourceGroup = "$ResourceGroup-loadgen" }
 $here = $PSScriptRoot
 $repoRoot = Split-Path -Parent $here
 $envFile = Join-Path $here ".env.aetherion.json"
 if (-not (Test-Path $envFile)) { throw "State file not found. Run 03-deploy-app.ps1 first." }
 $state = Get-Content $envFile -Raw | ConvertFrom-Json
+
+# Resolve the target from the state file when not passed explicitly, so surge/reset
+# always hit the correct (possibly -UniqueSuffix'd) environment - never a hardcoded name.
+if ([string]::IsNullOrWhiteSpace($ResourceGroup)) { $ResourceGroup = $state.resourceGroup }
+if ([string]::IsNullOrWhiteSpace($Location)) { $Location = if ($state.location) { $state.location } else { "swedencentral" } }
+# Load-gen RG is derived from the hack RG so it's always paired but separate.
+if ([string]::IsNullOrWhiteSpace($LoadGenResourceGroup)) { $LoadGenResourceGroup = "$ResourceGroup-loadgen" }
 
 $baseUrl = "$($state.apimGatewayUrl)/aetherion"
 $apiKey = $state.apimSubscriptionKey
