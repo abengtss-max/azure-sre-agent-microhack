@@ -1754,10 +1754,48 @@ challenge on this environment), reset to a clean baseline first:</p>
 <li><strong>Capture the baseline.</strong> Ask the agent for a baseline of the <code>aetherion</code> namespace, then sanity-check a few of its numbers against the Ops Center and <abbr title="Dashboarding tool used here to visualise AKS and Application Insights metrics.">Grafana</abbr>.</li>
 <li><strong>Put it on a schedule.</strong> Have the agent re-run that health check every morning so drift shows up before it turns into an incident.</li>
 </ol>
+<p><img alt="Challenge 1 storyboard — Sam and Aria onboard the SRE Agent and read the baseline" class="story-panel" loading="lazy" src="../../assets/storyboard/img-challenge-1.webp" /></p>
+<h3 id="suggested-azure-sre-agent-prompt">Suggested Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent prompt<a class="headerlink" href="#suggested-azure-sre-agent-prompt" title="Permanent link">&para;</a></h3>
+<div class="admonition quote">
+<p class="admonition-title">Paste into the agent chat</p>
+<p>Generate an operational baseline for the <code>aetherion</code> namespace, including:
+running services and ready <abbr title="One running copy (pod) of a service; more replicas share the load.">replica</abbr> counts; dependencies (which services use
+PostgreSQL and Redis, and what sits behind the API <abbr title="The single public entry point (API Management) through which all client traffic passes.">front door</abbr>); normal
+check-in and booking latency; and the top operational signals to watch.
+Support every finding with telemetry evidence, and make no changes.</p>
+</div>
+<h3 id="success-criteria">Success criteria<a class="headerlink" href="#success-criteria" title="Permanent link">&para;</a></h3>
+<ul>
+<li>All service tiles are healthy and <abbr title="Dashboarding tool used here to visualise AKS and Application Insights metrics.">Grafana</abbr> shows live metrics.</li>
+<li>The agent is connected to your resource group in <strong>Review</strong> mode, can list every resource, and asks for approval before any change.</li>
+<li>You hold a validated baseline — captured while the platform was healthy — whose <abbr title="One running copy (pod) of a service; more replicas share the load.">replica</abbr> counts and latency match the Ops Center and <abbr title="Dashboarding tool used here to visualise AKS and Application Insights metrics.">Grafana</abbr>.</li>
+<li>A scheduled daily health check exists, with a sensible drift threshold.</li>
+</ul>
+<div class="admonition success">
+<p class="admonition-title">Verify your work</p>
+<p>Run this when you're done. It grades the real end state:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="n">check-challenge</span><span class="p">.</span><span class="n">ps1</span> <span class="n">1</span>
+</code></pre></div>
+</div>
+<h3 id="hints">Hints<a class="headerlink" href="#hints" title="Permanent link">&para;</a></h3>
+<details>
+<summary>Hint — orientation &amp; the agent</summary>
+<p>Load the Operations Center first and let it settle. Create the agent in the <strong>same
+resource group</strong> as the platform, keep it at <abbr title="The built-in Azure role that grants read-only access — see everything, change nothing.">Reader</abbr>/Review, and ask it an open
+question about the resource group to confirm scope. A write request should produce
+an approval prompt, not an action.</p>
+</details>
+<details>
+<summary>Hint — baseline &amp; proactive</summary>
+<p>Ask one specific question about namespace health rather than browsing pod-by-pod,
+and cross-check <abbr title="One running copy (pod) of a service; more replicas share the load.">replica</abbr> counts and latency against the tiles and <abbr title="Dashboarding tool used here to visualise AKS and Application Insights metrics.">Grafana</abbr>. Keep the
+baseline somewhere you can find it again mid-incident, and schedule the same
+read-only check so the agent watches for drift on its own.</p>
+</details>
 <div class="admonition question">
-<p class="admonition-title">Stuck? Give each task a genuine attempt first</p>
-<p>Working it out yourself is where the learning sticks. If you want the exact
-clicks, open the matching task below.</p>
+<p class="admonition-title">Stuck? Step-by-step for each task</p>
+<p>Give each task a genuine attempt first — and skim the hints above. When you
+want the exact clicks, open the matching task below.</p>
 <details class="note">
 <summary>Task 1 · Check the board</summary>
 <ul>
@@ -1805,8 +1843,8 @@ deployment</strong> — in <abbr title="SRE Agent run mode where it proposes a p
 <details class="note">
 <summary>Task 4 · Capture the baseline</summary>
 <ul>
-<li>With the board green, paste the baseline prompt (just below this section)
-  into the agent chat.</li>
+<li>With the board green, paste the baseline prompt (the <strong>Suggested Azure
+  <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent prompt</strong> above) into the agent chat.</li>
 <li>When it answers, spot-check <strong>2–3 numbers</strong> — <abbr title="One running copy (pod) of a service; more replicas share the load.">replica</abbr> counts and check-in
   / booking latency — against the Ops Center tiles and <abbr title="Dashboarding tool used here to visualise AKS and Application Insights metrics.">Grafana</abbr>.</li>
 <li>If the board was recently degraded, reset and let telemetry settle first,
@@ -1856,44 +1894,6 @@ the scheduled task, resolves the timezone/cron, and sets the conditions.</p>
 sub-second, so an alert at "p95 &gt; 3 s" would miss real latency.</p>
 </details>
 </div>
-<p><img alt="Challenge 1 storyboard — Sam and Aria onboard the SRE Agent and read the baseline" class="story-panel" loading="lazy" src="../../assets/storyboard/img-challenge-1.webp" /></p>
-<h3 id="suggested-azure-sre-agent-prompt">Suggested Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent prompt<a class="headerlink" href="#suggested-azure-sre-agent-prompt" title="Permanent link">&para;</a></h3>
-<div class="admonition quote">
-<p class="admonition-title">Paste into the agent chat</p>
-<p>Generate an operational baseline for the <code>aetherion</code> namespace, including:
-running services and ready <abbr title="One running copy (pod) of a service; more replicas share the load.">replica</abbr> counts; dependencies (which services use
-PostgreSQL and Redis, and what sits behind the API <abbr title="The single public entry point (API Management) through which all client traffic passes.">front door</abbr>); normal
-check-in and booking latency; and the top operational signals to watch.
-Support every finding with telemetry evidence, and make no changes.</p>
-</div>
-<h3 id="success-criteria">Success criteria<a class="headerlink" href="#success-criteria" title="Permanent link">&para;</a></h3>
-<ul>
-<li>All service tiles are healthy and <abbr title="Dashboarding tool used here to visualise AKS and Application Insights metrics.">Grafana</abbr> shows live metrics.</li>
-<li>The agent is connected to your resource group in <strong>Review</strong> mode, can list every resource, and asks for approval before any change.</li>
-<li>You hold a validated baseline — captured while the platform was healthy — whose <abbr title="One running copy (pod) of a service; more replicas share the load.">replica</abbr> counts and latency match the Ops Center and <abbr title="Dashboarding tool used here to visualise AKS and Application Insights metrics.">Grafana</abbr>.</li>
-<li>A scheduled daily health check exists, with a sensible drift threshold.</li>
-</ul>
-<div class="admonition success">
-<p class="admonition-title">Verify your work</p>
-<p>Run this when you're done. It grades the real end state:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="n">check-challenge</span><span class="p">.</span><span class="n">ps1</span> <span class="n">1</span>
-</code></pre></div>
-</div>
-<h3 id="hints">Hints<a class="headerlink" href="#hints" title="Permanent link">&para;</a></h3>
-<details>
-<summary>Hint — orientation &amp; the agent</summary>
-<p>Load the Operations Center first and let it settle. Create the agent in the <strong>same
-resource group</strong> as the platform, keep it at <abbr title="The built-in Azure role that grants read-only access — see everything, change nothing.">Reader</abbr>/Review, and ask it an open
-question about the resource group to confirm scope. A write request should produce
-an approval prompt, not an action.</p>
-</details>
-<details>
-<summary>Hint — baseline &amp; proactive</summary>
-<p>Ask one specific question about namespace health rather than browsing pod-by-pod,
-and cross-check <abbr title="One running copy (pod) of a service; more replicas share the load.">replica</abbr> counts and latency against the tiles and <abbr title="Dashboarding tool used here to visualise AKS and Application Insights metrics.">Grafana</abbr>. Keep the
-baseline somewhere you can find it again mid-incident, and schedule the same
-read-only check so the agent watches for drift on its own.</p>
-</details>
 <h3 id="reference">Reference<a class="headerlink" href="#reference" title="Permanent link">&para;</a></h3>
 <ul>
 <li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/create-and-set-up">Create and set up the <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent</a></li>
