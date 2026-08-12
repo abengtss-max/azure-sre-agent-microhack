@@ -11,6 +11,7 @@ const SERVICE_LABELS = {
 const feedEl = document.getElementById('feed');
 const MAX_FEED = 40;
 let lastState = {};
+let flightOpsDown = false;
 
 function pushFeed(text, level = 'info') {
   const li = document.createElement('li');
@@ -324,6 +325,8 @@ async function pollStatus() {
     renderImpact(data.impact);
     renderIncidents(data.incidents);
     updateMap(data.services);
+    flightOpsDown = classify(data.services['flight-ops']) === 'red';
+    renderFlightBoard();
   } catch (err) {
     setOverall('degraded');
     document.getElementById('overallText').textContent = 'Gateway unreachable';
@@ -333,9 +336,21 @@ async function pollStatus() {
 
 const STATUS_LABELS = ['On Time', 'On Time', 'On Time', 'Delayed', 'Boarding'];
 function renderFlightBoard() {
-  const airports = ['LHR', 'JFK', 'DXB', 'SIN', 'FRA', 'HND', 'LAX', 'CDG'];
+  const board = document.getElementById('flightBoard');
   const rows = document.getElementById('flightRows');
   rows.innerHTML = '';
+  // Flight Ops feeds the board; if it's unavailable, the board loses its signal.
+  if (flightOpsDown) {
+    board.classList.add('dark');
+    for (let i = 0; i < 8; i++) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>AE${100 + i}</td><td>—</td><td>—</td><td><span class="badge cancelled">NO SIGNAL</span></td>`;
+      rows.appendChild(tr);
+    }
+    return;
+  }
+  board.classList.remove('dark');
+  const airports = ['LHR', 'JFK', 'DXB', 'SIN', 'FRA', 'HND', 'LAX', 'CDG'];
   for (let i = 0; i < 8; i++) {
     const o = airports[Math.floor(Math.random() * airports.length)];
     let d = airports[Math.floor(Math.random() * airports.length)];
