@@ -1,4 +1,4 @@
-# Challenge 2 — Detect and Investigate Without Touching Production
+# Challenge 2: Detect and Investigate Without Touching Production
 
 !!! abstract "Challenge 02 of 08 · Act II: Human-Guided Operations"
     **Run mode:** Review · **Access:** read-only investigation
