@@ -1739,7 +1739,7 @@ operational baseline, and schedule a proactive daily health check.</p>
 <p class="admonition-title">Start this challenge</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="nb">start-challenge</span><span class="p">.</span><span class="n">ps1</span> <span class="n">1</span>   <span class="c"># sets the scene (Challenge 1 injects no fault)</span>
 </code></pre></div>
-<p>The start-challenge.ps1 script will only print out information when a 1 is passed on the command line. No errors are injected, so the board stays green. You create the <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent yourself in Task 3.</p>
+<p>The start-challenge.ps1 script will only print out information when a <code>1</code> is passed on the command line. No errors are injected, so the board should stay green.</p>
 <p>If your Operations Center is <strong>not</strong> all-green (for example you ran a later
 challenge on this environment), reset to a clean baseline first:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="nb">reset-environment</span><span class="p">.</span><span class="n">ps1</span>
