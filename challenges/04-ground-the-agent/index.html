@@ -1713,14 +1713,14 @@
   
 
 
-<h1 id="challenge-4-give-the-agent-aetherions-operational-knowledge">Challenge 4 — Give the Agent Aetherion's Operational Knowledge<a class="headerlink" href="#challenge-4-give-the-agent-aetherions-operational-knowledge" title="Permanent link">&para;</a></h1>
+<h1 id="challenge-4-give-the-agent-aetherions-operational-knowledge">Challenge 4 · Give the Agent Aetherion's Operational Knowledge<a class="headerlink" href="#challenge-4-give-the-agent-aetherions-operational-knowledge" title="Permanent link">&para;</a></h1>
 <div class="admonition abstract">
-<p class="admonition-title">Challenge 04 of 08 · Act II — Human-Guided Operations</p>
+<p class="admonition-title">Challenge 04 of 08 · Act II: Human-Guided Operations</p>
 <p><strong>Run mode:</strong> Review → approved write · <strong>Access:</strong> scoped write on approval</p>
 <p><strong>Stage:</strong> Foundation → <strong>Operations</strong> → Engineering → Autonomous → Major Incident</p>
 </div>
-<p><strong>Situation.</strong> Crew scheduling is failing — the <code>crew-scheduling</code> tile is red while
-every other service stays healthy — and duty managers can't confirm who is legal to
+<p><strong>Situation.</strong> Crew scheduling is failing (the <code>crew-scheduling</code> tile is red while
+every other service stays healthy), and duty managers can't confirm who is legal to
 fly the evening wave. Out of the box the agent gives generic advice, and a generic
 "restart the database" is exactly what Aetherion's runbooks forbid. The fastest path
 to the right answer is to ground the agent in your own knowledge.</p>
@@ -1730,10 +1730,10 @@ non-destructive remediation and verify service is restored.</p>
 <p><strong>Why this matters</strong></p>
 <div class="grid cards why-cards">
 <ul>
-<li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 21.5c-1.35-.85-3.8-1.5-5.5-1.5-1.65 0-3.35.3-4.75 1.05-.1.05-.15.05-.25.05-.25 0-.5-.25-.5-.5V6c.6-.45 1.25-.75 2-1 1.11-.35 2.33-.5 3.5-.5 1.95 0 4.05.4 5.5 1.5 1.45-1.1 3.55-1.5 5.5-1.5 1.17 0 2.39.15 3.5.5.75.25 1.4.55 2 1v14.6c0 .25-.25.5-.5.5-.1 0-.15 0-.25-.05-1.4-.75-3.1-1.05-4.75-1.05-1.7 0-4.15.65-5.5 1.5M12 8v11.5c1.35-.85 3.8-1.5 5.5-1.5 1.2 0 2.4.15 3.5.5V7c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5m1 3.5c1.11-.68 2.6-1 4.5-1 .91 0 1.76.09 2.5.28V9.23c-.87-.15-1.71-.23-2.5-.23q-2.655 0-4.5.84zm4.5.17c-1.71 0-3.21.26-4.5.79v1.69c1.11-.65 2.6-.99 4.5-.99 1.04 0 1.88.08 2.5.24v-1.5c-.87-.16-1.71-.23-2.5-.23m2.5 2.9c-.87-.16-1.71-.24-2.5-.24-1.83 0-3.33.27-4.5.8v1.69c1.11-.66 2.6-.99 4.5-.99 1.04 0 1.88.08 2.5.24z"/></svg></span> <strong>Ground the agent</strong> — load Aetherion's runbooks and architecture</li>
-<li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11 2v2.07A8 8 0 0 0 4.07 11H2v2h2.07A8 8 0 0 0 11 19.93V22h2v-2.07A8 8 0 0 0 19.93 13H22v-2h-2.07A8 8 0 0 0 13 4.07V2m-2 4.08V8h2V6.09c2.5.41 4.5 2.41 4.92 4.91H16v2h1.91c-.41 2.5-2.41 4.5-4.91 4.92V16h-2v1.91C8.5 17.5 6.5 15.5 6.08 13H8v-2H6.09C6.5 8.5 8.5 6.5 11 6.08M12 11a1 1 0 0 0-1 1 1 1 0 0 0 1 1 1 1 0 0 0 1-1 1 1 0 0 0-1-1"/></svg></span> <strong>Right layer, right fix</strong> — one service down is not the database down</li>
-<li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 11c0 5.55-3.84 10.74-9 12-5.16-1.26-9-6.45-9-12V5l9-4 9 4zm-9 10c3.75-1 7-5.46 7-9.78V6.3l-7-3.12L5 6.3v4.92C5 15.54 8.25 20 12 21M11 7h2v6h-2zm0 8h2v2h-2z"/></svg></span> <strong>Respect guardrails</strong> — relieve the pool, never delete the database</li>
-<li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16 14h1.5v2.82l2.44 1.41-.75 1.3L16 17.69zm1-2a5 5 0 0 0-5 5 5 5 0 0 0 5 5 5 5 0 0 0 5-5 5 5 0 0 0-5-5m0-2a7 7 0 0 1 7 7 7 7 0 0 1-7 7c-2.79 0-5.2-1.64-6.33-4H1v-3c0-2.66 5.33-4 8-4 .6 0 1.34.07 2.12.2A6.99 6.99 0 0 1 17 10m-7 7c0-.7.1-1.38.29-2-.42-.07-.86-.1-1.29-.1-2.97 0-6.1 1.46-6.1 2.1v1.1h7.19A7 7 0 0 1 10 17M9 4a4 4 0 0 1 4 4 4 4 0 0 1-4 4 4 4 0 0 1-4-4 4 4 0 0 1 4-4m0 1.9A2.1 2.1 0 0 0 6.9 8 2.1 2.1 0 0 0 9 10.1 2.1 2.1 0 0 0 11.1 8 2.1 2.1 0 0 0 9 5.9"/></svg></span> <strong>Legal to fly</strong> — restore crew scheduling before the evening wave</li>
+<li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 21.5c-1.35-.85-3.8-1.5-5.5-1.5-1.65 0-3.35.3-4.75 1.05-.1.05-.15.05-.25.05-.25 0-.5-.25-.5-.5V6c.6-.45 1.25-.75 2-1 1.11-.35 2.33-.5 3.5-.5 1.95 0 4.05.4 5.5 1.5 1.45-1.1 3.55-1.5 5.5-1.5 1.17 0 2.39.15 3.5.5.75.25 1.4.55 2 1v14.6c0 .25-.25.5-.5.5-.1 0-.15 0-.25-.05-1.4-.75-3.1-1.05-4.75-1.05-1.7 0-4.15.65-5.5 1.5M12 8v11.5c1.35-.85 3.8-1.5 5.5-1.5 1.2 0 2.4.15 3.5.5V7c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5m1 3.5c1.11-.68 2.6-1 4.5-1 .91 0 1.76.09 2.5.28V9.23c-.87-.15-1.71-.23-2.5-.23q-2.655 0-4.5.84zm4.5.17c-1.71 0-3.21.26-4.5.79v1.69c1.11-.65 2.6-.99 4.5-.99 1.04 0 1.88.08 2.5.24v-1.5c-.87-.16-1.71-.23-2.5-.23m2.5 2.9c-.87-.16-1.71-.24-2.5-.24-1.83 0-3.33.27-4.5.8v1.69c1.11-.66 2.6-.99 4.5-.99 1.04 0 1.88.08 2.5.24z"/></svg></span> <strong>Ground the agent</strong>: load Aetherion's runbooks and architecture</li>
+<li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11 2v2.07A8 8 0 0 0 4.07 11H2v2h2.07A8 8 0 0 0 11 19.93V22h2v-2.07A8 8 0 0 0 19.93 13H22v-2h-2.07A8 8 0 0 0 13 4.07V2m-2 4.08V8h2V6.09c2.5.41 4.5 2.41 4.92 4.91H16v2h1.91c-.41 2.5-2.41 4.5-4.91 4.92V16h-2v1.91C8.5 17.5 6.5 15.5 6.08 13H8v-2H6.09C6.5 8.5 8.5 6.5 11 6.08M12 11a1 1 0 0 0-1 1 1 1 0 0 0 1 1 1 1 0 0 0 1-1 1 1 0 0 0-1-1"/></svg></span> <strong>Right layer, right fix</strong>: one service down is not the database down</li>
+<li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 11c0 5.55-3.84 10.74-9 12-5.16-1.26-9-6.45-9-12V5l9-4 9 4zm-9 10c3.75-1 7-5.46 7-9.78V6.3l-7-3.12L5 6.3v4.92C5 15.54 8.25 20 12 21M11 7h2v6h-2zm0 8h2v2h-2z"/></svg></span> <strong>Respect guardrails</strong>: relieve the pool, never delete the database</li>
+<li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16 14h1.5v2.82l2.44 1.41-.75 1.3L16 17.69zm1-2a5 5 0 0 0-5 5 5 5 0 0 0 5 5 5 5 0 0 0 5-5 5 5 0 0 0-5-5m0-2a7 7 0 0 1 7 7 7 7 0 0 1-7 7c-2.79 0-5.2-1.64-6.33-4H1v-3c0-2.66 5.33-4 8-4 .6 0 1.34.07 2.12.2A6.99 6.99 0 0 1 17 10m-7 7c0-.7.1-1.38.29-2-.42-.07-.86-.1-1.29-.1-2.97 0-6.1 1.46-6.1 2.1v1.1h7.19A7 7 0 0 1 10 17M9 4a4 4 0 0 1 4 4 4 4 0 0 1-4 4 4 4 0 0 1-4-4 4 4 0 0 1 4-4m0 1.9A2.1 2.1 0 0 0 6.9 8 2.1 2.1 0 0 0 9 10.1 2.1 2.1 0 0 0 11.1 8 2.1 2.1 0 0 0 9 5.9"/></svg></span> <strong>Legal to fly</strong>: restore crew scheduling before the evening wave</li>
 </ul>
 </div>
 <div class="admonition example">
@@ -1743,18 +1743,18 @@ non-destructive remediation and verify service is restored.</p>
 </div>
 <h3 id="tasks">Tasks<a class="headerlink" href="#tasks" title="Permanent link">&para;</a></h3>
 <ol>
-<li><strong>Confirm the <abbr title="How much of the system an incident (or a fix) can affect — kept as small as possible.">blast radius</abbr>.</strong> Check that only <code>crew-scheduling</code> is down — one red service isn't the whole database failing.</li>
+<li><strong>Confirm the <abbr title="How much of the system an incident (or a fix) can affect — kept as small as possible.">blast radius</abbr>.</strong> Check that only <code>crew-scheduling</code> is down. One red service isn't the whole database failing.</li>
 <li><strong>Ground the agent.</strong> Load Aetherion's <code>knowledge/</code> runbooks, then re-ask the remediation question and watch the advice change.</li>
 <li><strong>Apply the sanctioned fix.</strong> Relieve the <abbr title="A fixed set of reusable database connections; when it is exhausted, requests queue or fail.">connection pool</abbr> and stop the leak (never delete the database), then confirm crew scheduling recovers.</li>
 </ol>
-<p><img alt="Challenge 4 storyboard — Marco, Sam and Aria ground the agent in Aetherion's runbooks" class="story-panel" loading="lazy" src="../../assets/storyboard/img-challenge-4.webp" /></p>
+<p><img alt="Challenge 4 storyboard: Marco, Sam and Aria ground the agent in Aetherion's runbooks" class="story-panel" loading="lazy" src="../../assets/storyboard/img-challenge-4.webp" /></p>
 <h3 id="suggested-azure-sre-agent-prompt">Suggested Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent prompt<a class="headerlink" href="#suggested-azure-sre-agent-prompt" title="Permanent link">&para;</a></h3>
 <div class="admonition quote">
 <p class="admonition-title">Paste into the agent chat</p>
 <p>Given <code>crew-scheduling</code> is failing on PostgreSQL dependency timeouts while its
 database-backed peers stay healthy, and using the Aetherion runbooks I've
 loaded: what is the sanctioned remediation? Cite the guardrail and give me a
-plan I can approve — do not delete or restart the database.</p>
+plan I can approve. Do not delete or restart the database.</p>
 </div>
 <h3 id="success-criteria">Success criteria<a class="headerlink" href="#success-criteria" title="Permanent link">&para;</a></h3>
 <ul>
@@ -1770,26 +1770,26 @@ plan I can approve — do not delete or restart the database.</p>
 </div>
 <h3 id="hints">Hints<a class="headerlink" href="#hints" title="Permanent link">&para;</a></h3>
 <details>
-<summary>Hint — how wide is the blast radius?</summary>
-<p>Only <code>crew-scheduling</code> is red while its database-backed peers stay healthy — that
+<summary>Hint: how wide is the blast radius?</summary>
+<p>Only <code>crew-scheduling</code> is red while its database-backed peers stay healthy, which
 rules out a whole-database outage. The problem is local to one service.</p>
 </details>
 <details>
-<summary>Hint — let the runbooks answer</summary>
+<summary>Hint: let the runbooks answer</summary>
 <p>Load the <code>knowledge/</code> Markdown files, then re-ask and watch the advice turn
-Aetherion-specific. The runbook guardrail — relieve pressure by scaling, never
-delete the database — hints at what's being exhausted.</p>
+Aetherion-specific. The runbook guardrail (relieve pressure by scaling, never
+delete the database) hints at what's being exhausted.</p>
 </details>
 <div class="admonition question">
 <p class="admonition-title">Stuck? Step-by-step for each task</p>
-<p>Give each task a genuine attempt first — and skim the hints above. When you want
+<p>Give each task a genuine attempt first, and skim the hints above. When you want
 the exact clicks, open the matching task below.</p>
 <details class="note">
 <summary>Task 1 · Confirm the <abbr title="How much of the system an incident (or a fix) can affect — kept as small as possible.">blast radius</abbr></summary>
 <ul>
 <li>Read the Operations Center: is <strong>only</strong> <code>crew-scheduling</code> red, or are its
   database-backed peers (<code>booking</code>, <code>telemetry-ingest</code>) failing too?</li>
-<li>If just one service is down, a whole-database outage is ruled out — the
+<li>If just one service is down, a whole-database outage is ruled out, so the
   fault is local to that service.</li>
 </ul>
 </details>
@@ -1820,8 +1820,8 @@ the exact clicks, open the matching task below.</p>
 <li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/execute-mitigations">Review and approve mitigations</a></li>
 </ul>
 <div class="admonition success">
-<p class="admonition-title">Up next — make investigation &amp; recovery reusable</p>
-<p>You've worked several <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> incidents the same way — time to build a specialist and encode a recovery so both are reusable.</p>
+<p class="admonition-title">Up next: make investigation &amp; recovery reusable</p>
+<p>You've worked several <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> incidents the same way, so it's time to build a specialist and encode a recovery so both are reusable.</p>
 <p><a class="md-button md-button--primary" href="../05-engineer-the-agent/">Proceed to Challenge 5 · Engineer the Agent →</a></p>
 </div>
 <hr />

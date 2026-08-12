@@ -1713,28 +1713,28 @@
   
 
 
-<h1 id="challenge-3-controlled-recovery-and-change-correlation">Challenge 3 — Controlled Recovery and Change Correlation<a class="headerlink" href="#challenge-3-controlled-recovery-and-change-correlation" title="Permanent link">&para;</a></h1>
+<h1 id="challenge-3-controlled-recovery-and-change-correlation">Challenge 3 · Controlled Recovery and Change Correlation<a class="headerlink" href="#challenge-3-controlled-recovery-and-change-correlation" title="Permanent link">&para;</a></h1>
 <div class="admonition abstract">
-<p class="admonition-title">Challenge 03 of 08 · Act II — Human-Guided Operations</p>
+<p class="admonition-title">Challenge 03 of 08 · Act II: Human-Guided Operations</p>
 <p><strong>Run mode:</strong> Review → approved write · <strong>Access:</strong> scoped write on approval</p>
 <p><strong>Stage:</strong> Foundation → <strong>Operations</strong> → Engineering → Autonomous → Major Incident</p>
 </div>
 <p><strong>Situation.</strong> Two things hit in quick succession. Your check-in hypothesis is solid
-and the director wants it fixed — <strong>safely</strong>, with a human in the loop. Then the live
-<strong>flight board</strong> goes dark for every station and <code>flight-ops</code> drops straight to red —
+and the director wants it fixed <strong>safely</strong>, with a human in the loop. Then the live
+<strong>flight board</strong> goes dark for every station and <code>flight-ops</code> drops straight to red,
 the hallmark of a bad change. The flight board is the picture the whole center flies
 by, so this is a <strong><abbr title="Priority 1 — a critical, business-stopping incident.">P1</abbr></strong>: restore first, then correlate the change to prevent
 recurrence.</p>
 <p><strong>Mission.</strong> Recover check-in with the least-disruptive action under human approval,
 then restore the flight board by correlating the outage with a recent change and
-applying a reversible rollback — verifying both from telemetry.</p>
+applying a reversible rollback, and verifying both from telemetry.</p>
 <p><strong>Why this matters</strong></p>
 <div class="grid cards why-cards">
 <ul>
-<li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m21.1 12.5 1.4 1.41-6.53 6.59L12.5 17l1.4-1.41 2.07 2.08zM11 4a4 4 0 0 1 4 4 4 4 0 0 1-4 4 4 4 0 0 1-4-4 4 4 0 0 1 4-4m0 2a2 2 0 0 0-2 2 2 2 0 0 0 2 2 2 2 0 0 0 2-2 2 2 0 0 0-2-2m0 7c.68 0 1.5.09 2.41.26l-1.67 1.67-.74-.03c-2.97 0-6.1 1.46-6.1 2.1v1.1h6.2L13 20H3v-3c0-2.66 5.33-4 8-4"/></svg></span> <strong>Human-in-the-loop</strong> — approve the least-disruptive write</li>
-<li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 3a9 9 0 0 0-9 9H0l4 4 4-4H5a7 7 0 0 1 7-7 7 7 0 0 1 7 7 7 7 0 0 1-7 7c-1.5 0-2.91-.5-4.06-1.3L6.5 19.14A9.1 9.1 0 0 0 12 21a9 9 0 0 0 9-9 9 9 0 0 0-9-9m2 9a2 2 0 0 0-2-2 2 2 0 0 0-2 2 2 2 0 0 0 2 2 2 2 0 0 0 2-2"/></svg></span> <strong>Reversible recovery</strong> — roll back to the last good state</li>
-<li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 14c-3.36 0-4.46 1.35-4.82 2.24C9.25 16.7 10 17.76 10 19a3 3 0 0 1-3 3 3 3 0 0 1-3-3c0-1.31.83-2.42 2-2.83V7.83A2.99 2.99 0 0 1 4 5a3 3 0 0 1 3-3 3 3 0 0 1 3 3c0 1.31-.83 2.42-2 2.83v5.29c.88-.65 2.16-1.12 4-1.12 2.67 0 3.56-1.34 3.85-2.23A3.01 3.01 0 0 1 14 7a3 3 0 0 1 3-3 3 3 0 0 1 3 3c0 1.34-.88 2.5-2.09 2.86C17.65 11.29 16.68 14 13 14m-6 4a1 1 0 0 0-1 1 1 1 0 0 0 1 1 1 1 0 0 0 1-1 1 1 0 0 0-1-1M7 4a1 1 0 0 0-1 1 1 1 0 0 0 1 1 1 1 0 0 0 1-1 1 1 0 0 0-1-1m10 2a1 1 0 0 0-1 1 1 1 0 0 0 1 1 1 1 0 0 0 1-1 1 1 0 0 0-1-1"/></svg></span> <strong>Change correlation</strong> — line the outage up with a deploy or commit</li>
-<li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m23 12-2.4-2.8.3-3.7-3.6-.8-1.9-3.2L12 3 8.6 1.5 6.7 4.7l-3.6.8.3 3.7L1 12l2.4 2.8-.3 3.7 3.6.8 1.9 3.2L12 21l3.4 1.5 1.9-3.2 3.6-.8-.3-3.7zm-4.3 4.9-2.7.6-1.4 2.4-2.6-1.1-2.6 1.1L8 17.5l-2.7-.6.2-2.8L3.7 12l1.8-2.1-.2-2.8L8 6.5l1.4-2.4L12 5.2l2.6-1.1L16 6.5l2.7.6-.2 2.8 1.8 2.1-1.8 2.1zm-2.1-9.3L18 9l-8 8-4-4 1.4-1.4 2.6 2.6z"/></svg></span> <strong>Verified from telemetry</strong> — prove recovery, don't assume it</li>
+<li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m21.1 12.5 1.4 1.41-6.53 6.59L12.5 17l1.4-1.41 2.07 2.08zM11 4a4 4 0 0 1 4 4 4 4 0 0 1-4 4 4 4 0 0 1-4-4 4 4 0 0 1 4-4m0 2a2 2 0 0 0-2 2 2 2 0 0 0 2 2 2 2 0 0 0 2-2 2 2 0 0 0-2-2m0 7c.68 0 1.5.09 2.41.26l-1.67 1.67-.74-.03c-2.97 0-6.1 1.46-6.1 2.1v1.1h6.2L13 20H3v-3c0-2.66 5.33-4 8-4"/></svg></span> <strong>Human-in-the-loop</strong>: approve the least-disruptive write</li>
+<li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 3a9 9 0 0 0-9 9H0l4 4 4-4H5a7 7 0 0 1 7-7 7 7 0 0 1 7 7 7 7 0 0 1-7 7c-1.5 0-2.91-.5-4.06-1.3L6.5 19.14A9.1 9.1 0 0 0 12 21a9 9 0 0 0 9-9 9 9 0 0 0-9-9m2 9a2 2 0 0 0-2-2 2 2 0 0 0-2 2 2 2 0 0 0 2 2 2 2 0 0 0 2-2"/></svg></span> <strong>Reversible recovery</strong>: roll back to the last good state</li>
+<li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 14c-3.36 0-4.46 1.35-4.82 2.24C9.25 16.7 10 17.76 10 19a3 3 0 0 1-3 3 3 3 0 0 1-3-3c0-1.31.83-2.42 2-2.83V7.83A2.99 2.99 0 0 1 4 5a3 3 0 0 1 3-3 3 3 0 0 1 3 3c0 1.31-.83 2.42-2 2.83v5.29c.88-.65 2.16-1.12 4-1.12 2.67 0 3.56-1.34 3.85-2.23A3.01 3.01 0 0 1 14 7a3 3 0 0 1 3-3 3 3 0 0 1 3 3c0 1.34-.88 2.5-2.09 2.86C17.65 11.29 16.68 14 13 14m-6 4a1 1 0 0 0-1 1 1 1 0 0 0 1 1 1 1 0 0 0 1-1 1 1 0 0 0-1-1M7 4a1 1 0 0 0-1 1 1 1 0 0 0 1 1 1 1 0 0 0 1-1 1 1 0 0 0-1-1m10 2a1 1 0 0 0-1 1 1 1 0 0 0 1 1 1 1 0 0 0 1-1 1 1 0 0 0-1-1"/></svg></span> <strong>Change correlation</strong>: line the outage up with a deploy or commit</li>
+<li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m23 12-2.4-2.8.3-3.7-3.6-.8-1.9-3.2L12 3 8.6 1.5 6.7 4.7l-3.6.8.3 3.7L1 12l2.4 2.8-.3 3.7 3.6.8 1.9 3.2L12 21l3.4 1.5 1.9-3.2 3.6-.8-.3-3.7zm-4.3 4.9-2.7.6-1.4 2.4-2.6-1.1-2.6 1.1L8 17.5l-2.7-.6.2-2.8L3.7 12l1.8-2.1-.2-2.8L8 6.5l1.4-2.4L12 5.2l2.6-1.1L16 6.5l2.7.6-.2 2.8 1.8 2.1-1.8 2.1zm-2.1-9.3L18 9l-8 8-4-4 1.4-1.4 2.6 2.6z"/></svg></span> <strong>Verified from telemetry</strong>: prove recovery, don't assume it</li>
 </ul>
 </div>
 <div class="admonition example">
@@ -1749,7 +1749,7 @@ applying a reversible rollback — verifying both from telemetry.</p>
 <li><strong>Triage the flight board.</strong> Find out how <code>flight-ops</code> is failing from pod status and events.</li>
 <li><strong>Correlate and roll back.</strong> Line the outage up with the recent change, apply a reversible rollback, and check the board recovers.</li>
 </ol>
-<p><img alt="Challenge 3 storyboard — Sam, Aria and Elena run a controlled recovery and correlate the change" class="story-panel" loading="lazy" src="../../assets/storyboard/img-challenge-3.webp" /></p>
+<p><img alt="Challenge 3 storyboard: Sam, Aria and Elena run a controlled recovery and correlate the change" class="story-panel" loading="lazy" src="../../assets/storyboard/img-challenge-3.webp" /></p>
 <h3 id="suggested-azure-sre-agent-prompt">Suggested Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent prompt<a class="headerlink" href="#suggested-azure-sre-agent-prompt" title="Permanent link">&para;</a></h3>
 <div class="admonition quote">
 <p class="admonition-title">Paste into the agent chat</p>
@@ -1773,13 +1773,13 @@ propose the least-disruptive <strong>reversible</strong> rollback for my approva
 </div>
 <h3 id="hints">Hints<a class="headerlink" href="#hints" title="Permanent link">&para;</a></h3>
 <details>
-<summary>Hint — recover check-in safely</summary>
-<p>Ask the agent for a remediation <em>plan</em> first — it tells you the permission the
+<summary>Hint: recover check-in safely</summary>
+<p>Ask the agent for a remediation <em>plan</em> first. It tells you the permission the
 action needs. The safe fix removes the added delay and leaves the autoscaler to
 absorb the surge; it shouldn't touch the database, Redis, or nodes.</p>
 </details>
 <details>
-<summary>Hint — restore the flight board</summary>
+<summary>Hint: restore the flight board</summary>
 <p>Confirm how <code>flight-ops</code> is failing in <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> first, then line up the moment the tile
 went red with deployment / rollout history and the repo's recent changes. Closeness
 in time is your strongest lead, and returning to the last good state is usually the
@@ -1787,14 +1787,14 @@ fix.</p>
 </details>
 <div class="admonition question">
 <p class="admonition-title">Stuck? Step-by-step for each task</p>
-<p>Give each task a genuine attempt first — and skim the hints above. When you want
+<p>Give each task a genuine attempt first, and skim the hints above. When you want
 the exact clicks, open the matching task below.</p>
 <details class="note">
 <summary>Task 1 · Plan the fix</summary>
 <ul>
 <li>In the agent chat, paste the <strong>suggested prompt</strong> above (or ask it to turn
   your check-in hypothesis into a concrete <code>booking</code> remediation plan).</li>
-<li>The plan is your <strong>approval artifact</strong> — it should say exactly what it will
+<li>The plan is your <strong>approval artifact</strong>: it should say exactly what it will
   change and the <strong>permission</strong> the action needs.</li>
 </ul>
 </details>
@@ -1803,7 +1803,7 @@ the exact clicks, open the matching task below.</p>
 <p>Apply the least-disruptive fix one of two governed ways:</p>
 <ul>
 <li><strong>On-behalf-of:</strong> keep the agent in <strong>Review</strong>, and select <strong>Approve</strong> when
-  it proposes the write — it runs once, with your permission.</li>
+  it proposes the write; it runs once, with your permission.</li>
 <li><strong>Scoped role:</strong> grant the agent's <abbr title="An Azure identity for a workload (here, the agent) so it can authenticate without stored secrets.">managed identity</abbr> a <strong>narrow</strong> write role
   on just the affected resource (portal → resource group → <strong>Access control
   (IAM)</strong>), then let it act with its own identity.</li>
@@ -1839,8 +1839,8 @@ the exact clicks, open the matching task below.</p>
 <li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/connect-source-code">Connect source code</a></li>
 </ul>
 <div class="admonition success">
-<p class="admonition-title">Up next — teach the agent your runbooks</p>
-<p>The next incident's fix is already written in Aetherion's runbooks — if only the agent knew them.</p>
+<p class="admonition-title">Up next: teach the agent your runbooks</p>
+<p>The next incident's fix is already written in Aetherion's runbooks, if only the agent knew them.</p>
 <p><a class="md-button md-button--primary" href="../04-ground-the-agent/">Proceed to Challenge 4 · Ground the Agent →</a></p>
 </div>
 <hr />
