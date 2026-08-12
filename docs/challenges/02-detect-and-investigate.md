@@ -125,7 +125,6 @@ hypothesis, not when it's fixed.
 
 - [Run a deep investigation](https://learn.microsoft.com/en-us/azure/sre-agent/deep-investigation)
 - [Root cause analysis](https://learn.microsoft.com/en-us/azure/sre-agent/root-cause-analysis)
-- [Connect Log Analytics and Application Insights](https://learn.microsoft.com/en-us/azure/sre-agent/log-analytics-app-insights)
 - [Memory and knowledge](https://learn.microsoft.com/en-us/azure/sre-agent/memory)
 
 !!! success "Up next — controlled recovery under approval"
