@@ -31,8 +31,8 @@ operational baseline, and schedule a proactive daily health check.
     ./scripts/start-challenge.ps1 1   # sets the scene (Challenge 1 injects no fault)
     ```
 
-    The start-challenge.ps1 script will only print out information when a 1 is passed on the command line. No errors are injected, so the board stays green. You create the SRE Agent yourself in Task 3.
-    
+    The start-challenge.ps1 script will only print out information when a ````1```` is passed on the command line. No errors are injected, so the board should stay green.
+
     If your Operations Center is **not** all-green (for example you ran a later
     challenge on this environment), reset to a clean baseline first:
 
