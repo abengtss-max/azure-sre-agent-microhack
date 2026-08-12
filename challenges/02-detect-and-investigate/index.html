@@ -1716,7 +1716,7 @@
 <h1 id="challenge-2-detect-and-investigate-without-touching-production">Challenge 2 — Detect and Investigate Without Touching Production<a class="headerlink" href="#challenge-2-detect-and-investigate-without-touching-production" title="Permanent link">&para;</a></h1>
 <div class="admonition abstract">
 <p class="admonition-title">Challenge 02 of 08 · Act II — Human-Guided Operations</p>
-<p><strong>Agent mode:</strong> <abbr title="The built-in Azure role that grants read-only access — see everything, change nothing.">Reader</abbr> (read-only) · <strong>Permissions:</strong> <abbr title="The built-in Azure role that grants read-only access — see everything, change nothing.">Reader</abbr> · <strong>Estimated time:</strong> 20–30 min</p>
+<p><strong>Run mode:</strong> Review · <strong>Access:</strong> read-only investigation</p>
 <p><strong>Stage:</strong> Foundation → <strong>Operations</strong> → Engineering → Autonomous → Major Incident</p>
 </div>
 <p><strong>Situation.</strong> Passengers are reporting long check-in waits and the <strong>booking /
@@ -1746,32 +1746,26 @@ you're here to investigate.</p>
 </div>
 <h3 id="tasks">Tasks<a class="headerlink" href="#tasks" title="Permanent link">&para;</a></h3>
 <ol>
-<li><strong>Confirm the symptom</strong> — compare current check-in latency to your Challenge 1 baseline, and rely on the measured delta rather than a hunch.</li>
-<li><strong>Correlate read-only</strong> — have the agent correlate <code>booking</code> request duration with CPU, <abbr title="One running copy (pod) of a service; more replicas share the load.">replica</abbr> count and request load.</li>
-<li><strong>Test the capacity theory</strong> — if <abbr title="Running copies (pods) of a service; more replicas share the load.">replicas</abbr> scaled but latency stayed high while CPU isn't saturated, load alone doesn't explain it.</li>
-<li><strong>Record the hypothesis</strong> — write the root cause, the ≥2 signals behind it, and the least-disruptive recovery you'd propose (don't perform it).</li>
+<li><strong>Confirm the symptom.</strong> Compare check-in latency now to your Challenge 1 baseline and trust the measured delta.</li>
+<li><strong>Correlate read-only.</strong> Have the agent line up <code>booking</code> request duration against CPU, <abbr title="Running copies (pods) of a service; more replicas share the load.">replicas</abbr>, and request load.</li>
+<li><strong>Rule out capacity.</strong> Decide whether load alone explains the latency, or something was added on the path.</li>
+<li><strong>Record your hypothesis.</strong> Capture the root cause, the two signals behind it, and the recovery you'd propose (without performing it).</li>
 </ol>
-<div class="admonition question">
-<p class="admonition-title">Stuck? Give each task a genuine attempt first</p>
-<p>Working it out yourself is where the learning sticks. If you need the exact
-clicks, the <a href="../../getting-started/portal-walkthrough/">Azure portal walkthrough</a>
-has a step for every action.</p>
-</div>
 <p><img alt="Challenge 2 storyboard — Sam and Aria detect and investigate the incident read-only" class="story-panel" loading="lazy" src="../../assets/storyboard/img-challenge-2.webp" /></p>
 <h3 id="suggested-azure-sre-agent-prompt">Suggested Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent prompt<a class="headerlink" href="#suggested-azure-sre-agent-prompt" title="Permanent link">&para;</a></h3>
 <div class="admonition quote">
 <p class="admonition-title">Paste into the agent chat</p>
 <p>Analyze the check-in / booking path read-only. Correlate <code>booking</code> request
-duration with CPU, <abbr title="One running copy (pod) of a service; more replicas share the load.">replica</abbr> count, and request load over the last 30 minutes.
-Is the latency explained by capacity, or is there an added delay independent of
-load? Give a root-cause hypothesis with supporting evidence — and change nothing.</p>
+duration with CPU, <abbr title="One running copy (pod) of a service; more replicas share the load.">replica</abbr> count, and request load over the last 30 minutes, and
+check recent deployments and rollout history for changes in the same window.
+Give a root-cause hypothesis with supporting evidence, and change nothing.</p>
 </div>
 <div class="admonition tip">
 <p class="admonition-title">Optional — feed the agent a HAR trace or screenshot</p>
-<p>If a partner reports the failure from their side, capture a <strong>HAR trace</strong>
-(browser DevTools → Network → <em>Save all as HAR</em>) or a screenshot of the failing
-call and <strong>upload it in the agent chat</strong> — the agent parses HAR and image files
-directly and folds client-side timing into its investigation.</p>
+<p>If a partner reports the failure from their side, capture a <strong>HAR</strong> (HTTP
+Archive) trace (browser DevTools → Network → <em>Save all as HAR</em>) or a screenshot
+of the failing call and <strong>upload it in the agent chat</strong>. The agent parses HAR and
+image files directly and folds client-side timing into its investigation.</p>
 </div>
 <h3 id="success-criteria">Success criteria<a class="headerlink" href="#success-criteria" title="Permanent link">&para;</a></h3>
 <ul>
@@ -1787,21 +1781,68 @@ directly and folds client-side timing into its investigation.</p>
 </div>
 <h3 id="hints">Hints<a class="headerlink" href="#hints" title="Permanent link">&para;</a></h3>
 <details>
-<summary>Hint</summary>
-<p>Compare <code>booking</code> latency now against your recorded baseline and rely on the
-measured delta rather than a hunch. Correlate request duration with CPU and <abbr title="Running copies (pods) of a service; more replicas share the load.">replicas</abbr>
-over the same window, not latency alone. If the autoscaler added <abbr title="Running copies (pods) of a service; more replicas share the load.">replicas</abbr> and CPU
-isn't saturated yet latency stays high, the delay is being added independently of
-load — think about what adds a roughly constant delay per request. Detection is done
-when you can describe the symptom precisely and defend a hypothesis, not when it's
-fixed.</p>
+<summary>Hint — confirm and correlate</summary>
+<p>Start from the delta against your baseline, not a feeling. Line up request duration
+with CPU, <abbr title="Running copies (pods) of a service; more replicas share the load.">replicas</abbr>, and request load over the same window — one specific comparison
+beats browsing pod-by-pod.</p>
 </details>
+<details>
+<summary>Hint — capacity, or something else?</summary>
+<p>If the autoscaler added <abbr title="Running copies (pods) of a service; more replicas share the load.">replicas</abbr> and CPU still isn't saturated, load probably isn't
+the whole story. Look at what changed on the booking path around the time latency
+moved. You're done when you can describe the symptom precisely and defend a
+hypothesis, not when it's fixed.</p>
+</details>
+<div class="admonition question">
+<p class="admonition-title">Stuck? Step-by-step for each task</p>
+<p>Give each task a genuine attempt first — and skim the hints above. When you want
+the exact clicks, open the matching task below.</p>
+<details class="note">
+<summary>Task 1 · Confirm the symptom</summary>
+<ul>
+<li>Open the <strong>Operations Center</strong> and note the <strong>booking / check-in</strong> tile and
+  its current P95 latency.</li>
+<li>Compare that to the baseline you captured in Challenge 1. A jump from
+  milliseconds to seconds is a real regression, not just load.</li>
+</ul>
+</details>
+<details class="note">
+<summary>Task 2 · Correlate read-only</summary>
+<ul>
+<li>In the agent chat, paste the <strong>suggested prompt</strong> above (or ask it to
+  correlate <code>booking</code> request duration with CPU, <abbr title="One running copy (pod) of a service; more replicas share the load.">replica</abbr> count, and request
+  load over the last 30 minutes).</li>
+<li>Stay read-only — you're gathering evidence, changing nothing.</li>
+</ul>
+</details>
+<details class="note">
+<summary>Task 3 · Rule out capacity</summary>
+<ul>
+<li>Check whether the autoscaler (<strong><abbr title="Horizontal Pod Autoscaler — Kubernetes control loop that adds or removes pods as load changes.">HPA</abbr></strong>) added <abbr title="Running copies (pods) of a service; more replicas share the load.">replicas</abbr> and whether CPU is
+  near its target / request.</li>
+<li>If <abbr title="Running copies (pods) of a service; more replicas share the load.">replicas</abbr> scaled and CPU is well under target but latency stays high,
+  load alone doesn't explain it — look at what <strong>changed</strong> on the path (a
+  recent deployment / rollout) around the time latency moved.</li>
+</ul>
+</details>
+<details class="note">
+<summary>Task 4 · Record your hypothesis</summary>
+<ul>
+<li>Ask the agent to write a short summary: the <strong>root cause</strong>, the <strong>two
+  independent signals</strong> behind it, and the <strong>least-disruptive recovery</strong> you'd
+  propose (do not perform it).</li>
+<li>Keep it where Challenge 3 can use it — leave it in the chat thread, or save
+  it to the agent's <strong>memory</strong> (for example <code>#remember …</code>, or <em>"save this to
+  your knowledge"</em>).</li>
+</ul>
+</details>
+</div>
 <h3 id="reference">Reference<a class="headerlink" href="#reference" title="Permanent link">&para;</a></h3>
 <ul>
-<li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/overview">Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent overview</a></li>
-<li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/sub-agents">Subagents &amp; extensibility</a></li>
-<li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/permissions">Permissions &amp; run modes</a></li>
-<li><a href="../../getting-started/portal-walkthrough/">Azure portal walkthrough</a> · <a href="../../reference/architecture/">Architecture</a> · <a href="../../reference/commands/">Commands</a></li>
+<li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/deep-investigation">Run a deep investigation</a></li>
+<li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/root-cause-analysis">Root cause analysis</a></li>
+<li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/log-analytics-app-insights">Connect <abbr title="Azure service that stores and queries container and platform logs.">Log Analytics</abbr> and <abbr title="Azure application-performance monitoring — requests, dependencies, exceptions, latency.">Application Insights</abbr></a></li>
+<li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/memory">Memory and knowledge</a></li>
 </ul>
 <div class="admonition success">
 <p class="admonition-title">Up next — controlled recovery under approval</p>
