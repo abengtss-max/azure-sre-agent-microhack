@@ -1715,7 +1715,7 @@
 
 <h1 id="challenge-2-detect-and-investigate-without-touching-production">Challenge 2 — Detect and Investigate Without Touching Production<a class="headerlink" href="#challenge-2-detect-and-investigate-without-touching-production" title="Permanent link">&para;</a></h1>
 <div class="admonition abstract">
-<p class="admonition-title">Challenge 02 of 08 · Act II — Human-Guided Operations</p>
+<p class="admonition-title">Challenge 02 of 08 · Act II: Human-Guided Operations</p>
 <p><strong>Run mode:</strong> Review · <strong>Access:</strong> read-only investigation</p>
 <p><strong>Stage:</strong> Foundation → <strong>Operations</strong> → Engineering → Autonomous → Major Incident</p>
 </div>
@@ -1723,17 +1723,17 @@
 check-in</strong> tile is drifting from green toward amber — just as traffic climbs toward a
 departure peak. Is check-in broken, or simply busy? A change on the passenger path
 mid-surge is what turns a slowdown into an outage. This incident stays <strong>open</strong> into
-Challenge 3 — here you detect and investigate, you do not fix.</p>
+Challenge 3, here you detect and investigate, you do not fix.</p>
 <p><strong>Mission.</strong> Confirm the check-in degradation from live signals and form a
-root-cause hypothesis backed by at least two independent signals — without changing
+root-cause hypothesis backed by at least two independent signals without changing
 anything in production.</p>
 <p><strong>Why this matters</strong></p>
 <div class="grid cards why-cards">
 <ul>
-<li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 22v-2h3v-3h2v3.5c0 .39-.16.74-.46 1.04s-.65.46-1.04.46zM7 22H3.5c-.39 0-.74-.16-1.04-.46S2 20.89 2 20.5V17h2v3h3zM17 2h3.5c.39 0 .74.16 1.04.46s.46.65.46 1.04V7h-2V4h-3zM7 2v2H4v3H2V3.5c0-.39.16-.74.46-1.04S3.11 2 3.5 2zm3.5 4C13 6 15 8 15 10.5c0 .88-.25 1.7-.69 2.4l3.26 3.26-1.41 1.41-3.26-3.26c-.7.44-1.52.69-2.4.69C8 15 6 13 6 10.5S8 6 10.5 6m0 2a2.5 2.5 0 0 0 0 5 2.5 2.5 0 0 0 0-5"/></svg></span> <strong>Confirm the symptom</strong> — tell a real regression apart from load</li>
-<li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m16 11.78 4.24-7.33 1.73 1-5.23 9.05-6.51-3.75L5.46 19H22v2H2V3h2v14.54L9.5 8z"/></svg></span> <strong>Correlate signals</strong> — latency against CPU, <abbr title="Running copies (pods) of a service; more replicas share the load.">replicas</abbr> and request load</li>
-<li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 11c0 5.55-3.84 10.74-9 12-5.16-1.26-9-6.45-9-12V5l9-4 9 4zm-9 10c3.75-1 7-5.46 7-9.78V6.3l-7-3.12L5 6.3v4.92C5 15.54 8.25 20 12 21m-2-4-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9"/></svg></span> <strong>Zero production risk</strong> — a rigorous read-only investigation</li>
-<li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11h3v2h-3zM1 11h3v2H1zM13 1v3h-2V1zM4.92 3.5l2.13 2.14-1.42 1.41L3.5 4.93zm12.03 2.13 2.12-2.13 1.43 1.43-2.13 2.12zM12 6a6 6 0 0 1 6 6c0 2.22-1.21 4.16-3 5.2V19a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-1.8c-1.79-1.04-3-2.98-3-5.2a6 6 0 0 1 6-6m2 15v1a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-1zm-3-3h2v-2.13c1.73-.44 3-2.01 3-3.87a4 4 0 0 0-4-4 4 4 0 0 0-4 4c0 1.86 1.27 3.43 3 3.87z"/></svg></span> <strong>Defensible hypothesis</strong> — the evidence that speeds the approved fix</li>
+<li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 22v-2h3v-3h2v3.5c0 .39-.16.74-.46 1.04s-.65.46-1.04.46zM7 22H3.5c-.39 0-.74-.16-1.04-.46S2 20.89 2 20.5V17h2v3h3zM17 2h3.5c.39 0 .74.16 1.04.46s.46.65.46 1.04V7h-2V4h-3zM7 2v2H4v3H2V3.5c0-.39.16-.74.46-1.04S3.11 2 3.5 2zm3.5 4C13 6 15 8 15 10.5c0 .88-.25 1.7-.69 2.4l3.26 3.26-1.41 1.41-3.26-3.26c-.7.44-1.52.69-2.4.69C8 15 6 13 6 10.5S8 6 10.5 6m0 2a2.5 2.5 0 0 0 0 5 2.5 2.5 0 0 0 0-5"/></svg></span> <strong>Confirm the symptom</strong>: Tell a real regression apart from load</li>
+<li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m16 11.78 4.24-7.33 1.73 1-5.23 9.05-6.51-3.75L5.46 19H22v2H2V3h2v14.54L9.5 8z"/></svg></span> <strong>Correlate signals</strong>: Latency against CPU, <abbr title="Running copies (pods) of a service; more replicas share the load.">replicas</abbr> and request load</li>
+<li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 11c0 5.55-3.84 10.74-9 12-5.16-1.26-9-6.45-9-12V5l9-4 9 4zm-9 10c3.75-1 7-5.46 7-9.78V6.3l-7-3.12L5 6.3v4.92C5 15.54 8.25 20 12 21m-2-4-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9"/></svg></span> <strong>Zero production risk</strong>: A rigorous read-only investigation</li>
+<li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11h3v2h-3zM1 11h3v2H1zM13 1v3h-2V1zM4.92 3.5l2.13 2.14-1.42 1.41L3.5 4.93zm12.03 2.13 2.12-2.13 1.43 1.43-2.13 2.12zM12 6a6 6 0 0 1 6 6c0 2.22-1.21 4.16-3 5.2V19a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-1.8c-1.79-1.04-3-2.98-3-5.2a6 6 0 0 1 6-6m2 15v1a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-1zm-3-3h2v-2.13c1.73-.44 3-2.01 3-3.87a4 4 0 0 0-4-4 4 4 0 0 0-4 4c0 1.86 1.27 3.43 3 3.87z"/></svg></span> <strong>Defensible hypothesis</strong>: The evidence that speeds the approved fix</li>
 </ul>
 </div>
 <div class="admonition example">
@@ -1741,8 +1741,7 @@ anything in production.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="nb">start-challenge</span><span class="p">.</span><span class="n">ps1</span> <span class="n">2</span>   <span class="c"># open the incident</span>
 </code></pre></div>
 <p>Starting Challenge 2 injects the first incident, so your board moves from
-green to degraded within a minute or two. That is expected — it's the symptom
-you're here to investigate.</p>
+green to degraded within a minute or two.</p>
 </div>
 <h3 id="tasks">Tasks<a class="headerlink" href="#tasks" title="Permanent link">&para;</a></h3>
 <ol>
@@ -1782,9 +1781,8 @@ image files directly and folds client-side timing into its investigation.</p>
 <h3 id="hints">Hints<a class="headerlink" href="#hints" title="Permanent link">&para;</a></h3>
 <details>
 <summary>Hint — confirm and correlate</summary>
-<p>Start from the delta against your baseline, not a feeling. Line up request duration
-with CPU, <abbr title="Running copies (pods) of a service; more replicas share the load.">replicas</abbr>, and request load over the same window — one specific comparison
-beats browsing pod-by-pod.</p>
+<p>Start from the delta against your baseline. Line up request duration
+with CPU, <abbr title="Running copies (pods) of a service; more replicas share the load.">replicas</abbr>, and request load over the same window.</p>
 </details>
 <details>
 <summary>Hint — capacity, or something else?</summary>
@@ -1795,7 +1793,7 @@ hypothesis, not when it's fixed.</p>
 </details>
 <div class="admonition question">
 <p class="admonition-title">Stuck? Step-by-step for each task</p>
-<p>Give each task a genuine attempt first — and skim the hints above. When you want
+<p>Give each task a genuine attempt first and skim the hints above. When you want
 the exact clicks, open the matching task below.</p>
 <details class="note">
 <summary>Task 1 · Confirm the symptom</summary>
@@ -1812,7 +1810,7 @@ the exact clicks, open the matching task below.</p>
 <li>In the agent chat, paste the <strong>suggested prompt</strong> above (or ask it to
   correlate <code>booking</code> request duration with CPU, <abbr title="One running copy (pod) of a service; more replicas share the load.">replica</abbr> count, and request
   load over the last 30 minutes).</li>
-<li>Stay read-only — you're gathering evidence, changing nothing.</li>
+<li>Stay read-only, you're gathering evidence, changing nothing.</li>
 </ul>
 </details>
 <details class="note">
@@ -1821,7 +1819,7 @@ the exact clicks, open the matching task below.</p>
 <li>Check whether the autoscaler (<strong><abbr title="Horizontal Pod Autoscaler — Kubernetes control loop that adds or removes pods as load changes.">HPA</abbr></strong>) added <abbr title="Running copies (pods) of a service; more replicas share the load.">replicas</abbr> and whether CPU is
   near its target / request.</li>
 <li>If <abbr title="Running copies (pods) of a service; more replicas share the load.">replicas</abbr> scaled and CPU is well under target but latency stays high,
-  load alone doesn't explain it — look at what <strong>changed</strong> on the path (a
+  load alone doesn't explain it. Look at what <strong>changed</strong> on the path (a
   recent deployment / rollout) around the time latency moved.</li>
 </ul>
 </details>
@@ -1844,8 +1842,8 @@ the exact clicks, open the matching task below.</p>
 <li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/memory">Memory and knowledge</a></li>
 </ul>
 <div class="admonition success">
-<p class="admonition-title">Up next — controlled recovery under approval</p>
-<p>With a defensible hypothesis, you're ready to recover check-in under approval — and then the flight board goes dark.</p>
+<p class="admonition-title">Up next: Controlled recovery under approval</p>
+<p>With a defensible hypothesis, you're ready to recover check-in under approval and then the flight board goes dark.</p>
 <p><a class="md-button md-button--primary" href="../03-controlled-recovery/">Proceed to Challenge 3 · Controlled Recovery →</a></p>
 </div>
 <hr />
