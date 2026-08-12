@@ -31,8 +31,8 @@ operational baseline, and schedule a proactive daily health check.
     ./scripts/start-challenge.ps1 1   # sets the scene (Challenge 1 injects no fault)
     ```
 
-    Challenge 1 injects nothing, so the board stays green — you create the SRE
-    Agent yourself in Task 3 (the order relative to this script does not matter).
+    The start-challenge.ps1 script will only print out information when a 1 is passed on the command line. No errors are injected, so the board stays green. You create the SRE Agent yourself in Task 3.
+    
     If your Operations Center is **not** all-green (for example you ran a later
     challenge on this environment), reset to a clean baseline first:
 
@@ -188,7 +188,7 @@ read-only check so the agent watches for drift on its own.
 - [Complete your setup](https://learn.microsoft.com/en-us/azure/sre-agent/complete-setup)
 - [Tutorial: Create and edit scheduled tasks](https://learn.microsoft.com/en-us/azure/sre-agent/create-scheduled-task)
 
-!!! success "Up next — the first real symptom"
+!!! success "Up next: The first real symptom"
     Challenge 2 injects the first incident, so your board will go from green to
     degraded. You'll know it's abnormal because you measured normal.
 
