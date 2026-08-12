@@ -55,7 +55,7 @@ operational baseline, and schedule a proactive daily health check.
 !!! quote "Paste into the agent chat"
     Generate an operational baseline for the `aetherion` namespace, including:
     running services and ready replica counts; dependencies (which services use
-    PostgreSQL and Redis, and what sits behind the API front door); normal
+    PostgreSQL and Redis, and what sits behind the API); normal
     check-in and booking latency; and the top operational signals to watch.
     Support every finding with telemetry evidence, and make no changes.
 
