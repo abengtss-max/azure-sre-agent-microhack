@@ -1,4 +1,4 @@
-# Challenge 2: Detect and Investigate Without Touching Production
+# Challenge 2 · Detect and Investigate Without Touching Production
 
 !!! abstract "Challenge 02 of 08 · Act II: Human-Guided Operations"
     **Run mode:** Review · **Access:** read-only investigation
@@ -42,7 +42,7 @@ anything in production.
 3. **Rule out capacity.** Decide whether load alone explains the latency, or something was added on the path.
 4. **Record your hypothesis.** Capture the root cause, the two signals behind it, and the recovery you'd propose (without performing it).
 
-![Challenge 2 storyboard — Sam and Aria detect and investigate the incident read-only](../assets/storyboard/img-challenge-2.webp){ .story-panel loading=lazy }
+![Challenge 2 storyboard: Sam and Aria detect and investigate the incident read-only](../assets/storyboard/img-challenge-2.webp){ .story-panel loading=lazy }
 
 ### Suggested Azure SRE Agent prompt
 
@@ -52,7 +52,7 @@ anything in production.
     check recent deployments and rollout history for changes in the same window.
     Give a root-cause hypothesis with supporting evidence, and change nothing.
 
-!!! tip "Optional — feed the agent a HAR trace or screenshot"
+!!! tip "Optional: feed the agent a HAR trace or screenshot"
     If a partner reports the failure from their side, capture a **HAR** (HTTP
     Archive) trace (browser DevTools → Network → *Save all as HAR*) or a screenshot
     of the failing call and **upload it in the agent chat**. The agent parses HAR and
@@ -74,13 +74,13 @@ anything in production.
 
 ### Hints
 
-<details markdown="1"><summary>Hint — confirm and correlate</summary>
+<details markdown="1"><summary>Hint: confirm and correlate</summary>
 
 Start from the delta against your baseline. Line up request duration
 with CPU, replicas, and request load over the same window.
 </details>
 
-<details markdown="1"><summary>Hint — capacity, or something else?</summary>
+<details markdown="1"><summary>Hint: capacity, or something else?</summary>
 
 If the autoscaler added replicas and CPU still isn't saturated, load probably isn't
 the whole story. Look at what changed on the booking path around the time latency
@@ -115,7 +115,7 @@ hypothesis, not when it's fixed.
         - Ask the agent to write a short summary: the **root cause**, the **two
           independent signals** behind it, and the **least-disruptive recovery** you'd
           propose (do not perform it).
-        - Keep it where Challenge 3 can use it — leave it in the chat thread, or save
+        - Keep it where Challenge 3 can use it: leave it in the chat thread, or save
           it to the agent's **memory** (for example `#remember …`, or *"save this to
           your knowledge"*).
 

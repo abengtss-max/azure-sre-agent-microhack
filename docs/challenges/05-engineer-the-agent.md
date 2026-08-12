@@ -1,11 +1,11 @@
-# Challenge 5 — Engineer the Agent: Specialist Subagent and Reusable Skill
+# Challenge 5 · Engineer the Agent: Specialist Subagent and Reusable Skill
 
-!!! abstract "Challenge 05 of 08 · Act III — Agent Engineering"
+!!! abstract "Challenge 05 of 08 · Act III: Agent Engineering"
     **Run mode:** Review · **Access:** builder + scoped write
 
     **Stage:** Foundation → Operations → **Engineering** → Autonomous → Major Incident
 
-**Situation.** The platform is stable — the right time to invest in tooling. You've
+**Situation.** The platform is stable, which is the right time to invest in tooling. You've
 repeated the same Kubernetes triage (pod status, events, rollout history, dependency
 health) and the same crew pool-relief recovery across several incidents. Both
 investigation *and* recovery are perfect candidates to make reusable.
@@ -18,10 +18,10 @@ its guardrails intact.
 
 <div class="grid cards why-cards" markdown>
 
-- :material-robot-outline: **Specialist subagent** — scoped AKS triage on demand
-- :material-cog-sync-outline: **Reusable skill** — encode the sanctioned recovery once
-- :material-shield-check-outline: **Guardrails baked in** — scale, never delete the database
-- :material-rocket-launch-outline: **Faster next time** — handle recurrences without re-deriving steps
+- :material-robot-outline: **Specialist subagent**: scoped AKS triage on demand
+- :material-cog-sync-outline: **Reusable skill**: encode the sanctioned recovery once
+- :material-shield-check-outline: **Guardrails baked in**: scale, never delete the database
+- :material-rocket-launch-outline: **Faster next time**: handle recurrences without re-deriving steps
 
 </div>
 
@@ -37,7 +37,7 @@ its guardrails intact.
 2. **Encode the skill.** Capture the crew pool-relief recovery from Challenge 4 as a reusable skill, guardrails intact, and confirm it loads.
 3. **Know when to use which.** Be able to say when you'd reach for the subagent (invoke to investigate) versus the skill (auto-loads a procedure).
 
-![Challenge 5 storyboard — Sam and Aria engineer a specialist subagent and reusable skill](../assets/storyboard/img-challenge-5.webp){ .story-panel loading=lazy }
+![Challenge 5 storyboard: Sam and Aria engineer a specialist subagent and reusable skill](../assets/storyboard/img-challenge-5.webp){ .story-panel loading=lazy }
 
 ### Suggested Azure SRE Agent prompt
 
@@ -62,22 +62,22 @@ its guardrails intact.
 
 ### Hints
 
-<details markdown="1"><summary>Hint — scope the specialist</summary>
+<details markdown="1"><summary>Hint: scope the specialist</summary>
 
-Decide the specialist's remit in one sentence before you build it — narrow beats
+Decide the specialist's remit in one sentence before you build it; narrow beats
 broad. Judge it by whether its output would actually speed up a real AKS incident.
 </details>
 
-<details markdown="1"><summary>Hint — encode the recovery</summary>
+<details markdown="1"><summary>Hint: encode the recovery</summary>
 
 For the skill, reuse the exact steps from Challenge 4 as the backbone and bake in
 the guardrails (scale to relieve the pool, never delete/restart the database).
-Skills auto-load and encode a procedure; subagents are invoked and investigate —
+Skills auto-load and encode a procedure; subagents are invoked and investigate, so
 you'll want both in the final incident. Mind the 5 concurrent skills limit.
 </details>
 
 !!! question "Stuck? Step-by-step for each task"
-    Give each task a genuine attempt first — and skim the hints above. When you want
+    Give each task a genuine attempt first, and skim the hints above. When you want
     the exact clicks, open the matching task below.
 
     ??? note "Task 1 · Build the specialist"
@@ -107,8 +107,8 @@ you'll want both in the final incident. Mind the 5 concurrent skills limit.
 - [Create a skill](https://learn.microsoft.com/en-us/azure/sre-agent/create-skill)
 - [Subagents overview](https://learn.microsoft.com/en-us/azure/sre-agent/sub-agents)
 
-!!! success "Up next — let the agent run autonomously"
-    Now let the agent recover on its own for a small, bounded issue — then make sure it stays cost-effective at scale.
+!!! success "Up next: let the agent run autonomously"
+    Now let the agent recover on its own for a small, bounded issue, then make sure it stays cost-effective at scale.
 
     [Proceed to Challenge 6 · Autonomous & Cost →](06-autonomous-and-cost.md){ .md-button .md-button--primary }
 

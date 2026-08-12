@@ -1,4 +1,4 @@
-# Challenge 1 — Onboard the Agent and Establish the Baseline
+# Challenge 1 · Onboard the Agent and Establish the Baseline
 
 !!! abstract "Challenge 01 of 08 · Act I: Foundation"
     **Run mode:** Review · **Access:** scoped to one resource group · **Estimated time:** 20–30 min
@@ -48,7 +48,7 @@ operational baseline, and schedule a proactive daily health check.
 4. **Capture the baseline.** Ask the agent for a baseline of the `aetherion` namespace, then sanity-check a few of its numbers against the Ops Center and Grafana.
 5. **Put it on a schedule.** Have the agent re-run that health check every morning so drift shows up before it turns into an incident.
 
-![Challenge 1 storyboard — Sam and Aria onboard the SRE Agent and read the baseline](../assets/storyboard/img-challenge-1.webp){ .story-panel loading=lazy }
+![Challenge 1 storyboard: Sam and Aria onboard the SRE Agent and read the baseline](../assets/storyboard/img-challenge-1.webp){ .story-panel loading=lazy }
 
 ### Suggested Azure SRE Agent prompt
 
@@ -63,7 +63,7 @@ operational baseline, and schedule a proactive daily health check.
 
 - All service tiles are healthy and Grafana shows live metrics.
 - The agent is connected to your resource group in **Review** mode, can list every resource, and asks for approval before any change.
-- You hold a validated baseline captured while the platform was healthy — whose replica counts and latency match the Ops Center and Grafana.
+- You hold a validated baseline, captured while the platform was healthy, whose replica counts and latency match the Ops Center and Grafana.
 - A scheduled daily health check exists, with a sensible drift threshold.
 
 !!! success "Verify your work"
@@ -76,7 +76,7 @@ operational baseline, and schedule a proactive daily health check.
 
 ### Hints
 
-<details markdown="1"><summary>Hint — orientation & the agent</summary>
+<details markdown="1"><summary>Hint: orientation & the agent</summary>
 
 Load the Operations Center first and let it settle. Create the agent in the **same
 resource group** as the platform, keep it at Reader/Review, and ask it an open
@@ -84,7 +84,7 @@ question about the resource group to confirm scope. A write request should produ
 an approval prompt, not an action.
 </details>
 
-<details markdown="1"><summary>Hint — baseline & proactive</summary>
+<details markdown="1"><summary>Hint: baseline & proactive</summary>
 
 Ask one specific question about namespace health rather than browsing pod-by-pod,
 and cross-check replica counts and latency against the tiles and Grafana. Keep the
@@ -138,8 +138,8 @@ read-only check so the agent watches for drift on its own.
     ??? note "Task 4 · Capture the baseline"
         - With the board green, paste the baseline prompt (the **Suggested Azure
           SRE Agent prompt** above) into the agent chat.
-        - When it answers, spot-check **2–3 numbers** replica counts and check-in
-          / booking latency — against the Ops Center tiles and Grafana.
+        - When it answers, spot-check **2–3 numbers** (replica counts and check-in
+          / booking latency) against the Ops Center tiles and Grafana.
         - If the board was recently degraded, reset and let telemetry settle first,
           or the baseline will record the fault as "normal".
 

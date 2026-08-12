@@ -1,16 +1,16 @@
-# Challenge 8 — Boarding Resumes: Brief Airline Leadership
+# Challenge 8 · Boarding Resumes: Brief Airline Leadership
 
-!!! abstract "Challenge 08 of 08 · Act V — Major Incident"
+!!! abstract "Challenge 08 of 08 · Act V: Major Incident"
     **Run mode:** Review · **Access:** read-only summarization
 
     **Stage:** Foundation → Operations → Engineering → Autonomous → **Major Incident**
 
 **Situation.** The platform is stable and the peak departure bank is away safely. A
-major incident isn't closed when the tiles go green — it's closed when leadership
+major incident isn't closed when the tiles go green; it's closed when leadership
 understands it and the team has captured what to do differently.
 
-**Mission.** Turn the shift's evidence into two artifacts — a concise leadership
-briefing and an engineering RCA handover — that cleanly separate symptom, root cause,
+**Mission.** Turn the shift's evidence into two artifacts (a concise leadership
+briefing and an engineering RCA handover) that cleanly separate symptom, root cause,
 contributing factors, mitigation, permanent fix, recovery evidence and remaining
 risk.
 
@@ -18,10 +18,10 @@ risk.
 
 <div class="grid cards why-cards" markdown>
 
-- :material-file-document-outline: **Two audiences** — a leadership briefing and an engineering RCA
-- :material-podium: **Impact-first** — what happened and what it cost, for executives
-- :material-clipboard-text-clock-outline: **Precise handover** — actions, verification and open risks for the next on-call
-- :material-file-chart-outline: **Boardroom-ready** — an auto-generated PDF with a timeline chart
+- :material-file-document-outline: **Two audiences**: a leadership briefing and an engineering RCA
+- :material-podium: **Impact-first**: what happened and what it cost, for executives
+- :material-clipboard-text-clock-outline: **Precise handover**: actions, verification and open risks for the next on-call
+- :material-file-chart-outline: **Boardroom-ready**: an auto-generated PDF with a timeline chart
 
 </div>
 
@@ -38,7 +38,7 @@ risk.
 3. **Write the engineering RCA handover.** Precise actions, verification, open risks, and change evidence (Activity Log + GitHub) for the next on-call.
 4. **Generate the executive PDF.** Have the agent render the briefing (with a timeline chart) via its Python sandbox.
 
-![Challenge 8 storyboard — Sam and Elena brief airline leadership as boarding resumes](../assets/storyboard/img-challenge-8.webp){ .story-panel loading=lazy }
+![Challenge 8 storyboard: Sam and Elena brief airline leadership as boarding resumes](../assets/storyboard/img-challenge-8.webp){ .story-panel loading=lazy }
 
 ### Suggested Azure SRE Agent prompt
 
@@ -59,7 +59,7 @@ risk.
 
 !!! success "Verify your work"
 
-    Run this when you're done — it grades the real end state and completes the hack:
+    Run this when you're done. It grades the real end state and completes the hack:
 
     ```powershell
     ./scripts/check-challenge.ps1 8
@@ -67,26 +67,26 @@ risk.
 
 ### Hints
 
-<details markdown="1"><summary>Hint — evidence, and two audiences</summary>
+<details markdown="1"><summary>Hint: evidence, and two audiences</summary>
 
-Start from the evidence you preserved, not memory — let the agent's action plans jog
+Start from the evidence you preserved, not memory; let the agent's action plans jog
 the timeline. Write two documents, not one blended one: leadership wants impact and
 outcome; the next on-call wants exact actions, root-cause evidence, and open risks.
 </details>
 
-<details markdown="1"><summary>Hint — close the loop</summary>
+<details markdown="1"><summary>Hint: close the loop</summary>
 
 Feed the lessons learned back into the agent's knowledge / memory so a recurrence is
 handled faster next time.
 </details>
 
 !!! question "Stuck? Step-by-step for each task"
-    Give each task a genuine attempt first — and skim the hints above. When you want
+    Give each task a genuine attempt first, and skim the hints above. When you want
     the exact clicks, open the matching task below.
 
     ??? note "Task 1 · Assemble the evidence"
         - Pull the timeline together from what you preserved during the shift (agent
-          threads, action logs, Activity Log, telemetry) — one defensible narrative
+          threads, action logs, Activity Log, telemetry): one defensible narrative
           per incident, not from memory.
 
     ??? note "Task 2 · Write the leadership briefing"
@@ -110,7 +110,7 @@ handled faster next time.
 - [Monitor agent usage](https://learn.microsoft.com/en-us/azure/sre-agent/monitor-agent-usage)
 - [Memory and knowledge](https://learn.microsoft.com/en-us/azure/sre-agent/memory)
 
-!!! success "🎉 MicroHack complete — you built an AI SRE teammate from scratch"
+!!! success "🎉 MicroHack complete: you built an AI SRE teammate from scratch"
     Across eight challenges you onboarded, investigated, recovered, grounded,
     engineered, automated, and closed a Tier-0 major incident with the Azure SRE
     Agent.

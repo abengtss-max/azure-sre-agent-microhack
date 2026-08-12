@@ -1,29 +1,29 @@
-# Challenge 3 — Controlled Recovery and Change Correlation
+# Challenge 3 · Controlled Recovery and Change Correlation
 
-!!! abstract "Challenge 03 of 08 · Act II — Human-Guided Operations"
+!!! abstract "Challenge 03 of 08 · Act II: Human-Guided Operations"
     **Run mode:** Review → approved write · **Access:** scoped write on approval
 
     **Stage:** Foundation → **Operations** → Engineering → Autonomous → Major Incident
 
 **Situation.** Two things hit in quick succession. Your check-in hypothesis is solid
-and the director wants it fixed — **safely**, with a human in the loop. Then the live
-**flight board** goes dark for every station and `flight-ops` drops straight to red —
+and the director wants it fixed **safely**, with a human in the loop. Then the live
+**flight board** goes dark for every station and `flight-ops` drops straight to red,
 the hallmark of a bad change. The flight board is the picture the whole center flies
 by, so this is a **P1**: restore first, then correlate the change to prevent
 recurrence.
 
 **Mission.** Recover check-in with the least-disruptive action under human approval,
 then restore the flight board by correlating the outage with a recent change and
-applying a reversible rollback — verifying both from telemetry.
+applying a reversible rollback, and verifying both from telemetry.
 
 **Why this matters**
 
 <div class="grid cards why-cards" markdown>
 
-- :material-account-check-outline: **Human-in-the-loop** — approve the least-disruptive write
-- :material-backup-restore: **Reversible recovery** — roll back to the last good state
-- :material-source-branch: **Change correlation** — line the outage up with a deploy or commit
-- :material-check-decagram-outline: **Verified from telemetry** — prove recovery, don't assume it
+- :material-account-check-outline: **Human-in-the-loop**: approve the least-disruptive write
+- :material-backup-restore: **Reversible recovery**: roll back to the last good state
+- :material-source-branch: **Change correlation**: line the outage up with a deploy or commit
+- :material-check-decagram-outline: **Verified from telemetry**: prove recovery, don't assume it
 
 </div>
 
@@ -40,7 +40,7 @@ applying a reversible rollback — verifying both from telemetry.
 3. **Triage the flight board.** Find out how `flight-ops` is failing from pod status and events.
 4. **Correlate and roll back.** Line the outage up with the recent change, apply a reversible rollback, and check the board recovers.
 
-![Challenge 3 storyboard — Sam, Aria and Elena run a controlled recovery and correlate the change](../assets/storyboard/img-challenge-3.webp){ .story-panel loading=lazy }
+![Challenge 3 storyboard: Sam, Aria and Elena run a controlled recovery and correlate the change](../assets/storyboard/img-challenge-3.webp){ .story-panel loading=lazy }
 
 ### Suggested Azure SRE Agent prompt
 
@@ -67,14 +67,14 @@ applying a reversible rollback — verifying both from telemetry.
 
 ### Hints
 
-<details markdown="1"><summary>Hint — recover check-in safely</summary>
+<details markdown="1"><summary>Hint: recover check-in safely</summary>
 
-Ask the agent for a remediation *plan* first — it tells you the permission the
+Ask the agent for a remediation *plan* first. It tells you the permission the
 action needs. The safe fix removes the added delay and leaves the autoscaler to
 absorb the surge; it shouldn't touch the database, Redis, or nodes.
 </details>
 
-<details markdown="1"><summary>Hint — restore the flight board</summary>
+<details markdown="1"><summary>Hint: restore the flight board</summary>
 
 Confirm how `flight-ops` is failing in AKS first, then line up the moment the tile
 went red with deployment / rollout history and the repo's recent changes. Closeness
@@ -83,20 +83,20 @@ fix.
 </details>
 
 !!! question "Stuck? Step-by-step for each task"
-    Give each task a genuine attempt first — and skim the hints above. When you want
+    Give each task a genuine attempt first, and skim the hints above. When you want
     the exact clicks, open the matching task below.
 
     ??? note "Task 1 · Plan the fix"
         - In the agent chat, paste the **suggested prompt** above (or ask it to turn
           your check-in hypothesis into a concrete `booking` remediation plan).
-        - The plan is your **approval artifact** — it should say exactly what it will
+        - The plan is your **approval artifact**: it should say exactly what it will
           change and the **permission** the action needs.
 
     ??? note "Task 2 · Recover under approval"
         Apply the least-disruptive fix one of two governed ways:
 
         - **On-behalf-of:** keep the agent in **Review**, and select **Approve** when
-          it proposes the write — it runs once, with your permission.
+          it proposes the write; it runs once, with your permission.
         - **Scoped role:** grant the agent's managed identity a **narrow** write role
           on just the affected resource (portal → resource group → **Access control
           (IAM)**), then let it act with its own identity.
@@ -124,8 +124,8 @@ fix.
 - [Manage roles and permissions](https://learn.microsoft.com/en-us/azure/sre-agent/manage-permissions)
 - [Connect source code](https://learn.microsoft.com/en-us/azure/sre-agent/connect-source-code)
 
-!!! success "Up next — teach the agent your runbooks"
-    The next incident's fix is already written in Aetherion's runbooks — if only the agent knew them.
+!!! success "Up next: teach the agent your runbooks"
+    The next incident's fix is already written in Aetherion's runbooks, if only the agent knew them.
 
     [Proceed to Challenge 4 · Ground the Agent →](04-ground-the-agent.md){ .md-button .md-button--primary }
 
