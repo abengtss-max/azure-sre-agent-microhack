@@ -1716,7 +1716,7 @@
 <h1 id="challenge-8-boarding-resumes-brief-airline-leadership">Challenge 8 — Boarding Resumes: Brief Airline Leadership<a class="headerlink" href="#challenge-8-boarding-resumes-brief-airline-leadership" title="Permanent link">&para;</a></h1>
 <div class="admonition abstract">
 <p class="admonition-title">Challenge 08 of 08 · Act V — Major Incident</p>
-<p><strong>Agent mode:</strong> Read-only summarization · <strong>Permissions:</strong> <abbr title="The built-in Azure role that grants read-only access — see everything, change nothing.">Reader</abbr> · <strong>Estimated time:</strong> 20–30 min</p>
+<p><strong>Run mode:</strong> Review · <strong>Access:</strong> read-only summarization</p>
 <p><strong>Stage:</strong> Foundation → Operations → Engineering → Autonomous → <strong>Major Incident</strong></p>
 </div>
 <p><strong>Situation.</strong> The platform is stable and the peak departure bank is away safely. A
@@ -1742,17 +1742,11 @@ risk.</p>
 </div>
 <h3 id="tasks">Tasks<a class="headerlink" href="#tasks" title="Permanent link">&para;</a></h3>
 <ol>
-<li><strong>Assemble the evidence</strong> — build one defensible narrative per incident from what you preserved through the shift.</li>
-<li><strong>Write the leadership briefing</strong> — short, impact-first, non-technical, for the operations director.</li>
-<li><strong>Write the engineering RCA handover</strong> — precise actions, verification, open risks, and change-correlation evidence (<abbr title="Azure's record of control-plane changes (who changed what, and when).">Activity Log</abbr> + GitHub) for the next on-call.</li>
-<li><strong>Generate the executive PDF</strong> — have the agent render the briefing (with an incident-timeline chart) via its built-in <strong>Python sandbox</strong>.</li>
+<li><strong>Assemble the evidence.</strong> Build one defensible narrative per incident from what you preserved through the shift.</li>
+<li><strong>Write the leadership briefing.</strong> Short, impact-first, non-technical, for the operations director.</li>
+<li><strong>Write the engineering RCA handover.</strong> Precise actions, verification, open risks, and change evidence (<abbr title="Azure's record of control-plane changes (who changed what, and when).">Activity Log</abbr> + GitHub) for the next on-call.</li>
+<li><strong>Generate the executive PDF.</strong> Have the agent render the briefing (with a timeline chart) via its Python sandbox.</li>
 </ol>
-<div class="admonition question">
-<p class="admonition-title">Stuck? Give each task a genuine attempt first</p>
-<p>Working it out yourself is where the learning sticks. If you need the exact
-clicks, the <a href="../../getting-started/portal-walkthrough/">Azure portal walkthrough</a>
-has a step for every action.</p>
-</div>
 <p><img alt="Challenge 8 storyboard — Sam and Elena brief airline leadership as boarding resumes" class="story-panel" loading="lazy" src="../../assets/storyboard/img-challenge-8.webp" /></p>
 <h3 id="suggested-azure-sre-agent-prompt">Suggested Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent prompt<a class="headerlink" href="#suggested-azure-sre-agent-prompt" title="Permanent link">&para;</a></h3>
 <div class="admonition quote">
@@ -1779,17 +1773,58 @@ with an incident-timeline chart using your Python sandbox.</p>
 </div>
 <h3 id="hints">Hints<a class="headerlink" href="#hints" title="Permanent link">&para;</a></h3>
 <details>
-<summary>Hint</summary>
-<p>Start from the evidence you preserved, not memory — let the agent's action plans
-jog the timeline. Leadership wants impact and outcome; the next on-call wants exact
-actions, root-cause evidence, and open risks — write both, not one blended document. Feed the lessons
-learned back into the agent's knowledge so recurrence is handled faster next time.</p>
+<summary>Hint — evidence, and two audiences</summary>
+<p>Start from the evidence you preserved, not memory — let the agent's action plans jog
+the timeline. Write two documents, not one blended one: leadership wants impact and
+outcome; the next on-call wants exact actions, root-cause evidence, and open risks.</p>
 </details>
+<details>
+<summary>Hint — close the loop</summary>
+<p>Feed the lessons learned back into the agent's knowledge / memory so a recurrence is
+handled faster next time.</p>
+</details>
+<div class="admonition question">
+<p class="admonition-title">Stuck? Step-by-step for each task</p>
+<p>Give each task a genuine attempt first — and skim the hints above. When you want
+the exact clicks, open the matching task below.</p>
+<details class="note">
+<summary>Task 1 · Assemble the evidence</summary>
+<ul>
+<li>Pull the timeline together from what you preserved during the shift (agent
+  threads, action logs, <abbr title="Azure's record of control-plane changes (who changed what, and when).">Activity Log</abbr>, telemetry) — one defensible narrative
+  per incident, not from memory.</li>
+</ul>
+</details>
+<details class="note">
+<summary>Task 2 · Write the leadership briefing</summary>
+<ul>
+<li>Ask the agent for a short, impact-first, non-technical briefing for the
+  operations director: business impact, root cause in plain terms, recovery,
+  cost / risk, and lessons learned.</li>
+</ul>
+</details>
+<details class="note">
+<summary>Task 3 · Write the engineering RCA handover</summary>
+<ul>
+<li>Ask for a precise engineering handover: actions taken and how each was
+  verified, remaining risk, and change-correlation evidence (<abbr title="Azure's record of control-plane changes (who changed what, and when).">Activity Log</abbr> +
+  your fork's commits) for the next on-call.</li>
+</ul>
+</details>
+<details class="note">
+<summary>Task 4 · Generate the executive PDF</summary>
+<ul>
+<li>Ask the agent to render the leadership briefing as a formatted <strong>PDF</strong> with
+  an incident-timeline chart using its built-in <strong>Python sandbox</strong>, then
+  download it.</li>
+</ul>
+</details>
+</div>
 <h3 id="reference">Reference<a class="headerlink" href="#reference" title="Permanent link">&para;</a></h3>
 <ul>
-<li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/overview">Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent overview</a></li>
-<li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/team-onboard">Team onboarding &amp; memory</a></li>
-<li><a href="../../getting-started/portal-walkthrough/">Azure portal walkthrough</a> · <a href="../../reference/architecture/">Architecture</a> · <a href="../../reference/commands/">Commands</a></li>
+<li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/track-incident-value">Track incident value</a></li>
+<li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/monitor-agent-usage">Monitor agent usage</a></li>
+<li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/memory">Memory and knowledge</a></li>
 </ul>
 <div class="admonition success">
 <p class="admonition-title">🎉 MicroHack complete — you built an AI <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> teammate from scratch</p>

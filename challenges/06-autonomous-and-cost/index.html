@@ -1716,7 +1716,7 @@
 <h1 id="challenge-6-autonomous-recovery-and-cost-aware-governance">Challenge 6 — Autonomous Recovery and Cost-Aware Governance<a class="headerlink" href="#challenge-6-autonomous-recovery-and-cost-aware-governance" title="Permanent link">&para;</a></h1>
 <div class="admonition abstract">
 <p class="admonition-title">Challenge 06 of 08 · Act IV — Autonomous &amp; Cost</p>
-<p><strong>Agent mode:</strong> Bounded Autonomous → read-only review · <strong>Permissions:</strong> scoped write · <strong>Estimated time:</strong> 30–40 min</p>
+<p><strong>Run mode:</strong> Autonomous (bounded) · <strong>Access:</strong> scoped write</p>
 <p><strong>Stage:</strong> Foundation → Operations → Engineering → <strong>Autonomous</strong> → Major Incident</p>
 </div>
 <p><strong>Situation.</strong> Every write so far has waited for your approval. Now a minor issue
@@ -1745,18 +1745,12 @@ investigation — before you reach Challenge 7.</p>
 </div>
 <h3 id="tasks">Tasks<a class="headerlink" href="#tasks" title="Permanent link">&para;</a></h3>
 <ol>
-<li><strong>Confirm the symptom</strong> — verify the baggage errors in the Ops Center and telemetry so you know what "recovered" looks like.</li>
-<li><strong>Grant bounded autonomy</strong> — a narrowly scoped write role plus <strong>Autonomous</strong> mode; let the agent detect, decide and fix without intervening, then review the action log.</li>
-<li><strong>See where AAUs go</strong> — inspect the agent's consumption by thread type and operational purpose.</li>
-<li><strong>Design a cost-aware model</strong> — name concrete reductions (consolidate workloads, delete unused pilots, right-size model choice, trim noisy plans/schedules) without losing reliability, ownership, <abbr title="Role-Based Access Control — Azure's permission model; roles decide what an identity may do.">RBAC</abbr>, isolation or investigation quality.</li>
-<li><strong>Arm the Sev1 response plan</strong> — bind the pre-provisioned <code>aetherion-major-incident</code> alert to the agent so the next major incident auto-triggers an investigation. Do this <strong>now</strong>, before Challenge 7.</li>
+<li><strong>Confirm the symptom.</strong> Verify the baggage errors in the Ops Center and telemetry so you know what "recovered" looks like.</li>
+<li><strong>Grant bounded autonomy.</strong> Give a narrowly scoped write role plus <strong>Autonomous</strong> mode, let the agent fix it end-to-end, then review the action log.</li>
+<li><strong>See where AAUs go.</strong> Inspect the agent's consumption by thread type and purpose.</li>
+<li><strong>Design a cost-aware model.</strong> Name concrete reductions without losing reliability or investigation quality.</li>
+<li><strong>Arm the Sev1 response plan.</strong> Bind the pre-provisioned <code>aetherion-major-incident</code> alert so the next major incident auto-triggers — do this now, before Challenge 7.</li>
 </ol>
-<div class="admonition question">
-<p class="admonition-title">Stuck? Give each task a genuine attempt first</p>
-<p>Working it out yourself is where the learning sticks. If you need the exact
-clicks, the <a href="../../getting-started/portal-walkthrough/">Azure portal walkthrough</a>
-has a step for every action.</p>
-</div>
 <p><img alt="Challenge 6 storyboard — Sam, Priya and Aria review autonomous recovery and cost governance" class="story-panel" loading="lazy" src="../../assets/storyboard/img-challenge-6.webp" /></p>
 <h3 id="suggested-azure-sre-agent-prompt">Suggested Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent prompt<a class="headerlink" href="#suggested-azure-sre-agent-prompt" title="Permanent link">&para;</a></h3>
 <div class="admonition quote">
@@ -1787,24 +1781,73 @@ or your environment. Don't claim that stopping an agent ends all billing.</p>
 </div>
 <h3 id="hints">Hints<a class="headerlink" href="#hints" title="Permanent link">&para;</a></h3>
 <details>
-<summary>Hint</summary>
+<summary>Hint — make autonomy safe</summary>
 <p>Confirm the symptom first — you can't judge an autonomous recovery without knowing
 what healthy looks like. Autonomy is safe because it's <em>scoped</em>: give the agent only
 the write permission this one recovery needs, then switch to Autonomous and resist
-helping. For governance, optimize what you can measure: look at real consumption by
-thread type and purpose. Consolidation, deleting unused pilots, model fit,
-response-plan noise, and schedule frequency are usually the biggest levers — aim for
-a <em>balanced</em> model, not the cheapest possible setup. Last, wire the <strong>Sev1</strong> response
-plan now: it's the difference between the agent auto-triggering on the next major
-incident and you wiring it by hand while the board is red in Challenge 7. Match the
-filter to the pre-provisioned <code>aetherion-major-incident</code> alert's severity exactly.</p>
+helping.</p>
 </details>
+<details>
+<summary>Hint — cost model and the Sev1 plan</summary>
+<p>Optimize what you can measure: look at real consumption by thread type and purpose
+— consolidation, deleting unused pilots, model fit, and plan/schedule noise are the
+biggest levers. Aim for a <em>balanced</em> model, not the cheapest. Then wire the <strong>Sev1</strong>
+response plan now, matching the pre-provisioned <code>aetherion-major-incident</code> alert's
+severity exactly — or you'll be wiring it by hand while the board is red in
+Challenge 7.</p>
+</details>
+<div class="admonition question">
+<p class="admonition-title">Stuck? Step-by-step for each task</p>
+<p>Give each task a genuine attempt first — and skim the hints above. When you want
+the exact clicks, open the matching task below.</p>
+<details class="note">
+<summary>Task 1 · Confirm the symptom</summary>
+<ul>
+<li>Check the <strong>baggage</strong> tile and telemetry (<abbr title="Azure application-performance monitoring — requests, dependencies, exceptions, latency.">Application Insights</abbr> failed
+  requests) so you know the current error rate and what "recovered" means.</li>
+</ul>
+</details>
+<details class="note">
+<summary>Task 2 · Grant bounded autonomy</summary>
+<ul>
+<li>Grant the agent's <abbr title="An Azure identity for a workload (here, the agent) so it can authenticate without stored secrets.">managed identity</abbr> a <strong>narrow</strong> write role on just the
+  baggage resource (portal → resource group → <strong>Access control (IAM)</strong>).</li>
+<li>Set the run mode to <strong>Autonomous</strong> (on the response plan / task), then let
+  the agent detect → decide → fix on its own. Review the action log after.</li>
+</ul>
+</details>
+<details class="note">
+<summary>Task 3 · See where AAUs go</summary>
+<ul>
+<li>In the agent, open <strong>Settings → Agent consumption</strong> and read the breakdown
+  by thread type (Chats, Incidents, Scheduled tasks, Triggers) and by thread.</li>
+</ul>
+</details>
+<details class="note">
+<summary>Task 4 · Design a cost-aware model</summary>
+<ul>
+<li>Write a short operating model naming concrete levers: consolidate workloads
+  under one agent, delete unused pilot agents, pick a model that fits the
+  task, and trim noisy response plans / schedules — without losing
+  reliability, ownership, <abbr title="Role-Based Access Control — Azure's permission model; roles decide what an identity may do.">RBAC</abbr>, isolation, or investigation quality. Use only
+  real figures.</li>
+</ul>
+</details>
+<details class="note">
+<summary>Task 5 · Arm the Sev1 response plan</summary>
+<ul>
+<li><strong>Builder → Incident response plans → New.</strong> Filter by severity <strong>Sev1</strong> so
+  it matches the pre-provisioned <code>aetherion-major-incident</code> alert exactly, and
+  route it to your agent.</li>
+<li>Do this <strong>now</strong> — Challenge 7 depends on it auto-triggering.</li>
+</ul>
+</details>
+</div>
 <h3 id="reference">Reference<a class="headerlink" href="#reference" title="Permanent link">&para;</a></h3>
 <ul>
-<li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/permissions">Permissions &amp; run modes</a></li>
-<li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/security-overview">Security overview</a></li>
-<li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/pricing-billing">Pricing &amp; billing</a></li>
-<li><a href="../../getting-started/portal-walkthrough/">Azure portal walkthrough</a> · <a href="../../reference/architecture/">Architecture</a> · <a href="../../reference/commands/">Commands</a></li>
+<li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/run-modes">Run modes</a></li>
+<li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/pricing-billing">Pricing and billing</a></li>
+<li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/incident-response-plans">Incident response plans</a></li>
 </ul>
 <div class="admonition success">
 <p class="admonition-title">Up next — the final major incident</p>

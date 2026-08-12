@@ -1716,7 +1716,7 @@
 <h1 id="challenge-7-final-incident-restore-global-check-in-before-peak-departure">Challenge 7 — Final Incident: Restore Global Check-In Before Peak Departure<a class="headerlink" href="#challenge-7-final-incident-restore-global-check-in-before-peak-departure" title="Permanent link">&para;</a></h1>
 <div class="admonition abstract">
 <p class="admonition-title">Challenge 07 of 08 · Act V — Major Incident</p>
-<p><strong>Agent mode:</strong> Approved + bounded automation · <strong>Permissions:</strong> scoped write · <strong>Estimated time:</strong> 40–50 min</p>
+<p><strong>Run mode:</strong> Review + bounded automation · <strong>Access:</strong> scoped write</p>
 <p><strong>Stage:</strong> Foundation → Operations → Engineering → Autonomous → <strong>Major Incident</strong></p>
 </div>
 <p><strong>Situation.</strong> Minutes before peak departures, several services fail together under
@@ -1776,19 +1776,13 @@ approved or bounded actions, and verify recovery service by service.</p>
 </div>
 <h3 id="tasks">Tasks<a class="headerlink" href="#tasks" title="Permanent link">&para;</a></h3>
 <ol>
-<li><strong>Confirm the Sev1 plan is live</strong> — check the response plan from Challenge 6 is active (bound to <code>aetherion-major-incident</code>) so the alert auto-triggers an investigation. If you skipped it, create it now, <strong>before</strong> running the start command.</li>
-<li><strong>Read the whole board</strong> — order the work by business impact (situational awareness and legal-to-fly first), not the loudest alert.</li>
-<li><strong>Check the agent's memory</strong> — ask whether a similar crew-scheduling / check-in incident has happened, and let session insights surface the earlier RCA and remediation.</li>
-<li><strong>Delegate &amp; recover</strong> — hand <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> triage to your specialist subagent and apply sanctioned recoveries (reuse your crew-pool skill), keeping actions governed.</li>
-<li><strong>Localize the <abbr title="The single public entry point (API Management) through which all client traffic passes.">front door</abbr></strong> — use the direct-vs-<abbr title="Azure API Management — the API &quot;front door&quot; that authenticates and rate-limits traffic to the services.">APIM</abbr> comparison; treat the policy change as customer-facing.</li>
-<li><strong>Verify every service</strong> — confirm each fix from telemetry, then the whole platform green.</li>
+<li><strong>Confirm the Sev1 plan is live.</strong> Check the response plan from Challenge 6 is active so the alert auto-triggers — if you skipped it, create it <strong>before</strong> you start.</li>
+<li><strong>Read the whole board.</strong> Order the work by business impact (situational awareness and legal-to-fly first), not the loudest alert.</li>
+<li><strong>Check the agent's memory.</strong> Ask whether a similar incident has happened and let session insights surface the earlier RCA.</li>
+<li><strong>Delegate and recover.</strong> Hand <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> triage to your specialist subagent and reuse your crew-pool skill, keeping every action governed.</li>
+<li><strong>Localize the <abbr title="The single public entry point (API Management) through which all client traffic passes.">front door</abbr>.</strong> Use the direct-vs-<abbr title="Azure API Management — the API &quot;front door&quot; that authenticates and rate-limits traffic to the services.">APIM</abbr> comparison and treat the policy change as customer-facing.</li>
+<li><strong>Verify every service.</strong> Confirm each fix from telemetry, then the whole platform back to green.</li>
 </ol>
-<div class="admonition question">
-<p class="admonition-title">Stuck? Give each task a genuine attempt first</p>
-<p>Working it out yourself is where the learning sticks. If you need the exact
-clicks, the <a href="../../getting-started/portal-walkthrough/">Azure portal walkthrough</a>
-has a step for every action.</p>
-</div>
 <p><img alt="Challenge 7 storyboard — Sam, Aria and Elena restore global check-in before peak departure" class="story-panel" loading="lazy" src="../../assets/storyboard/img-challenge-7.webp" /></p>
 <h3 id="suggested-azure-sre-agent-prompt">Suggested Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent prompt<a class="headerlink" href="#suggested-azure-sre-agent-prompt" title="Permanent link">&para;</a></h3>
 <div class="admonition quote">
@@ -1820,19 +1814,77 @@ catch it — a broader filter fires on everything, a mismatched one catches noth
 </div>
 <h3 id="hints">Hints<a class="headerlink" href="#hints" title="Permanent link">&para;</a></h3>
 <details>
-<summary>Hint</summary>
+<summary>Hint — triage, don't firefight</summary>
 <p>Don't fix the first red tile you see — read the whole board and order by business
-tier. Delegate <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> triage to your specialist and apply your crew-pool skill;
-you've solved every one of these failure classes already. If the backend is
-healthy directly but clients still fail, the problem is at the API <abbr title="The single public entry point (API Management) through which all client traffic passes.">front door</abbr>, not
-the services.</p>
+tier. You've solved every one of these failure classes already: delegate <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> triage
+to your specialist and apply your crew-pool skill.</p>
 </details>
+<details>
+<summary>Hint — is it the service, or the front door?</summary>
+<p>If the backend is healthy when you hit it directly but clients still fail, the
+problem is at the API <abbr title="The single public entry point (API Management) through which all client traffic passes.">front door</abbr>, not the services. Treat the policy change as
+customer-facing.</p>
+</details>
+<div class="admonition question">
+<p class="admonition-title">Stuck? Step-by-step for each task</p>
+<p>Give each task a genuine attempt first — and skim the hints above. When you want
+the exact clicks, open the matching task below.</p>
+<details class="note">
+<summary>Task 1 · Confirm the Sev1 plan is live</summary>
+<ul>
+<li>Open <strong>Builder → Incident response plans</strong> and confirm your Sev1 plan (from
+  Challenge 6) is <strong>On</strong> and filtered to match <code>aetherion-major-incident</code>.</li>
+<li>If it's missing, create it <strong>before</strong> running the start command — otherwise
+  the alert won't auto-trigger the investigation.</li>
+</ul>
+</details>
+<details class="note">
+<summary>Task 2 · Read the whole board</summary>
+<ul>
+<li>Open the Operations Center and list every failing service. Order remediation
+  by business tier — situational awareness (flight board) and legal-to-fly
+  (crew) first — not by whichever alert is loudest.</li>
+</ul>
+</details>
+<details class="note">
+<summary>Task 3 · Check the agent's memory</summary>
+<ul>
+<li>Ask the agent whether a similar crew-scheduling / check-in incident has
+  happened before; let session insights surface the earlier RCA and the fix
+  that worked.</li>
+</ul>
+</details>
+<details class="note">
+<summary>Task 4 · Delegate and recover</summary>
+<ul>
+<li>Invoke your <strong><abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> specialist subagent</strong> for pod / rollout triage, and apply
+  your <strong>crew-pool skill</strong> for the sanctioned recovery.</li>
+<li>Keep actions governed (approval or a scoped role) and follow the runbooks:
+  scale to relieve pressure, never delete the database.</li>
+</ul>
+</details>
+<details class="note">
+<summary>Task 5 · Localize the <abbr title="The single public entry point (API Management) through which all client traffic passes.">front door</abbr></summary>
+<ul>
+<li>Compare backend health <strong>directly</strong> (<code>http://&lt;gateway-ip&gt;/api/status</code>)
+  against the same call <strong>through <abbr title="Azure API Management — the API &quot;front door&quot; that authenticates and rate-limits traffic to the services.">APIM</abbr></strong>. If direct is 200 but <abbr title="Azure API Management — the API &quot;front door&quot; that authenticates and rate-limits traffic to the services.">APIM</abbr> returns
+  429, the fault is the <strong>edge policy</strong>, not the service — treat the change as
+  customer-facing.</li>
+</ul>
+</details>
+<details class="note">
+<summary>Task 6 · Verify every service</summary>
+<ul>
+<li>Confirm each fix from telemetry / health before closing, then check the
+  whole platform is green and <code>/api/flights</code> responds.</li>
+</ul>
+</details>
+</div>
 <h3 id="reference">Reference<a class="headerlink" href="#reference" title="Permanent link">&para;</a></h3>
 <ul>
-<li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/overview">Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent overview</a></li>
-<li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/permissions">Permissions &amp; run modes</a></li>
-<li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/security-overview">Security overview</a></li>
-<li><a href="../../getting-started/portal-walkthrough/">Azure portal walkthrough</a> · <a href="../../reference/architecture/">Architecture</a> · <a href="../../reference/commands/">Commands</a></li>
+<li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/incident-response">Automate incident response</a></li>
+<li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/incident-response-plans">Incident response plans</a></li>
+<li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/execute-mitigations">Review and approve mitigations</a></li>
 </ul>
 <div class="admonition success">
 <p class="admonition-title">Up next — brief airline leadership</p>

@@ -1716,7 +1716,7 @@
 <h1 id="challenge-5-engineer-the-agent-specialist-subagent-and-reusable-skill">Challenge 5 — Engineer the Agent: Specialist Subagent and Reusable Skill<a class="headerlink" href="#challenge-5-engineer-the-agent-specialist-subagent-and-reusable-skill" title="Permanent link">&para;</a></h1>
 <div class="admonition abstract">
 <p class="admonition-title">Challenge 05 of 08 · Act III — Agent Engineering</p>
-<p><strong>Agent mode:</strong> Read-only investigation + approved write · <strong>Permissions:</strong> <abbr title="The built-in Azure role that grants read-only access — see everything, change nothing.">Reader</abbr> → scoped write · <strong>Estimated time:</strong> 25–35 min</p>
+<p><strong>Run mode:</strong> Review · <strong>Access:</strong> builder + scoped write</p>
 <p><strong>Stage:</strong> Foundation → Operations → <strong>Engineering</strong> → Autonomous → Major Incident</p>
 </div>
 <p><strong>Situation.</strong> The platform is stable — the right time to invest in tooling. You've
@@ -1742,16 +1742,10 @@ its guardrails intact.</p>
 </div>
 <h3 id="tasks">Tasks<a class="headerlink" href="#tasks" title="Permanent link">&para;</a></h3>
 <ol>
-<li><strong>Build the specialist</strong> — create an <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> reliability triage subagent for the <code>aetherion</code> namespace and invoke it explicitly to summarize namespace health and likely causes.</li>
-<li><strong>Encode the skill</strong> — capture the crew connection-pool relief from Challenge 4 as a reusable skill, keeping the guardrails (scale, never delete the database), and confirm it loads.</li>
-<li><strong>Know the difference</strong> — a subagent is invoked and investigates; a skill auto-loads and encodes a procedure. You'll want both in the final incident.</li>
+<li><strong>Build the specialist.</strong> Create an <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> triage subagent for the <code>aetherion</code> namespace and invoke it to summarize namespace health and likely causes.</li>
+<li><strong>Encode the skill.</strong> Capture the crew pool-relief recovery from Challenge 4 as a reusable skill, guardrails intact, and confirm it loads.</li>
+<li><strong>Know when to use which.</strong> Be able to say when you'd reach for the subagent (invoke to investigate) versus the skill (auto-loads a procedure).</li>
 </ol>
-<div class="admonition question">
-<p class="admonition-title">Stuck? Give each task a genuine attempt first</p>
-<p>Working it out yourself is where the learning sticks. If you need the exact
-clicks, the <a href="../../getting-started/portal-walkthrough/">Azure portal walkthrough</a>
-has a step for every action.</p>
-</div>
 <p><img alt="Challenge 5 storyboard — Sam and Aria engineer a specialist subagent and reusable skill" class="story-panel" loading="lazy" src="../../assets/storyboard/img-challenge-5.webp" /></p>
 <h3 id="suggested-azure-sre-agent-prompt">Suggested Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent prompt<a class="headerlink" href="#suggested-azure-sre-agent-prompt" title="Permanent link">&para;</a></h3>
 <div class="admonition quote">
@@ -1774,21 +1768,57 @@ namespace's health and the most likely causes. Keep it scoped to <abbr title="Az
 </div>
 <h3 id="hints">Hints<a class="headerlink" href="#hints" title="Permanent link">&para;</a></h3>
 <details>
-<summary>Hint</summary>
-<p>Decide the specialist's remit in one sentence before creating it — narrow beats
-broad — and judge it by whether its output would actually speed up a real <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr>
-incident. For the skill, reuse the exact steps from Challenge 4 as its backbone and
-bake in the guardrails (relieve the pool by scaling, never delete/restart the
-database). Skills load automatically and encode procedure; subagents are invoked
-and investigate — you want both in the final incident. Respect the 5 concurrent
-skills limit.</p>
+<summary>Hint — scope the specialist</summary>
+<p>Decide the specialist's remit in one sentence before you build it — narrow beats
+broad. Judge it by whether its output would actually speed up a real <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> incident.</p>
 </details>
+<details>
+<summary>Hint — encode the recovery</summary>
+<p>For the skill, reuse the exact steps from Challenge 4 as the backbone and bake in
+the guardrails (scale to relieve the pool, never delete/restart the database).
+Skills auto-load and encode a procedure; subagents are invoked and investigate —
+you'll want both in the final incident. Mind the 5 concurrent skills limit.</p>
+</details>
+<div class="admonition question">
+<p class="admonition-title">Stuck? Step-by-step for each task</p>
+<p>Give each task a genuine attempt first — and skim the hints above. When you want
+the exact clicks, open the matching task below.</p>
+<details class="note">
+<summary>Task 1 · Build the specialist</summary>
+<ul>
+<li>In the agent, go to <strong>Builder → Subagent builder → Create → Custom Agent</strong>.
+  Name it (e.g. <code>aks-triage</code>) and give it a one-line remit: triage pod
+  status, events, rollout history, and dependency health for the
+  <code>aetherion</code> namespace.</li>
+<li>Invoke it explicitly and ask for a namespace-health summary with likely
+  causes. Judge it on whether it would speed a real <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> incident.</li>
+</ul>
+</details>
+<details class="note">
+<summary>Task 2 · Encode the skill</summary>
+<ul>
+<li><strong>Builder → Subagent builder → Create → Skill.</strong> In <code>SKILL.md</code>, write the
+  crew pool-relief steps from Challenge 4 (scale <abbr title="Running copies (pods) of a service; more replicas share the load.">replicas</abbr> / raise pool
+  headroom, stop the leak) and the guardrail (never delete/restart the DB).</li>
+<li>Save it and confirm it appears in the <strong>Skills</strong> list and loads when
+  relevant.</li>
+</ul>
+</details>
+<details class="note">
+<summary>Task 3 · Know when to use which</summary>
+<ul>
+<li>A <strong>subagent</strong> is something you <em>invoke</em> to investigate a domain (your <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr>
+  specialist).</li>
+<li>A <strong>skill</strong> <em>auto-loads</em> when relevant and encodes a <em>procedure</em> (the
+  pool-relief recovery). You'll want both in the final incident.</li>
+</ul>
+</details>
+</div>
 <h3 id="reference">Reference<a class="headerlink" href="#reference" title="Permanent link">&para;</a></h3>
 <ul>
-<li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/sub-agents">Subagents &amp; extensibility</a></li>
-<li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/skills">Skills</a></li>
-<li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/agent-hooks">Agent hooks</a></li>
-<li><a href="../../getting-started/portal-walkthrough/">Azure portal walkthrough</a> · <a href="../../reference/architecture/">Architecture</a> · <a href="../../reference/commands/">Commands</a></li>
+<li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/create-subagent">Create a subagent</a></li>
+<li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/create-skill">Create a skill</a></li>
+<li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/sub-agents">Subagents overview</a></li>
 </ul>
 <div class="admonition success">
 <p class="admonition-title">Up next — let the agent run autonomously</p>

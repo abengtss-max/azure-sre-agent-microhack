@@ -1716,7 +1716,7 @@
 <h1 id="challenge-4-give-the-agent-aetherions-operational-knowledge">Challenge 4 — Give the Agent Aetherion's Operational Knowledge<a class="headerlink" href="#challenge-4-give-the-agent-aetherions-operational-knowledge" title="Permanent link">&para;</a></h1>
 <div class="admonition abstract">
 <p class="admonition-title">Challenge 04 of 08 · Act II — Human-Guided Operations</p>
-<p><strong>Agent mode:</strong> Review → approved write · <strong>Permissions:</strong> <abbr title="The built-in Azure role that grants read-only access — see everything, change nothing.">Reader</abbr> → scoped write · <strong>Estimated time:</strong> 20–30 min</p>
+<p><strong>Run mode:</strong> Review → approved write · <strong>Access:</strong> scoped write on approval</p>
 <p><strong>Stage:</strong> Foundation → <strong>Operations</strong> → Engineering → Autonomous → Major Incident</p>
 </div>
 <p><strong>Situation.</strong> Crew scheduling is failing — the <code>crew-scheduling</code> tile is red while
@@ -1743,16 +1743,10 @@ non-destructive remediation and verify service is restored.</p>
 </div>
 <h3 id="tasks">Tasks<a class="headerlink" href="#tasks" title="Permanent link">&para;</a></h3>
 <ol>
-<li><strong>Confirm the <abbr title="How much of the system an incident (or a fix) can affect — kept as small as possible.">blast radius</abbr></strong> — one service down is not the database being down, so you fix the right layer.</li>
-<li><strong>Ground the agent</strong> — load the <code>knowledge/</code> runbooks, then re-ask the remediation question and note how the advice changes.</li>
-<li><strong>Apply the sanctioned fix</strong> — relieve the pool and stop the leak (never delete the database); verify crew scheduling recovers.</li>
+<li><strong>Confirm the <abbr title="How much of the system an incident (or a fix) can affect — kept as small as possible.">blast radius</abbr>.</strong> Check that only <code>crew-scheduling</code> is down — one red service isn't the whole database failing.</li>
+<li><strong>Ground the agent.</strong> Load Aetherion's <code>knowledge/</code> runbooks, then re-ask the remediation question and watch the advice change.</li>
+<li><strong>Apply the sanctioned fix.</strong> Relieve the <abbr title="A fixed set of reusable database connections; when it is exhausted, requests queue or fail.">connection pool</abbr> and stop the leak (never delete the database), then confirm crew scheduling recovers.</li>
 </ol>
-<div class="admonition question">
-<p class="admonition-title">Stuck? Give each task a genuine attempt first</p>
-<p>Working it out yourself is where the learning sticks. If you need the exact
-clicks, the <a href="../../getting-started/portal-walkthrough/">Azure portal walkthrough</a>
-has a step for every action.</p>
-</div>
 <p><img alt="Challenge 4 storyboard — Marco, Sam and Aria ground the agent in Aetherion's runbooks" class="story-panel" loading="lazy" src="../../assets/storyboard/img-challenge-4.webp" /></p>
 <h3 id="suggested-azure-sre-agent-prompt">Suggested Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent prompt<a class="headerlink" href="#suggested-azure-sre-agent-prompt" title="Permanent link">&para;</a></h3>
 <div class="admonition quote">
@@ -1776,19 +1770,54 @@ plan I can approve — do not delete or restart the database.</p>
 </div>
 <h3 id="hints">Hints<a class="headerlink" href="#hints" title="Permanent link">&para;</a></h3>
 <details>
-<summary>Hint</summary>
-<p>Only <code>crew-scheduling</code> is red while database-backed peers stay healthy — that
-rules out a global database outage. Load the <code>knowledge/</code> Markdown files, then
-re-ask and watch the advice become Aetherion-specific. The runbook guardrail —
-relieve pressure by scaling, never delete the database — is itself the strongest
-hint at what's being exhausted (the <abbr title="A fixed set of reusable database connections; when it is exhausted, requests queue or fail.">connection pool</abbr>).</p>
+<summary>Hint — how wide is the blast radius?</summary>
+<p>Only <code>crew-scheduling</code> is red while its database-backed peers stay healthy — that
+rules out a whole-database outage. The problem is local to one service.</p>
 </details>
+<details>
+<summary>Hint — let the runbooks answer</summary>
+<p>Load the <code>knowledge/</code> Markdown files, then re-ask and watch the advice turn
+Aetherion-specific. The runbook guardrail — relieve pressure by scaling, never
+delete the database — hints at what's being exhausted.</p>
+</details>
+<div class="admonition question">
+<p class="admonition-title">Stuck? Step-by-step for each task</p>
+<p>Give each task a genuine attempt first — and skim the hints above. When you want
+the exact clicks, open the matching task below.</p>
+<details class="note">
+<summary>Task 1 · Confirm the <abbr title="How much of the system an incident (or a fix) can affect — kept as small as possible.">blast radius</abbr></summary>
+<ul>
+<li>Read the Operations Center: is <strong>only</strong> <code>crew-scheduling</code> red, or are its
+  database-backed peers (<code>booking</code>, <code>telemetry-ingest</code>) failing too?</li>
+<li>If just one service is down, a whole-database outage is ruled out — the
+  fault is local to that service.</li>
+</ul>
+</details>
+<details class="note">
+<summary>Task 2 · Ground the agent</summary>
+<ul>
+<li>In the agent, open <strong>Builder → Knowledge base</strong> and add Aetherion's
+  runbooks from the repo's <code>knowledge/</code> folder (architecture, ops guide,
+  platform standards, and the <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> / database runbooks).</li>
+<li>Re-ask the remediation question. The advice should now <strong>cite Aetherion's
+  runbook</strong> instead of generic guidance.</li>
+</ul>
+</details>
+<details class="note">
+<summary>Task 3 · Apply the sanctioned fix</summary>
+<ul>
+<li>Follow the runbook: <strong>relieve the pool</strong> (scale <abbr title="Running copies (pods) of a service; more replicas share the load.">replicas</abbr> / raise pool
+  headroom) and stop the leak. Do <strong>not</strong> delete or restart the database.</li>
+<li>Apply it under approval (Review / on-behalf-of, or a scoped write role),
+  then verify <code>/api/crew</code> recovers and the tile goes green.</li>
+</ul>
+</details>
+</div>
 <h3 id="reference">Reference<a class="headerlink" href="#reference" title="Permanent link">&para;</a></h3>
 <ul>
-<li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/team-onboard">Team onboarding &amp; memory</a></li>
-<li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/complete-setup">Complete your setup</a></li>
-<li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/permissions">Permissions &amp; run modes</a></li>
-<li><a href="../../getting-started/portal-walkthrough/">Azure portal walkthrough</a> · <a href="../../reference/architecture/">Architecture</a> · <a href="../../reference/commands/">Commands</a></li>
+<li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/connect-knowledge">Connect knowledge</a></li>
+<li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/memory">Memory and knowledge</a></li>
+<li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/execute-mitigations">Review and approve mitigations</a></li>
 </ul>
 <div class="admonition success">
 <p class="admonition-title">Up next — make investigation &amp; recovery reusable</p>
