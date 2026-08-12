@@ -312,6 +312,15 @@ $script:Challenges = [ordered]@{
 
 function Get-MaxChallenge { return ($script:Challenges.Keys | Measure-Object -Maximum).Maximum }
 
+function Get-ChallengeByNumber([int]$Number) {
+    # Look up by KEY. An [ordered] dictionary treats an int indexer as a positional
+    # (0-based) index, so $script:Challenges[$Number] would return the wrong entry.
+    foreach ($e in $script:Challenges.GetEnumerator()) {
+        if ([int]$e.Key -eq $Number) { return $e.Value }
+    }
+    return $null
+}
+
 # ---------------------------------------------------------------------------
 # Orchestration
 # ---------------------------------------------------------------------------
@@ -319,7 +328,7 @@ function Start-AetherionChallenge([int]$Number) {
     if (-not $script:Challenges.Contains($Number)) {
         throw "Unknown challenge '$Number'. Valid range: 1..$(Get-MaxChallenge)."
     }
-    $ch = $script:Challenges[$Number]
+    $ch = Get-ChallengeByNumber $Number
 
     Write-Host ""
     Write-Host "=== Challenge $Number : $($ch.Title) ===" -ForegroundColor Cyan
@@ -338,7 +347,7 @@ function Test-AetherionChallenge([int]$Number) {
     if (-not $script:Challenges.Contains($Number)) {
         throw "Unknown challenge '$Number'. Valid range: 1..$(Get-MaxChallenge)."
     }
-    $ch = $script:Challenges[$Number]
+    $ch = Get-ChallengeByNumber $Number
     Write-Host ""
     Write-Host "=== Grading challenge $Number : $($ch.Title) ===" -ForegroundColor Cyan
     $result = & $ch.Check
