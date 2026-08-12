@@ -33,10 +33,6 @@ fixes to bounded autonomy before peak departure.
 <span>Observe</span> <em>→</em> <span>Detect</span> <em>→</em> <span>Investigate</span> <em>→</em> <span>Decide</span> <em>→</em> <span>Remediate</span> <em>→</em> <span>Verify</span> <em>→</em> <span>Learn</span>
 </div>
 
-## Start here
-
-1. **[Set up the environment](getting-started/environment.md)** — install the tools, then run one command to provision the whole estate.
-2. **[Begin Challenge 1](challenges/01-onboard-and-baseline.md)** — onboard the agent and capture a healthy baseline.
 
 New to the agent? Skim the optional primer **[Meet the SRE Agent](getting-started/sre-agent-fundamentals.md)** first — permissions, run modes, skills and subagents in a couple of minutes.
 
