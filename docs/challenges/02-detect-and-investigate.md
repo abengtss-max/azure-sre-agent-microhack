@@ -1,6 +1,6 @@
 # Challenge 2 — Detect and Investigate Without Touching Production
 
-!!! abstract "Challenge 02 of 08 · Act II — Human-Guided Operations"
+!!! abstract "Challenge 02 of 08 · Act II: Human-Guided Operations"
     **Run mode:** Review · **Access:** read-only investigation
 
     **Stage:** Foundation → **Operations** → Engineering → Autonomous → Major Incident
@@ -9,20 +9,20 @@
 check-in** tile is drifting from green toward amber — just as traffic climbs toward a
 departure peak. Is check-in broken, or simply busy? A change on the passenger path
 mid-surge is what turns a slowdown into an outage. This incident stays **open** into
-Challenge 3 — here you detect and investigate, you do not fix.
+Challenge 3, here you detect and investigate, you do not fix.
 
 **Mission.** Confirm the check-in degradation from live signals and form a
-root-cause hypothesis backed by at least two independent signals — without changing
+root-cause hypothesis backed by at least two independent signals without changing
 anything in production.
 
 **Why this matters**
 
 <div class="grid cards why-cards" markdown>
 
-- :material-magnify-scan: **Confirm the symptom** — tell a real regression apart from load
-- :material-chart-line: **Correlate signals** — latency against CPU, replicas and request load
-- :material-shield-check-outline: **Zero production risk** — a rigorous read-only investigation
-- :material-lightbulb-on-outline: **Defensible hypothesis** — the evidence that speeds the approved fix
+- :material-magnify-scan: **Confirm the symptom**: Tell a real regression apart from load
+- :material-chart-line: **Correlate signals**: Latency against CPU, replicas and request load
+- :material-shield-check-outline: **Zero production risk**: A rigorous read-only investigation
+- :material-lightbulb-on-outline: **Defensible hypothesis**: The evidence that speeds the approved fix
 
 </div>
 
@@ -33,8 +33,7 @@ anything in production.
     ```
 
     Starting Challenge 2 injects the first incident, so your board moves from
-    green to degraded within a minute or two. That is expected — it's the symptom
-    you're here to investigate.
+    green to degraded within a minute or two.
 
 ### Tasks
 
@@ -77,9 +76,8 @@ anything in production.
 
 <details markdown="1"><summary>Hint — confirm and correlate</summary>
 
-Start from the delta against your baseline, not a feeling. Line up request duration
-with CPU, replicas, and request load over the same window — one specific comparison
-beats browsing pod-by-pod.
+Start from the delta against your baseline. Line up request duration
+with CPU, replicas, and request load over the same window.
 </details>
 
 <details markdown="1"><summary>Hint — capacity, or something else?</summary>
@@ -91,7 +89,7 @@ hypothesis, not when it's fixed.
 </details>
 
 !!! question "Stuck? Step-by-step for each task"
-    Give each task a genuine attempt first — and skim the hints above. When you want
+    Give each task a genuine attempt first and skim the hints above. When you want
     the exact clicks, open the matching task below.
 
     ??? note "Task 1 · Confirm the symptom"
@@ -104,13 +102,13 @@ hypothesis, not when it's fixed.
         - In the agent chat, paste the **suggested prompt** above (or ask it to
           correlate `booking` request duration with CPU, replica count, and request
           load over the last 30 minutes).
-        - Stay read-only — you're gathering evidence, changing nothing.
+        - Stay read-only, you're gathering evidence, changing nothing.
 
     ??? note "Task 3 · Rule out capacity"
         - Check whether the autoscaler (**HPA**) added replicas and whether CPU is
           near its target / request.
         - If replicas scaled and CPU is well under target but latency stays high,
-          load alone doesn't explain it — look at what **changed** on the path (a
+          load alone doesn't explain it. Look at what **changed** on the path (a
           recent deployment / rollout) around the time latency moved.
 
     ??? note "Task 4 · Record your hypothesis"
@@ -127,8 +125,8 @@ hypothesis, not when it's fixed.
 - [Root cause analysis](https://learn.microsoft.com/en-us/azure/sre-agent/root-cause-analysis)
 - [Memory and knowledge](https://learn.microsoft.com/en-us/azure/sre-agent/memory)
 
-!!! success "Up next — controlled recovery under approval"
-    With a defensible hypothesis, you're ready to recover check-in under approval — and then the flight board goes dark.
+!!! success "Up next: Controlled recovery under approval"
+    With a defensible hypothesis, you're ready to recover check-in under approval and then the flight board goes dark.
 
     [Proceed to Challenge 3 · Controlled Recovery →](03-controlled-recovery.md){ .md-button .md-button--primary }
 
