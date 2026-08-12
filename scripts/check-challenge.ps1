@@ -1,9 +1,9 @@
 # =============================================================================
 # Aetherion AirOps - check (grade) a challenge
 # -----------------------------------------------------------------------------
-# Validates the REAL remediation for the given challenge against live cluster /
-# APIM state. On success it unlocks the next challenge. Symptom-only or
-# "wait it out" fixes will not pass - the injected fault must be truly cleared.
+# Grades the given challenge against live cluster / APIM state (plus self-attest
+# questions where applicable). For incident challenges the injected fault must be
+# truly cleared - symptom-only or "wait it out" fixes will not pass.
 #
 # Usage:
 #   ./scripts/check-challenge.ps1 1
