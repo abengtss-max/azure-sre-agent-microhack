@@ -17,9 +17,9 @@ hide:
 # Keep Aetherion AirOps flying
 
 You are the new reliability team for a global airline platform. Over five acts
-and eight challenges you will pair with the **Azure SRE Agent** — first guiding it
+and eight challenges you will pair with the **Azure SRE Agent**, first guiding it
 hands-on, then grounding and extending it, and finally trusting it to recover a
-live microservices estate on its own within guardrails — moving from human-approved
+live microservices estate on its own within guardrails, moving from human-approved
 fixes to bounded autonomy before peak departure.
 
 <p class="aet-meta">Self-paced · 5 acts · 8 challenges · ~4–5 hours</p>
@@ -34,7 +34,7 @@ fixes to bounded autonomy before peak departure.
 </div>
 
 
-New to the agent? Skim the optional primer **[Meet the SRE Agent](getting-started/sre-agent-fundamentals.md)** first — permissions, run modes, skills and subagents in a couple of minutes.
+New to the agent? Skim the optional primer **[Meet the SRE Agent](getting-started/sre-agent-fundamentals.md)** first and learn about permissions, run modes, skills and subagents in a couple of minutes.
 
 ## The journey
 
