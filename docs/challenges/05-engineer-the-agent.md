@@ -1,7 +1,7 @@
 # Challenge 5 — Engineer the Agent: Specialist Subagent and Reusable Skill
 
 !!! abstract "Challenge 05 of 08 · Act III — Agent Engineering"
-    **Agent mode:** Read-only investigation + approved write · **Permissions:** Reader → scoped write · **Estimated time:** 25–35 min
+    **Run mode:** Review · **Access:** builder + scoped write
 
     **Stage:** Foundation → Operations → **Engineering** → Autonomous → Major Incident
 
@@ -33,14 +33,9 @@ its guardrails intact.
 
 ### Tasks
 
-1. **Build the specialist** — create an AKS reliability triage subagent for the `aetherion` namespace and invoke it explicitly to summarize namespace health and likely causes.
-2. **Encode the skill** — capture the crew connection-pool relief from Challenge 4 as a reusable skill, keeping the guardrails (scale, never delete the database), and confirm it loads.
-3. **Know the difference** — a subagent is invoked and investigates; a skill auto-loads and encodes a procedure. You'll want both in the final incident.
-
-!!! question "Stuck? Give each task a genuine attempt first"
-    Working it out yourself is where the learning sticks. If you need the exact
-    clicks, the [Azure portal walkthrough](../getting-started/portal-walkthrough.md)
-    has a step for every action.
+1. **Build the specialist.** Create an AKS triage subagent for the `aetherion` namespace and invoke it to summarize namespace health and likely causes.
+2. **Encode the skill.** Capture the crew pool-relief recovery from Challenge 4 as a reusable skill, guardrails intact, and confirm it loads.
+3. **Know when to use which.** Be able to say when you'd reach for the subagent (invoke to investigate) versus the skill (auto-loads a procedure).
 
 ![Challenge 5 storyboard — Sam and Aria engineer a specialist subagent and reusable skill](../assets/storyboard/img-challenge-5.webp){ .story-panel loading=lazy }
 
@@ -67,23 +62,50 @@ its guardrails intact.
 
 ### Hints
 
-<details markdown="1"><summary>Hint</summary>
+<details markdown="1"><summary>Hint — scope the specialist</summary>
 
-Decide the specialist's remit in one sentence before creating it — narrow beats
-broad — and judge it by whether its output would actually speed up a real AKS
-incident. For the skill, reuse the exact steps from Challenge 4 as its backbone and
-bake in the guardrails (relieve the pool by scaling, never delete/restart the
-database). Skills load automatically and encode procedure; subagents are invoked
-and investigate — you want both in the final incident. Respect the 5 concurrent
-skills limit.
+Decide the specialist's remit in one sentence before you build it — narrow beats
+broad. Judge it by whether its output would actually speed up a real AKS incident.
 </details>
+
+<details markdown="1"><summary>Hint — encode the recovery</summary>
+
+For the skill, reuse the exact steps from Challenge 4 as the backbone and bake in
+the guardrails (scale to relieve the pool, never delete/restart the database).
+Skills auto-load and encode a procedure; subagents are invoked and investigate —
+you'll want both in the final incident. Mind the 5 concurrent skills limit.
+</details>
+
+!!! question "Stuck? Step-by-step for each task"
+    Give each task a genuine attempt first — and skim the hints above. When you want
+    the exact clicks, open the matching task below.
+
+    ??? note "Task 1 · Build the specialist"
+        - In the agent, go to **Builder → Subagent builder → Create → Custom Agent**.
+          Name it (e.g. `aks-triage`) and give it a one-line remit: triage pod
+          status, events, rollout history, and dependency health for the
+          `aetherion` namespace.
+        - Invoke it explicitly and ask for a namespace-health summary with likely
+          causes. Judge it on whether it would speed a real AKS incident.
+
+    ??? note "Task 2 · Encode the skill"
+        - **Builder → Subagent builder → Create → Skill.** In `SKILL.md`, write the
+          crew pool-relief steps from Challenge 4 (scale replicas / raise pool
+          headroom, stop the leak) and the guardrail (never delete/restart the DB).
+        - Save it and confirm it appears in the **Skills** list and loads when
+          relevant.
+
+    ??? note "Task 3 · Know when to use which"
+        - A **subagent** is something you *invoke* to investigate a domain (your AKS
+          specialist).
+        - A **skill** *auto-loads* when relevant and encodes a *procedure* (the
+          pool-relief recovery). You'll want both in the final incident.
 
 ### Reference
 
-- [Subagents & extensibility](https://learn.microsoft.com/en-us/azure/sre-agent/sub-agents)
-- [Skills](https://learn.microsoft.com/en-us/azure/sre-agent/skills)
-- [Agent hooks](https://learn.microsoft.com/en-us/azure/sre-agent/agent-hooks)
-- [Azure portal walkthrough](../getting-started/portal-walkthrough.md) · [Architecture](../reference/architecture.md) · [Commands](../reference/commands.md)
+- [Create a subagent](https://learn.microsoft.com/en-us/azure/sre-agent/create-subagent)
+- [Create a skill](https://learn.microsoft.com/en-us/azure/sre-agent/create-skill)
+- [Subagents overview](https://learn.microsoft.com/en-us/azure/sre-agent/sub-agents)
 
 !!! success "Up next — let the agent run autonomously"
     Now let the agent recover on its own for a small, bounded issue — then make sure it stays cost-effective at scale.

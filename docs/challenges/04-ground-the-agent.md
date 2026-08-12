@@ -1,7 +1,7 @@
 # Challenge 4 — Give the Agent Aetherion's Operational Knowledge
 
 !!! abstract "Challenge 04 of 08 · Act II — Human-Guided Operations"
-    **Agent mode:** Review → approved write · **Permissions:** Reader → scoped write · **Estimated time:** 20–30 min
+    **Run mode:** Review → approved write · **Access:** scoped write on approval
 
     **Stage:** Foundation → **Operations** → Engineering → Autonomous → Major Incident
 
@@ -34,14 +34,9 @@ non-destructive remediation and verify service is restored.
 
 ### Tasks
 
-1. **Confirm the blast radius** — one service down is not the database being down, so you fix the right layer.
-2. **Ground the agent** — load the `knowledge/` runbooks, then re-ask the remediation question and note how the advice changes.
-3. **Apply the sanctioned fix** — relieve the pool and stop the leak (never delete the database); verify crew scheduling recovers.
-
-!!! question "Stuck? Give each task a genuine attempt first"
-    Working it out yourself is where the learning sticks. If you need the exact
-    clicks, the [Azure portal walkthrough](../getting-started/portal-walkthrough.md)
-    has a step for every action.
+1. **Confirm the blast radius.** Check that only `crew-scheduling` is down — one red service isn't the whole database failing.
+2. **Ground the agent.** Load Aetherion's `knowledge/` runbooks, then re-ask the remediation question and watch the advice change.
+3. **Apply the sanctioned fix.** Relieve the connection pool and stop the leak (never delete the database), then confirm crew scheduling recovers.
 
 ![Challenge 4 storyboard — Marco, Sam and Aria ground the agent in Aetherion's runbooks](../assets/storyboard/img-challenge-4.webp){ .story-panel loading=lazy }
 
@@ -69,21 +64,47 @@ non-destructive remediation and verify service is restored.
 
 ### Hints
 
-<details markdown="1"><summary>Hint</summary>
+<details markdown="1"><summary>Hint — how wide is the blast radius?</summary>
 
-Only `crew-scheduling` is red while database-backed peers stay healthy — that
-rules out a global database outage. Load the `knowledge/` Markdown files, then
-re-ask and watch the advice become Aetherion-specific. The runbook guardrail —
-relieve pressure by scaling, never delete the database — is itself the strongest
-hint at what's being exhausted (the connection pool).
+Only `crew-scheduling` is red while its database-backed peers stay healthy — that
+rules out a whole-database outage. The problem is local to one service.
 </details>
+
+<details markdown="1"><summary>Hint — let the runbooks answer</summary>
+
+Load the `knowledge/` Markdown files, then re-ask and watch the advice turn
+Aetherion-specific. The runbook guardrail — relieve pressure by scaling, never
+delete the database — hints at what's being exhausted.
+</details>
+
+!!! question "Stuck? Step-by-step for each task"
+    Give each task a genuine attempt first — and skim the hints above. When you want
+    the exact clicks, open the matching task below.
+
+    ??? note "Task 1 · Confirm the blast radius"
+        - Read the Operations Center: is **only** `crew-scheduling` red, or are its
+          database-backed peers (`booking`, `telemetry-ingest`) failing too?
+        - If just one service is down, a whole-database outage is ruled out — the
+          fault is local to that service.
+
+    ??? note "Task 2 · Ground the agent"
+        - In the agent, open **Builder → Knowledge base** and add Aetherion's
+          runbooks from the repo's `knowledge/` folder (architecture, ops guide,
+          platform standards, and the AKS / database runbooks).
+        - Re-ask the remediation question. The advice should now **cite Aetherion's
+          runbook** instead of generic guidance.
+
+    ??? note "Task 3 · Apply the sanctioned fix"
+        - Follow the runbook: **relieve the pool** (scale replicas / raise pool
+          headroom) and stop the leak. Do **not** delete or restart the database.
+        - Apply it under approval (Review / on-behalf-of, or a scoped write role),
+          then verify `/api/crew` recovers and the tile goes green.
 
 ### Reference
 
-- [Team onboarding & memory](https://learn.microsoft.com/en-us/azure/sre-agent/team-onboard)
-- [Complete your setup](https://learn.microsoft.com/en-us/azure/sre-agent/complete-setup)
-- [Permissions & run modes](https://learn.microsoft.com/en-us/azure/sre-agent/permissions)
-- [Azure portal walkthrough](../getting-started/portal-walkthrough.md) · [Architecture](../reference/architecture.md) · [Commands](../reference/commands.md)
+- [Connect knowledge](https://learn.microsoft.com/en-us/azure/sre-agent/connect-knowledge)
+- [Memory and knowledge](https://learn.microsoft.com/en-us/azure/sre-agent/memory)
+- [Review and approve mitigations](https://learn.microsoft.com/en-us/azure/sre-agent/execute-mitigations)
 
 !!! success "Up next — make investigation & recovery reusable"
     You've worked several AKS incidents the same way — time to build a specialist and encode a recovery so both are reusable.

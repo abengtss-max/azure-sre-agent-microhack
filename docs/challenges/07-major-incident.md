@@ -1,7 +1,7 @@
 # Challenge 7 — Final Incident: Restore Global Check-In Before Peak Departure
 
 !!! abstract "Challenge 07 of 08 · Act V — Major Incident"
-    **Agent mode:** Approved + bounded automation · **Permissions:** scoped write · **Estimated time:** 40–50 min
+    **Run mode:** Review + bounded automation · **Access:** scoped write
 
     **Stage:** Foundation → Operations → Engineering → Autonomous → **Major Incident**
 
@@ -42,17 +42,12 @@ approved or bounded actions, and verify recovery service by service.
 
 ### Tasks
 
-1. **Confirm the Sev1 plan is live** — check the response plan from Challenge 6 is active (bound to `aetherion-major-incident`) so the alert auto-triggers an investigation. If you skipped it, create it now, **before** running the start command.
-2. **Read the whole board** — order the work by business impact (situational awareness and legal-to-fly first), not the loudest alert.
-3. **Check the agent's memory** — ask whether a similar crew-scheduling / check-in incident has happened, and let session insights surface the earlier RCA and remediation.
-4. **Delegate & recover** — hand AKS triage to your specialist subagent and apply sanctioned recoveries (reuse your crew-pool skill), keeping actions governed.
-5. **Localize the front door** — use the direct-vs-APIM comparison; treat the policy change as customer-facing.
-6. **Verify every service** — confirm each fix from telemetry, then the whole platform green.
-
-!!! question "Stuck? Give each task a genuine attempt first"
-    Working it out yourself is where the learning sticks. If you need the exact
-    clicks, the [Azure portal walkthrough](../getting-started/portal-walkthrough.md)
-    has a step for every action.
+1. **Confirm the Sev1 plan is live.** Check the response plan from Challenge 6 is active so the alert auto-triggers — if you skipped it, create it **before** you start.
+2. **Read the whole board.** Order the work by business impact (situational awareness and legal-to-fly first), not the loudest alert.
+3. **Check the agent's memory.** Ask whether a similar incident has happened and let session insights surface the earlier RCA.
+4. **Delegate and recover.** Hand AKS triage to your specialist subagent and reuse your crew-pool skill, keeping every action governed.
+5. **Localize the front door.** Use the direct-vs-APIM comparison and treat the policy change as customer-facing.
+6. **Verify every service.** Confirm each fix from telemetry, then the whole platform back to green.
 
 ![Challenge 7 storyboard — Sam, Aria and Elena restore global check-in before peak departure](../assets/storyboard/img-challenge-7.webp){ .story-panel loading=lazy }
 
@@ -87,21 +82,61 @@ approved or bounded actions, and verify recovery service by service.
 
 ### Hints
 
-<details markdown="1"><summary>Hint</summary>
+<details markdown="1"><summary>Hint — triage, don't firefight</summary>
 
 Don't fix the first red tile you see — read the whole board and order by business
-tier. Delegate AKS triage to your specialist and apply your crew-pool skill;
-you've solved every one of these failure classes already. If the backend is
-healthy directly but clients still fail, the problem is at the API front door, not
-the services.
+tier. You've solved every one of these failure classes already: delegate AKS triage
+to your specialist and apply your crew-pool skill.
 </details>
+
+<details markdown="1"><summary>Hint — is it the service, or the front door?</summary>
+
+If the backend is healthy when you hit it directly but clients still fail, the
+problem is at the API front door, not the services. Treat the policy change as
+customer-facing.
+</details>
+
+!!! question "Stuck? Step-by-step for each task"
+    Give each task a genuine attempt first — and skim the hints above. When you want
+    the exact clicks, open the matching task below.
+
+    ??? note "Task 1 · Confirm the Sev1 plan is live"
+        - Open **Builder → Incident response plans** and confirm your Sev1 plan (from
+          Challenge 6) is **On** and filtered to match `aetherion-major-incident`.
+        - If it's missing, create it **before** running the start command — otherwise
+          the alert won't auto-trigger the investigation.
+
+    ??? note "Task 2 · Read the whole board"
+        - Open the Operations Center and list every failing service. Order remediation
+          by business tier — situational awareness (flight board) and legal-to-fly
+          (crew) first — not by whichever alert is loudest.
+
+    ??? note "Task 3 · Check the agent's memory"
+        - Ask the agent whether a similar crew-scheduling / check-in incident has
+          happened before; let session insights surface the earlier RCA and the fix
+          that worked.
+
+    ??? note "Task 4 · Delegate and recover"
+        - Invoke your **AKS specialist subagent** for pod / rollout triage, and apply
+          your **crew-pool skill** for the sanctioned recovery.
+        - Keep actions governed (approval or a scoped role) and follow the runbooks:
+          scale to relieve pressure, never delete the database.
+
+    ??? note "Task 5 · Localize the front door"
+        - Compare backend health **directly** (`http://<gateway-ip>/api/status`)
+          against the same call **through APIM**. If direct is 200 but APIM returns
+          429, the fault is the **edge policy**, not the service — treat the change as
+          customer-facing.
+
+    ??? note "Task 6 · Verify every service"
+        - Confirm each fix from telemetry / health before closing, then check the
+          whole platform is green and `/api/flights` responds.
 
 ### Reference
 
-- [Azure SRE Agent overview](https://learn.microsoft.com/en-us/azure/sre-agent/overview)
-- [Permissions & run modes](https://learn.microsoft.com/en-us/azure/sre-agent/permissions)
-- [Security overview](https://learn.microsoft.com/en-us/azure/sre-agent/security-overview)
-- [Azure portal walkthrough](../getting-started/portal-walkthrough.md) · [Architecture](../reference/architecture.md) · [Commands](../reference/commands.md)
+- [Automate incident response](https://learn.microsoft.com/en-us/azure/sre-agent/incident-response)
+- [Incident response plans](https://learn.microsoft.com/en-us/azure/sre-agent/incident-response-plans)
+- [Review and approve mitigations](https://learn.microsoft.com/en-us/azure/sre-agent/execute-mitigations)
 
 !!! success "Up next — brief airline leadership"
     The incident is technically closed — now leadership needs it closed formally.

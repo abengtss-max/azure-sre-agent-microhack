@@ -1,7 +1,7 @@
 # Challenge 8 — Boarding Resumes: Brief Airline Leadership
 
 !!! abstract "Challenge 08 of 08 · Act V — Major Incident"
-    **Agent mode:** Read-only summarization · **Permissions:** Reader · **Estimated time:** 20–30 min
+    **Run mode:** Review · **Access:** read-only summarization
 
     **Stage:** Foundation → Operations → Engineering → Autonomous → **Major Incident**
 
@@ -33,15 +33,10 @@ risk.
 
 ### Tasks
 
-1. **Assemble the evidence** — build one defensible narrative per incident from what you preserved through the shift.
-2. **Write the leadership briefing** — short, impact-first, non-technical, for the operations director.
-3. **Write the engineering RCA handover** — precise actions, verification, open risks, and change-correlation evidence (Activity Log + GitHub) for the next on-call.
-4. **Generate the executive PDF** — have the agent render the briefing (with an incident-timeline chart) via its built-in **Python sandbox**.
-
-!!! question "Stuck? Give each task a genuine attempt first"
-    Working it out yourself is where the learning sticks. If you need the exact
-    clicks, the [Azure portal walkthrough](../getting-started/portal-walkthrough.md)
-    has a step for every action.
+1. **Assemble the evidence.** Build one defensible narrative per incident from what you preserved through the shift.
+2. **Write the leadership briefing.** Short, impact-first, non-technical, for the operations director.
+3. **Write the engineering RCA handover.** Precise actions, verification, open risks, and change evidence (Activity Log + GitHub) for the next on-call.
+4. **Generate the executive PDF.** Have the agent render the briefing (with a timeline chart) via its Python sandbox.
 
 ![Challenge 8 storyboard — Sam and Elena brief airline leadership as boarding resumes](../assets/storyboard/img-challenge-8.webp){ .story-panel loading=lazy }
 
@@ -72,19 +67,48 @@ risk.
 
 ### Hints
 
-<details markdown="1"><summary>Hint</summary>
+<details markdown="1"><summary>Hint — evidence, and two audiences</summary>
 
-Start from the evidence you preserved, not memory — let the agent's action plans
-jog the timeline. Leadership wants impact and outcome; the next on-call wants exact
-actions, root-cause evidence, and open risks — write both, not one blended document. Feed the lessons
-learned back into the agent's knowledge so recurrence is handled faster next time.
+Start from the evidence you preserved, not memory — let the agent's action plans jog
+the timeline. Write two documents, not one blended one: leadership wants impact and
+outcome; the next on-call wants exact actions, root-cause evidence, and open risks.
 </details>
+
+<details markdown="1"><summary>Hint — close the loop</summary>
+
+Feed the lessons learned back into the agent's knowledge / memory so a recurrence is
+handled faster next time.
+</details>
+
+!!! question "Stuck? Step-by-step for each task"
+    Give each task a genuine attempt first — and skim the hints above. When you want
+    the exact clicks, open the matching task below.
+
+    ??? note "Task 1 · Assemble the evidence"
+        - Pull the timeline together from what you preserved during the shift (agent
+          threads, action logs, Activity Log, telemetry) — one defensible narrative
+          per incident, not from memory.
+
+    ??? note "Task 2 · Write the leadership briefing"
+        - Ask the agent for a short, impact-first, non-technical briefing for the
+          operations director: business impact, root cause in plain terms, recovery,
+          cost / risk, and lessons learned.
+
+    ??? note "Task 3 · Write the engineering RCA handover"
+        - Ask for a precise engineering handover: actions taken and how each was
+          verified, remaining risk, and change-correlation evidence (Activity Log +
+          your fork's commits) for the next on-call.
+
+    ??? note "Task 4 · Generate the executive PDF"
+        - Ask the agent to render the leadership briefing as a formatted **PDF** with
+          an incident-timeline chart using its built-in **Python sandbox**, then
+          download it.
 
 ### Reference
 
-- [Azure SRE Agent overview](https://learn.microsoft.com/en-us/azure/sre-agent/overview)
-- [Team onboarding & memory](https://learn.microsoft.com/en-us/azure/sre-agent/team-onboard)
-- [Azure portal walkthrough](../getting-started/portal-walkthrough.md) · [Architecture](../reference/architecture.md) · [Commands](../reference/commands.md)
+- [Track incident value](https://learn.microsoft.com/en-us/azure/sre-agent/track-incident-value)
+- [Monitor agent usage](https://learn.microsoft.com/en-us/azure/sre-agent/monitor-agent-usage)
+- [Memory and knowledge](https://learn.microsoft.com/en-us/azure/sre-agent/memory)
 
 !!! success "🎉 MicroHack complete — you built an AI SRE teammate from scratch"
     Across eight challenges you onboarded, investigated, recovered, grounded,
