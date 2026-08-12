@@ -44,7 +44,11 @@ if ([string]::IsNullOrWhiteSpace($apiKey)) {
 $vus = if ($Vus -gt 0) { $Vus } elseif ($Mode -eq 'surge') { 120 } else { 25 }
 
 # --- Separate, un-monitored resource group -----------------------------------
-Write-Host "Creating load-gen resource group '$LoadGenResourceGroup'..." -ForegroundColor Cyan
+if ((az group exists --name $LoadGenResourceGroup) -eq 'true') {
+    Write-Host "Reusing load-gen resource group '$LoadGenResourceGroup'." -ForegroundColor Cyan
+} else {
+    Write-Host "Creating load-gen resource group '$LoadGenResourceGroup'..." -ForegroundColor Cyan
+}
 az group create --name $LoadGenResourceGroup --location $Location --only-show-errors | Out-Null
 
 # --- Carry the k6 script into the container via an ACI secret volume ---------
@@ -53,7 +57,7 @@ az group create --name $LoadGenResourceGroup --location $Location --only-show-er
 # the base64 of the script; ACI mounts the decoded file at /scripts/k6-load.js.
 $scriptB64 = [Convert]::ToBase64String([System.IO.File]::ReadAllBytes((Join-Path $repoRoot "load/k6-load.js")))
 
-Write-Host "Starting k6 on Azure Container Instance (mode=$Mode, vus=$vus)..." -ForegroundColor Cyan
+Write-Host "Redeploying k6 load generator on Azure Container Instance (mode=$Mode, vus=$vus)..." -ForegroundColor Cyan
 az container delete -g $LoadGenResourceGroup -n aetherion-k6 --yes --only-show-errors 2>$null | Out-Null
 az container create `
     -g $LoadGenResourceGroup -n aetherion-k6 `
