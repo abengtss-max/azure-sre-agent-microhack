@@ -5,13 +5,13 @@
 
     **Stage:** Foundation → **Operations** → Engineering → Autonomous → Major Incident
 
-**Situation.** Passengers are reporting long check-in waits and the **booking /
-check-in** tile is drifting from green toward amber — just as traffic climbs toward a
+**Situation:** Passengers are reporting long check-in waits and the **booking /
+check-in** tile is drifting from green toward amber just as traffic climbs toward a
 departure peak. Is check-in broken, or simply busy? A change on the passenger path
 mid-surge is what turns a slowdown into an outage. This incident stays **open** into
 Challenge 3, here you detect and investigate, you do not fix.
 
-**Mission.** Confirm the check-in degradation from live signals and form a
+**Mission:** Confirm the check-in degradation from live signals and form a
 root-cause hypothesis backed by at least two independent signals without changing
 anything in production.
 
