@@ -5,13 +5,13 @@
 
     **Stage:** **Foundation** → Operations → Engineering → Autonomous → Major Incident
 
-**Situation.** You've just taken over the Aetherion AirOps Operations Center at the
+**Situation:** You've just taken over the Aetherion AirOps Operations Center at the
 start of your shift, and every service tile is green. Before the SRE Agent can help
 with real incidents, you need to know what *healthy* looks like, and connect the
 agent with least-privilege access in **Review** mode so it proposes changes and
 waits for your approval.
 
-**Mission.** Connect the SRE Agent with Reader access, capture a validated
+**Mission:** Connect the SRE Agent with Reader access, capture a validated
 operational baseline, and schedule a proactive daily health check.
 
 **Why this matters**
