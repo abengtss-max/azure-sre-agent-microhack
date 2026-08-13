@@ -339,14 +339,12 @@ function renderFlightBoard() {
   const board = document.getElementById('flightBoard');
   const rows = document.getElementById('flightRows');
   rows.innerHTML = '';
-  // Flight Ops feeds the board; if it's unavailable, the board loses its signal.
+  // Flight Ops feeds the board; if it's unavailable, the whole board goes dark.
   if (flightOpsDown) {
     board.classList.add('dark');
-    for (let i = 0; i < 8; i++) {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td>AE${100 + i}</td><td>—</td><td>—</td><td><span class="badge cancelled">NO SIGNAL</span></td>`;
-      rows.appendChild(tr);
-    }
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td colspan="4" class="board-offline"><span class="board-offline-title">FLIGHT BOARD OFFLINE</span><span class="board-offline-sub">Flight Ops signal lost · no live departures</span></td>`;
+    rows.appendChild(tr);
     return;
   }
   board.classList.remove('dark');
