@@ -1758,10 +1758,11 @@ applying a reversible rollback, and verifying both from telemetry.</p>
 <div class="admonition quote">
 <p class="admonition-title">Paste into the agent chat</p>
 <p>Turn my check-in hypothesis into a concrete remediation plan for the <code>booking</code>
-service that removes the added latency without rebuilding, and tell me exactly
-what permission the action needs. Then, for <code>flight-ops</code>, correlate the outage
-time with recent deployment/rollout history and the GitHub change record, and
-propose the least-disruptive <strong>reversible</strong> rollback for my approval.</p>
+service that restores normal response times without rebuilding the service, and
+tell me exactly what permission the action needs. Then, for <code>flight-ops</code>,
+correlate the outage time with recent deployment/rollout history and the GitHub
+change record, and propose the least-disruptive <strong>reversible</strong> rollback for my
+approval.</p>
 </div>
 <h3 id="success-criteria">Success criteria<a class="headerlink" href="#success-criteria" title="Permanent link">&para;</a></h3>
 <ul>
@@ -1779,8 +1780,8 @@ propose the least-disruptive <strong>reversible</strong> rollback for my approva
 <details>
 <summary>Hint: recover check-in safely</summary>
 <p>Ask the agent for a remediation <em>plan</em> first. It tells you the permission the
-action needs. The safe fix removes the added delay and leaves the autoscaler to
-absorb the surge; it shouldn't touch the database, Redis, or nodes.</p>
+action needs. The safe fix restores what the last change took away and leaves the
+autoscaler to absorb the surge; it shouldn't touch the database, Redis, or nodes.</p>
 </details>
 <details>
 <summary>Hint: restore the flight board</summary>

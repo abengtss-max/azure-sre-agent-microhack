@@ -1749,7 +1749,7 @@ non-destructive remediation and verify service is restored.</p>
 <ol>
 <li><strong>Confirm the <abbr title="How much of the system an incident (or a fix) can affect — kept as small as possible.">blast radius</abbr>.</strong> Check that only <code>crew-scheduling</code> is down. One red service isn't the whole database failing.</li>
 <li><strong>Ground the agent.</strong> Load Aetherion's <code>knowledge/</code> runbooks, then re-ask the remediation question and watch the advice change.</li>
-<li><strong>Apply the sanctioned fix.</strong> Relieve the <abbr title="A fixed set of reusable database connections; when it is exhausted, requests queue or fail.">connection pool</abbr> and stop the leak (never delete the database), then confirm crew scheduling recovers.</li>
+<li><strong>Apply the sanctioned fix.</strong> Relieve the <abbr title="A fixed set of reusable database connections; when it is exhausted, requests queue or fail.">connection pool</abbr> (never delete the database), then confirm crew scheduling recovers.</li>
 </ol>
 <p><img alt="Challenge 4 storyboard: Marco, Sam and Aria ground the agent in Aetherion's runbooks" class="story-panel" loading="lazy" src="../../assets/storyboard/img-challenge-4.webp" /></p>
 <h3 id="suggested-azure-sre-agent-prompt">Suggested Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent prompt<a class="headerlink" href="#suggested-azure-sre-agent-prompt" title="Permanent link">&para;</a></h3>
@@ -1763,7 +1763,7 @@ plan I can approve. Do not delete or restart the database.</p>
 <h3 id="success-criteria">Success criteria<a class="headerlink" href="#success-criteria" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Only <code>crew-scheduling</code> is identified as affected.</li>
-<li>The grounded agent cites the runbook guardrail (relieve the pool <strong>and</strong> stop the leak, never delete the database) and you apply that non-destructive fix.</li>
+<li>The grounded agent cites the runbook guardrail (relieve the pool, never delete the database) and you apply that non-destructive fix.</li>
 <li>The tile is green, <code>/api/crew</code> recovers, and <code>check-challenge.ps1 4</code> passes.</li>
 </ul>
 <div class="admonition success">
@@ -1780,9 +1780,10 @@ rules out a whole-database outage. The problem is local to one service.</p>
 </details>
 <details>
 <summary>Hint: let the runbooks answer</summary>
-<p>Load the <code>knowledge/</code> Markdown files, then re-ask and watch the advice turn
-Aetherion-specific. The runbook guardrail (relieve pressure by scaling, never
-delete the database) hints at what's being exhausted.</p>
+<p>Load the <code>knowledge/</code> Markdown files from your <strong>lab clone</strong> (the application fork
+doesn't carry them), then re-ask and watch the advice turn Aetherion-specific. The
+runbook guardrail (relieve pressure before killing sessions, never delete the
+database) hints at what's being exhausted.</p>
 </details>
 <div class="admonition question">
 <p class="admonition-title">Stuck? Step-by-step for each task</p>
@@ -1800,9 +1801,12 @@ the exact clicks, open the matching task below.</p>
 <details class="note">
 <summary>Task 2 · Ground the agent</summary>
 <ul>
-<li>In the agent, open <strong>Builder → Knowledge base</strong> and add Aetherion's
-  runbooks from the repo's <code>knowledge/</code> folder (architecture, ops guide,
-  platform standards, and the <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> / database runbooks).</li>
+<li>In the agent, open <strong>Builder → Knowledge Sources</strong> and add Aetherion's
+  runbooks from your <strong>lab clone's</strong> <code>knowledge/</code> folder (architecture,
+  escalation, ops guide, platform standards, and the <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> / <abbr title="Azure API Management — the API &quot;front door&quot; that authenticates and rate-limits traffic to the services.">APIM</abbr> / database
+  runbooks). The application fork does not contain them.</li>
+<li>Bulk upload can partially fail. Check every file shows <strong>Indexed</strong>, then
+  confirm the agent can actually quote a runbook line before relying on it.</li>
 <li>Re-ask the remediation question. The advice should now <strong>cite Aetherion's
   runbook</strong> instead of generic guidance.</li>
 </ul>
@@ -1810,10 +1814,12 @@ the exact clicks, open the matching task below.</p>
 <details class="note">
 <summary>Task 3 · Apply the sanctioned fix</summary>
 <ul>
-<li>Follow the runbook: <strong>relieve the pool</strong> (scale <abbr title="Running copies (pods) of a service; more replicas share the load.">replicas</abbr> / raise pool
-  headroom) and stop the leak. Do <strong>not</strong> delete or restart the database.</li>
-<li>Apply it under approval (Review / on-behalf-of, or a scoped write role),
-  then verify <code>/api/crew</code> recovers and the tile goes green.</li>
+<li>Follow the runbook: <strong>relieve the pool</strong> (raise the pool headroom the
+  service runs with). Do <strong>not</strong> delete or restart the database.</li>
+<li>Note that the autoscaler has already added <abbr title="Running copies (pods) of a service; more replicas share the load.">replicas</abbr> and the incident is
+  still there, which tells you where the real limit is.</li>
+<li>Apply it under approval (keep the agent in <strong>Review</strong> and approve the
+  write), then verify <code>/api/crew</code> recovers and the tile goes green.</li>
 </ul>
 </details>
 </div>
