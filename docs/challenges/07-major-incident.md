@@ -98,6 +98,11 @@ to your specialist and apply your crew recovery skill.
 If the backend is healthy when you hit it directly but clients still fail, the
 problem is at the API front door, not the services. Treat the policy change as
 customer-facing.
+
+Expect the board to get *worse* once the front door is fixed: with traffic flowing
+again, the degradations further back become visible. That is normal in a layered
+incident — restoring the edge doesn't create new faults, it reveals the ones the
+outage was masking.
 </details>
 
 !!! question "Stuck? Step-by-step for each task"

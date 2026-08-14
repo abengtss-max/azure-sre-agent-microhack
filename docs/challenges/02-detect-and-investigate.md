@@ -32,8 +32,10 @@ without changing anything in production.
     ./scripts/start-challenge.ps1 2   # open the incident
     ```
 
-    Starting Challenge 2 injects the first incident, so your board moves from
-    green to degraded within a minute or two.
+    Starting Challenge 2 injects the first incident. The check-in tile flickers
+    rather than turning solidly amber — the slowdown is intermittent and
+    load-correlated, so the clearest evidence is in the telemetry (P95 against your
+    baseline, and CPU throttling), not in a single tile reading.
 
 ### Tasks
 

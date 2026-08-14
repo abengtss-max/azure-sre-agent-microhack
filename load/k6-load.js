@@ -8,7 +8,7 @@ import { Rate } from 'k6/metrics';
 //
 // Configure via environment variables:
 //   BASE_URL   - APIM gateway base URL (required), e.g. https://<apim>.azure-api.net/aetherion
-//   MODE       - "normal" (default), "surge", or "crew-burst"
+//   MODE       - "normal" (default), "surge", "crew-burst", or "major"
 //   VUS        - override virtual users
 //   API_KEY    - APIM subscription key (optional; sent as Ocp-Apim-Subscription-Key)
 
@@ -19,6 +19,7 @@ const API_KEY = __ENV.API_KEY || '';
 const normalVus = parseInt(__ENV.VUS || '25', 10);
 const surgeVus = parseInt(__ENV.VUS || '120', 10);
 const burstVus = parseInt(__ENV.VUS || '250', 10);
+const majorVus = parseInt(__ENV.VUS || '200', 10);
 
 // A crew-roster rush (shift handover) concentrates traffic on one service.
 const crewBurstOptions = {
@@ -34,6 +35,18 @@ const crewBurstOptions = {
 export const options =
   MODE === 'crew-burst'
     ? crewBurstOptions
+    : MODE === 'major'
+    ? {
+        // Peak departure wave: the whole platform is busy and rosters are pulled
+        // repeatedly as crews sign on.
+        scenarios: {
+          major: {
+            executor: 'constant-vus',
+            vus: majorVus,
+            duration: __ENV.DURATION || '24h'
+          }
+        }
+      }
     : MODE === 'surge'
     ? {
         // A departure-wave surge holds a sustained, closed-loop concurrency.
@@ -94,6 +107,13 @@ export default function () {
   group('crew-scheduling', () => {
     const res = http.get(`${BASE_URL}/api/crew`, { headers: headers() });
     check(res, { 'crew ok': (r) => track(r) });
+    // During a departure wave every crew signing on re-reads the roster, so the
+    // crew path carries far more concurrency than the rest of the journey.
+    if (MODE === 'major') {
+      for (let i = 0; i < 6; i++) {
+        track(http.get(`${BASE_URL}/api/crew`, { headers: headers() }));
+      }
+    }
   });
 
   // Journey 3: create a booking / check-in (write path -> DB + Redis)

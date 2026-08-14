@@ -225,8 +225,8 @@ $script:Challenges = [ordered]@{
             Write-Host "disruptive safe action under human approval (Review / on-behalf-of)."
             Write-Host ""
             Write-Host "INCIDENT P1: moments later the live flight board goes dark for every station" -ForegroundColor Red
-            Write-Host "shortly after a change rolled out. Correlate with deployment / rollout history"
-            Write-Host "(and the GitHub change record), then recover with a reversible rollback."
+            Write-Host "shortly after a change rolled out. Correlate with deployment / rollout history,"
+            Write-Host "then recover with a reversible rollback."
         }
         Check = {
             $okBook   = (Test-ServiceHealthy 'booking' 400)
@@ -313,7 +313,7 @@ $script:Challenges = [ordered]@{
             Invoke-Fault 'crew-scheduling' 'slow-query'
             Invoke-Fault 'booking' 'cpu-starve'
             Invoke-Fault 'apim' 'bad-backend'
-            Set-Load 'surge'
+            Set-Load 'major'
             Write-Host "MAJOR INCIDENT: multiple services fail at once during a passenger surge, minutes" -ForegroundColor Red
             Write-Host "before peak departures. The flight board is dark, crew and check-in are degraded,"
             Write-Host "and the API front door is failing legitimate traffic. Triage by impact and recover."
