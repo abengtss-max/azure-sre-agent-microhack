@@ -20,9 +20,10 @@ This is the most common database incident in Aetherion AirOps.
 
 1. Confirm the pool is the bottleneck (dependency timeouts, not CPU):
    `kubectl logs deploy/crew-scheduling -n aetherion --tail=200`.
-2. **Scale before killing sessions.** Increase pool headroom by scaling replicas
-   (each replica adds its own pool) or raise `PG_POOL_MAX`:
+2. **Relieve the pool before killing sessions.** Raise the per-pod pool headroom:
    `kubectl set env deploy/crew-scheduling -n aetherion PG_POOL_MAX=20`.
+   Adding replicas also adds pools, but the autoscaler may already have done so;
+   if the incident persists after it scaled out, the per-pod pool is the limit.
 3. If this env's injected fault: reset the service profile -> `SVC_PROFILE=standard`.
 4. Only if truly stuck, and never as a first step, consider terminating idle
    backend sessions on the server side. Do **not** restart the database server.
