@@ -1720,7 +1720,7 @@
 <h1 id="challenge-3-controlled-recovery-and-change-correlation">Challenge 3 · Controlled Recovery and Change Correlation<a class="headerlink" href="#challenge-3-controlled-recovery-and-change-correlation" title="Permanent link">&para;</a></h1>
 <div class="admonition abstract">
 <p class="admonition-title">Challenge 03 of 08 · Act II: Human-Guided Operations</p>
-<p><strong>Run mode:</strong> Review → approved write · <strong>Access:</strong> scoped write on approval</p>
+<p><strong>Run mode:</strong> Review → approved write · <strong>Access:</strong> approval-gated write</p>
 <p><strong>Stage:</strong> Foundation → <strong>Operations</strong> → Engineering → Autonomous → Major Incident</p>
 </div>
 <p><strong>Situation.</strong> Two things hit in quick succession. Your check-in hypothesis is solid
@@ -1749,7 +1749,7 @@ applying a reversible rollback, and verifying both from telemetry.</p>
 <h3 id="tasks">Tasks<a class="headerlink" href="#tasks" title="Permanent link">&para;</a></h3>
 <ol>
 <li><strong>Plan the fix.</strong> Ask the agent to turn your hypothesis into a concrete <code>booking</code> remediation plan and name the permission it needs.</li>
-<li><strong>Recover under approval.</strong> Apply the least-disruptive fix with your approval (on-behalf-of, or a narrow scoped role), then confirm latency is back to baseline.</li>
+<li><strong>Recover under approval.</strong> Keep the agent in Review, approve the least-disruptive fix, then confirm latency is back to baseline.</li>
 <li><strong>Triage the flight board.</strong> Find out how <code>flight-ops</code> is failing from pod status and events.</li>
 <li><strong>Correlate and roll back.</strong> Line the outage up with the recent change, apply a reversible rollback, and check the board recovers.</li>
 </ol>
@@ -1765,7 +1765,7 @@ propose the least-disruptive <strong>reversible</strong> rollback for my approva
 </div>
 <h3 id="success-criteria">Success criteria<a class="headerlink" href="#success-criteria" title="Permanent link">&para;</a></h3>
 <ul>
-<li>Check-in is remediated with a least-disruptive action governed by approval or a scoped role (not ungoverned automation); <code>booking</code> is healthy and latency is back to baseline.</li>
+<li>Check-in is remediated with a least-disruptive action you approved in <strong>Review</strong> mode (not ungoverned automation); <code>booking</code> is healthy and latency is back to baseline.</li>
 <li><code>flight-ops</code>'s failure mode is identified and linked to a recent change/rollout; the recovery is reversible and doesn't touch unrelated resources.</li>
 <li>Both tiles are green, <code>/api/flights</code> responds, and <code>check-challenge.ps1 3</code> passes.</li>
 </ul>
@@ -1804,13 +1804,13 @@ the exact clicks, open the matching task below.</p>
 </details>
 <details class="note">
 <summary>Task 2 · Recover under approval</summary>
-<p>Apply the least-disruptive fix one of two governed ways:</p>
 <ul>
-<li><strong>On-behalf-of:</strong> keep the agent in <strong>Review</strong>, and select <strong>Approve</strong> when
-  it proposes the write; it runs once, with your permission.</li>
-<li><strong>Scoped role:</strong> grant the agent's <abbr title="An Azure identity for a workload (here, the agent) so it can authenticate without stored secrets.">managed identity</abbr> a <strong>narrow</strong> write role
-  on just the affected resource (portal → resource group → <strong>Access control
-  (IAM)</strong>), then let it act with its own identity.</li>
+<li>Keep the agent in <strong>Review</strong>. When it proposes the write, select <strong>Approve</strong>:
+  it runs once, with your approval, and the action is recorded.</li>
+<li>Note <em>what</em> gated that write. The recovery is a Kubernetes operation, so it
+  was your <strong>run mode</strong> that held it for approval, not the agent's Azure role.
+  Permissions decide what the agent can reach; run mode decides whether it
+  asks first.</li>
 </ul>
 <p>Then verify <code>booking</code> latency is back to baseline.</p>
 </details>
