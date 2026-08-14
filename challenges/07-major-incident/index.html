@@ -1831,6 +1831,10 @@ to your specialist and apply your crew recovery skill.</p>
 <p>If the backend is healthy when you hit it directly but clients still fail, the
 problem is at the API <abbr title="The single public entry point (API Management) through which all client traffic passes.">front door</abbr>, not the services. Treat the policy change as
 customer-facing.</p>
+<p>Expect the board to get <em>worse</em> once the <abbr title="The single public entry point (API Management) through which all client traffic passes.">front door</abbr> is fixed: with traffic flowing
+again, the degradations further back become visible. That is normal in a layered
+incident — restoring the edge doesn't create new faults, it reveals the ones the
+outage was masking.</p>
 </details>
 <div class="admonition question">
 <p class="admonition-title">Stuck? Step-by-step for each task</p>

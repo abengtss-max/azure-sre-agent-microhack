@@ -1744,8 +1744,10 @@ without changing anything in production.</p>
 <p class="admonition-title">Start this challenge</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="nb">start-challenge</span><span class="p">.</span><span class="n">ps1</span> <span class="n">2</span>   <span class="c"># open the incident</span>
 </code></pre></div>
-<p>Starting Challenge 2 injects the first incident, so your board moves from
-green to degraded within a minute or two.</p>
+<p>Starting Challenge 2 injects the first incident. The check-in tile flickers
+rather than turning solidly amber — the slowdown is intermittent and
+load-correlated, so the clearest evidence is in the telemetry (P95 against your
+baseline, and CPU throttling), not in a single tile reading.</p>
 </div>
 <h3 id="tasks">Tasks<a class="headerlink" href="#tasks" title="Permanent link">&para;</a></h3>
 <ol>
