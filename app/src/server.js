@@ -254,9 +254,10 @@ function registerGatewayRoutes() {
     const values = Object.values(health);
     const total = values.length || 1;
     const down = values.filter((h) => !h.ok).length;
-    const slow = values.filter((h) => h.ok && h.latencyMs > 1500).length;
+    // Aetherion's latency budget for a passenger-facing path is 400ms.
+    const slow = values.filter((h) => h.ok && h.latencyMs > 400).length;
 
-    const score = Math.min(100, down * 32 + slow * 14 + (down + slow ? 6 : 4));
+    const score = Math.min(100, down * 32 + slow * 20 + (down + slow ? 6 : 4));
     const level = score >= 60 ? 'HIGH' : score >= 25 ? 'MEDIUM' : 'LOW';
 
     const latencies = values.map((h) => h.latencyMs || 0).sort((a, b) => a - b);

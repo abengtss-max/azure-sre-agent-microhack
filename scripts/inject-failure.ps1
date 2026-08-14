@@ -63,7 +63,7 @@ if ($Fault -eq "badimage") {
 
 if ($Fault -eq "cpu-starve") {
     Write-Host "Applying tightened CPU limits to '$Service'..." -ForegroundColor Yellow
-    kubectl set resources deploy/$Service -n $ns -c $Service --requests=cpu=25m,memory=128Mi --limits=cpu=50m,memory=256Mi | Out-Null
+    kubectl set resources deploy/$Service -n $ns -c $Service --requests=cpu=10m,memory=128Mi --limits=cpu=25m,memory=256Mi | Out-Null
     kubectl annotate deploy/$Service -n $ns kubernetes.io/change-cause="cost optimisation: reduce cpu request/limit and cap autoscaling" --overwrite | Out-Null
     # The same cost-optimisation change caps how far the service may scale out,
     # so the autoscaler can no longer compensate for the smaller limit.
