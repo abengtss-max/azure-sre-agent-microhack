@@ -24,6 +24,23 @@ foreach ($s in $services) {
     else { Write-Host "  $s -> skipped (deployment not found)" -ForegroundColor DarkYellow }
 }
 
+# Undo the change-shaped faults: release tag, resource limits, pool headroom and
+# any canary revision a challenge left behind.
+Write-Host "Restoring releases, limits and pool headroom..." -ForegroundColor Cyan
+if (Test-Path $envFile) {
+    $resetState = Get-Content $envFile -Raw | ConvertFrom-Json
+    $goodImage = "$($resetState.acrLoginServer)/aetherion-airops:latest"
+    foreach ($s in $services) {
+        kubectl set image deploy/$s -n $ns "$s=$goodImage" 2>$null | Out-Null
+        kubectl set resources deploy/$s -n $ns -c $s --requests=cpu=100m,memory=128Mi --limits=cpu=500m,memory=256Mi 2>$null | Out-Null
+    }
+    Write-Host "  images -> :latest, cpu limits -> 500m" -ForegroundColor Gray
+}
+# PG_POOL_MAX comes from the aetherion-config ConfigMap; drop any deployment override.
+kubectl set env deploy/crew-scheduling -n $ns PG_POOL_MAX- 2>$null | Out-Null
+foreach ($s in $services) { kubectl delete deploy "$s-v2" -n $ns --ignore-not-found 2>$null | Out-Null }
+Write-Host "  pool override cleared, canary revisions removed" -ForegroundColor Gray
+
 # Return the load generator to its normal level (challenges 2 & 7 set surge).
 & (Join-Path $PSScriptRoot "deploy-loadgen.ps1") -Mode normal 2>$null | Out-Null
 Write-Host "  k6 load -> normal (25 VUs)" -ForegroundColor Gray

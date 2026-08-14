@@ -84,6 +84,27 @@ async function initSchema() {
       }
       console.log('[db] seeded flights and crew_roster');
     }
+
+    // Duty records accumulate every season, so the roster table is large even
+    // though only current assignments are served. Guarded by an advisory lock
+    // because several services run initSchema at start-up.
+    await client.query('SELECT pg_advisory_lock(4201)');
+    try {
+      const { rows: crew } = await client.query('SELECT count(*)::int AS c FROM crew_roster');
+      if (crew[0].c < 200000) {
+        await client.query(`
+          INSERT INTO crew_roster (flight_no, crew_member, role, assigned)
+          SELECT 'AE' || (100 + (g % 30)),
+                 'Crew ' || g,
+                 CASE WHEN g % 3 = 0 THEN 'Captain' WHEN g % 3 = 1 THEN 'First Officer' ELSE 'Cabin Crew' END,
+                 false
+          FROM generate_series(1, 250000) AS g
+        `);
+        console.log('[db] backfilled historical crew duty records');
+      }
+    } finally {
+      await client.query('SELECT pg_advisory_unlock(4201)');
+    }
   } finally {
     client.release();
   }

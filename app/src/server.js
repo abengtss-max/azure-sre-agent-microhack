@@ -9,9 +9,8 @@ const redisLib = require('./lib/redis');
 const ROLE = (process.env.ROLE || 'gateway').toLowerCase();
 const PORT = parseInt(process.env.PORT || '8080', 10);
 
-// Behaviour is controlled by an opaque service-profile environment variable so
-// its value never names the underlying condition: an operator (or agent) that
-// inspects the deployment sees only `SVC_PROFILE=r1`, not `FAULT_MODE=latency`.
+// Service behaviour profile. Operations sets this per deployment to select the
+// service tier the workload runs under.
 //   SVC_PROFILE = standard | r1 | r2 | r3 | r4 | r5
 const PROFILE_FAULT = {
   standard: 'none',
@@ -22,7 +21,7 @@ const PROFILE_FAULT = {
   r5: 'db-pool',
 };
 const SVC_PROFILE = (process.env.SVC_PROFILE || 'standard').toLowerCase();
-const FAULT_MODE = PROFILE_FAULT[SVC_PROFILE] || 'none';
+const SERVICE_MODE = PROFILE_FAULT[SVC_PROFILE] || 'none';
 const FAULT_LATENCY_MS = parseInt(process.env.PROFILE_DELAY_MS || '2500', 10);
 const FAULT_ERROR_RATE = parseFloat(process.env.PROFILE_ERR_RATE || '0.5');
 
@@ -46,13 +45,13 @@ function sleep(ms) {
 // was already handled (e.g. error response) and the caller should stop.
 async function applyFault(req, res) {
   requestCount++;
-  switch (FAULT_MODE) {
+  switch (SERVICE_MODE) {
     case 'latency':
       await sleep(FAULT_LATENCY_MS);
       return false;
     case 'error':
       if (Math.random() < FAULT_ERROR_RATE) {
-        res.status(500).json({ error: 'Internal error (injected fault)', role: ROLE });
+        res.status(500).json({ error: 'Internal Server Error', role: ROLE });
         return true;
       }
       return false;
@@ -82,16 +81,16 @@ async function applyFault(req, res) {
 
 // ---- Health probes -------------------------------------------------------
 app.get('/health/live', (req, res) => {
-  // crash fault: liveness fails so Kubernetes restarts the pod -> CrashLoopBackOff
-  if (FAULT_MODE === 'crash') {
-    return res.status(500).json({ status: 'unhealthy', reason: 'injected crash fault' });
+  // Liveness fails under the crash profile so Kubernetes restarts the pod.
+  if (SERVICE_MODE === 'crash') {
+    return res.status(500).json({ status: 'unhealthy', reason: 'liveness check failed' });
   }
   res.json({ status: 'alive', role: ROLE, uptimeSec: Math.round((Date.now() - started) / 1000) });
 });
 
 app.get('/health/ready', async (req, res) => {
-  if (FAULT_MODE === 'crash') {
-    return res.status(503).json({ status: 'not-ready', reason: 'injected crash fault' });
+  if (SERVICE_MODE === 'crash') {
+    return res.status(503).json({ status: 'not-ready', reason: 'startup checks incomplete' });
   }
   // crew-scheduling/booking/telemetry depend on the database
   if (['crew-scheduling', 'booking', 'telemetry-ingest'].includes(ROLE) && db.isConfigured()) {
@@ -106,7 +105,7 @@ app.get('/health/ready', async (req, res) => {
 });
 
 app.get('/api/health', (req, res) => {
-  res.json({ role: ROLE, profile: SVC_PROFILE, requests: requestCount });
+  res.json({ role: ROLE, requests: requestCount });
 });
 
 // ---- Role-specific domain endpoints -------------------------------------
@@ -133,7 +132,11 @@ function registerRoleRoutes() {
         try {
           const pool = db.getPool();
           const { rows } = await pool.query(
-            'SELECT flight_no, crew_member, role, assigned FROM crew_roster ORDER BY id LIMIT 40'
+            `SELECT flight_no, crew_member, role, assigned
+               FROM crew_roster
+              WHERE assigned = true AND role <> 'Cabin Crew'
+              ORDER BY flight_no, crew_member
+              LIMIT 40`
           );
           res.json({ roster: rows, count: rows.length });
         } catch (err) {
@@ -217,8 +220,8 @@ function registerGatewayRoutes() {
   const CORE = { booking: 'SEV-1', 'flight-ops': 'SEV-1' };
 
   // Probe each service's REAL user-facing endpoint (not just readiness) so the
-  // Ops Center reacts authentically to injected latency/error faults instead of
-  // only to pod crashes. This measures genuine request latency and status.
+  // Ops Center reflects what customers actually experience, not just pod state.
+  // This measures genuine request latency and status.
   const PROBES = {
     'flight-ops': { method: 'GET', path: '/api/flights' },
     'crew-scheduling': { method: 'GET', path: '/api/crew' },
@@ -246,7 +249,7 @@ function registerGatewayRoutes() {
   }
 
   // Derive executive/business/operational signals from the REAL probe results so
-  // every panel reacts authentically the moment a fault is injected.
+  // every panel reflects the live state of the platform.
   function deriveSignals(health) {
     const values = Object.values(health);
     const total = values.length || 1;
@@ -318,7 +321,7 @@ function registerGatewayRoutes() {
   // Reverse-proxy the downstream domain endpoints so external traffic (the k6
   // load generator via APIM, and operators hitting the gateway directly) reaches
   // the role services. Without this the gateway 404s these paths and the load
-  // never exercises the downstream services, so injected faults produce no
+  // never exercises the downstream services, so degradations produce no
   // signal under load.
   const PROXY_ROUTES = [
     { method: 'get', path: '/api/flights', target: services['flight-ops'] },
@@ -364,7 +367,7 @@ async function bootstrap() {
   }
   registerRoleRoutes();
   app.listen(PORT, () => {
-    console.log(`[aetherion] role=${ROLE} listening on :${PORT} profile=${SVC_PROFILE}`);
+    console.log(`[aetherion] role=${ROLE} listening on :${PORT}`);
   });
 }
 

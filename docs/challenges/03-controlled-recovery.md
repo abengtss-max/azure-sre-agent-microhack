@@ -46,10 +46,11 @@ applying a reversible rollback, and verifying both from telemetry.
 
 !!! quote "Paste into the agent chat"
     Turn my check-in hypothesis into a concrete remediation plan for the `booking`
-    service that removes the added latency without rebuilding, and tell me exactly
-    what permission the action needs. Then, for `flight-ops`, correlate the outage
-    time with recent deployment/rollout history and the GitHub change record, and
-    propose the least-disruptive **reversible** rollback for my approval.
+    service that restores normal response times without rebuilding the service, and
+    tell me exactly what permission the action needs. Then, for `flight-ops`,
+    correlate the outage time with recent deployment/rollout history and the GitHub
+    change record, and propose the least-disruptive **reversible** rollback for my
+    approval.
 
 ### Success criteria
 
@@ -70,8 +71,8 @@ applying a reversible rollback, and verifying both from telemetry.
 <details markdown="1"><summary>Hint: recover check-in safely</summary>
 
 Ask the agent for a remediation *plan* first. It tells you the permission the
-action needs. The safe fix removes the added delay and leaves the autoscaler to
-absorb the surge; it shouldn't touch the database, Redis, or nodes.
+action needs. The safe fix restores what the last change took away and leaves the
+autoscaler to absorb the surge; it shouldn't touch the database, Redis, or nodes.
 </details>
 
 <details markdown="1"><summary>Hint: restore the flight board</summary>

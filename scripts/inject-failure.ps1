@@ -18,7 +18,7 @@ param(
     [string]$Service,
 
     [Parameter(Mandatory = $true)]
-    [ValidateSet("none", "latency", "error", "crash", "memory", "db-pool", "throttle")]
+    [ValidateSet("none", "latency", "error", "crash", "memory", "db-pool", "throttle", "badimage", "cpu-starve", "canary")]
     [string]$Fault
 )
 
@@ -40,6 +40,73 @@ if ($Service -eq "apim") {
     else {
         throw "Failed to apply APIM throttle policy."
     }
+    return
+}
+
+# --- Real-world change faults -------------------------------------------------
+# These leave no synthetic marker on the workload: they are ordinary operator
+# mistakes (a release pinned to a tag that was never pushed, a resource limit cut
+# too far, a canary rolled out with the wrong role), so the estate looks exactly
+# like a real incident rather than a lab.
+
+if ($Fault -eq "badimage") {
+    if (-not (Test-Path $envFile)) { throw "State file not found. Deploy first." }
+    $state = Get-Content $envFile -Raw | ConvertFrom-Json
+    $badTag = "$($state.acrLoginServer)/aetherion-airops:v2.4.1"
+    Write-Host "Rolling '$Service' to release $badTag..." -ForegroundColor Yellow
+    kubectl set image deploy/$Service -n $ns "$Service=$badTag" | Out-Null
+    kubectl annotate deploy/$Service -n $ns kubernetes.io/change-cause="release v2.4.1" --overwrite | Out-Null
+    Start-Sleep -Seconds 5
+    Write-Host "Release rolled out. Pods cannot pull the new tag." -ForegroundColor Green
+    return
+}
+
+if ($Fault -eq "cpu-starve") {
+    Write-Host "Applying tightened CPU limits to '$Service'..." -ForegroundColor Yellow
+    kubectl set resources deploy/$Service -n $ns -c $Service --requests=cpu=25m,memory=128Mi --limits=cpu=100m,memory=256Mi | Out-Null
+    kubectl annotate deploy/$Service -n $ns kubernetes.io/change-cause="cost optimisation: reduce cpu request/limit" --overwrite | Out-Null
+    kubectl rollout status deploy/$Service -n $ns --timeout=120s
+    Write-Host "CPU limits applied to '$Service'." -ForegroundColor Green
+    return
+}
+
+if ($Fault -eq "canary") {
+    if (-not (Test-Path $envFile)) { throw "State file not found. Deploy first." }
+    $state = Get-Content $envFile -Raw | ConvertFrom-Json
+    # A second revision behind the same Service, rolled out with the wrong ROLE.
+    # Its pods pass health checks but serve the wrong API surface, so a slice of
+    # traffic fails while the rest succeeds.
+    $canary = @"
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: $Service-v2
+  namespace: $ns
+  labels: { app: $Service, tier: service, track: canary }
+  annotations: { kubernetes.io/change-cause: "canary rollout v2" }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: $Service, track: canary } }
+  template:
+    metadata:
+      labels: { app: $Service, tier: service, track: canary }
+    spec:
+      containers:
+        - name: $Service
+          image: $($state.acrLoginServer)/aetherion-airops:latest
+          ports: [{ containerPort: 8080 }]
+          envFrom: [{ configMapRef: { name: aetherion-config } }]
+          env:
+            - { name: ROLE, value: "telemetry-ingest" }
+            - { name: APPLICATIONINSIGHTS_CONNECTION_STRING, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: APPLICATIONINSIGHTS_CONNECTION_STRING } } }
+          readinessProbe: { httpGet: { path: /health/ready, port: 8080 }, initialDelaySeconds: 5, periodSeconds: 10 }
+          livenessProbe: { httpGet: { path: /health/live, port: 8080 }, initialDelaySeconds: 10, periodSeconds: 10 }
+          resources: { requests: { cpu: "100m", memory: "128Mi" }, limits: { cpu: "500m", memory: "256Mi" } }
+"@
+    Write-Host "Rolling out canary '$Service-v2'..." -ForegroundColor Yellow
+    $canary | kubectl apply -f - | Out-Null
+    kubectl rollout status deploy/$Service-v2 -n $ns --timeout=120s
+    Write-Host "Canary '$Service-v2' is serving traffic alongside '$Service'." -ForegroundColor Green
     return
 }
 

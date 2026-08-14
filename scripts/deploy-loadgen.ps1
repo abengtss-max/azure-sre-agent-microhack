@@ -18,7 +18,7 @@ param(
     # Separate resource group for the load generator (NOT monitored by the agent).
     [string]$LoadGenResourceGroup = "",
     [string]$Location = "",
-    [ValidateSet("normal", "surge")]
+    [ValidateSet("normal", "surge", "crew-burst")]
     [string]$Mode = "normal",
     [int]$Vus = 0
 )
@@ -42,7 +42,7 @@ $apiKey = $state.apimSubscriptionKey
 if ([string]::IsNullOrWhiteSpace($apiKey)) {
     throw "APIM subscription key not found in state. Run 03-deploy-app.ps1 first."
 }
-$vus = if ($Vus -gt 0) { $Vus } elseif ($Mode -eq 'surge') { 120 } else { 25 }
+$vus = if ($Vus -gt 0) { $Vus } elseif ($Mode -eq 'surge') { 120 } elseif ($Mode -eq 'crew-burst') { 150 } else { 25 }
 
 # --- Separate, un-monitored resource group -----------------------------------
 if ((az group exists --name $LoadGenResourceGroup) -eq 'true') {

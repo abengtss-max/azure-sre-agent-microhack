@@ -8,7 +8,7 @@ import { Rate } from 'k6/metrics';
 //
 // Configure via environment variables:
 //   BASE_URL   - APIM gateway base URL (required), e.g. https://<apim>.azure-api.net/aetherion
-//   MODE       - "normal" (default) or "surge"
+//   MODE       - "normal" (default), "surge", or "crew-burst"
 //   VUS        - override virtual users
 //   API_KEY    - APIM subscription key (optional; sent as Ocp-Apim-Subscription-Key)
 
@@ -18,9 +18,23 @@ const API_KEY = __ENV.API_KEY || '';
 
 const normalVus = parseInt(__ENV.VUS || '25', 10);
 const surgeVus = parseInt(__ENV.VUS || '120', 10);
+const burstVus = parseInt(__ENV.VUS || '150', 10);
+
+// A crew-roster rush (shift handover) concentrates traffic on one service.
+const crewBurstOptions = {
+  scenarios: {
+    crewBurst: {
+      executor: 'constant-vus',
+      vus: burstVus,
+      duration: __ENV.DURATION || '24h'
+    }
+  }
+};
 
 export const options =
-  MODE === 'surge'
+  MODE === 'crew-burst'
+    ? crewBurstOptions
+    : MODE === 'surge'
     ? {
         scenarios: {
           surge: {
@@ -59,6 +73,17 @@ function track(res) {
 }
 
 export default function () {
+  // Shift-handover rush: crew rosters are pulled far harder than the rest of the
+  // platform, so the crew path carries the concurrency on its own.
+  if (MODE === 'crew-burst') {
+    group('crew-scheduling', () => {
+      const res = http.get(`${BASE_URL}/api/crew`, { headers: headers() });
+      check(res, { 'crew ok': (r) => track(r) });
+    });
+    sleep(Math.random() * 0.2);
+    return;
+  }
+
   // Journey 1: passenger browses the flight board
   group('browse-flights', () => {
     const res = http.get(`${BASE_URL}/api/flights`, { headers: headers() });

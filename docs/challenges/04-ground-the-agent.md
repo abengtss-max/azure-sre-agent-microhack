@@ -36,7 +36,7 @@ non-destructive remediation and verify service is restored.
 
 1. **Confirm the blast radius.** Check that only `crew-scheduling` is down. One red service isn't the whole database failing.
 2. **Ground the agent.** Load Aetherion's `knowledge/` runbooks, then re-ask the remediation question and watch the advice change.
-3. **Apply the sanctioned fix.** Relieve the connection pool and stop the leak (never delete the database), then confirm crew scheduling recovers.
+3. **Apply the sanctioned fix.** Relieve the connection pool (never delete the database), then confirm crew scheduling recovers.
 
 ![Challenge 4 storyboard: Marco, Sam and Aria ground the agent in Aetherion's runbooks](../assets/storyboard/img-challenge-4.webp){ .story-panel loading=lazy }
 
@@ -51,7 +51,7 @@ non-destructive remediation and verify service is restored.
 ### Success criteria
 
 - Only `crew-scheduling` is identified as affected.
-- The grounded agent cites the runbook guardrail (relieve the pool **and** stop the leak, never delete the database) and you apply that non-destructive fix.
+- The grounded agent cites the runbook guardrail (relieve the pool, never delete the database) and you apply that non-destructive fix.
 - The tile is green, `/api/crew` recovers, and `check-challenge.ps1 4` passes.
 
 !!! success "Verify your work"
@@ -72,9 +72,10 @@ rules out a whole-database outage. The problem is local to one service.
 
 <details markdown="1"><summary>Hint: let the runbooks answer</summary>
 
-Load the `knowledge/` Markdown files, then re-ask and watch the advice turn
-Aetherion-specific. The runbook guardrail (relieve pressure by scaling, never
-delete the database) hints at what's being exhausted.
+Load the `knowledge/` Markdown files from your **lab clone** (the application fork
+doesn't carry them), then re-ask and watch the advice turn Aetherion-specific. The
+runbook guardrail (relieve pressure before killing sessions, never delete the
+database) hints at what's being exhausted.
 </details>
 
 !!! question "Stuck? Step-by-step for each task"
@@ -88,17 +89,22 @@ delete the database) hints at what's being exhausted.
           fault is local to that service.
 
     ??? note "Task 2 · Ground the agent"
-        - In the agent, open **Builder → Knowledge base** and add Aetherion's
-          runbooks from the repo's `knowledge/` folder (architecture, ops guide,
-          platform standards, and the AKS / database runbooks).
+        - In the agent, open **Builder → Knowledge Sources** and add Aetherion's
+          runbooks from your **lab clone's** `knowledge/` folder (architecture,
+          escalation, ops guide, platform standards, and the AKS / APIM / database
+          runbooks). The application fork does not contain them.
+        - Bulk upload can partially fail. Check every file shows **Indexed**, then
+          confirm the agent can actually quote a runbook line before relying on it.
         - Re-ask the remediation question. The advice should now **cite Aetherion's
           runbook** instead of generic guidance.
 
     ??? note "Task 3 · Apply the sanctioned fix"
-        - Follow the runbook: **relieve the pool** (scale replicas / raise pool
-          headroom) and stop the leak. Do **not** delete or restart the database.
-        - Apply it under approval (Review / on-behalf-of, or a scoped write role),
-          then verify `/api/crew` recovers and the tile goes green.
+        - Follow the runbook: **relieve the pool** (raise the pool headroom the
+          service runs with). Do **not** delete or restart the database.
+        - Note that the autoscaler has already added replicas and the incident is
+          still there, which tells you where the real limit is.
+        - Apply it under approval (keep the agent in **Review** and approve the
+          write), then verify `/api/crew` recovers and the tile goes green.
 
 ### Reference
 

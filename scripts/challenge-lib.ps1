@@ -90,6 +90,33 @@ function Get-ReadyReplicas([string]$Service) {
     return [int]$v
 }
 
+function Get-DesiredReplicas([string]$Service) {
+    $v = kubectl get deploy $Service -n $script:NS -o jsonpath='{.spec.replicas}' 2>$null
+    if ([string]::IsNullOrWhiteSpace($v)) { return 0 }
+    return [int]$v
+}
+
+function Get-ImageTag([string]$Service) {
+    $v = kubectl get deploy $Service -n $script:NS -o jsonpath='{.spec.template.spec.containers[0].image}' 2>$null
+    if ([string]::IsNullOrWhiteSpace($v)) { return '' }
+    return ($v.Split(':')[-1]).Trim()
+}
+
+function Get-CpuLimitMilli([string]$Service) {
+    $v = kubectl get deploy $Service -n $script:NS -o jsonpath='{.spec.template.spec.containers[0].resources.limits.cpu}' 2>$null
+    if ([string]::IsNullOrWhiteSpace($v)) { return 0 }
+    $v = $v.Trim()
+    if ($v.EndsWith('m')) { return [int]($v.TrimEnd('m')) }
+    return [int]([double]$v * 1000)
+}
+
+# A second revision rolled out behind the same Service (challenge 6).
+function Test-CanaryPresent([string]$Service) {
+    $v = kubectl get deploy "$Service-v2" -n $script:NS -o jsonpath='{.spec.replicas}' 2>$null
+    if ([string]::IsNullOrWhiteSpace($v)) { return $false }
+    return ([int]$v -gt 0)
+}
+
 function Test-ApimHealthy {
     # 200 = routing OK / throttle cleared. 429 (throttled) throws -> false.
     $st = Get-AetherionState
@@ -175,7 +202,7 @@ $script:Challenges = [ordered]@{
         Title = 'Detect and Investigate Without Touching Production'
         Kind  = 'fault'
         Start = {
-            Invoke-Fault 'booking' 'latency'
+            Invoke-Fault 'booking' 'cpu-starve'
             Set-Load 'surge'
             Write-Host "INCIDENT P2 (open): passengers report online check-in and booking are slow." -ForegroundColor Yellow
             Write-Host "Complaints are rising as a passenger surge builds. Root cause is unknown."
@@ -192,7 +219,7 @@ $script:Challenges = [ordered]@{
         Title = 'Controlled Recovery and Change Correlation'
         Kind  = 'fault'
         Start = {
-            Invoke-Fault 'flight-ops' 'crash'
+            Invoke-Fault 'flight-ops' 'badimage'
             Write-Host "Two things at once. First, recover the open check-in incident with the least" -ForegroundColor Yellow
             Write-Host "disruptive safe action under human approval (Review / on-behalf-of)."
             Write-Host ""
@@ -201,12 +228,12 @@ $script:Challenges = [ordered]@{
             Write-Host "(and the GitHub change record), then recover with a reversible rollback."
         }
         Check = {
-            $fmBook   = Get-FaultMode 'booking'
             $okBook   = (Test-ServiceHealthy 'booking')
-            $fmFlight = Get-FaultMode 'flight-ops'
+            $cpuBook  = Get-CpuLimitMilli 'booking'
             $okFlight = (Test-ServiceHealthy 'flight-ops')
-            $pass = ($okBook -and $fmBook -ne 'latency' -and $okFlight -and $fmFlight -ne 'crash')
-            @{ Pass = $pass; Detail = "booking healthy=$okBook faultMode=$fmBook | flight-ops healthy=$okFlight faultMode=$fmFlight" }
+            $tagFlight = Get-ImageTag 'flight-ops'
+            $pass = ($okBook -and $cpuBook -ge 500 -and $okFlight -and $tagFlight -eq 'latest')
+            @{ Pass = $pass; Detail = "booking healthy=$okBook cpuLimit=${cpuBook}m | flight-ops healthy=$okFlight image=:$tagFlight" }
         }
     }
 
@@ -214,17 +241,18 @@ $script:Challenges = [ordered]@{
         Title = "Give the Agent Aetherion's Operational Knowledge"
         Kind  = 'fault'
         Start = {
-            Invoke-Fault 'crew-scheduling' 'db-pool'
+            Set-Load 'crew-burst'
             Write-Host "INCIDENT P2: crew scheduling requests hang then error; only this service is affected." -ForegroundColor Yellow
             Write-Host "The sanctioned remediation lives in Aetherion's runbooks - ground the agent in the"
-            Write-Host "knowledge base so it recommends the approved fix (scale, never delete the database)."
+            Write-Host "knowledge base so it recommends the approved fix (relieve the pool, never delete the database)."
         }
         Check = {
-            $fm   = Get-FaultMode 'crew-scheduling'
-            $ok   = (Test-ServiceHealthy 'crew-scheduling')
-            $pool = Get-PoolMax 'crew-scheduling'
-            $note = if ($pool -gt 5) { " (pool raised to $pool)" } else { '' }
-            @{ Pass = ($ok -and $fm -ne 'db-pool'); Detail = "crew-scheduling healthy=$ok faultMode=$fm$note" }
+            $ok    = (Test-ServiceHealthy 'crew-scheduling')
+            $pool  = Get-PoolMax 'crew-scheduling'
+            $reps  = Get-DesiredReplicas 'crew-scheduling'
+            # Replicas alone are not accepted: the autoscaler already adds them and the
+            # incident persists, so pool headroom is the remediation that matters.
+            @{ Pass = ($ok -and $pool -gt 5); Detail = "crew-scheduling healthy=$ok poolMax=$pool replicas=$reps" }
         }
     }
 
@@ -248,7 +276,7 @@ $script:Challenges = [ordered]@{
         Title = 'Autonomous Recovery and Cost-Aware Governance'
         Kind  = 'fault'
         Start = {
-            Invoke-Fault 'baggage' 'error'
+            Invoke-Fault 'baggage' 'canary'
             Write-Host "INCIDENT P3 (bounded): the baggage service is returning errors to a slice of" -ForegroundColor Yellow
             Write-Host "traffic. Blast radius is small and the remediation is well understood - the safe"
             Write-Host "place to let the agent run in AUTONOMOUS mode and fix it end-to-end without waiting"
@@ -262,12 +290,12 @@ $script:Challenges = [ordered]@{
             Write-Host "major incident auto-triggers an investigation instead of waiting for a human."
         }
         Check = {
-            $fm   = Get-FaultMode 'baggage'
-            $ok   = (Test-ServiceHealthy 'baggage')
+            $ok     = (Test-ServiceHealthy 'baggage')
+            $canary = Test-CanaryPresent 'baggage'
             $auto = Confirm-SelfAttest 'Did the agent remediate baggage while running in Autonomous mode (you supervised, did not fix it by hand)?'
             $cost = Confirm-SelfAttest 'Have you reviewed agent consumption and produced a cost-aware operating model (not just the cheapest option)?'
             $plan = Confirm-SelfAttest 'Have you created a Sev1-filtered major-incident response plan on the agent (bound to the aetherion-major-incident alert) so the next major incident auto-triggers an investigation?'
-            @{ Pass = ($ok -and $fm -ne 'error' -and $auto -and $cost -and $plan); Detail = "baggage healthy=$ok faultMode=$fm autonomous=$auto cost-model=$cost responsePlan=$plan" }
+            @{ Pass = ($ok -and (-not $canary) -and $auto -and $cost -and $plan); Detail = "baggage healthy=$ok canaryStillServing=$canary autonomous=$auto cost-model=$cost responsePlan=$plan" }
         }
     }
 
@@ -275,9 +303,9 @@ $script:Challenges = [ordered]@{
         Title = 'Final Incident: Restore Global Check-In Before Peak Departure'
         Kind  = 'fault'
         Start = {
-            Invoke-Fault 'flight-ops' 'crash'
+            Invoke-Fault 'flight-ops' 'badimage'
             Invoke-Fault 'crew-scheduling' 'db-pool'
-            Invoke-Fault 'booking' 'latency'
+            Invoke-Fault 'booking' 'cpu-starve'
             Invoke-Fault 'apim' 'throttle'
             Set-Load 'surge'
             Write-Host "MAJOR INCIDENT: multiple services fail at once during a passenger surge, minutes" -ForegroundColor Red
@@ -296,15 +324,15 @@ $script:Challenges = [ordered]@{
             Write-Host "    18:25  Major incident declared - you are incident commander" -ForegroundColor Gray
         }
         Check = {
-            $fFlight = Get-FaultMode 'flight-ops'
-            $fCrew   = Get-FaultMode 'crew-scheduling'
-            $fBook   = Get-FaultMode 'booking'
-            $apimOk  = Test-ApimHealthy
-            $s       = Get-AetherionStatus
-            $allOk   = $true
+            $tagFlight = Get-ImageTag 'flight-ops'
+            $fCrew     = Get-FaultMode 'crew-scheduling'
+            $cpuBook   = Get-CpuLimitMilli 'booking'
+            $apimOk    = Test-ApimHealthy
+            $s         = Get-AetherionStatus
+            $allOk     = $true
             foreach ($p in $s.services.PSObject.Properties) { if (-not $p.Value.ok) { $allOk = $false } }
-            $pass = ($allOk -and $apimOk -and $fFlight -ne 'crash' -and $fCrew -ne 'db-pool' -and $fBook -ne 'latency')
-            @{ Pass = $pass; Detail = "overall=$($s.overall) apimOk=$apimOk flight=$fFlight crew=$fCrew booking=$fBook" }
+            $pass = ($allOk -and $apimOk -and $tagFlight -eq 'latest' -and $fCrew -ne 'db-pool' -and $cpuBook -ge 500)
+            @{ Pass = $pass; Detail = "overall=$($s.overall) apimOk=$apimOk flight=:$tagFlight crew=$fCrew bookingCpu=${cpuBook}m" }
         }
     }
 
