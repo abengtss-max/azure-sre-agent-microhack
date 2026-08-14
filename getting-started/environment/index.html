@@ -1756,6 +1756,12 @@ platform on Azure, then hands you straight to Challenge 1.</p>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">winget</span> <span class="n">install</span> <span class="p">-</span><span class="n">-id</span> <span class="n">Git</span><span class="p">.</span><span class="n">Git</span> <span class="p">-</span><span class="o">-exact</span> <span class="p">-</span><span class="n">-accept-source-agreements</span> <span class="p">-</span><span class="n">-accept-package-agreements</span>
 </code></pre></div>
 <p>After installs complete, restart your terminal so the commands are available on PATH.</p>
+<div class="admonition warning">
+<p class="admonition-title">Run every command in PowerShell 7 (<code>pwsh</code>)</p>
+<p>Windows PowerShell 5.1 is the default on Windows and is <strong>not</strong> supported: the
+scripts stop with a version error. Start your session with <code>pwsh</code> and confirm
+with <code>$PSVersionTable.PSVersion</code> (must be 7.0 or later).</p>
+</div>
 <h2 id="2-get-the-two-repositories">2. Get the two repositories<a class="headerlink" href="#2-get-the-two-repositories" title="Permanent link">&para;</a></h2>
 <p>You use <strong>two</strong> repositories in this MicroHack:</p>
 <p><strong>a) Clone the lab repo</strong> — it drives the hack (challenges + scripts):</p>
