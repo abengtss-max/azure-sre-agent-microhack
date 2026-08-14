@@ -1764,11 +1764,11 @@ with <code>$PSVersionTable.PSVersion</code> (must be 7.0 or later).</p>
 </div>
 <h2 id="2-get-the-two-repositories">2. Get the two repositories<a class="headerlink" href="#2-get-the-two-repositories" title="Permanent link">&para;</a></h2>
 <p>You use <strong>two</strong> repositories in this MicroHack:</p>
-<p><strong>a) Clone the lab repo</strong> — it drives the hack (challenges + scripts):</p>
+<p><strong>a) Clone the lab repo.</strong> It drives the hack (challenges + scripts):</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">://</span><span class="n">github</span><span class="p">.</span><span class="n">com</span><span class="p">/</span><span class="n">abengtss-max</span><span class="p">/</span><span class="n">azure-sre-agent-microhack</span><span class="p">.</span><span class="n">git</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nb">cd </span><span class="n">azure-sre-agent-microhack</span>
 </code></pre></div>
-<p><strong>b) Fork the application repo</strong> — this is the Aetherion AirOps <em>application</em>
+<p><strong>b) Fork the application repo.</strong> This is the Aetherion AirOps <em>application</em>
 source that the Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent connects to for change correlation. Fork it to
 <strong>your own account</strong> so the agent can read its history and open pull requests:</p>
 <ol>
@@ -1777,15 +1777,15 @@ source that the Azure <abbr title="Site Reliability Engineering — running serv
 </ol>
 <p>You'll connect the <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent to <strong>your fork</strong> in Challenge 1.</p>
 <div class="admonition danger">
-<p class="admonition-title">Connect the agent to your fork — never to the lab repo</p>
-<p><strong>Never connect the Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent to the lab repo — it contains the
+<p class="admonition-title">Connect the agent to your fork, never to the lab repo</p>
+<p><strong>Never connect the Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent to the lab repo because it contains the
 challenge material</strong> and would spoil every investigation. Connect the agent
 <strong>only to your fork of <code>aetherion-airops-platform</code></strong>.</p>
 </div>
 <h2 id="3-check-you-have-access">3. Check you have access<a class="headerlink" href="#3-check-you-have-access" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong>Azure subscription</strong> with <strong>Owner</strong> (or Contributor + User Access
-  Administrator) — the provisioner deploys infrastructure and assigns the agent's
+    Administrator). The provisioner deploys infrastructure and assigns the agent's
   <abbr title="An Azure identity for a workload (here, the agent) so it can authenticate without stored secrets.">managed identity</abbr>.</li>
 <li>This repository cloned locally and opened in VS Code.</li>
 </ul>
@@ -1795,22 +1795,21 @@ challenge material</strong> and would spoil every investigation. Connect the age
 <h2 id="4-run-one-command">4. Run one command<a class="headerlink" href="#4-run-one-command" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="n">provision-environment</span><span class="p">.</span><span class="n">ps1</span>
 </code></pre></div>
-<p>That's it. The script is idempotent — safe to re-run if a step fails. It runs
-preflight → deploy infrastructure → build &amp; push images → deploy the app →
+<p>That's it. It runs preflight → deploy infrastructure → build &amp; push images → deploy the app →
 validate, then opens the Operations Center, <abbr title="Dashboarding tool used here to visualise AKS and Application Insights metrics.">Grafana</abbr>, and the resource group in
-your browser.</p>
+your browser. The script is idempotent and safe to re-run if a step fails.</p>
 <p>Each run provisions into a <strong>uniquely named</strong> resource group,
 <code>rg-aetherion-microhack-&lt;suffix&gt;</code> (for example <code>rg-aetherion-microhack-a7c3</code>), in
-<code>swedencentral</code>. The script <strong>prints the exact name</strong> when it finishes — use that
+<code>swedencentral</code>. The script <strong>prints the exact name</strong> when it finishes. Use that
 name wherever these docs mention <em>your resource group</em>, and when you scope the
 Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent to it. Because every run is unique, multiple attendees can share a
 single subscription and you can safely re-provision without collisions.</p>
 <p>Override the base name or region with <code>-ResourceGroup</code>, <code>-Location</code>, or
-<code>-NamePrefix</code> — the unique suffix is always appended.</p>
+<code>-NamePrefix</code>; the unique suffix is always appended.</p>
 <div class="admonition warning">
 <p class="admonition-title">Re-provisioning leaves the previous environment running</p>
 <p>Because each run creates a <strong>new</strong> suffixed resource group, re-provisioning
-does <strong>not</strong> replace your earlier environment — the previous one keeps running
+does <strong>not</strong> replace your earlier environment. The previous one keeps running
 (and billing), and a stray copy can confuse the agent if you scope it to the
 wrong one. If you re-provision, either reuse the environment you already have,
 or tear down the old ones. The teardown script lists every
@@ -1819,11 +1818,11 @@ and lets you pick which to delete:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="n">99-teardown</span><span class="p">.</span><span class="n">ps1</span>        <span class="c"># pick an environment to delete</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="n">99-teardown</span><span class="p">.</span><span class="n">ps1</span> <span class="n">-All</span>   <span class="c"># delete all lab environments</span>
 </code></pre></div>
-<p>Always scope the Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent to your <strong>current</strong> resource group — the name
+<p>Always scope the Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent to your <strong>current</strong> resource group, using the name
 the provisioner printed when it finished.</p>
 </div>
 <h2 id="5-what-gets-deployed">5. What gets deployed<a class="headerlink" href="#5-what-gets-deployed" title="Permanent link">&para;</a></h2>
-<p><a href="../../assets/architecture/aetherion-architecture.png"><img alt="Aetherion AirOps — Azure SRE Agent MicroHack environment architecture" class="arch-diagram" loading="lazy" src="../../assets/architecture/aetherion-architecture.png" /></a></p>
+<p><a href="../../assets/architecture/aetherion-architecture.png"><img alt="Aetherion AirOps: Azure SRE Agent MicroHack environment architecture" class="arch-diagram" loading="lazy" src="../../assets/architecture/aetherion-architecture.png" /></a></p>
 <p><em>Request/data flow runs left to right (solid blue); telemetry and control flow to
 observability and the Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent (dashed purple); alerting is shown in red.
 </em><em>Click the diagram to open it full size.</em><em> See the <a href="../../reference/architecture/">full architecture reference</a> for the deep dive.</em></p>
@@ -1841,7 +1840,7 @@ observability and the Azure <abbr title="Site Reliability Engineering — runnin
 </tr>
 <tr>
 <td>Compute</td>
-<td><abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> cluster <code>aetherion-aks</code>, namespace <code>aetherion</code> — 6 microservices + in-cluster Redis cache</td>
+<td><abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> cluster <code>aetherion-aks</code>, namespace <code>aetherion</code>: 6 microservices + in-cluster Redis cache</td>
 </tr>
 <tr>
 <td>Data</td>
@@ -1929,7 +1928,7 @@ all tiles green.</p>
 </tr>
 <tr>
 <td>Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent</td>
-<td>Investigate, plan, and remediate — with approval, or bounded autonomy</td>
+<td>Investigate, plan, and remediate with approval or bounded autonomy</td>
 <td>Azure portal → <code>aetherion-sre-agent</code></td>
 </tr>
 </tbody>
