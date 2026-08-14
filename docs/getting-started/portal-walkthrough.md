@@ -214,9 +214,9 @@ Reference: [Subagents & extensibility](https://learn.microsoft.com/en-us/azure/s
 ## K · Create a reusable skill { #k-skill }
 
 1. In the agent, open **Skills** → **Create**.
-2. Encode a well-defined procedure (e.g. the crew connection-pool relief) as steps,
-   keeping the guardrails (scale to relieve the pool, **never** delete the
-   database).
+2. Encode a well-defined procedure (e.g. the crew query-path recovery) as steps,
+   keeping the guardrails (confirm which layer is saturated, repair the query
+   path, **never** delete the database).
 3. Save it. Skills **auto-load** by context and are capped at **5 concurrent** —
    remove any you don't need.
 
@@ -251,12 +251,18 @@ You can let the agent do this, or check directly:
 
 ---
 
-## N · Correlate a change with the Activity Log & GitHub { #n-activity }
+## N · Correlate a change with rollout history & the Activity Log { #n-activity }
 
-1. Open the affected resource (or the resource group) → **Activity log**.
-2. Filter by the time the tile went red — look for a recent deployment or config
-   change.
-3. Cross-check the timing against the repo's recent commits/deployments on GitHub.
+1. For workload changes, start with the cluster's own change record:
+   ```powershell
+   kubectl rollout history deploy/<service> -n aetherion
+   ```
+   Each revision carries the change cause recorded with it.
+2. For Azure-resource changes (for example an API Management policy), open the
+   resource or resource group → **Activity log** and filter by the time the tile
+   went red.
+3. Note the gap: changes applied straight to the cluster never appear in the
+   Activity Log, which is exactly why teams route changes through a pipeline.
    Proximity in time is your strongest lead for a change-induced outage.
 
 ---
@@ -269,7 +275,7 @@ When clients fail but the backend looks healthy, the problem is at the front doo
 # Load env once
 $st = Get-Content ./scripts/.env.aetherion.json | ConvertFrom-Json
 
-# Through the API front door (APIM) — may be throttled (HTTP 429)
+# Through the API front door (APIM)
 Invoke-WebRequest "$($st.apimGatewayUrl)/aetherion/api/status" `
   -Headers @{ 'Ocp-Apim-Subscription-Key' = $st.apimSubscriptionKey } -UseBasicParsing
 
@@ -277,7 +283,7 @@ Invoke-WebRequest "$($st.apimGatewayUrl)/aetherion/api/status" `
 Invoke-WebRequest "http://$($st.gatewayIp)/api/status" -UseBasicParsing
 ```
 
-If **direct** returns 200 but **APIM** returns 429, the fault is an API Management
+If **direct** returns 200 but **APIM** fails, the fault is an API Management
 policy, not the service.
 
 ---

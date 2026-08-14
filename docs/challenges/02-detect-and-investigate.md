@@ -12,8 +12,8 @@ mid-surge is what turns a slowdown into an outage. This incident stays **open** 
 Challenge 3, here you detect and investigate, you do not fix.
 
 **Mission:** Confirm the check-in degradation from live signals and form a
-root-cause hypothesis backed by at least two independent signals without changing
-anything in production.
+hypothesis for the likely cause, backed by at least two independent signals,
+without changing anything in production.
 
 **Why this matters**
 
@@ -37,10 +37,9 @@ anything in production.
 
 ### Tasks
 
-1. **Confirm the symptom.** Compare check-in latency now to your Challenge 1 baseline and trust the measured delta.
+1. **Confirm the symptom.** Compare check-in latency now to your Challenge 1 baseline, using the Operations Center and Grafana, and trust the measured delta.
 2. **Correlate read-only.** Have the agent line up `booking` request duration against CPU, replicas, and request load.
-3. **Rule out capacity.** Decide whether load alone explains the latency, or something was added on the path.
-4. **Record your hypothesis.** Capture the root cause, the two signals behind it, and the recovery you'd propose (without performing it).
+3. **Record your hypothesis.** Capture the likely cause, the two signals behind it, and the recovery you'd propose (without performing it).
 
 ![Challenge 2 storyboard: Sam and Aria detect and investigate the incident read-only](../assets/storyboard/img-challenge-2.webp){ .story-panel loading=lazy }
 
@@ -48,9 +47,10 @@ anything in production.
 
 !!! quote "Paste into the agent chat"
     Analyze the check-in / booking path read-only. Correlate `booking` request
-    duration with CPU, replica count, and request load over the last 30 minutes, and
-    check recent deployments and rollout history for changes in the same window.
-    Give a root-cause hypothesis with supporting evidence, and change nothing.
+    duration with CPU, CPU throttling, replica count, and request load over the last
+    30 minutes, and check recent deployments and rollout history for changes in the
+    same window. Give me the most likely cause with supporting evidence, and change
+    nothing.
 
 !!! tip "Optional: feed the agent a HAR trace or screenshot"
     If a partner reports the failure from their side, capture a **HAR** (HTTP
@@ -61,7 +61,7 @@ anything in production.
 ### Success criteria
 
 - You've confirmed the degradation and can name the affected service and user-facing path.
-- You can name the most likely source, backed by at least two independent signals, and separate the load-driven latency from the added delay.
+- You can name the most likely cause, backed by at least two independent signals, and separate the load-driven latency from **the change that reduced capacity**.
 - You've made no change to production.
 
 !!! success "Verify your work"
@@ -82,10 +82,11 @@ with CPU, replicas, and request load over the same window.
 
 <details markdown="1"><summary>Hint: capacity, or something else?</summary>
 
-If the autoscaler added replicas and CPU still isn't saturated, load probably isn't
-the whole story. Look at what changed on the booking path around the time latency
-moved. You're done when you can describe the symptom precisely and defend a
-hypothesis, not when it's fixed.
+Busy alone doesn't make a service slow — a service that can't keep up with busy
+does. Check whether the container is being **throttled against its CPU limit**, and
+whether the autoscaler is able to add replicas or has hit a ceiling. Then look at
+what **changed** on the booking path around the time latency moved. You're done when
+you can describe the symptom precisely and defend a hypothesis, not when it's fixed.
 </details>
 
 !!! question "Stuck? Step-by-step for each task"
@@ -94,25 +95,22 @@ hypothesis, not when it's fixed.
 
     ??? note "Task 1 · Confirm the symptom"
         - Open the **Operations Center** and note the **booking / check-in** tile and
-          its current P95 latency.
+          its current P95 latency, then open the **Grafana** dashboard for the same
+          window — the two together are your evidence, not the agent's summary.
         - Compare that to the baseline you captured in Challenge 1. A jump from
           milliseconds to seconds is a real regression, not just load.
 
     ??? note "Task 2 · Correlate read-only"
         - In the agent chat, paste the **suggested prompt** above (or ask it to
-          correlate `booking` request duration with CPU, replica count, and request
-          load over the last 30 minutes).
+          correlate `booking` request duration with CPU, CPU throttling, replica
+          count, and request load over the last 30 minutes).
+        - Watch for the disagreement between signals: a container pinned at its CPU
+          limit while the autoscaler cannot add capacity is a very different story
+          from "we're simply busy".
         - Stay read-only, you're gathering evidence, changing nothing.
 
-    ??? note "Task 3 · Rule out capacity"
-        - Check whether the autoscaler (**HPA**) added replicas and whether CPU is
-          near its target / request.
-        - If replicas scaled and CPU is well under target but latency stays high,
-          load alone doesn't explain it. Look at what **changed** on the path (a
-          recent deployment / rollout) around the time latency moved.
-
-    ??? note "Task 4 · Record your hypothesis"
-        - Ask the agent to write a short summary: the **root cause**, the **two
+    ??? note "Task 3 · Record your hypothesis"
+        - Ask the agent to write a short summary: the **likely cause**, the **two
           independent signals** behind it, and the **least-disruptive recovery** you'd
           propose (do not perform it).
         - Keep it where Challenge 3 can use it: leave it in the chat thread, or save

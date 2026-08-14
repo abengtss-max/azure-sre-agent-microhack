@@ -7,7 +7,7 @@ any underlined acronym to see its meaning in place.
 |------|---------|
 | **Azure SRE Agent** | Azure's AI-powered reliability agent. Investigates, plans and remediates across the whole Azure estate (not just AKS) — with approval, or, once trusted, autonomously within guardrails. |
 | **AKS** | Azure Kubernetes Service — the managed Kubernetes cluster that runs Aetherion's microservices. |
-| **APIM / front door** | Azure API Management — the single public entry point that authenticates (subscription key) and rate-limits all client traffic to the services. |
+| **APIM / front door** | Azure API Management — the single public entry point that authenticates (subscription key) and routes all client traffic to the services. |
 | **HPA / autoscaler** | Horizontal Pod Autoscaler — the Kubernetes control loop that adds or removes pods (replicas) as load changes. |
 | **Replica** | One running copy (pod) of a service. More replicas share the load; the HPA adjusts the count. |
 | **Connection pool** | A fixed set of reusable database connections. When it is exhausted, new requests queue or fail even though the database itself is healthy. |
@@ -28,5 +28,5 @@ any underlined acronym to see its meaning in place.
 | **Activity Log** | Azure's record of control-plane changes — who changed what, and when — used to correlate incidents with deployments. |
 | **Tier 0 / P1 / P2** | Business criticality and incident priority. Tier 0 services (check-in, crew scheduling) have immediate business impact; P1 is a critical outage, P2 a major degradation. |
 | **SEV / severity** | Incident severity. <span class="aet-sev sev1">SEV1</span> critical, <span class="aet-sev sev2">SEV2</span> major, <span class="aet-sev sev3">SEV3</span> minor. |
-| **Fault mode** | The injected failure on a service: `none`, `latency`, `error`, `crash`, `memory`, `db-pool`, or APIM `throttle`. |
+| **Fault mode** | The kind of change behind an incident: a bad release, a resource limit cut too far, a canary revision serving the wrong role, a missing database index, or an API Management policy override. |
 | **Reactive → Assisted → Autonomous** | The operational maturity arc the hack walks through, from human-driven response to trusted autonomy. |

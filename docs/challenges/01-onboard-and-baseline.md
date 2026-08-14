@@ -1,18 +1,19 @@
 # Challenge 1 · Onboard the Agent and Establish the Baseline
 
 !!! abstract "Challenge 01 of 08 · Act I: Foundation"
-    **Run mode:** Review · **Access:** scoped to one resource group · **Estimated time:** 20–30 min
+    **Run mode:** Review · **Access:** scoped to one resource group
 
     **Stage:** **Foundation** → Operations → Engineering → Autonomous → Major Incident
 
 **Situation:** You've just taken over the Aetherion AirOps Operations Center at the
 start of your shift, and every service tile is green. Before the SRE Agent can help
 with real incidents, you need to know what *healthy* looks like, and connect the
-agent with least-privilege access in **Review** mode so it proposes changes and
-waits for your approval.
+agent scoped to a single resource group in **Review** mode, so it proposes changes
+and waits for your approval.
 
-**Mission:** Connect the SRE Agent with Reader access, capture a validated
-operational baseline, and schedule a proactive daily health check.
+**Mission:** Connect the SRE Agent scoped to your resource group in Review mode,
+capture a validated operational baseline, and schedule a proactive daily health
+check.
 
 **Why this matters**
 
@@ -20,7 +21,7 @@ operational baseline, and schedule a proactive daily health check.
 
 - :material-chart-box-outline: **Baseline**: Healthy-state reference every later incident is measured against
 - :material-flash: **Faster RCA**: Spot anomalies sooner against a known-good benchmark
-- :material-lock-outline: **Least privilege**: Scope the agent to one resource group; in **Review** mode it proposes changes and waits for approval
+- :material-lock-outline: **Bounded from the start**: Scope the agent to one resource group; in **Review** mode it proposes changes and waits for approval
 - :material-shield-check-outline: **Proactive ops**: Catch drift before a symptom becomes an outage
 
 </div>
@@ -31,7 +32,8 @@ operational baseline, and schedule a proactive daily health check.
     ./scripts/start-challenge.ps1 1   # sets the scene (Challenge 1 injects no fault)
     ```
 
-    The start-challenge.ps1 script will only print out information when a ````1```` is passed on the command line. No errors are injected, so the board should stay green.
+    For Challenge 1 the script only prints the scenario — no fault is injected, so
+    the board stays green.
 
     If your Operations Center is **not** all-green (for example you ran a later
     challenge on this environment), reset to a clean baseline first:
@@ -39,6 +41,12 @@ operational baseline, and schedule a proactive daily health check.
     ```powershell
     ./scripts/reset-environment.ps1
     ```
+
+    !!! warning "Baseline on a clean board"
+        A baseline captured while the platform is degraded quietly breaks Challenges
+        2 and 3, because every later comparison is measured against it. If the board
+        was recently red, reset and let telemetry settle for a few minutes before you
+        capture anything.
 
 ### Tasks
 
@@ -68,7 +76,9 @@ operational baseline, and schedule a proactive daily health check.
 
 !!! success "Verify your work"
 
-    Run this when you're done. It grades the real end state:
+    The check confirms the platform is healthy, then asks you two yes/no questions
+    about the agent connection and your baseline — answer them honestly, they aren't
+    graded from the environment:
 
     ```powershell
     ./scripts/check-challenge.ps1 1

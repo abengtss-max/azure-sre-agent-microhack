@@ -9,23 +9,27 @@ APIM is the single public front door. Callers must send a subscription key
 header `Ocp-Apim-Subscription-Key`. APIM forwards to the AKS `gateway` public IP
 (`serviceUrl`), which in turn fans out to the microservices.
 
-## Symptom: clients receive HTTP 429 (Too Many Requests)
+## Symptom: calls fail through APIM while the platform is healthy
 
-- **Cause in this env:** a restrictive `rate-limit-by-key` policy on the
-  `aetherion-ops` product (e.g. 5 calls / 60s) throttles traffic.
+- **Typical cause:** a policy change on the `aetherion-ops` product that
+  redirects traffic away from the real backend - most often a
+  `set-backend-service` override left behind by a release or an experiment.
 - **Symptoms:**
-  - k6 / clients see 429 responses; Ops Center may look healthy directly on the
-    gateway IP but fails through APIM.
-  - APIM analytics show a spike in 429s.
+  - k6 / clients see 5xx responses from the gateway.
+  - The Ops Center looks healthy directly on the gateway IP but fails through
+    APIM - the giveaway that the fault is at the edge, not in the services.
+  - APIM analytics show errors with no matching failures in Application Insights.
 
 ### Remediate
 
 1. Compare direct vs through-APIM:
-   - Direct: `http://<gateway-ip>/api/status` -> 200 means backend is fine.
-   - Through APIM: `<apim-gateway-url>/aetherion/api/status` -> 429 means policy.
-2. Inspect the product policy for a `rate-limit-by-key` element.
-3. Restore a sane policy (remove/relax the rate limit). Treat this as a
-   **customer-facing change** and confirm before applying.
+   - Direct: `http://<gateway-ip>/api/status` -> 200 means the backend is fine.
+   - Through APIM: `<apim-gateway-url>/aetherion/api/status` -> failure means the
+     problem is the gateway or its policy.
+2. Inspect the product policy for anything that changes routing or rejects
+   callers (`set-backend-service`, `rate-limit*`, `check-header`).
+3. Restore the default policy so the product inherits the API's backend. Treat
+   this as a **customer-facing change** and confirm before applying.
 
 ## Symptom: HTTP 5xx or timeouts through APIM
 

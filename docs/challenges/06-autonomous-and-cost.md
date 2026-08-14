@@ -1,7 +1,7 @@
 # Challenge 6 · Autonomous Recovery and Cost-Aware Governance
 
 !!! abstract "Challenge 06 of 08 · Act IV: Autonomous & Cost"
-    **Run mode:** Autonomous (bounded) · **Access:** scoped write
+    **Run mode:** Autonomous (bounded) · **Governance:** bounded blast radius, no per-action approval
 
     **Stage:** Foundation → Operations → Engineering → **Autonomous** → Major Incident
 
@@ -37,7 +37,7 @@ investigation, before you reach Challenge 7.
 ### Tasks
 
 1. **Confirm the symptom.** Verify the baggage errors in the Ops Center and telemetry so you know what "recovered" looks like.
-2. **Grant bounded autonomy.** Give a narrowly scoped write role plus **Autonomous** mode, let the agent fix it end-to-end, then review the action log.
+2. **Decide the bounds, then hand over.** Judge whether this incident is safe to automate, switch to **Autonomous** mode, let the agent fix it end-to-end, then review the action log.
 3. **See where AAUs go.** Inspect the agent's consumption by thread type and purpose.
 4. **Design a cost-aware model.** Name concrete reductions without losing reliability or investigation quality.
 5. **Arm the Sev1 response plan.** Bind the pre-provisioned `aetherion-major-incident` alert so the next major incident auto-triggers. Do this now, before Challenge 7.
@@ -47,14 +47,14 @@ investigation, before you reach Challenge 7.
 ### Suggested Azure SRE Agent prompt
 
 !!! quote "Paste into the agent chat"
-    The `baggage` service is returning intermittent errors within a small blast
-    radius. Using only the scoped write permission I've granted, detect the fault,
-    decide the sanctioned reversible fix, apply it autonomously, and report exactly
-    what you changed and why it was safe to automate.
+    The `baggage` service is returning intermittent errors to a slice of traffic
+    while other requests succeed. Detect the fault, decide the sanctioned reversible
+    fix, apply it autonomously, and report exactly what you changed and why it was
+    safe to automate.
 
 ### Success criteria
 
-- The agent detects the baggage errors, executes a sanctioned fix autonomously, the service returns to healthy, and you can explain why it was safe to automate.
+- The agent detects the baggage errors, executes a sanctioned fix autonomously, the service returns to healthy, and you can explain why it was safe to automate: small blast radius, a reversible and well-understood remedy, a service that is degraded rather than down, and a run mode you chose deliberately.
 - You've reviewed real consumption data and produced a written, defensibly balanced operating model, cost-aware, not merely cheapest.
 - A **Sev1 major-incident response plan** is active on the agent (bound to the pre-provisioned `aetherion-major-incident` alert), ready to auto-trigger the agent when the next major incident fires.
 - `check-challenge.ps1 6` passes.
@@ -77,9 +77,12 @@ investigation, before you reach Challenge 7.
 <details markdown="1"><summary>Hint: make autonomy safe</summary>
 
 Confirm the symptom first; you can't judge an autonomous recovery without knowing
-what healthy looks like. Autonomy is safe because it's *scoped*: give the agent only
-the write permission this one recovery needs, then switch to Autonomous and resist
-helping.
+what healthy looks like.
+
+What makes this one safe to automate isn't a permission setting — it's the shape of
+the incident: one degraded (not down) service, a remedy you can undo in seconds, and
+a blast radius you can describe in a sentence. Decide that *before* you switch mode,
+then switch to Autonomous and resist helping.
 </details>
 
 <details markdown="1"><summary>Hint: cost model and the Sev1 plan</summary>
@@ -99,12 +102,19 @@ Challenge 7.
     ??? note "Task 1 · Confirm the symptom"
         - Check the **baggage** tile and telemetry (Application Insights failed
           requests) so you know the current error rate and what "recovered" means.
+        - Some requests succeed and some fail, so look at *which* pods are behind the
+          service: `kubectl get pods -n aetherion -l app=baggage --show-labels`.
 
-    ??? note "Task 2 · Grant bounded autonomy"
-        - Grant the agent's managed identity a **narrow** write role on just the
-          baggage resource (portal → resource group → **Access control (IAM)**).
+    ??? note "Task 2 · Decide the bounds, then hand over"
+        - Write down the bounds first: what may the agent change, what must it never
+          touch, and how would you undo it? That judgement is the governance here.
         - Set the run mode to **Autonomous** (on the response plan / task), then let
           the agent detect → decide → fix on its own. Review the action log after.
+
+        !!! note "\"Never delete\" applies to data, not to a bad revision"
+            Aetherion's guardrails forbid deleting **data resources** — databases,
+            caches, storage. Removing a workload revision that shouldn't be serving
+            is an ordinary, reversible rollback, and it is the sanctioned fix here.
 
     ??? note "Task 3 · See where AAUs go"
         - In the agent, open **Settings → Agent consumption** and read the breakdown

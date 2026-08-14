@@ -1,17 +1,17 @@
 # Challenge 5 · Engineer the Agent: Specialist Subagent and Reusable Skill
 
 !!! abstract "Challenge 05 of 08 · Act III: Agent Engineering"
-    **Run mode:** Review · **Access:** builder + scoped write
+    **Run mode:** Review · **Focus:** builder, no incident to fix
 
     **Stage:** Foundation → Operations → **Engineering** → Autonomous → Major Incident
 
 **Situation.** The platform is stable, which is the right time to invest in tooling. You've
 repeated the same Kubernetes triage (pod status, events, rollout history, dependency
-health) and the same crew pool-relief recovery across several incidents. Both
+health) and the same crew query-path recovery across several incidents. Both
 investigation *and* recovery are perfect candidates to make reusable.
 
 **Mission.** Build a custom AKS-focused specialist subagent and use it for a scoped
-investigation, then encode the crew pool-relief recovery as a reusable skill with
+investigation, then encode the crew query-path recovery as a reusable skill with
 its guardrails intact.
 
 **Why this matters**
@@ -20,7 +20,7 @@ its guardrails intact.
 
 - :material-robot-outline: **Specialist subagent**: scoped AKS triage on demand
 - :material-cog-sync-outline: **Reusable skill**: encode the sanctioned recovery once
-- :material-shield-check-outline: **Guardrails baked in**: scale, never delete the database
+- :material-shield-check-outline: **Guardrails baked in**: fix the saturated layer, never delete the database
 - :material-rocket-launch-outline: **Faster next time**: handle recurrences without re-deriving steps
 
 </div>
@@ -31,10 +31,12 @@ its guardrails intact.
     ./scripts/start-challenge.ps1 5   # open / set up this challenge
     ```
 
+    Challenge 5 injects no fault — the board stays green while you build.
+
 ### Tasks
 
 1. **Build the specialist.** Create an AKS triage subagent for the `aetherion` namespace and invoke it to summarize namespace health and likely causes.
-2. **Encode the skill.** Capture the crew pool-relief recovery from Challenge 4 as a reusable skill, guardrails intact, and confirm it loads.
+2. **Encode the skill.** Capture the crew query-path recovery from Challenge 4 as a reusable skill, guardrails intact, and confirm it loads.
 3. **Know when to use which.** Be able to say when you'd reach for the subagent (invoke to investigate) versus the skill (auto-loads a procedure).
 
 ![Challenge 5 storyboard: Sam and Aria engineer a specialist subagent and reusable skill](../assets/storyboard/img-challenge-5.webp){ .story-panel loading=lazy }
@@ -54,7 +56,8 @@ its guardrails intact.
 
 !!! success "Verify your work"
 
-    Run this when you're done. It grades the real end state:
+    Both questions are yours to answer honestly — nothing here changes the platform,
+    so the check asks you to confirm what you built:
 
     ```powershell
     ./scripts/check-challenge.ps1 5
@@ -71,9 +74,12 @@ broad. Judge it by whether its output would actually speed up a real AKS inciden
 <details markdown="1"><summary>Hint: encode the recovery</summary>
 
 For the skill, reuse the exact steps from Challenge 4 as the backbone and bake in
-the guardrails (scale to relieve the pool, never delete/restart the database).
+the guardrails (diagnose which layer is saturated, repair the query path, never
+delete or restart the database). Be careful not to encode "scale it" as the answer —
+Challenge 4 is precisely the case where scaling cannot work.
+
 Skills auto-load and encode a procedure; subagents are invoked and investigate, so
-you'll want both in the final incident. Mind the 5 concurrent skills limit.
+you'll want both in the final incident.
 </details>
 
 !!! question "Stuck? Step-by-step for each task"
@@ -90,8 +96,9 @@ you'll want both in the final incident. Mind the 5 concurrent skills limit.
 
     ??? note "Task 2 · Encode the skill"
         - **Builder → Subagent builder → Create → Skill.** In `SKILL.md`, write the
-          crew pool-relief steps from Challenge 4 (scale replicas / raise pool
-          headroom, stop the leak) and the guardrail (never delete/restart the DB).
+          crew query-path steps from Challenge 4 (confirm which layer is saturated,
+          then repair the query path under approval) and the guardrail (never
+          delete/restart the DB, and don't scale the layer that is merely waiting).
         - Save it and confirm it appears in the **Skills** list and loads when
           relevant.
 
@@ -99,7 +106,7 @@ you'll want both in the final incident. Mind the 5 concurrent skills limit.
         - A **subagent** is something you *invoke* to investigate a domain (your AKS
           specialist).
         - A **skill** *auto-loads* when relevant and encodes a *procedure* (the
-          pool-relief recovery). You'll want both in the final incident.
+          query-path recovery). You'll want both in the final incident.
 
 ### Reference
 

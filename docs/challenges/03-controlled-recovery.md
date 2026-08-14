@@ -1,7 +1,7 @@
 # Challenge 3 · Controlled Recovery and Change Correlation
 
 !!! abstract "Challenge 03 of 08 · Act II: Human-Guided Operations"
-    **Run mode:** Review → approved write · **Access:** approval-gated write
+    **Run mode:** Review → approved write · **Governance:** every action approved by you
 
     **Stage:** Foundation → **Operations** → Engineering → Autonomous → Major Incident
 
@@ -35,8 +35,13 @@ applying a reversible rollback, and verifying both from telemetry.
 
 ### Tasks
 
+**Part A — finish the check-in incident**
+
 1. **Plan the fix.** Ask the agent to turn your hypothesis into a concrete `booking` remediation plan and name the permission it needs.
 2. **Recover under approval.** Keep the agent in Review, approve the least-disruptive fix, then confirm latency is back to baseline.
+
+**Part B — the flight board goes dark**
+
 3. **Triage the flight board.** Find out how `flight-ops` is failing from pod status and events.
 4. **Correlate and roll back.** Line the outage up with the recent change, apply a reversible rollback, and check the board recovers.
 
@@ -48,14 +53,14 @@ applying a reversible rollback, and verifying both from telemetry.
     Turn my check-in hypothesis into a concrete remediation plan for the `booking`
     service that restores normal response times without rebuilding the service, and
     tell me exactly what permission the action needs. Then, for `flight-ops`,
-    correlate the outage time with recent deployment/rollout history and the GitHub
-    change record, and propose the least-disruptive **reversible** rollback for my
-    approval.
+    correlate the outage time with deployment and rollout history — including the
+    recorded change cause — and propose the least-disruptive **reversible** rollback
+    for my approval.
 
 ### Success criteria
 
-- Check-in is remediated with a least-disruptive action you approved in **Review** mode (not ungoverned automation); `booking` is healthy and latency is back to baseline.
-- `flight-ops`'s failure mode is identified and linked to a recent change/rollout; the recovery is reversible and doesn't touch unrelated resources.
+- Check-in is remediated with a least-disruptive action you approved in **Review** mode (not ungoverned automation); `booking` is healthy, latency is back to baseline, and **the CPU limit the change reduced is back where it was** — compensating with extra replicas is not a fix.
+- `flight-ops`'s failure mode is identified and linked to a recent change/rollout; the recovery is reversible and doesn't touch unrelated resources, and the service is back on its previous image.
 - Both tiles are green, `/api/flights` responds, and `check-challenge.ps1 3` passes.
 
 !!! success "Verify your work"
@@ -78,9 +83,12 @@ autoscaler to absorb the surge; it shouldn't touch the database, Redis, or nodes
 <details markdown="1"><summary>Hint: restore the flight board</summary>
 
 Confirm how `flight-ops` is failing in AKS first, then line up the moment the tile
-went red with deployment / rollout history and the repo's recent changes. Closeness
-in time is your strongest lead, and returning to the last good state is usually the
-fix.
+went red with deployment and rollout history. Closeness in time is your strongest
+lead, and returning to the last good state is usually the fix.
+
+Not every change arrives through git. This one was applied straight to the cluster,
+so the rollout history *is* the change record — which is exactly why teams insist
+changes go through a pipeline that leaves one.
 </details>
 
 !!! question "Stuck? Step-by-step for each task"
@@ -101,7 +109,9 @@ fix.
           Permissions decide what the agent can reach; run mode decides whether it
           asks first.
 
-        Then verify `booking` latency is back to baseline.
+        Then verify `booking` latency is back to baseline, and confirm the change was
+        actually reverted rather than worked around — the resource limits should match
+        what the service was sized for, not a smaller value propped up by more pods.
 
     ??? note "Task 3 · Triage the flight board"
         - Check `flight-ops` pod status and recent events:
@@ -111,9 +121,9 @@ fix.
           change anything.
 
     ??? note "Task 4 · Correlate and roll back"
-        - Line the outage time up with **deployment / rollout history** and the repo's
-          recent changes: `kubectl rollout history deploy/flight-ops -n aetherion`,
-          plus your fork's commits.
+        - Line the outage time up with **deployment / rollout history**:
+          `kubectl rollout history deploy/flight-ops -n aetherion` shows the new
+          revision and the change cause recorded with it.
         - Apply a **reversible** rollback to the last good revision (for example
           `kubectl rollout undo deploy/flight-ops -n aetherion`), then confirm the
           board updates and `/api/flights` responds.

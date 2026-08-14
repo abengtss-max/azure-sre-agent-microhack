@@ -75,7 +75,6 @@ spec:
           ports: [{ containerPort: 8080 }]
           env:
             - { name: ROLE, value: "gateway" }
-            - { name: SVC_PROFILE, value: "standard" }
             - name: APPLICATIONINSIGHTS_CONNECTION_STRING
               valueFrom: { secretKeyRef: { name: aetherion-secrets, key: APPLICATIONINSIGHTS_CONNECTION_STRING } }
           readinessProbe: { httpGet: { path: /health/ready, port: 8080 }, initialDelaySeconds: 5, periodSeconds: 10 }
@@ -101,9 +100,9 @@ metadata:
   labels: { app: flight-ops, tier: service }
 spec:
   replicas: 2
-  # Recreate so a `crash` fault takes the service fully down (the flight board
-  # goes dark). Under the default RollingUpdate, maxUnavailable rounds to 0 and
-  # the old healthy pods keep serving because the crashing pods never go Ready.
+  # The flight board publishes a single authoritative view per station, so two
+  # revisions must never serve at the same time. Old pods are stopped before new
+  # ones start, which makes a failed release immediately customer-visible.
   strategy: { type: Recreate }
   selector: { matchLabels: { app: flight-ops } }
   template:
@@ -117,7 +116,6 @@ spec:
           envFrom: [{ configMapRef: { name: aetherion-config } }]
           env:
             - { name: ROLE, value: "flight-ops" }
-            - { name: SVC_PROFILE, value: "standard" }
             - { name: PGHOST, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: PGHOST } } }
             - { name: PGUSER, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: PGUSER } } }
             - { name: PGPASSWORD, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: PGPASSWORD } } }
@@ -154,7 +152,6 @@ spec:
           envFrom: [{ configMapRef: { name: aetherion-config } }]
           env:
             - { name: ROLE, value: "crew-scheduling" }
-            - { name: SVC_PROFILE, value: "standard" }
             - { name: PGHOST, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: PGHOST } } }
             - { name: PGUSER, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: PGUSER } } }
             - { name: PGPASSWORD, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: PGPASSWORD } } }
@@ -191,7 +188,6 @@ spec:
           envFrom: [{ configMapRef: { name: aetherion-config } }]
           env:
             - { name: ROLE, value: "booking" }
-            - { name: SVC_PROFILE, value: "standard" }
             - { name: PGHOST, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: PGHOST } } }
             - { name: PGUSER, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: PGUSER } } }
             - { name: PGPASSWORD, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: PGPASSWORD } } }
@@ -229,7 +225,6 @@ spec:
           ports: [{ containerPort: 8080 }]
           env:
             - { name: ROLE, value: "baggage" }
-            - { name: SVC_PROFILE, value: "standard" }
             - { name: APPLICATIONINSIGHTS_CONNECTION_STRING, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: APPLICATIONINSIGHTS_CONNECTION_STRING } } }
           readinessProbe: { httpGet: { path: /health/ready, port: 8080 }, initialDelaySeconds: 5, periodSeconds: 10 }
           livenessProbe: { httpGet: { path: /health/live, port: 8080 }, initialDelaySeconds: 10, periodSeconds: 10 }
@@ -263,7 +258,6 @@ spec:
           envFrom: [{ configMapRef: { name: aetherion-config } }]
           env:
             - { name: ROLE, value: "telemetry-ingest" }
-            - { name: SVC_PROFILE, value: "standard" }
             - { name: PGHOST, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: PGHOST } } }
             - { name: PGUSER, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: PGUSER } } }
             - { name: PGPASSWORD, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: PGPASSWORD } } }

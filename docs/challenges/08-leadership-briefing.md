@@ -31,11 +31,13 @@ risk.
     ./scripts/start-challenge.ps1 8   # open / set up this challenge
     ```
 
+    Challenge 8 injects no fault — the platform stays green while you write.
+
 ### Tasks
 
 1. **Assemble the evidence.** Build one defensible narrative per incident from what you preserved through the shift.
 2. **Write the leadership briefing.** Short, impact-first, non-technical, for the operations director.
-3. **Write the engineering RCA handover.** Precise actions, verification, open risks, and change evidence (Activity Log + GitHub) for the next on-call.
+3. **Write the engineering RCA handover.** Precise actions, verification, open risks, and change evidence for the next on-call.
 4. **Generate the executive PDF.** Have the agent render the briefing (with a timeline chart) via its Python sandbox.
 
 ![Challenge 8 storyboard: Sam and Elena brief airline leadership as boarding resumes](../assets/storyboard/img-challenge-8.webp){ .story-panel loading=lazy }
@@ -46,20 +48,23 @@ risk.
     From today's preserved evidence and action plans, draft two separate artifacts:
     (1) a concise, impact-first **leadership briefing** (business impact, root cause,
     recovery, cost/risk, lessons learned) and (2) an **engineering RCA handover**
-    (actions taken, how each was verified, open risks, and Activity Log + GitHub
-    change references). Then render the leadership briefing as a formatted **PDF**
-    with an incident-timeline chart using your Python sandbox.
+    (actions taken, how each was verified, open risks, and change evidence: rollout
+    history with its recorded change causes for the workload changes, and the Azure
+    Activity Log for the API Management policy change). Then render the leadership
+    briefing as a formatted **PDF** with an incident-timeline chart using your Python
+    sandbox.
 
 ### Success criteria
 
 - The platform is healthy at close.
-- The leadership briefing covers impact, root cause, recovery, cost/risk, and lessons learned; the engineering RCA handover captures actions, verification, remaining risk, and change evidence.
+- The leadership briefing covers impact, root cause, recovery, cost/risk, and lessons learned; the engineering RCA handover captures actions, verification, remaining risk, and change evidence from rollout history and the Activity Log.
 - The agent produced a **downloadable PDF** of the leadership briefing (with a timeline chart) via its Python sandbox.
 - Symptom, root cause, contributing factors, immediate mitigation, and permanent corrective action are clearly separated, and `check-challenge.ps1 8` passes.
 
 !!! success "Verify your work"
 
-    Run this when you're done. It grades the real end state and completes the hack:
+    The platform health is graded; the briefing and RCA are yours to attest to. Run
+    this when you're done to complete the hack:
 
     ```powershell
     ./scripts/check-challenge.ps1 8
@@ -96,8 +101,14 @@ handled faster next time.
 
     ??? note "Task 3 · Write the engineering RCA handover"
         - Ask for a precise engineering handover: actions taken and how each was
-          verified, remaining risk, and change-correlation evidence (Activity Log +
-          your fork's commits) for the next on-call.
+          verified, remaining risk, and change-correlation evidence for the next
+          on-call.
+        - Be specific about where that evidence lives. The workload changes are in
+          **rollout history** (`kubectl rollout history deploy/<svc> -n aetherion`)
+          with the change cause recorded against each revision; the API Management
+          policy change is in the **Azure Activity Log**. In-cluster changes never
+          reach the Activity Log — which is itself worth calling out as a gap in the
+          handover.
 
     ??? note "Task 4 · Generate the executive PDF"
         - Ask the agent to render the leadership briefing as a formatted **PDF** with

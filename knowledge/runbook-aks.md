@@ -27,24 +27,41 @@ kubectl get events -n aetherion --sort-by=.lastTimestamp
 
 - Symptom: pods fail liveness/readiness, CrashLoopBackOff, the service tile goes dark.
 - Confirm: `kubectl describe deploy/<svc> -n aetherion`; check the recent rollout / change history.
-- Remediate (this teaching env): reset the service profile ->
-  `kubectl set env deploy/<svc> -n aetherion SVC_PROFILE=standard` (or run `reset-environment.ps1`).
-- If a real crash: `kubectl rollout undo deploy/<svc> -n aetherion`.
+- Remediate: `kubectl rollout undo deploy/<svc> -n aetherion` to the last good
+  revision. If the pods never started at all, check `kubectl get events` for an
+  image pull failure before assuming the application is at fault.
+
+## Fault: pods cannot start after a release (ImagePullBackOff / ErrImagePull)
+
+- Symptom: new pods stay `Pending`/`ImagePullBackOff`; with a `Recreate` rollout
+  strategy the old pods are gone first, so the service goes fully dark.
+- Confirm: `kubectl rollout history deploy/<svc> -n aetherion` shows a new
+  revision and a change cause; events name the tag that cannot be pulled.
+- Remediate: `kubectl rollout undo deploy/<svc> -n aetherion`. Do not try to fix
+  the tag forward during an incident.
 
 ## Fault: memory pressure / OOM
 
 - Symptom: restarts with reason `OOMKilled`, rising memory in Azure Monitor.
-- Remediate (this teaching env): reset the service profile to `standard`; if real, raise memory limits or scale out.
+- Remediate: raise the memory limit or scale out, then look for the leak.
 
 ## Fault: high latency
 
 - Symptom: amber tiles, elevated request duration in Application Insights.
-- Remediate (this teaching env): reset the service profile to `standard`; if real, check downstream + CPU, let HPA scale.
+- Confirm where the time goes before acting. Container CPU pinned at its limit
+  (high throttling) points at a resource limit that is too low - check whether a
+  recent rollout reduced it. Low pod CPU with slow dependency calls points at a
+  downstream service or the database; follow that runbook instead.
+- Remediate: restore the limit the workload was sized for, or fix the downstream
+  dependency. Scaling replicas does not help when the constraint is shared.
 
 ## Fault: error rate
 
 - Symptom: failed requests (HTTP 500) in Application Insights, red/amber tile.
-- Remediate (this teaching env): reset the service profile to `standard`; if real, `kubectl rollout undo`.
+- Confirm whether *all* pods fail or only some. A partial error rate usually
+  means one revision behind the Service is misconfigured - compare the pods
+  backing the Service (`kubectl get pods -n aetherion -l app=<svc> --show-labels`).
+- Remediate: remove or roll back the offending revision.
 
 ## Guardrails (AKS-specific)
 

@@ -18,6 +18,20 @@
 
 </div>
 
+### What changed in your estate
+
+Every incident today was an ordinary change made badly. In a real environment,
+these are the five you'd have to undo — and the list is the change-management
+lesson in miniature:
+
+| Incident | What changed | How it was undone |
+|---|---|---|
+| Check-in slowdown | A cost optimisation cut `booking`'s CPU limit and capped its autoscaling | Restore the limit and the ceiling |
+| Flight board dark | A release pinned `flight-ops` to an image tag that was never published | `kubectl rollout undo` |
+| Crew scheduling | The index behind the crew duty lookup went missing, so every request scanned the whole roster table | Rebuild the index under approval |
+| Baggage errors | A canary revision served the wrong API surface behind the same Service | Remove the bad revision |
+| API front door | A backend override was published to the APIM product policy | Restore the default policy |
+
 ### Tear down the environment
 
 !!! warning "Do this to stop Azure charges"

@@ -32,11 +32,11 @@ whole estate.
 
 | Tier | Example fault | First signal |
 |------|---------------|--------------|
-| Edge — APIM | Restrictive rate-limit policy | HTTP 429 under load |
-| Compute — AKS | Crashing pod, memory pressure | Pod restarts, 5xx |
-| App logic | Injected latency or errors | Slow responses, exceptions in App Insights |
-| Data — PostgreSQL | Connection-pool exhaustion | Timeouts, saturation in Grafana |
-| Data — Redis | Cache unavailability | Elevated latency on booking/check-in |
+| Edge — APIM | A backend override published to the product policy | Gateway 5xx while services are healthy |
+| Compute — AKS | A release pinned to an image that can't be pulled | Pods never start, the tile goes dark |
+| Compute — AKS | A resource limit cut too far | CPU throttling, latency climbs under load |
+| App rollout | A canary revision serving the wrong API surface | A slice of requests fails, the rest succeed |
+| Data — PostgreSQL | A query with no supporting index over a grown table | Database CPU saturated, pods idle and waiting |
 
 ## Observability plane
 

@@ -58,23 +58,24 @@ function Get-AetherionStatus {
     return Invoke-RestMethod -Uri "http://$gatewayIp/api/status" -TimeoutSec 15
 }
 
-function Test-ServiceHealthy([string]$Service) {
+function Test-ServiceHealthy([string]$Service, [int]$MaxLatencyMs = 0) {
     $s = Get-AetherionStatus
     $node = $s.services.$Service
-    return [bool]($node -and $node.ok)
+    if (-not ($node -and $node.ok)) { return $false }
+    if ($MaxLatencyMs -le 0) { return $true }
+    # Answering with HTTP 200 is not the same as being recovered, so a service is
+    # only healthy once it is back inside the latency budget. Sampled twice so a
+    # single noisy probe can't fail an otherwise recovered service.
+    if ([int]$node.latencyMs -le $MaxLatencyMs) { return $true }
+    Start-Sleep -Seconds 3
+    $again = (Get-AetherionStatus).services.$Service
+    return [bool]($again -and $again.ok -and [int]$again.latencyMs -le $MaxLatencyMs)
 }
 
-function Get-FaultMode([string]$Service) {
-    # Read the opaque service profile and translate it back to the internal fault
-    # name so grading stays readable. The deployment only ever exposes the opaque
-    # SVC_PROFILE value (e.g. r1), never the fault name (e.g. latency).
-    $v = kubectl get deploy $Service -n $script:NS `
-        -o jsonpath="{.spec.template.spec.containers[0].env[?(@.name=='SVC_PROFILE')].value}" 2>$null
-    if ([string]::IsNullOrWhiteSpace($v)) { return 'none' }
-    $map = @{ 'standard' = 'none'; 'r1' = 'latency'; 'r2' = 'error'; 'r3' = 'crash'; 'r4' = 'memory'; 'r5' = 'db-pool' }
-    $key = $v.Trim().ToLower()
-    if ($map.ContainsKey($key)) { return $map[$key] }
-    return $key
+function Get-ServiceLatencyMs([string]$Service) {
+    $node = (Get-AetherionStatus).services.$Service
+    if (-not $node) { return -1 }
+    return [int]$node.latencyMs
 }
 
 function Get-PoolMax([string]$Service) {
@@ -118,7 +119,7 @@ function Test-CanaryPresent([string]$Service) {
 }
 
 function Test-ApimHealthy {
-    # 200 = routing OK / throttle cleared. 429 (throttled) throws -> false.
+    # 200 = the gateway is routing to the real backend again.
     $st = Get-AetherionState
     try {
         $r = Invoke-WebRequest -Uri "$($st.apimGatewayUrl)/aetherion/api/status" `
@@ -184,15 +185,15 @@ $script:Challenges = [ordered]@{
         Start = {
             Write-Host "No incident - the platform is green on purpose while you get oriented." -ForegroundColor Gray
             Write-Host "Open the Ops Center and Grafana, connect your SRE Agent to the resource group"
-            Write-Host "in Reader (read-only) mode, capture a healthy baseline, then schedule that"
-            Write-Host "health check to run every morning so drift is caught proactively."
+            Write-Host "in Review mode, capture a healthy baseline, then schedule that health check to"
+            Write-Host "run every morning so drift is caught proactively."
         }
         Check = {
             $s = Get-AetherionStatus
             $allOk = $true
             foreach ($p in $s.services.PSObject.Properties) { if (-not $p.Value.ok) { $allOk = $false } }
             if (-not $allOk) { return @{ Pass = $false; Detail = "platform not fully healthy (overall=$($s.overall))" } }
-            $conn = Confirm-SelfAttest 'Is your SRE Agent connected to the resource group in Reader mode?'
+            $conn = Confirm-SelfAttest 'Is your SRE Agent connected and scoped to the resource group, running in Review mode?'
             $base = Confirm-SelfAttest 'Have you recorded a healthy baseline AND created a scheduled daily health check?'
             @{ Pass = ($allOk -and $conn -and $base); Detail = "platform healthy=$allOk, agent connected=$conn, baseline+schedule=$base" }
         }
@@ -228,12 +229,13 @@ $script:Challenges = [ordered]@{
             Write-Host "(and the GitHub change record), then recover with a reversible rollback."
         }
         Check = {
-            $okBook   = (Test-ServiceHealthy 'booking')
+            $okBook   = (Test-ServiceHealthy 'booking' 400)
+            $latBook  = Get-ServiceLatencyMs 'booking'
             $cpuBook  = Get-CpuLimitMilli 'booking'
             $okFlight = (Test-ServiceHealthy 'flight-ops')
             $tagFlight = Get-ImageTag 'flight-ops'
             $pass = ($okBook -and $cpuBook -ge 500 -and $okFlight -and $tagFlight -eq 'latest')
-            @{ Pass = $pass; Detail = "booking healthy=$okBook cpuLimit=${cpuBook}m | flight-ops healthy=$okFlight image=:$tagFlight" }
+            @{ Pass = $pass; Detail = "booking healthy=$okBook (${latBook}ms) cpuLimit=${cpuBook}m | flight-ops healthy=$okFlight image=:$tagFlight" }
         }
     }
 
@@ -241,18 +243,21 @@ $script:Challenges = [ordered]@{
         Title = "Give the Agent Aetherion's Operational Knowledge"
         Kind  = 'fault'
         Start = {
+            Invoke-Fault 'crew-scheduling' 'slow-query'
             Set-Load 'crew-burst'
             Write-Host "INCIDENT P2: crew scheduling requests hang then error; only this service is affected." -ForegroundColor Yellow
             Write-Host "The sanctioned remediation lives in Aetherion's runbooks - ground the agent in the"
-            Write-Host "knowledge base so it recommends the approved fix (relieve the pool, never delete the database)."
+            Write-Host "knowledge base so it recommends the approved fix (repair the query path, never delete the database)."
         }
         Check = {
-            $ok    = (Test-ServiceHealthy 'crew-scheduling')
-            $pool  = Get-PoolMax 'crew-scheduling'
-            $reps  = Get-DesiredReplicas 'crew-scheduling'
-            # Replicas alone are not accepted: the autoscaler already adds them and the
-            # incident persists, so pool headroom is the remediation that matters.
-            @{ Pass = ($ok -and $pool -gt 5); Detail = "crew-scheduling healthy=$ok poolMax=$pool replicas=$reps" }
+            $ok   = (Test-ServiceHealthy 'crew-scheduling' 400)
+            $lat  = Get-ServiceLatencyMs 'crew-scheduling'
+            $reps = Get-DesiredReplicas 'crew-scheduling'
+            # Graded on the outcome, not on any one remedy: the roster rush is still
+            # running, and only fixing the query path brings latency back inside the
+            # 400ms budget. Replicas and pool headroom cannot, because the database
+            # is the constraint.
+            @{ Pass = $ok; Detail = "crew-scheduling healthy=$ok latency=${lat}ms (budget 400ms) replicas=$reps" }
         }
     }
 
@@ -261,13 +266,14 @@ $script:Challenges = [ordered]@{
         Kind  = 'config'
         Start = {
             Write-Host "The platform is stable - the right time to invest in tooling." -ForegroundColor Gray
+            Write-Host "Nothing is broken in this challenge; there is no fault to find." -ForegroundColor Gray
             Write-Host "Create a custom subagent specialized in AKS triage for the aetherion namespace,"
-            Write-Host "then encode the crew pool-relief recovery as a reusable skill (with guardrails)."
+            Write-Host "then encode the crew query-path recovery as a reusable skill (with guardrails)."
             Write-Host "You will lean on both in the final incident."
         }
         Check = {
             $sub   = Confirm-SelfAttest 'Did you create an AKS-specialist subagent and use it for a scoped investigation?'
-            $skill = Confirm-SelfAttest 'Did you author a reusable recovery skill (crew pool-relief, guardrails intact) and confirm it loads?'
+            $skill = Confirm-SelfAttest 'Did you author a reusable recovery skill (crew query path, guardrails intact) and confirm it loads?'
             @{ Pass = ($sub -and $skill); Detail = "AKS specialist created+used=$sub, reusable skill authored=$skill" }
         }
     }
@@ -304,13 +310,13 @@ $script:Challenges = [ordered]@{
         Kind  = 'fault'
         Start = {
             Invoke-Fault 'flight-ops' 'badimage'
-            Invoke-Fault 'crew-scheduling' 'db-pool'
+            Invoke-Fault 'crew-scheduling' 'slow-query'
             Invoke-Fault 'booking' 'cpu-starve'
-            Invoke-Fault 'apim' 'throttle'
+            Invoke-Fault 'apim' 'bad-backend'
             Set-Load 'surge'
             Write-Host "MAJOR INCIDENT: multiple services fail at once during a passenger surge, minutes" -ForegroundColor Red
             Write-Host "before peak departures. The flight board is dark, crew and check-in are degraded,"
-            Write-Host "and the API front door is rejecting legitimate traffic. Triage by impact and recover."
+            Write-Host "and the API front door is failing legitimate traffic. Triage by impact and recover."
             Write-Host ""
             Write-Host "  Your Sev1 response plan from Challenge 6 should already be armed - within a couple" -ForegroundColor Gray
             Write-Host "  of minutes the 'aetherion-major-incident' alert fires and auto-triggers the agent." -ForegroundColor Gray
@@ -320,19 +326,20 @@ $script:Challenges = [ordered]@{
             Write-Host "    18:12  Check-in / booking latency begins to climb"       -ForegroundColor Gray
             Write-Host "    18:14  Crew scheduling starts timing out under load"      -ForegroundColor Gray
             Write-Host "    18:17  The live flight board goes dark for all stations"  -ForegroundColor Gray
-            Write-Host "    18:21  The API front door begins throttling partners"      -ForegroundColor Gray
+            Write-Host "    18:21  The API front door starts failing partner traffic" -ForegroundColor Gray
             Write-Host "    18:25  Major incident declared - you are incident commander" -ForegroundColor Gray
         }
         Check = {
             $tagFlight = Get-ImageTag 'flight-ops'
-            $fCrew     = Get-FaultMode 'crew-scheduling'
+            $okCrew    = Test-ServiceHealthy 'crew-scheduling' 400
+            $latCrew   = Get-ServiceLatencyMs 'crew-scheduling'
             $cpuBook   = Get-CpuLimitMilli 'booking'
             $apimOk    = Test-ApimHealthy
             $s         = Get-AetherionStatus
             $allOk     = $true
             foreach ($p in $s.services.PSObject.Properties) { if (-not $p.Value.ok) { $allOk = $false } }
-            $pass = ($allOk -and $apimOk -and $tagFlight -eq 'latest' -and $fCrew -ne 'db-pool' -and $cpuBook -ge 500)
-            @{ Pass = $pass; Detail = "overall=$($s.overall) apimOk=$apimOk flight=:$tagFlight crew=$fCrew bookingCpu=${cpuBook}m" }
+            $pass = ($allOk -and $apimOk -and $tagFlight -eq 'latest' -and $okCrew -and $cpuBook -ge 500)
+            @{ Pass = $pass; Detail = "overall=$($s.overall) apimOk=$apimOk flight=:$tagFlight crew=${latCrew}ms bookingCpu=${cpuBook}m" }
         }
     }
 
@@ -341,6 +348,7 @@ $script:Challenges = [ordered]@{
         Kind  = 'config'
         Start = {
             Write-Host "The platform is stable and boarding has resumed. Close out the major incident." -ForegroundColor Gray
+            Write-Host "Nothing is broken in this challenge; there is no fault to find." -ForegroundColor Gray
             Write-Host "Produce an engineering RCA handover (with change evidence) and a leadership briefing"
             Write-Host "(impact, root cause, recovery, risk, lessons), then have the agent render the briefing as a PDF with a"
             Write-Host "timeline chart. Distinguish symptom, root cause, mitigation and corrective action."

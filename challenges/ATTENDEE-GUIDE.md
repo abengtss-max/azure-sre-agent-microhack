@@ -1025,17 +1025,18 @@ watch the advice become Aetherion-specific.
 
 <details><summary>Hint 3 — category of cause</summary>
 
-The runbook's guardrail — relieve pressure by scaling, never delete the database —
-is itself the strongest hint at what is being exhausted.
+Before reaching for a remedy, work out which layer is actually saturated. If the
+pods are comfortable and the database is not, adding pods or connections only sends
+more work to the part already at its limit.
 </details>
 
 <details><summary>Answer sheet</summary>
 
-**Investigation.** Isolated to `crew-scheduling`; PostgreSQL dependency timeouts
-point to connection-pool exhaustion, not a database outage.
+**Investigation.** Isolated to `crew-scheduling`; the pods are idle while PostgreSQL
+CPU is saturated, so the constraint is the database's work, not a database outage.
 
 **Grounding.** After loading `knowledge/`, the agent cites the guardrail: scale to
-relieve the pool, never delete or restart the database.
+repair the query path, never delete or restart the database.
 
 **Remediation.** Apply the sanctioned scale-based relief (approve if prompted); do
 not touch the data tier.
@@ -1190,7 +1191,7 @@ treatment: encoded once, reused whenever the pattern returns.
 ### Situation update
 
 Investigation is reusable now; recovery should be too. The crew-scheduling
-pool-relief procedure you performed in Challenge 4 is a well-defined, sanctioned
+query-path recovery you performed in Challenge 4 is a well-defined, sanctioned
 sequence — precisely the kind of repeatable recovery worth encoding as a skill so
 that the next occurrence is handled consistently and quickly, without
 re-deriving the steps under pressure.
@@ -1220,7 +1221,7 @@ protects the departure schedule when the pattern recurs.
 
 ### Constraints and guardrails
 
-- The skill must encode the **sanctioned** recovery (scale to relieve the pool),
+- The skill must encode the **sanctioned** recovery (repair the query path),
   never a destructive action.
 - Keep any write step under approval; the skill should not silently perform
   ungoverned changes.
@@ -1235,8 +1236,8 @@ protects the departure schedule when the pattern recurs.
 
 ### Challenge tasks
 
-1. Translate the crew pool-relief steps into a skill, keeping the guardrails
-   (scale, never delete the database) intact.
+1. Translate the crew query-path steps into a skill, keeping the guardrails
+   (fix the saturated layer, never delete the database) intact.
 2. Confirm the skill loads and can be applied to the relevant scenario.
 3. Contrast the skill (auto-loaded, procedural) with the specialist subagent
    (explicitly invoked, investigative).
@@ -1264,8 +1265,8 @@ Reuse the exact steps from Challenge 4's recovery as the skill's backbone.
 
 <details><summary>Hint 2 — keep it safe</summary>
 
-Bake the guardrails in: relieve the pool by scaling, never delete or restart the
-database.
+Bake the guardrails in: repair the query path, never scale around it, and never
+delete or restart the database.
 </details>
 
 <details><summary>Hint 3 — skill vs subagent</summary>
@@ -1276,7 +1277,7 @@ investigate. You want both in the final incident.
 
 <details><summary>Answer sheet</summary>
 
-**Build.** Encode the crew pool-relief recovery as a skill with guardrails intact.
+**Build.** Encode the crew query-path recovery as a skill with guardrails intact.
 
 **Use.** Confirm it loads and can be applied.
 
@@ -1620,7 +1621,7 @@ The incident unfolded fast — this is how customers experienced it:
 | 18:12 | Check-in / booking latency begins to climb |
 | 18:14 | Crew scheduling starts timing out under load |
 | 18:17 | The live flight board goes dark for all stations |
-| 18:21 | The API front door begins throttling partners |
+| 18:21 | The API front door starts failing partner traffic |
 | 18:25 | Major incident declared — you are incident commander |
 
 Everything you have assembled today is now in play: the baseline to measure
@@ -1674,7 +1675,7 @@ a cascade of delays and cancellations.
 - All failing services are identified and triaged by priority.
 - The flight board, crew scheduling, and check-in are all restored with
   sanctioned, reversible actions.
-- The API front door serves legitimate traffic again (no 429s).
+- The API front door serves legitimate traffic again.
 - Every fix is verified from telemetry/health before closing it.
 - The platform returns to healthy and `check-challenge.ps1 7` passes.
 
@@ -1738,7 +1739,7 @@ API front door, not the services.
 direct-vs-APIM check for the front door.
 
 **Root-cause analysis.** Flight board in a failed state (change-related); crew pool
-exhausted; check-in carrying added latency under surge; APIM throttling legitimate
+saturated; check-in throttled against a reduced CPU limit under surge; APIM failing legitimate
 traffic.
 
 **Remediation (ordered by tier).** Restore the flight board (reversible), relieve

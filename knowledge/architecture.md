@@ -31,7 +31,7 @@ Azure API Management               Envoy Gateway (Gateway API) + HTTPS
    └── telemetry-ingest   (aircraft/ground telemetry -> PostgreSQL)
    │
    ├── Azure Database for PostgreSQL Flexible Server (Burstable B2s, db: aetherion)
-   └── Azure Managed Redis (Redis Enterprise, Balanced B1, TLS 10000) - check-in/session state
+    └── Redis (in-cluster, namespace `aetherion`) - check-in/session state
 ```
 
 Two front doors sit in front of the cluster:
@@ -52,7 +52,7 @@ Two front doors sit in front of the cluster:
 | Compute | AKS `aetherion-aks` (namespace `aetherion`) | Runs all microservices |
 | Registry | ACR `aetherionacr*` | Holds `aetherion-airops:latest` |
 | Relational DB | PostgreSQL Flexible Server `aetherion-pg-*` | Flights, crew, bookings |
-| Cache | Azure Managed Redis `aetherion-redis-*` (Redis Enterprise, Balanced B1) | Check-in/session state, TLS port 10000 |
+| Cache | Redis (in-cluster Deployment + Service, namespace `aetherion`) | Check-in/session state |
 | Telemetry | Application Insights `aetherion-appi` | App traces/metrics/logs |
 | Logs | Log Analytics `aetherion-law` | Central log store (AKS + AppInsights) |
 | Dashboards | Managed Grafana `aetherion-grafana-*` | Azure Monitor data source |
@@ -60,8 +60,7 @@ Two front doors sit in front of the cluster:
 ## Microservice roles
 
 All services run from **one image** (`aetherion-airops:latest`) with behaviour
-selected by the `ROLE` environment variable. Each deployment carries a
-`SVC_PROFILE` env var used only in this teaching environment to simulate incidents.
+selected by the `ROLE` environment variable.
 
 | Service | ROLE | Key endpoints | Depends on |
 |---------|------|---------------|-----------|

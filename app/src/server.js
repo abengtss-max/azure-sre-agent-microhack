@@ -9,89 +9,25 @@ const redisLib = require('./lib/redis');
 const ROLE = (process.env.ROLE || 'gateway').toLowerCase();
 const PORT = parseInt(process.env.PORT || '8080', 10);
 
-// Service behaviour profile. Operations sets this per deployment to select the
-// service tier the workload runs under.
-//   SVC_PROFILE = standard | r1 | r2 | r3 | r4 | r5
-const PROFILE_FAULT = {
-  standard: 'none',
-  r1: 'latency',
-  r2: 'error',
-  r3: 'crash',
-  r4: 'memory',
-  r5: 'db-pool',
-};
-const SVC_PROFILE = (process.env.SVC_PROFILE || 'standard').toLowerCase();
-const SERVICE_MODE = PROFILE_FAULT[SVC_PROFILE] || 'none';
-const FAULT_LATENCY_MS = parseInt(process.env.PROFILE_DELAY_MS || '2500', 10);
-const FAULT_ERROR_RATE = parseFloat(process.env.PROFILE_ERR_RATE || '0.5');
-
 initTelemetry(ROLE);
 
 const app = express();
 app.use(express.json());
 
-// Simulated memory leak store (only grows under profile r4)
-const leakedMemory = [];
-// Leaked DB clients (only grows under profile r5) - never released
-const leakedDbClients = [];
 let started = Date.now();
 let requestCount = 0;
 
-function sleep(ms) {
-  return new Promise((r) => setTimeout(r, ms));
-}
-
-// Applies the active fault to a domain request. Returns true if the request
-// was already handled (e.g. error response) and the caller should stop.
-async function applyFault(req, res) {
+app.use((req, res, next) => {
   requestCount++;
-  switch (SERVICE_MODE) {
-    case 'latency':
-      await sleep(FAULT_LATENCY_MS);
-      return false;
-    case 'error':
-      if (Math.random() < FAULT_ERROR_RATE) {
-        res.status(500).json({ error: 'Internal Server Error', role: ROLE });
-        return true;
-      }
-      return false;
-    case 'memory':
-      // Allocate ~5MB per request and hold onto it
-      leakedMemory.push(Buffer.alloc(5 * 1024 * 1024, 1));
-      return false;
-    case 'db-pool': {
-      // Leak a pooled connection each request until the pool is exhausted,
-      // after which connection acquisition times out and requests fail.
-      const pool = db.getPool();
-      if (pool) {
-        try {
-          const client = await pool.connect(); // intentionally never released
-          leakedDbClients.push(client);
-        } catch (err) {
-          res.status(503).json({ error: 'Database connection pool exhausted', role: ROLE });
-          return true;
-        }
-      }
-      return false;
-    }
-    default:
-      return false;
-  }
-}
+  next();
+});
 
 // ---- Health probes -------------------------------------------------------
 app.get('/health/live', (req, res) => {
-  // Liveness fails under the crash profile so Kubernetes restarts the pod.
-  if (SERVICE_MODE === 'crash') {
-    return res.status(500).json({ status: 'unhealthy', reason: 'liveness check failed' });
-  }
   res.json({ status: 'alive', role: ROLE, uptimeSec: Math.round((Date.now() - started) / 1000) });
 });
 
 app.get('/health/ready', async (req, res) => {
-  if (SERVICE_MODE === 'crash') {
-    return res.status(503).json({ status: 'not-ready', reason: 'startup checks incomplete' });
-  }
   // crew-scheduling/booking/telemetry depend on the database
   if (['crew-scheduling', 'booking', 'telemetry-ingest'].includes(ROLE) && db.isConfigured()) {
     try {
@@ -113,7 +49,6 @@ function registerRoleRoutes() {
   switch (ROLE) {
     case 'flight-ops':
       app.get('/api/flights', async (req, res) => {
-        if (await applyFault(req, res)) return;
         try {
           const pool = db.getPool();
           const { rows } = pool
@@ -128,7 +63,6 @@ function registerRoleRoutes() {
 
     case 'crew-scheduling':
       app.get('/api/crew', async (req, res) => {
-        if (await applyFault(req, res)) return;
         try {
           const pool = db.getPool();
           const { rows } = await pool.query(
@@ -147,7 +81,6 @@ function registerRoleRoutes() {
 
     case 'booking':
       app.post('/api/book', async (req, res) => {
-        if (await applyFault(req, res)) return;
         try {
           const pnr = 'PNR' + Math.random().toString(36).slice(2, 8).toUpperCase();
           const passenger = (req.body && req.body.passenger) || 'Traveler';
@@ -166,7 +99,6 @@ function registerRoleRoutes() {
         }
       });
       app.get('/api/bookings/count', async (req, res) => {
-        if (await applyFault(req, res)) return;
         try {
           const pool = db.getPool();
           const { rows } = pool ? await pool.query('SELECT count(*)::int AS c FROM bookings') : { rows: [{ c: 0 }] };
@@ -179,14 +111,12 @@ function registerRoleRoutes() {
 
     case 'baggage':
       app.get('/api/baggage/throughput', async (req, res) => {
-        if (await applyFault(req, res)) return;
         res.json({ bagsPerMinute: 400 + Math.floor(Math.random() * 200), inTransit: Math.floor(Math.random() * 5000) });
       });
       break;
 
     case 'telemetry-ingest':
       app.post('/api/telemetry', async (req, res) => {
-        if (await applyFault(req, res)) return;
         trackMetric('aircraft_telemetry_events', 1);
         res.json({ accepted: true, ts: Date.now() });
       });
@@ -301,7 +231,6 @@ function registerGatewayRoutes() {
   }
 
   app.get('/api/status', async (req, res) => {
-    if (await applyFault(req, res)) return;
     const entries = await Promise.all(
       Object.entries(services).map(async ([name, url]) => [name, await probe(url, PROBES[name])])
     );

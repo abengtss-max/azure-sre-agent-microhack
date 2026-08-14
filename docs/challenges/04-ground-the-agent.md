@@ -1,7 +1,7 @@
 # Challenge 4 · Give the Agent Aetherion's Operational Knowledge
 
 !!! abstract "Challenge 04 of 08 · Act II: Human-Guided Operations"
-    **Run mode:** Review → approved write · **Access:** scoped write on approval
+    **Run mode:** Review → approved write · **Governance:** every action approved by you
 
     **Stage:** Foundation → **Operations** → Engineering → Autonomous → Major Incident
 
@@ -20,8 +20,8 @@ non-destructive remediation and verify service is restored.
 <div class="grid cards why-cards" markdown>
 
 - :material-book-open-variant: **Ground the agent**: load Aetherion's runbooks and architecture
-- :material-target: **Right layer, right fix**: one service down is not the database down
-- :material-shield-alert-outline: **Respect guardrails**: relieve the pool, never delete the database
+- :material-target: **Right layer, right fix**: scaling the wrong tier cannot fix a saturated one
+- :material-shield-alert-outline: **Respect guardrails**: repair the query path, never delete the database
 - :material-account-clock-outline: **Legal to fly**: restore crew scheduling before the evening wave
 
 </div>
@@ -36,23 +36,24 @@ non-destructive remediation and verify service is restored.
 
 1. **Confirm the blast radius.** Check that only `crew-scheduling` is down. One red service isn't the whole database failing.
 2. **Ground the agent.** Load Aetherion's `knowledge/` runbooks, then re-ask the remediation question and watch the advice change.
-3. **Apply the sanctioned fix.** Relieve the connection pool (never delete the database), then confirm crew scheduling recovers.
+3. **Apply the sanctioned fix.** Repair the query path the runbook points to (never delete the database), then confirm crew scheduling recovers.
 
 ![Challenge 4 storyboard: Marco, Sam and Aria ground the agent in Aetherion's runbooks](../assets/storyboard/img-challenge-4.webp){ .story-panel loading=lazy }
 
 ### Suggested Azure SRE Agent prompt
 
 !!! quote "Paste into the agent chat"
-    Given `crew-scheduling` is failing on PostgreSQL dependency timeouts while its
-    database-backed peers stay healthy, and using the Aetherion runbooks I've
-    loaded: what is the sanctioned remediation? Cite the guardrail and give me a
-    plan I can approve. Do not delete or restart the database.
+    `crew-scheduling` is timing out on its database calls while its database-backed
+    peers stay healthy, and the pods themselves are not CPU-bound. Using the
+    Aetherion runbooks I've loaded: what is the sanctioned remediation? Cite the
+    guardrail and give me a plan I can approve. Do not delete or restart the
+    database.
 
 ### Success criteria
 
-- Only `crew-scheduling` is identified as affected.
-- The grounded agent cites the runbook guardrail (relieve the pool, never delete the database) and you apply that non-destructive fix.
-- The tile is green, `/api/crew` recovers, and `check-challenge.ps1 4` passes.
+- Only `crew-scheduling` is identified as affected, and you can say **which layer** is saturated.
+- The grounded agent cites the runbook guardrail (repair the query path, never delete the database) and you apply that non-destructive fix under approval.
+- `/api/crew` is back **inside the 400 ms latency budget while the roster rush is still running** — that is what `check-challenge.ps1 4` grades. A tile that is merely answering again is not a pass.
 
 !!! success "Verify your work"
 
@@ -73,9 +74,11 @@ rules out a whole-database outage. The problem is local to one service.
 <details markdown="1"><summary>Hint: let the runbooks answer</summary>
 
 Load the `knowledge/` Markdown files from your **lab clone** (the application fork
-doesn't carry them), then re-ask and watch the advice turn Aetherion-specific. The
-runbook guardrail (relieve pressure before killing sessions, never delete the
-database) hints at what's being exhausted.
+doesn't carry them), then re-ask and watch the advice turn Aetherion-specific.
+
+Before you reach for a remedy, work out **which layer is saturated**. If the pods
+are comfortable and the database is not, adding pods or connections just sends more
+work to the part that is already at its limit.
 </details>
 
 !!! question "Stuck? Step-by-step for each task"
@@ -86,7 +89,11 @@ database) hints at what's being exhausted.
         - Read the Operations Center: is **only** `crew-scheduling` red, or are its
           database-backed peers (`booking`, `telemetry-ingest`) failing too?
         - If just one service is down, a whole-database outage is ruled out, so the
-          fault is local to that service.
+          fault is local to that service's workload — or to what that workload asks
+          the database to do.
+        - Compare the two layers: pod CPU (`kubectl top pods -n aetherion`) against
+          the PostgreSQL server's CPU in the portal. They will not agree, and the
+          disagreement is the finding.
 
     ??? note "Task 2 · Ground the agent"
         - In the agent, open **Builder → Knowledge Sources** and add Aetherion's
@@ -99,12 +106,14 @@ database) hints at what's being exhausted.
           runbook** instead of generic guidance.
 
     ??? note "Task 3 · Apply the sanctioned fix"
-        - Follow the runbook: **relieve the pool** (raise the pool headroom the
-          service runs with). Do **not** delete or restart the database.
-        - Note that the autoscaler has already added replicas and the incident is
-          still there, which tells you where the real limit is.
-        - Apply it under approval (keep the agent in **Review** and approve the
-          write), then verify `/api/crew` recovers and the tile goes green.
+        - Follow the runbook: **repair the query path**. Do **not** delete or restart
+          the database.
+        - Note what the autoscaler is doing. It is not adding replicas, because pod
+          CPU is below target — the pods are waiting, not working. That rules out
+          scaling as the remedy, and widening the connection pool with it.
+        - The remedy is a schema change, so apply it under approval (keep the agent
+          in **Review** and approve the write). Then verify `/api/crew` is fast
+          again, not merely answering.
 
 ### Reference
 

@@ -2,8 +2,8 @@
 
 const { Pool } = require('pg');
 
-// A small connection pool. The pool max is deliberately small so the
-// "db-pool" fault (leaking connections) exhausts it quickly and visibly.
+// A small connection pool, sized per pod. Services run several replicas, so the
+// per-pod value is deliberately conservative.
 const POOL_MAX = parseInt(process.env.PG_POOL_MAX || '5', 10);
 
 let pool = null;

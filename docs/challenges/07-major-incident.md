@@ -1,13 +1,13 @@
 # Challenge 7 · Final Incident: Restore Global Check-In Before Peak Departure
 
 !!! abstract "Challenge 07 of 08 · Act V: Major Incident"
-    **Run mode:** Review + bounded automation · **Access:** scoped write
+    **Run mode:** Review + bounded automation · **Governance:** you decide what is approved and what is automated
 
     **Stage:** Foundation → Operations → Engineering → Autonomous → **Major Incident**
 
 **Situation.** Minutes before peak departures, several services fail together under
 a passenger surge: the flight board is dark, crew scheduling is timing out, check-in
-has slowed to a crawl, and the API front door is turning away legitimate partner and
+has slowed to a crawl, and the API front door is failing legitimate partner and
 mobile traffic. The risk gauge is pinned. Everything you built today is now in play.
 
 | Time | Event |
@@ -16,7 +16,7 @@ mobile traffic. The risk gauge is pinned. Everything you built today is now in p
 | 18:12 | Check-in / booking latency begins to climb |
 | 18:14 | Crew scheduling starts timing out under load |
 | 18:17 | The live flight board goes dark for all stations |
-| 18:21 | The API front door begins throttling partners |
+| 18:21 | The API front door starts failing partner traffic |
 | 18:25 | Major incident declared. You are incident commander |
 
 **Mission.** Bring Aetherion AirOps back to full health before peak departure:
@@ -29,7 +29,7 @@ approved or bounded actions, and verify recovery service by service.
 
 - :material-clipboard-list-outline: **Triage by impact**: order by business tier, not the loudest alert
 - :material-history: **Agent memory**: recall the earlier RCA to resolve faster
-- :material-account-group-outline: **Delegate & reuse**: your specialist subagent and crew-pool skill
+- :material-account-group-outline: **Delegate & reuse**: your specialist subagent and crew recovery skill
 - :material-check-all: **Verify each fix**: service by service, back to green
 
 </div>
@@ -45,9 +45,19 @@ approved or bounded actions, and verify recovery service by service.
 1. **Confirm the Sev1 plan is live.** Check the response plan from Challenge 6 is active so the alert auto-triggers. If you skipped it, create it **before** you start.
 2. **Read the whole board.** Order the work by business impact (situational awareness and legal-to-fly first), not the loudest alert.
 3. **Check the agent's memory.** Ask whether a similar incident has happened and let session insights surface the earlier RCA.
-4. **Delegate and recover.** Hand AKS triage to your specialist subagent and reuse your crew-pool skill, keeping every action governed.
+4. **Delegate and recover.** Hand AKS triage to your specialist subagent and reuse your crew recovery skill, keeping every action governed.
 5. **Localize the front door.** Use the direct-vs-APIM comparison and treat the policy change as customer-facing.
 6. **Verify every service.** Confirm each fix from telemetry, then the whole platform back to green.
+
+!!! note "Why Sev1?"
+    The environment pre-provisions a fixed **Sev1** Azure Monitor alert
+    (`aetherion-major-incident`, on Application Insights failed requests). A response
+    plan matches incoming alerts **by severity**, so your filter must be `Sev1` to
+    catch it; a broader filter fires on everything, a mismatched one catches nothing.
+
+    The plan shapes the *experience*, not the grade: `check-challenge.ps1 7` marks
+    the platform's end state, so you can still pass without it — you'll just have
+    driven the whole incident by hand.
 
 ![Challenge 7 storyboard: Sam, Aria and Elena restore global check-in before peak departure](../assets/storyboard/img-challenge-7.webp){ .story-panel loading=lazy }
 
@@ -60,16 +70,10 @@ approved or bounded actions, and verify recovery service by service.
     seen a similar crew-scheduling / check-in incident before. Pull the earlier RCA
     from session memory.
 
-!!! note "Why Sev1?"
-    The environment pre-provisions a fixed **Sev1** Azure Monitor alert
-    (`aetherion-major-incident`, on Application Insights failed requests). A response
-    plan matches incoming alerts **by severity**, so your filter must be `Sev1` to
-    catch it; a broader filter fires on everything, a mismatched one catches nothing.
-
 ### Success criteria
 
 - All failing services are triaged by priority and restored with sanctioned, reversible actions.
-- The API front door serves legitimate traffic again (no 429s), and every fix is verified from telemetry/health before closing.
+- The API front door serves legitimate traffic again, and every fix is verified from telemetry/health before closing.
 - The platform is healthy and `check-challenge.ps1 7` passes.
 
 !!! success "Verify your work"
@@ -86,7 +90,7 @@ approved or bounded actions, and verify recovery service by service.
 
 Don't fix the first red tile you see; read the whole board and order by business
 tier. You've solved every one of these failure classes already: delegate AKS triage
-to your specialist and apply your crew-pool skill.
+to your specialist and apply your crew recovery skill.
 </details>
 
 <details markdown="1"><summary>Hint: is it the service, or the front door?</summary>
@@ -118,15 +122,16 @@ customer-facing.
 
     ??? note "Task 4 · Delegate and recover"
         - Invoke your **AKS specialist subagent** for pod / rollout triage, and apply
-          your **crew-pool skill** for the sanctioned recovery.
-        - Keep actions governed (approval or a scoped role) and follow the runbooks:
-          scale to relieve pressure, never delete the database.
+          your **crew recovery skill** for the sanctioned recovery — crew is failing
+          the same way it did in Challenge 4, so the skill should carry.
+        - Keep actions governed and follow the runbooks: fix the layer that is
+          actually saturated, never delete the database.
 
     ??? note "Task 5 · Localize the front door"
         - Compare backend health **directly** (`http://<gateway-ip>/api/status`)
-          against the same call **through APIM**. If direct is 200 but APIM returns
-          429, the fault is the **edge policy**, not the service; treat the change as
-          customer-facing.
+          against the same call **through APIM**. If direct returns 200 but APIM
+          fails, the fault is the **edge policy**, not the service; treat the change
+          as customer-facing.
 
     ??? note "Task 6 · Verify every service"
         - Confirm each fix from telemetry / health before closing, then check the

@@ -2,15 +2,14 @@
 # Aetherion AirOps - inject a failure for a MicroHack challenge.
 #
 # Usage:
-#   ./inject-failure.ps1 -Service crew-scheduling -Fault db-pool
-#   ./inject-failure.ps1 -Service booking        -Fault latency
-#   ./inject-failure.ps1 -Service flight-ops     -Fault crash
-#   ./inject-failure.ps1 -Service apim           -Fault throttle
+#   ./inject-failure.ps1 -Service crew-scheduling -Fault slow-query
+#   ./inject-failure.ps1 -Service booking        -Fault cpu-starve
+#   ./inject-failure.ps1 -Service flight-ops     -Fault badimage
+#   ./inject-failure.ps1 -Service apim           -Fault bad-backend
 #
-# App behaviour is controlled by an opaque service profile so the deployment env
-# never names the fault. The mapping (kept in sync with app/src/server.js) is:
-#   standard=none  r1=latency  r2=error  r3=crash  r4=memory  r5=db-pool
-# Special target 'apim' applies a restrictive rate-limit policy instead.
+# The change faults leave no synthetic marker: each one is an ordinary operator
+# mistake applied the way a real one would be. The legacy profile faults are
+# retained for facilitator use only.
 
 param(
     [Parameter(Mandatory = $true)]
@@ -18,7 +17,7 @@ param(
     [string]$Service,
 
     [Parameter(Mandatory = $true)]
-    [ValidateSet("none", "latency", "error", "crash", "memory", "db-pool", "throttle", "badimage", "cpu-starve", "canary")]
+    [ValidateSet("bad-backend", "badimage", "cpu-starve", "canary", "slow-query")]
     [string]$Fault
 )
 
@@ -26,19 +25,23 @@ $ErrorActionPreference = "Stop"
 $ns = "aetherion"
 $envFile = Join-Path $PSScriptRoot ".env.aetherion.json"
 . (Join-Path $PSScriptRoot 'lib-apim.ps1')
+. (Join-Path $PSScriptRoot 'lib-dbjob.ps1')
 
 if ($Service -eq "apim") {
-    if ($Fault -ne "throttle") { throw "For service 'apim', only -Fault throttle is supported." }
+    if ($Fault -ne "bad-backend") { throw "For service 'apim', only -Fault bad-backend is supported." }
     if (-not (Test-Path $envFile)) { throw "State file not found. Deploy first." }
     $state = Get-Content $envFile -Raw | ConvertFrom-Json
 
-    $policy = '<policies><inbound><base /><rate-limit-by-key calls="5" renewal-period="60" counter-key="@(context.Subscription.Id)" /></inbound><backend><base /></backend><outbound><base /></outbound><on-error><base /></on-error></policies>'
-    Write-Host "Applying restrictive rate-limit (5 calls / 60s) on APIM product 'aetherion-ops'..." -ForegroundColor Yellow
+    # A backend override published to the product policy. The host does not
+    # resolve, so the gateway fails every call while the services behind it stay
+    # healthy - the signature of an edge-only outage.
+    $policy = '<policies><inbound><base /><set-backend-service base-url="http://aetherion-origin-v2.internal" /></inbound><backend><base /></backend><outbound><base /></outbound><on-error><base /></on-error></policies>'
+    Write-Host "Publishing backend override on APIM product 'aetherion-ops'..." -ForegroundColor Yellow
     if (Set-AetherionApimProductPolicy -ResourceGroup $state.resourceGroup -ApimName $state.apimName -PolicyXml $policy) {
-        Write-Host "APIM throttle injected. Expect HTTP 429 under load." -ForegroundColor Green
+        Write-Host "Backend override published. Expect gateway errors while the services stay healthy." -ForegroundColor Green
     }
     else {
-        throw "Failed to apply APIM throttle policy."
+        throw "Failed to publish the APIM backend override."
     }
     return
 }
@@ -63,7 +66,7 @@ if ($Fault -eq "badimage") {
 
 if ($Fault -eq "cpu-starve") {
     Write-Host "Applying tightened CPU limits to '$Service'..." -ForegroundColor Yellow
-    kubectl set resources deploy/$Service -n $ns -c $Service --requests=cpu=10m,memory=128Mi --limits=cpu=25m,memory=256Mi | Out-Null
+    kubectl set resources deploy/$Service -n $ns -c $Service --requests=cpu=10m,memory=128Mi --limits=cpu=50m,memory=256Mi | Out-Null
     kubectl annotate deploy/$Service -n $ns kubernetes.io/change-cause="cost optimisation: reduce cpu request/limit and cap autoscaling" --overwrite | Out-Null
     # The same cost-optimisation change caps how far the service may scale out,
     # so the autoscaler can no longer compensate for the smaller limit.
@@ -71,6 +74,20 @@ if ($Fault -eq "cpu-starve") {
     kubectl patch hpa $Service -n $ns --type=merge -p $hpaPatch 2>$null | Out-Null
     kubectl rollout status deploy/$Service -n $ns --timeout=120s
     Write-Host "CPU limits applied to '$Service'." -ForegroundColor Green
+    return
+}
+
+if ($Fault -eq "slow-query") {
+    # Removes the index behind the crew duty lookup, the way a maintenance script
+    # that rebuilds the roster table would. The query still returns correct data,
+    # it just falls back to scanning every retained duty record.
+    Write-Host "Dropping the crew roster duty index..." -ForegroundColor Yellow
+    if (Invoke-AetherionDbSql -Sql 'DROP INDEX IF EXISTS idx_crew_roster_duty;' -Name 'crew-roster-reindex') {
+        Write-Host "Crew duty lookup is now unindexed." -ForegroundColor Green
+    }
+    else {
+        throw "Failed to drop the crew roster index."
+    }
     return
 }
 
@@ -114,18 +131,4 @@ spec:
     return
 }
 
-# Map the internal fault name to the opaque profile the app actually reads.
-$profileFor = @{ 'none' = 'standard'; 'latency' = 'r1'; 'error' = 'r2'; 'crash' = 'r3'; 'memory' = 'r4'; 'db-pool' = 'r5' }
-$profile = $profileFor[$Fault]
-Write-Host "Setting service profile '$profile' on deployment '$Service'..." -ForegroundColor Yellow
-kubectl set env deploy/$Service -n $ns SVC_PROFILE=$profile
-if ($Fault -eq "crash") {
-    # A crash fault fails liveness/readiness by design, so the rollout never
-    # reaches Ready - don't block on `rollout status` (it would wait the full
-    # timeout). The service is meant to go down; give Kubernetes a moment.
-    Write-Host "Crash fault set - pods will fail health checks and the service goes down." -ForegroundColor Yellow
-    Start-Sleep -Seconds 5
-} else {
-    kubectl rollout status deploy/$Service -n $ns --timeout=120s
-}
-Write-Host "Fault '$Fault' injected into '$Service'." -ForegroundColor Green
+throw "Fault '$Fault' is not supported for service '$Service'. Use one of: badimage, cpu-starve, canary, slow-query (or bad-backend on apim)."

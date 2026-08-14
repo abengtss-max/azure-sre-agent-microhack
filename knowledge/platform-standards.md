@@ -24,10 +24,10 @@
    (or increase the connection pool) before terminating active sessions.
 4. **One change at a time.** Apply a single remediation, observe `/api/status`
    and Application Insights for 3-5 minutes, then decide the next step.
-5. **Prefer reversible actions.** Scaling replicas, resetting a service profile,
+5. **Prefer reversible actions.** Scaling replicas, rolling back a revision,
    and HPA changes are reversible and preferred over node or infra changes.
-6. **APIM policy changes are customer-facing.** Rate-limit / throttle policy
-   edits affect every caller; treat as high-impact and confirm before applying.
+6. **APIM policy changes are customer-facing.** Any policy edit affects every
+   caller; treat as high-impact and confirm before applying.
 
 ## Standard remediation ladder
 
@@ -36,7 +36,8 @@ For an unhealthy microservice, escalate in this order:
 2. Check readiness vs liveness - is it a dependency problem or the process?
 3. If a bad rollout: `kubectl rollout undo` to the last good revision.
 4. If resource pressure: scale replicas / let HPA react; check node capacity.
-5. If a clearly injected fault (this env): reset the service profile to `standard`.
+5. If a recent change reduced capacity or configuration: restore the previous
+   value rather than compensating around it.
 6. If a dependency (PostgreSQL/Redis): follow the matching runbook, do not delete.
 
 ## Naming & locations
@@ -51,5 +52,5 @@ For an unhealthy microservice, escalate in this order:
 
 - All six app deployments report `availableReplicas >= 1`.
 - `/api/status` returns HTTP 200 with every service `green` and latency < 400 ms.
-- APIM returns 200 (not 429) for `/aetherion/api/status` under normal load.
+- APIM returns 200 for `/aetherion/api/status` under normal load.
 - No sustained exception spike in Application Insights.

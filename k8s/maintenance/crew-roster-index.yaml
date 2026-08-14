@@ -1,0 +1,42 @@
+# Crew roster index maintenance.
+#
+# The crew duty lookup filters on `assigned` and returns the roster ordered by
+# flight and crew member. `crew_roster` retains every past season's duty
+# records, so without a supporting index that lookup degrades into a sequential
+# scan over the whole table and saturates the database under load.
+#
+# Run with `kubectl create -f` (not `apply`) so each run gets its own job name:
+#   kubectl create -f k8s/maintenance/crew-roster-index.yaml
+#
+# CREATE INDEX CONCURRENTLY keeps the table writable while the index is built.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  generateName: crew-roster-index-
+  namespace: aetherion
+  labels: { app: crew-scheduling, component: db-maintenance }
+spec:
+  backoffLimit: 2
+  ttlSecondsAfterFinished: 3600
+  template:
+    metadata:
+      labels: { app: crew-scheduling, component: db-maintenance }
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: psql
+          image: postgres:16-alpine
+          env:
+            - { name: PGHOST, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: PGHOST } } }
+            - { name: PGUSER, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: PGUSER } } }
+            - { name: PGPASSWORD, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: PGPASSWORD } } }
+            - { name: PGDATABASE, valueFrom: { configMapKeyRef: { name: aetherion-config, key: PGDATABASE } } }
+            - { name: PGPORT, valueFrom: { configMapKeyRef: { name: aetherion-config, key: PGPORT } } }
+            - { name: PGSSLMODE, value: "require" }
+          command:
+            - psql
+            - -v
+            - ON_ERROR_STOP=1
+            - -c
+            - CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_crew_roster_duty ON crew_roster (assigned, flight_no, crew_member);
+          resources: { requests: { cpu: "50m", memory: "64Mi" }, limits: { cpu: "500m", memory: "256Mi" } }

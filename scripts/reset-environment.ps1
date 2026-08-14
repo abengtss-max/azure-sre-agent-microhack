@@ -1,8 +1,9 @@
 #Requires -Version 7.0
 # Aetherion AirOps - reset all injected failures back to a clean, healthy baseline.
 #
-# Resets every service profile, removes the APIM throttle policy, and returns the
-# load generator to normal, then verifies the platform reports healthy.
+# Restores releases, resource limits, autoscaler ceilings and the database
+# baseline, removes the APIM backend override, and returns the load generator to
+# normal, then verifies the platform reports healthy.
 # Use -ResetProgress to ALSO reset the linear challenge unlock gate
 # (aetherion-progress) back to 1 for a brand-new run.
 
@@ -14,15 +15,8 @@ $ErrorActionPreference = "Stop"
 $ns = "aetherion"
 $envFile = Join-Path $PSScriptRoot ".env.aetherion.json"
 . (Join-Path $PSScriptRoot 'lib-apim.ps1')
+. (Join-Path $PSScriptRoot 'lib-dbjob.ps1')
 $services = @("flight-ops", "crew-scheduling", "booking", "baggage", "telemetry-ingest", "gateway")
-
-Write-Host "Resetting service profiles to standard..." -ForegroundColor Cyan
-foreach ($s in $services) {
-    # Keep going if one deployment is missing; a partial estate should still reset.
-    kubectl set env deploy/$s -n $ns SVC_PROFILE=standard 2>$null | Out-Null
-    if ($LASTEXITCODE -eq 0) { Write-Host "  $s -> standard" -ForegroundColor Gray }
-    else { Write-Host "  $s -> skipped (deployment not found)" -ForegroundColor DarkYellow }
-}
 
 # Undo the change-shaped faults: release tag, resource limits, pool headroom and
 # any canary revision a challenge left behind.
@@ -44,6 +38,17 @@ kubectl patch hpa booking -n $ns --type=merge -p (@{ spec = @{ maxReplicas = 6 }
 kubectl patch hpa crew-scheduling -n $ns --type=merge -p (@{ spec = @{ maxReplicas = 3 } } | ConvertTo-Json -Compress) 2>$null | Out-Null
 Write-Host "  pool override cleared, canary revisions removed, autoscaler ceilings restored" -ForegroundColor Gray
 
+# The baseline estate has no index behind the crew duty lookup - that is the
+# latent weakness Challenge 4 exposes - so a reset removes one if a previous run
+# created it, along with any maintenance jobs left behind.
+kubectl delete jobs -n $ns -l component=db-maintenance --ignore-not-found 2>$null | Out-Null
+if (Invoke-AetherionDbSql -Sql 'DROP INDEX IF EXISTS idx_crew_roster_duty;' -Name 'reset-crew-index') {
+    Write-Host "  crew roster index removed (baseline state)" -ForegroundColor Gray
+}
+else {
+    Write-Host "  WARNING: could not reset the crew roster index - Challenge 4 may already be solved." -ForegroundColor Yellow
+}
+
 # Return the load generator to its normal level (challenges 2 & 7 set surge).
 & (Join-Path $PSScriptRoot "deploy-loadgen.ps1") -Mode normal 2>$null | Out-Null
 Write-Host "  k6 load -> normal (25 VUs)" -ForegroundColor Gray
@@ -53,7 +58,7 @@ if (Test-Path $envFile) {
     $policy = '<policies><inbound><base /></inbound><backend><base /></backend><outbound><base /></outbound><on-error><base /></on-error></policies>'
     Write-Host "Restoring default APIM product policy..." -ForegroundColor Cyan
     if (-not (Set-AetherionApimProductPolicy -ResourceGroup $state.resourceGroup -ApimName $state.apimName -PolicyXml $policy)) {
-        Write-Host "  WARNING: APIM product policy reset failed (a throttle from Challenge 7 may persist)." -ForegroundColor Yellow
+        Write-Host "  WARNING: APIM product policy reset failed (a backend override from Challenge 7 may persist)." -ForegroundColor Yellow
     }
 }
 

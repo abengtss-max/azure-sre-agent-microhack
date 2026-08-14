@@ -36,15 +36,14 @@ export const options =
     ? crewBurstOptions
     : MODE === 'surge'
     ? {
+        // A departure-wave surge holds a sustained, closed-loop concurrency.
+        // Ramping stages made the offered load vary while an incident was open,
+        // so the same fault produced a different symptom minute to minute.
         scenarios: {
           surge: {
-            executor: 'ramping-vus',
-            startVUs: 20,
-            stages: [
-              { duration: '1m', target: surgeVus },
-              { duration: '5m', target: surgeVus },
-              { duration: '1m', target: 20 }
-            ]
+            executor: 'constant-vus',
+            vus: surgeVus,
+            duration: __ENV.DURATION || '24h'
           }
         }
       }
