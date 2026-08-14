@@ -116,8 +116,8 @@ hypothesis, not when it's fixed.
           independent signals** behind it, and the **least-disruptive recovery** you'd
           propose (do not perform it).
         - Keep it where Challenge 3 can use it: leave it in the chat thread, or save
-          it to the agent's **memory** (for example `#remember …`, or *"save this to
-          your knowledge"*).
+          it to the agent's **memory** (type `/remember …` in the chat box, which
+          becomes `#remember`, or *"save this to your knowledge"*).
 
 ### Reference
 
