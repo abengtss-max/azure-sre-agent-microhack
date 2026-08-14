@@ -18,12 +18,12 @@ function Set-AetherionApimProductPolicy {
     $tmp = Join-Path $env:TEMP ("apim-policy-" + [guid]::NewGuid().ToString('N').Substring(0, 8) + ".json")
     [System.IO.File]::WriteAllText($tmp, $body, (New-Object System.Text.UTF8Encoding($false)))
     $url = "https://management.azure.com/subscriptions/$SubscriptionId/resourceGroups/$ResourceGroup/providers/Microsoft.ApiManagement/service/$ApimName/products/$ProductId/policies/policy?api-version=2022-08-01"
-    $prevEnc = $env:PYTHONIOENCODING
-    # APIM returns the policy with a BOM that the Windows console can't encode; force UTF-8 to avoid a cosmetic crash.
-    $env:PYTHONIOENCODING = 'utf-8'
-    az rest --method put --url $url --body "@$tmp" --headers "Content-Type=application/json" --output none 2>$null | Out-Null
+    # ARM returns the policy as XML with a BOM. Without --output-file the CLI tries to
+    # decode it as JSON, exits non-zero, and a successful write looks like a failure.
+    $respFile = Join-Path $env:TEMP ("apim-policy-resp-" + [guid]::NewGuid().ToString('N').Substring(0, 8) + ".json")
+    az rest --method put --url $url --body "@$tmp" --headers "Content-Type=application/json" --output-file $respFile 2>$null | Out-Null
     $ok = ($LASTEXITCODE -eq 0)
-    if ($null -eq $prevEnc) { Remove-Item Env:PYTHONIOENCODING -ErrorAction SilentlyContinue } else { $env:PYTHONIOENCODING = $prevEnc }
+    Remove-Item $respFile -Force -ErrorAction SilentlyContinue
     Remove-Item $tmp -Force -ErrorAction SilentlyContinue
     return $ok
 }
