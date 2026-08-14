@@ -1720,7 +1720,7 @@
 <h1 id="challenge-6-autonomous-recovery-and-cost-aware-governance">Challenge 6 · Autonomous Recovery and Cost-Aware Governance<a class="headerlink" href="#challenge-6-autonomous-recovery-and-cost-aware-governance" title="Permanent link">&para;</a></h1>
 <div class="admonition abstract">
 <p class="admonition-title">Challenge 06 of 08 · Act IV: Autonomous &amp; Cost</p>
-<p><strong>Run mode:</strong> Autonomous (bounded) · <strong>Access:</strong> scoped write</p>
+<p><strong>Run mode:</strong> Autonomous (bounded) · <strong>Governance:</strong> bounded <abbr title="How much of the system an incident (or a fix) can affect — kept as small as possible.">blast radius</abbr>, no per-action approval</p>
 <p><strong>Stage:</strong> Foundation → Operations → Engineering → <strong>Autonomous</strong> → Major Incident</p>
 </div>
 <p><strong>Situation.</strong> Every write so far has waited for your approval. Now a minor issue
@@ -1750,7 +1750,7 @@ investigation, before you reach Challenge 7.</p>
 <h3 id="tasks">Tasks<a class="headerlink" href="#tasks" title="Permanent link">&para;</a></h3>
 <ol>
 <li><strong>Confirm the symptom.</strong> Verify the baggage errors in the Ops Center and telemetry so you know what "recovered" looks like.</li>
-<li><strong>Grant bounded autonomy.</strong> Give a narrowly scoped write role plus <strong>Autonomous</strong> mode, let the agent fix it end-to-end, then review the action log.</li>
+<li><strong>Decide the bounds, then hand over.</strong> Judge whether this incident is safe to automate, switch to <strong>Autonomous</strong> mode, let the agent fix it end-to-end, then review the action log.</li>
 <li><strong>See where AAUs go.</strong> Inspect the agent's consumption by thread type and purpose.</li>
 <li><strong>Design a cost-aware model.</strong> Name concrete reductions without losing reliability or investigation quality.</li>
 <li><strong>Arm the Sev1 response plan.</strong> Bind the pre-provisioned <code>aetherion-major-incident</code> alert so the next major incident auto-triggers. Do this now, before Challenge 7.</li>
@@ -1759,14 +1759,14 @@ investigation, before you reach Challenge 7.</p>
 <h3 id="suggested-azure-sre-agent-prompt">Suggested Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent prompt<a class="headerlink" href="#suggested-azure-sre-agent-prompt" title="Permanent link">&para;</a></h3>
 <div class="admonition quote">
 <p class="admonition-title">Paste into the agent chat</p>
-<p>The <code>baggage</code> service is returning intermittent errors within a small blast
-radius. Using only the scoped write permission I've granted, detect the fault,
-decide the sanctioned reversible fix, apply it autonomously, and report exactly
-what you changed and why it was safe to automate.</p>
+<p>The <code>baggage</code> service is returning intermittent errors to a slice of traffic
+while other requests succeed. Detect the fault, decide the sanctioned reversible
+fix, apply it autonomously, and report exactly what you changed and why it was
+safe to automate.</p>
 </div>
 <h3 id="success-criteria">Success criteria<a class="headerlink" href="#success-criteria" title="Permanent link">&para;</a></h3>
 <ul>
-<li>The agent detects the baggage errors, executes a sanctioned fix autonomously, the service returns to healthy, and you can explain why it was safe to automate.</li>
+<li>The agent detects the baggage errors, executes a sanctioned fix autonomously, the service returns to healthy, and you can explain why it was safe to automate: small <abbr title="How much of the system an incident (or a fix) can affect — kept as small as possible.">blast radius</abbr>, a reversible and well-understood remedy, a service that is degraded rather than down, and a run mode you chose deliberately.</li>
 <li>You've reviewed real consumption data and produced a written, defensibly balanced operating model, cost-aware, not merely cheapest.</li>
 <li>A <strong>Sev1 major-incident response plan</strong> is active on the agent (bound to the pre-provisioned <code>aetherion-major-incident</code> alert), ready to auto-trigger the agent when the next major incident fires.</li>
 <li><code>check-challenge.ps1 6</code> passes.</li>
@@ -1787,9 +1787,11 @@ or your environment. Don't claim that stopping an agent ends all billing.</p>
 <details>
 <summary>Hint: make autonomy safe</summary>
 <p>Confirm the symptom first; you can't judge an autonomous recovery without knowing
-what healthy looks like. Autonomy is safe because it's <em>scoped</em>: give the agent only
-the write permission this one recovery needs, then switch to Autonomous and resist
-helping.</p>
+what healthy looks like.</p>
+<p>What makes this one safe to automate isn't a permission setting — it's the shape of
+the incident: one degraded (not down) service, a remedy you can undo in seconds, and
+a <abbr title="How much of the system an incident (or a fix) can affect — kept as small as possible.">blast radius</abbr> you can describe in a sentence. Decide that <em>before</em> you switch mode,
+then switch to Autonomous and resist helping.</p>
 </details>
 <details>
 <summary>Hint: cost model and the Sev1 plan</summary>
@@ -1809,16 +1811,24 @@ the exact clicks, open the matching task below.</p>
 <ul>
 <li>Check the <strong>baggage</strong> tile and telemetry (<abbr title="Azure application-performance monitoring — requests, dependencies, exceptions, latency.">Application Insights</abbr> failed
   requests) so you know the current error rate and what "recovered" means.</li>
+<li>Some requests succeed and some fail, so look at <em>which</em> pods are behind the
+  service: <code>kubectl get pods -n aetherion -l app=baggage --show-labels</code>.</li>
 </ul>
 </details>
 <details class="note">
-<summary>Task 2 · Grant bounded autonomy</summary>
+<summary>Task 2 · Decide the bounds, then hand over</summary>
 <ul>
-<li>Grant the agent's <abbr title="An Azure identity for a workload (here, the agent) so it can authenticate without stored secrets.">managed identity</abbr> a <strong>narrow</strong> write role on just the
-  baggage resource (portal → resource group → <strong>Access control (IAM)</strong>).</li>
+<li>Write down the bounds first: what may the agent change, what must it never
+  touch, and how would you undo it? That judgement is the governance here.</li>
 <li>Set the run mode to <strong>Autonomous</strong> (on the response plan / task), then let
   the agent detect → decide → fix on its own. Review the action log after.</li>
 </ul>
+<div class="admonition note">
+<p class="admonition-title">\"Never delete\" applies to data, not to a bad revision</p>
+<p>Aetherion's guardrails forbid deleting <strong>data resources</strong> — databases,
+caches, storage. Removing a workload revision that shouldn't be serving
+is an ordinary, reversible rollback, and it is the sanctioned fix here.</p>
+</div>
 </details>
 <details class="note">
 <summary>Task 3 · See where AAUs go</summary>

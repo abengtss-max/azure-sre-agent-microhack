@@ -1743,12 +1743,13 @@ risk.</p>
 <p class="admonition-title">Start this challenge</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="nb">start-challenge</span><span class="p">.</span><span class="n">ps1</span> <span class="n">8</span>   <span class="c"># open / set up this challenge</span>
 </code></pre></div>
+<p>Challenge 8 injects no fault — the platform stays green while you write.</p>
 </div>
 <h3 id="tasks">Tasks<a class="headerlink" href="#tasks" title="Permanent link">&para;</a></h3>
 <ol>
 <li><strong>Assemble the evidence.</strong> Build one defensible narrative per incident from what you preserved through the shift.</li>
 <li><strong>Write the leadership briefing.</strong> Short, impact-first, non-technical, for the operations director.</li>
-<li><strong>Write the engineering RCA handover.</strong> Precise actions, verification, open risks, and change evidence (<abbr title="Azure's record of control-plane changes (who changed what, and when).">Activity Log</abbr> + GitHub) for the next on-call.</li>
+<li><strong>Write the engineering RCA handover.</strong> Precise actions, verification, open risks, and change evidence for the next on-call.</li>
 <li><strong>Generate the executive PDF.</strong> Have the agent render the briefing (with a timeline chart) via its Python sandbox.</li>
 </ol>
 <p><img alt="Challenge 8 storyboard: Sam and Elena brief airline leadership as boarding resumes" class="story-panel" loading="lazy" src="../../assets/storyboard/img-challenge-8.webp" /></p>
@@ -1758,20 +1759,23 @@ risk.</p>
 <p>From today's preserved evidence and action plans, draft two separate artifacts:
 (1) a concise, impact-first <strong>leadership briefing</strong> (business impact, root cause,
 recovery, cost/risk, lessons learned) and (2) an <strong>engineering RCA handover</strong>
-(actions taken, how each was verified, open risks, and <abbr title="Azure's record of control-plane changes (who changed what, and when).">Activity Log</abbr> + GitHub
-change references). Then render the leadership briefing as a formatted <strong>PDF</strong>
-with an incident-timeline chart using your Python sandbox.</p>
+(actions taken, how each was verified, open risks, and change evidence: rollout
+history with its recorded change causes for the workload changes, and the Azure
+<abbr title="Azure's record of control-plane changes (who changed what, and when).">Activity Log</abbr> for the API Management policy change). Then render the leadership
+briefing as a formatted <strong>PDF</strong> with an incident-timeline chart using your Python
+sandbox.</p>
 </div>
 <h3 id="success-criteria">Success criteria<a class="headerlink" href="#success-criteria" title="Permanent link">&para;</a></h3>
 <ul>
 <li>The platform is healthy at close.</li>
-<li>The leadership briefing covers impact, root cause, recovery, cost/risk, and lessons learned; the engineering RCA handover captures actions, verification, remaining risk, and change evidence.</li>
+<li>The leadership briefing covers impact, root cause, recovery, cost/risk, and lessons learned; the engineering RCA handover captures actions, verification, remaining risk, and change evidence from rollout history and the <abbr title="Azure's record of control-plane changes (who changed what, and when).">Activity Log</abbr>.</li>
 <li>The agent produced a <strong>downloadable PDF</strong> of the leadership briefing (with a timeline chart) via its Python sandbox.</li>
 <li>Symptom, root cause, contributing factors, immediate mitigation, and permanent corrective action are clearly separated, and <code>check-challenge.ps1 8</code> passes.</li>
 </ul>
 <div class="admonition success">
 <p class="admonition-title">Verify your work</p>
-<p>Run this when you're done. It grades the real end state and completes the hack:</p>
+<p>The platform health is graded; the briefing and RCA are yours to attest to. Run
+this when you're done to complete the hack:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="n">check-challenge</span><span class="p">.</span><span class="n">ps1</span> <span class="n">8</span>
 </code></pre></div>
 </div>
@@ -1811,8 +1815,14 @@ the exact clicks, open the matching task below.</p>
 <summary>Task 3 · Write the engineering RCA handover</summary>
 <ul>
 <li>Ask for a precise engineering handover: actions taken and how each was
-  verified, remaining risk, and change-correlation evidence (<abbr title="Azure's record of control-plane changes (who changed what, and when).">Activity Log</abbr> +
-  your fork's commits) for the next on-call.</li>
+  verified, remaining risk, and change-correlation evidence for the next
+  on-call.</li>
+<li>Be specific about where that evidence lives. The workload changes are in
+  <strong>rollout history</strong> (<code>kubectl rollout history deploy/&lt;svc&gt; -n aetherion</code>)
+  with the change cause recorded against each revision; the API Management
+  policy change is in the <strong>Azure <abbr title="Azure's record of control-plane changes (who changed what, and when).">Activity Log</abbr></strong>. In-cluster changes never
+  reach the <abbr title="Azure's record of control-plane changes (who changed what, and when).">Activity Log</abbr> — which is itself worth calling out as a gap in the
+  handover.</li>
 </ul>
 </details>
 <details class="note">

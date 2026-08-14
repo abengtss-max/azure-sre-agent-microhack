@@ -1679,7 +1679,7 @@
   <a href="#n-activity" class="md-nav__link">
     <span class="md-ellipsis">
       
-        N · Correlate a change with the Activity Log &amp; GitHub
+        N · Correlate a change with rollout history &amp; the Activity Log
       
     </span>
   </a>
@@ -1905,7 +1905,7 @@
   <a href="#n-activity" class="md-nav__link">
     <span class="md-ellipsis">
       
-        N · Correlate a change with the Activity Log &amp; GitHub
+        N · Correlate a change with rollout history &amp; the Activity Log
       
     </span>
   </a>
@@ -2164,9 +2164,9 @@ run mode (section F), not from the role.</p>
 <h2 id="k-skill">K · Create a reusable skill<a class="headerlink" href="#k-skill" title="Permanent link">&para;</a></h2>
 <ol>
 <li>In the agent, open <strong>Skills</strong> → <strong>Create</strong>.</li>
-<li>Encode a well-defined procedure (e.g. the crew connection-pool relief) as steps,
-   keeping the guardrails (scale to relieve the pool, <strong>never</strong> delete the
-   database).</li>
+<li>Encode a well-defined procedure (e.g. the crew query-path recovery) as steps,
+   keeping the guardrails (confirm which layer is saturated, repair the query
+   path, <strong>never</strong> delete the database).</li>
 <li>Save it. Skills <strong>auto-load</strong> by context and are capped at <strong>5 concurrent</strong> —
    remove any you don't need.</li>
 </ol>
@@ -2195,28 +2195,33 @@ run mode (section F), not from the role.</p>
 </code></pre></div></li>
 </ul>
 <hr />
-<h2 id="n-activity">N · Correlate a change with the <abbr title="Azure's record of control-plane changes (who changed what, and when).">Activity Log</abbr> &amp; GitHub<a class="headerlink" href="#n-activity" title="Permanent link">&para;</a></h2>
+<h2 id="n-activity">N · Correlate a change with rollout history &amp; the <abbr title="Azure's record of control-plane changes (who changed what, and when).">Activity Log</abbr><a class="headerlink" href="#n-activity" title="Permanent link">&para;</a></h2>
 <ol>
-<li>Open the affected resource (or the resource group) → <strong>Activity log</strong>.</li>
-<li>Filter by the time the tile went red — look for a recent deployment or config
-   change.</li>
-<li>Cross-check the timing against the repo's recent commits/deployments on GitHub.
+<li>For workload changes, start with the cluster's own change record:
+   <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">kubectl</span> <span class="n">rollout</span> <span class="nb">history </span><span class="n">deploy</span><span class="p">/&lt;</span><span class="n">service</span><span class="p">&gt;</span> <span class="n">-n</span> <span class="n">aetherion</span>
+</code></pre></div>
+   Each revision carries the change cause recorded with it.</li>
+<li>For Azure-resource changes (for example an API Management policy), open the
+   resource or resource group → <strong>Activity log</strong> and filter by the time the tile
+   went red.</li>
+<li>Note the gap: changes applied straight to the cluster never appear in the
+   <abbr title="Azure's record of control-plane changes (who changed what, and when).">Activity Log</abbr>, which is exactly why teams route changes through a pipeline.
    Proximity in time is your strongest lead for a change-induced outage.</li>
 </ol>
 <hr />
 <h2 id="o-direct-apim">O · Compare direct-vs-<abbr title="Azure API Management — the API &quot;front door&quot; that authenticates and rate-limits traffic to the services.">APIM</abbr> (front-door problems)<a class="headerlink" href="#o-direct-apim" title="Permanent link">&para;</a></h2>
 <p>When clients fail but the backend looks healthy, the problem is at the <abbr title="The single public entry point (API Management) through which all client traffic passes.">front door</abbr>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c"># Load env once</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nv">$st</span> <span class="p">=</span> <span class="nb">Get-Content</span> <span class="p">./</span><span class="n">scripts</span><span class="p">/.</span><span class="n">env</span><span class="p">.</span><span class="n">aetherion</span><span class="p">.</span><span class="n">json</span> <span class="p">|</span> <span class="nb">ConvertFrom-Json</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c"># Through the API front door (APIM) — may be throttled (HTTP 429)</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="nb">Invoke-WebRequest</span> <span class="s2">&quot;</span><span class="p">$(</span><span class="nv">$st</span><span class="p">.</span><span class="n">apimGatewayUrl</span><span class="p">)</span><span class="s2">/aetherion/api/status&quot;</span> <span class="p">`</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>  <span class="n">-Headers</span> <span class="p">@{</span> <span class="s1">&#39;Ocp-Apim-Subscription-Key&#39;</span> <span class="p">=</span> <span class="nv">$st</span><span class="p">.</span><span class="n">apimSubscriptionKey</span> <span class="p">}</span> <span class="n">-UseBasicParsing</span>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="c"># Direct to the service (bypasses APIM) — if this is 200, the service is fine</span>
-<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="nb">Invoke-WebRequest</span> <span class="s2">&quot;http://</span><span class="p">$(</span><span class="nv">$st</span><span class="p">.</span><span class="n">gatewayIp</span><span class="p">)</span><span class="s2">/api/status&quot;</span> <span class="n">-UseBasicParsing</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c"># Load env once</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="nv">$st</span> <span class="p">=</span> <span class="nb">Get-Content</span> <span class="p">./</span><span class="n">scripts</span><span class="p">/.</span><span class="n">env</span><span class="p">.</span><span class="n">aetherion</span><span class="p">.</span><span class="n">json</span> <span class="p">|</span> <span class="nb">ConvertFrom-Json</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c"># Through the API front door (APIM)</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="nb">Invoke-WebRequest</span> <span class="s2">&quot;</span><span class="p">$(</span><span class="nv">$st</span><span class="p">.</span><span class="n">apimGatewayUrl</span><span class="p">)</span><span class="s2">/aetherion/api/status&quot;</span> <span class="p">`</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>  <span class="n">-Headers</span> <span class="p">@{</span> <span class="s1">&#39;Ocp-Apim-Subscription-Key&#39;</span> <span class="p">=</span> <span class="nv">$st</span><span class="p">.</span><span class="n">apimSubscriptionKey</span> <span class="p">}</span> <span class="n">-UseBasicParsing</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="c"># Direct to the service (bypasses APIM) — if this is 200, the service is fine</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="nb">Invoke-WebRequest</span> <span class="s2">&quot;http://</span><span class="p">$(</span><span class="nv">$st</span><span class="p">.</span><span class="n">gatewayIp</span><span class="p">)</span><span class="s2">/api/status&quot;</span> <span class="n">-UseBasicParsing</span>
 </code></pre></div>
-<p>If <strong>direct</strong> returns 200 but <strong><abbr title="Azure API Management — the API &quot;front door&quot; that authenticates and rate-limits traffic to the services.">APIM</abbr></strong> returns 429, the fault is an API Management
+<p>If <strong>direct</strong> returns 200 but <strong><abbr title="Azure API Management — the API &quot;front door&quot; that authenticates and rate-limits traffic to the services.">APIM</abbr></strong> fails, the fault is an API Management
 policy, not the service.</p>
 <hr />
 <p>Return to any challenge — each one tells you exactly which of these procedures to

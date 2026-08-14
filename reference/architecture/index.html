@@ -1712,28 +1712,28 @@ whole estate.</p>
 <tbody>
 <tr>
 <td>Edge — <abbr title="Azure API Management — the API &quot;front door&quot; that authenticates and rate-limits traffic to the services.">APIM</abbr></td>
-<td>Restrictive rate-limit policy</td>
-<td>HTTP 429 under load</td>
+<td>A backend override published to the product policy</td>
+<td>Gateway 5xx while services are healthy</td>
 </tr>
 <tr>
 <td>Compute — <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr></td>
-<td>Crashing pod, memory pressure</td>
-<td>Pod restarts, 5xx</td>
+<td>A release pinned to an image that can't be pulled</td>
+<td>Pods never start, the tile goes dark</td>
 </tr>
 <tr>
-<td>App logic</td>
-<td>Injected latency or errors</td>
-<td>Slow responses, exceptions in App Insights</td>
+<td>Compute — <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr></td>
+<td>A resource limit cut too far</td>
+<td>CPU throttling, latency climbs under load</td>
+</tr>
+<tr>
+<td>App rollout</td>
+<td>A canary revision serving the wrong API surface</td>
+<td>A slice of requests fails, the rest succeed</td>
 </tr>
 <tr>
 <td>Data — PostgreSQL</td>
-<td>Connection-pool exhaustion</td>
-<td>Timeouts, saturation in <abbr title="Dashboarding tool used here to visualise AKS and Application Insights metrics.">Grafana</abbr></td>
-</tr>
-<tr>
-<td>Data — Redis</td>
-<td>Cache unavailability</td>
-<td>Elevated latency on booking/check-in</td>
+<td>A query with no supporting index over a grown table</td>
+<td>Database CPU saturated, pods idle and waiting</td>
 </tr>
 </tbody>
 </table>

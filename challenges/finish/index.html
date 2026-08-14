@@ -1160,6 +1160,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#what-changed-in-your-estate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What changed in your estate
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#tear-down-the-environment" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1630,6 +1641,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#what-changed-in-your-estate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What changed in your estate
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#tear-down-the-environment" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1689,6 +1711,46 @@ commanded a Tier-0 major incident, and briefed leadership. That's the full
 <li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8zm4 18H6V4h7v5h5zm-9-7v6H7v-6zm6 2v4h2v-4zm-4-4v8h2v-8z"/></svg></span> <strong>Close the loop</strong> — RCA handover and a leadership briefing</li>
 </ul>
 </div>
+<h3 id="what-changed-in-your-estate">What changed in your estate<a class="headerlink" href="#what-changed-in-your-estate" title="Permanent link">&para;</a></h3>
+<p>Every incident today was an ordinary change made badly. In a real environment,
+these are the five you'd have to undo — and the list is the change-management
+lesson in miniature:</p>
+<table>
+<thead>
+<tr>
+<th>Incident</th>
+<th>What changed</th>
+<th>How it was undone</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Check-in slowdown</td>
+<td>A cost optimisation cut <code>booking</code>'s CPU limit and capped its autoscaling</td>
+<td>Restore the limit and the ceiling</td>
+</tr>
+<tr>
+<td>Flight board dark</td>
+<td>A release pinned <code>flight-ops</code> to an image tag that was never published</td>
+<td><code>kubectl rollout undo</code></td>
+</tr>
+<tr>
+<td>Crew scheduling</td>
+<td>The index behind the crew duty lookup went missing, so every request scanned the whole roster table</td>
+<td>Rebuild the index under approval</td>
+</tr>
+<tr>
+<td>Baggage errors</td>
+<td>A canary revision served the wrong API surface behind the same Service</td>
+<td>Remove the bad revision</td>
+</tr>
+<tr>
+<td>API <abbr title="The single public entry point (API Management) through which all client traffic passes.">front door</abbr></td>
+<td>A backend override was published to the <abbr title="Azure API Management — the API &quot;front door&quot; that authenticates and rate-limits traffic to the services.">APIM</abbr> product policy</td>
+<td>Restore the default policy</td>
+</tr>
+</tbody>
+</table>
 <h3 id="tear-down-the-environment">Tear down the environment<a class="headerlink" href="#tear-down-the-environment" title="Permanent link">&para;</a></h3>
 <div class="admonition warning">
 <p class="admonition-title">Do this to stop Azure charges</p>

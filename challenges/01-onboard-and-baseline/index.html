@@ -1720,22 +1720,23 @@
 <h1 id="challenge-1-onboard-the-agent-and-establish-the-baseline">Challenge 1 · Onboard the Agent and Establish the Baseline<a class="headerlink" href="#challenge-1-onboard-the-agent-and-establish-the-baseline" title="Permanent link">&para;</a></h1>
 <div class="admonition abstract">
 <p class="admonition-title">Challenge 01 of 08 · Act I: Foundation</p>
-<p><strong>Run mode:</strong> Review · <strong>Access:</strong> scoped to one resource group · <strong>Estimated time:</strong> 20–30 min</p>
+<p><strong>Run mode:</strong> Review · <strong>Access:</strong> scoped to one resource group</p>
 <p><strong>Stage:</strong> <strong>Foundation</strong> → Operations → Engineering → Autonomous → Major Incident</p>
 </div>
 <p><strong>Situation:</strong> You've just taken over the Aetherion AirOps Operations Center at the
 start of your shift, and every service tile is green. Before the <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent can help
 with real incidents, you need to know what <em>healthy</em> looks like, and connect the
-agent with least-privilege access in <strong>Review</strong> mode so it proposes changes and
-waits for your approval.</p>
-<p><strong>Mission:</strong> Connect the <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent with <abbr title="The built-in Azure role that grants read-only access — see everything, change nothing.">Reader</abbr> access, capture a validated
-operational baseline, and schedule a proactive daily health check.</p>
+agent scoped to a single resource group in <strong>Review</strong> mode, so it proposes changes
+and waits for your approval.</p>
+<p><strong>Mission:</strong> Connect the <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent scoped to your resource group in <abbr title="SRE Agent run mode where it proposes a plan and waits for your approval before any write.">Review mode</abbr>,
+capture a validated operational baseline, and schedule a proactive daily health
+check.</p>
 <p><strong>Why this matters</strong></p>
 <div class="grid cards why-cards">
 <ul>
 <li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9 17H7v-7h2zm4 0h-2V7h2zm4 0h-2v-4h2zm2 2H5V5h14v14.1M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2"/></svg></span> <strong>Baseline</strong>: Healthy-state reference every later incident is measured against</li>
 <li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7 2v11h3v9l7-12h-4l4-8z"/></svg></span> <strong>Faster RCA</strong>: Spot anomalies sooner against a known-good benchmark</li>
-<li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 17a2 2 0 0 1-2-2c0-1.11.89-2 2-2a2 2 0 0 1 2 2 2 2 0 0 1-2 2m6 3V10H6v10zm0-12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V10c0-1.11.89-2 2-2h1V6a5 5 0 0 1 5-5 5 5 0 0 1 5 5v2zm-6-5a3 3 0 0 0-3 3v2h6V6a3 3 0 0 0-3-3"/></svg></span> <strong>Least privilege</strong>: Scope the agent to one resource group; in <strong>Review</strong> mode it proposes changes and waits for approval</li>
+<li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 17a2 2 0 0 1-2-2c0-1.11.89-2 2-2a2 2 0 0 1 2 2 2 2 0 0 1-2 2m6 3V10H6v10zm0-12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V10c0-1.11.89-2 2-2h1V6a5 5 0 0 1 5-5 5 5 0 0 1 5 5v2zm-6-5a3 3 0 0 0-3 3v2h6V6a3 3 0 0 0-3-3"/></svg></span> <strong>Bounded from the start</strong>: Scope the agent to one resource group; in <strong>Review</strong> mode it proposes changes and waits for approval</li>
 <li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 11c0 5.55-3.84 10.74-9 12-5.16-1.26-9-6.45-9-12V5l9-4 9 4zm-9 10c3.75-1 7-5.46 7-9.78V6.3l-7-3.12L5 6.3v4.92C5 15.54 8.25 20 12 21m-2-4-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9"/></svg></span> <strong>Proactive ops</strong>: Catch drift before a symptom becomes an outage</li>
 </ul>
 </div>
@@ -1743,11 +1744,19 @@ operational baseline, and schedule a proactive daily health check.</p>
 <p class="admonition-title">Start this challenge</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="nb">start-challenge</span><span class="p">.</span><span class="n">ps1</span> <span class="n">1</span>   <span class="c"># sets the scene (Challenge 1 injects no fault)</span>
 </code></pre></div>
-<p>The start-challenge.ps1 script will only print out information when a <code>1</code> is passed on the command line. No errors are injected, so the board should stay green.</p>
+<p>For Challenge 1 the script only prints the scenario — no fault is injected, so
+the board stays green.</p>
 <p>If your Operations Center is <strong>not</strong> all-green (for example you ran a later
 challenge on this environment), reset to a clean baseline first:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="nb">reset-environment</span><span class="p">.</span><span class="n">ps1</span>
 </code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">Baseline on a clean board</p>
+<p>A baseline captured while the platform is degraded quietly breaks Challenges
+2 and 3, because every later comparison is measured against it. If the board
+was recently red, reset and let telemetry settle for a few minutes before you
+capture anything.</p>
+</div>
 </div>
 <h3 id="tasks">Tasks<a class="headerlink" href="#tasks" title="Permanent link">&para;</a></h3>
 <ol>
@@ -1776,7 +1785,9 @@ Support every finding with telemetry evidence, and make no changes.</p>
 </ul>
 <div class="admonition success">
 <p class="admonition-title">Verify your work</p>
-<p>Run this when you're done. It grades the real end state:</p>
+<p>The check confirms the platform is healthy, then asks you two yes/no questions
+about the agent connection and your baseline — answer them honestly, they aren't
+graded from the environment:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="n">check-challenge</span><span class="p">.</span><span class="n">ps1</span> <span class="n">1</span>
 </code></pre></div>
 </div>

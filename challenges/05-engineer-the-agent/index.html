@@ -1720,22 +1720,22 @@
 <h1 id="challenge-5-engineer-the-agent-specialist-subagent-and-reusable-skill">Challenge 5 · Engineer the Agent: Specialist Subagent and Reusable Skill<a class="headerlink" href="#challenge-5-engineer-the-agent-specialist-subagent-and-reusable-skill" title="Permanent link">&para;</a></h1>
 <div class="admonition abstract">
 <p class="admonition-title">Challenge 05 of 08 · Act III: Agent Engineering</p>
-<p><strong>Run mode:</strong> Review · <strong>Access:</strong> builder + scoped write</p>
+<p><strong>Run mode:</strong> Review · <strong>Focus:</strong> builder, no incident to fix</p>
 <p><strong>Stage:</strong> Foundation → Operations → <strong>Engineering</strong> → Autonomous → Major Incident</p>
 </div>
 <p><strong>Situation.</strong> The platform is stable, which is the right time to invest in tooling. You've
 repeated the same Kubernetes triage (pod status, events, rollout history, dependency
-health) and the same crew pool-relief recovery across several incidents. Both
+health) and the same crew query-path recovery across several incidents. Both
 investigation <em>and</em> recovery are perfect candidates to make reusable.</p>
 <p><strong>Mission.</strong> Build a custom <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr>-focused specialist subagent and use it for a scoped
-investigation, then encode the crew pool-relief recovery as a reusable skill with
+investigation, then encode the crew query-path recovery as a reusable skill with
 its guardrails intact.</p>
 <p><strong>Why this matters</strong></p>
 <div class="grid cards why-cards">
 <ul>
 <li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17.5 15.5c0 1.11-.89 2-2 2s-2-.89-2-2 .9-2 2-2 2 .9 2 2m-9-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.89 2-2-.89-2-2-2M23 15v3c0 .55-.45 1-1 1h-1v1c0 1.11-.89 2-2 2H5a2 2 0 0 1-2-2v-1H2c-.55 0-1-.45-1-1v-3c0-.55.45-1 1-1h1c0-3.87 3.13-7 7-7h1V5.73c-.6-.34-1-.99-1-1.73 0-1.1.9-2 2-2s2 .9 2 2c0 .74-.4 1.39-1 1.73V7h1c3.87 0 7 3.13 7 7h1c.55 0 1 .45 1 1m-2 1h-2v-2c0-2.76-2.24-5-5-5h-4c-2.76 0-5 2.24-5 5v2H3v1h2v3h14v-3h2z"/></svg></span> <strong>Specialist subagent</strong>: scoped <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> triage on demand</li>
 <li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11.7 20h-.4l-.4-2.6c-1.2-.2-2.2-.9-3-1.8l-2.4 1-.8-1.3 2.1-1.6q-.6-1.8 0-3.6L4.7 8.7l.8-1.3 2.4 1q1.2-1.35 3-1.8l.3-2.6h1.5l.4 2.6c1.2.2 2.3.9 3 1.8l2.4-1 .8 1.3-2.1 1.5q.3.9.3 1.8h.5c.5 0 1 .1 1.5.2V12l-.1-1 2.1-1.6c.2-.2.2-.4.1-.6l-2-3.5c-.1-.3-.3-.3-.6-.3l-2.5 1c-.5-.4-1.1-.7-1.7-1l-.4-2.7c.1-.1-.2-.3-.4-.3h-4c-.2 0-.5.2-.5.4l-.4 2.7c-.6.2-1.1.6-1.7.9L5 5c-.3 0-.5 0-.7.3l-2 3.5c-.1.2 0 .4.2.6L4.6 11l-.1 1 .1 1-2.1 1.7c-.2.2-.2.4-.1.6l2 3.5c.1.2.3.2.6.2l2.5-1c.5.4 1.1.7 1.7 1l.4 2.7c0 .2.2.4.5.4h2.5c-.5-.7-.7-1.4-.9-2.1m4.3-7.7V12c0-2.2-1.8-4-4-4s-4 1.8-4 4 1.8 4 4 4c.7-1.7 2.2-3.1 4-3.7m-6-.3c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2m8 2.5V13l-2.2 2.2 2.2 2.2V16c1.4 0 2.5 1.1 2.5 2.5 0 .4-.1.8-.3 1.1l1.1 1.1c1.2-1.8.7-4.3-1.1-5.5-.6-.5-1.4-.7-2.2-.7m0 6.5c-1.4 0-2.5-1.1-2.5-2.5 0-.4.1-.8.3-1.1l-1.1-1.1c-1.2 1.8-.7 4.3 1.1 5.5.7.4 1.4.7 2.2.7V24l2.2-2.2-2.2-2.3z"/></svg></span> <strong>Reusable skill</strong>: encode the sanctioned recovery once</li>
-<li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 11c0 5.55-3.84 10.74-9 12-5.16-1.26-9-6.45-9-12V5l9-4 9 4zm-9 10c3.75-1 7-5.46 7-9.78V6.3l-7-3.12L5 6.3v4.92C5 15.54 8.25 20 12 21m-2-4-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9"/></svg></span> <strong>Guardrails baked in</strong>: scale, never delete the database</li>
+<li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 11c0 5.55-3.84 10.74-9 12-5.16-1.26-9-6.45-9-12V5l9-4 9 4zm-9 10c3.75-1 7-5.46 7-9.78V6.3l-7-3.12L5 6.3v4.92C5 15.54 8.25 20 12 21m-2-4-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9"/></svg></span> <strong>Guardrails baked in</strong>: fix the saturated layer, never delete the database</li>
 <li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m13.13 22.19-1.63-3.83c1.57-.58 3.04-1.36 4.4-2.27zM5.64 12.5l-3.83-1.63 6.1-2.77C7 9.46 6.22 10.93 5.64 12.5M19.22 4c.28 0 .53 0 .74.05.17 1.39-.02 4.25-3.3 7.53-1.7 1.71-3.73 3.02-6.01 3.89l-2.15-2.1c.92-2.31 2.23-4.34 3.92-6.03C15.18 4.58 17.64 4 19.22 4m0-2c-1.98 0-4.98.69-8.22 3.93-2.19 2.19-3.5 4.6-4.35 6.71-.28.75-.09 1.57.46 2.13l2.13 2.12c.38.38.89.61 1.42.61.23 0 .47-.06.7-.15A19.1 19.1 0 0 0 18.07 13c5.66-5.66 3.54-10.61 3.54-10.61S20.7 2 19.22 2m-4.68 7.46c-.78-.78-.78-2.05 0-2.83s2.05-.78 2.83 0c.77.78.78 2.05 0 2.83s-2.05.78-2.83 0m-5.66 7.07-1.41-1.41zM6.24 22l3.64-3.64c-.34-.09-.67-.24-.97-.45L4.83 22zM2 22h1.41l4.77-4.76-1.42-1.41L2 20.59zm0-2.83 4.09-4.08c-.21-.3-.36-.62-.45-.97L2 17.76z"/></svg></span> <strong>Faster next time</strong>: handle recurrences without re-deriving steps</li>
 </ul>
 </div>
@@ -1743,11 +1743,12 @@ its guardrails intact.</p>
 <p class="admonition-title">Start this challenge</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="nb">start-challenge</span><span class="p">.</span><span class="n">ps1</span> <span class="n">5</span>   <span class="c"># open / set up this challenge</span>
 </code></pre></div>
+<p>Challenge 5 injects no fault — the board stays green while you build.</p>
 </div>
 <h3 id="tasks">Tasks<a class="headerlink" href="#tasks" title="Permanent link">&para;</a></h3>
 <ol>
 <li><strong>Build the specialist.</strong> Create an <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> triage subagent for the <code>aetherion</code> namespace and invoke it to summarize namespace health and likely causes.</li>
-<li><strong>Encode the skill.</strong> Capture the crew pool-relief recovery from Challenge 4 as a reusable skill, guardrails intact, and confirm it loads.</li>
+<li><strong>Encode the skill.</strong> Capture the crew query-path recovery from Challenge 4 as a reusable skill, guardrails intact, and confirm it loads.</li>
 <li><strong>Know when to use which.</strong> Be able to say when you'd reach for the subagent (invoke to investigate) versus the skill (auto-loads a procedure).</li>
 </ol>
 <p><img alt="Challenge 5 storyboard: Sam and Aria engineer a specialist subagent and reusable skill" class="story-panel" loading="lazy" src="../../assets/storyboard/img-challenge-5.webp" /></p>
@@ -1766,7 +1767,8 @@ namespace's health and the most likely causes. Keep it scoped to <abbr title="Az
 </ul>
 <div class="admonition success">
 <p class="admonition-title">Verify your work</p>
-<p>Run this when you're done. It grades the real end state:</p>
+<p>Both questions are yours to answer honestly — nothing here changes the platform,
+so the check asks you to confirm what you built:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="n">check-challenge</span><span class="p">.</span><span class="n">ps1</span> <span class="n">5</span>
 </code></pre></div>
 </div>
@@ -1779,9 +1781,11 @@ broad. Judge it by whether its output would actually speed up a real <abbr title
 <details>
 <summary>Hint: encode the recovery</summary>
 <p>For the skill, reuse the exact steps from Challenge 4 as the backbone and bake in
-the guardrails (scale to relieve the pool, never delete/restart the database).
-Skills auto-load and encode a procedure; subagents are invoked and investigate, so
-you'll want both in the final incident. Mind the 5 concurrent skills limit.</p>
+the guardrails (diagnose which layer is saturated, repair the query path, never
+delete or restart the database). Be careful not to encode "scale it" as the answer —
+Challenge 4 is precisely the case where scaling cannot work.</p>
+<p>Skills auto-load and encode a procedure; subagents are invoked and investigate, so
+you'll want both in the final incident.</p>
 </details>
 <div class="admonition question">
 <p class="admonition-title">Stuck? Step-by-step for each task</p>
@@ -1802,8 +1806,9 @@ the exact clicks, open the matching task below.</p>
 <summary>Task 2 · Encode the skill</summary>
 <ul>
 <li><strong>Builder → Subagent builder → Create → Skill.</strong> In <code>SKILL.md</code>, write the
-  crew pool-relief steps from Challenge 4 (scale <abbr title="Running copies (pods) of a service; more replicas share the load.">replicas</abbr> / raise pool
-  headroom, stop the leak) and the guardrail (never delete/restart the DB).</li>
+  crew query-path steps from Challenge 4 (confirm which layer is saturated,
+  then repair the query path under approval) and the guardrail (never
+  delete/restart the DB, and don't scale the layer that is merely waiting).</li>
 <li>Save it and confirm it appears in the <strong>Skills</strong> list and loads when
   relevant.</li>
 </ul>
@@ -1814,7 +1819,7 @@ the exact clicks, open the matching task below.</p>
 <li>A <strong>subagent</strong> is something you <em>invoke</em> to investigate a domain (your <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr>
   specialist).</li>
 <li>A <strong>skill</strong> <em>auto-loads</em> when relevant and encodes a <em>procedure</em> (the
-  pool-relief recovery). You'll want both in the final incident.</li>
+  query-path recovery). You'll want both in the final incident.</li>
 </ul>
 </details>
 </div>

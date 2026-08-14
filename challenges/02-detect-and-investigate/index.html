@@ -1729,8 +1729,8 @@ departure peak. Is check-in broken, or simply busy? A change on the passenger pa
 mid-surge is what turns a slowdown into an outage. This incident stays <strong>open</strong> into
 Challenge 3, here you detect and investigate, you do not fix.</p>
 <p><strong>Mission:</strong> Confirm the check-in degradation from live signals and form a
-root-cause hypothesis backed by at least two independent signals without changing
-anything in production.</p>
+hypothesis for the likely cause, backed by at least two independent signals,
+without changing anything in production.</p>
 <p><strong>Why this matters</strong></p>
 <div class="grid cards why-cards">
 <ul>
@@ -1749,19 +1749,19 @@ green to degraded within a minute or two.</p>
 </div>
 <h3 id="tasks">Tasks<a class="headerlink" href="#tasks" title="Permanent link">&para;</a></h3>
 <ol>
-<li><strong>Confirm the symptom.</strong> Compare check-in latency now to your Challenge 1 baseline and trust the measured delta.</li>
+<li><strong>Confirm the symptom.</strong> Compare check-in latency now to your Challenge 1 baseline, using the Operations Center and <abbr title="Dashboarding tool used here to visualise AKS and Application Insights metrics.">Grafana</abbr>, and trust the measured delta.</li>
 <li><strong>Correlate read-only.</strong> Have the agent line up <code>booking</code> request duration against CPU, <abbr title="Running copies (pods) of a service; more replicas share the load.">replicas</abbr>, and request load.</li>
-<li><strong>Rule out capacity.</strong> Decide whether load alone explains the latency, or something was added on the path.</li>
-<li><strong>Record your hypothesis.</strong> Capture the root cause, the two signals behind it, and the recovery you'd propose (without performing it).</li>
+<li><strong>Record your hypothesis.</strong> Capture the likely cause, the two signals behind it, and the recovery you'd propose (without performing it).</li>
 </ol>
 <p><img alt="Challenge 2 storyboard: Sam and Aria detect and investigate the incident read-only" class="story-panel" loading="lazy" src="../../assets/storyboard/img-challenge-2.webp" /></p>
 <h3 id="suggested-azure-sre-agent-prompt">Suggested Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent prompt<a class="headerlink" href="#suggested-azure-sre-agent-prompt" title="Permanent link">&para;</a></h3>
 <div class="admonition quote">
 <p class="admonition-title">Paste into the agent chat</p>
 <p>Analyze the check-in / booking path read-only. Correlate <code>booking</code> request
-duration with CPU, <abbr title="One running copy (pod) of a service; more replicas share the load.">replica</abbr> count, and request load over the last 30 minutes, and
-check recent deployments and rollout history for changes in the same window.
-Give a root-cause hypothesis with supporting evidence, and change nothing.</p>
+duration with CPU, CPU throttling, <abbr title="One running copy (pod) of a service; more replicas share the load.">replica</abbr> count, and request load over the last
+30 minutes, and check recent deployments and rollout history for changes in the
+same window. Give me the most likely cause with supporting evidence, and change
+nothing.</p>
 </div>
 <div class="admonition tip">
 <p class="admonition-title">Optional: feed the agent a HAR trace or screenshot</p>
@@ -1773,7 +1773,7 @@ image files directly and folds client-side timing into its investigation.</p>
 <h3 id="success-criteria">Success criteria<a class="headerlink" href="#success-criteria" title="Permanent link">&para;</a></h3>
 <ul>
 <li>You've confirmed the degradation and can name the affected service and user-facing path.</li>
-<li>You can name the most likely source, backed by at least two independent signals, and separate the load-driven latency from the added delay.</li>
+<li>You can name the most likely cause, backed by at least two independent signals, and separate the load-driven latency from <strong>the change that reduced capacity</strong>.</li>
 <li>You've made no change to production.</li>
 </ul>
 <div class="admonition success">
@@ -1790,10 +1790,11 @@ with CPU, <abbr title="Running copies (pods) of a service; more replicas share t
 </details>
 <details>
 <summary>Hint: capacity, or something else?</summary>
-<p>If the autoscaler added <abbr title="Running copies (pods) of a service; more replicas share the load.">replicas</abbr> and CPU still isn't saturated, load probably isn't
-the whole story. Look at what changed on the booking path around the time latency
-moved. You're done when you can describe the symptom precisely and defend a
-hypothesis, not when it's fixed.</p>
+<p>Busy alone doesn't make a service slow — a service that can't keep up with busy
+does. Check whether the container is being <strong>throttled against its CPU limit</strong>, and
+whether the autoscaler is able to add <abbr title="Running copies (pods) of a service; more replicas share the load.">replicas</abbr> or has hit a ceiling. Then look at
+what <strong>changed</strong> on the booking path around the time latency moved. You're done when
+you can describe the symptom precisely and defend a hypothesis, not when it's fixed.</p>
 </details>
 <div class="admonition question">
 <p class="admonition-title">Stuck? Step-by-step for each task</p>
@@ -1803,7 +1804,8 @@ the exact clicks, open the matching task below.</p>
 <summary>Task 1 · Confirm the symptom</summary>
 <ul>
 <li>Open the <strong>Operations Center</strong> and note the <strong>booking / check-in</strong> tile and
-  its current P95 latency.</li>
+  its current P95 latency, then open the <strong><abbr title="Dashboarding tool used here to visualise AKS and Application Insights metrics.">Grafana</abbr></strong> dashboard for the same
+  window — the two together are your evidence, not the agent's summary.</li>
 <li>Compare that to the baseline you captured in Challenge 1. A jump from
   milliseconds to seconds is a real regression, not just load.</li>
 </ul>
@@ -1812,25 +1814,18 @@ the exact clicks, open the matching task below.</p>
 <summary>Task 2 · Correlate read-only</summary>
 <ul>
 <li>In the agent chat, paste the <strong>suggested prompt</strong> above (or ask it to
-  correlate <code>booking</code> request duration with CPU, <abbr title="One running copy (pod) of a service; more replicas share the load.">replica</abbr> count, and request
-  load over the last 30 minutes).</li>
+  correlate <code>booking</code> request duration with CPU, CPU throttling, <abbr title="One running copy (pod) of a service; more replicas share the load.">replica</abbr>
+  count, and request load over the last 30 minutes).</li>
+<li>Watch for the disagreement between signals: a container pinned at its CPU
+  limit while the autoscaler cannot add capacity is a very different story
+  from "we're simply busy".</li>
 <li>Stay read-only, you're gathering evidence, changing nothing.</li>
 </ul>
 </details>
 <details class="note">
-<summary>Task 3 · Rule out capacity</summary>
+<summary>Task 3 · Record your hypothesis</summary>
 <ul>
-<li>Check whether the autoscaler (<strong><abbr title="Horizontal Pod Autoscaler — Kubernetes control loop that adds or removes pods as load changes.">HPA</abbr></strong>) added <abbr title="Running copies (pods) of a service; more replicas share the load.">replicas</abbr> and whether CPU is
-  near its target / request.</li>
-<li>If <abbr title="Running copies (pods) of a service; more replicas share the load.">replicas</abbr> scaled and CPU is well under target but latency stays high,
-  load alone doesn't explain it. Look at what <strong>changed</strong> on the path (a
-  recent deployment / rollout) around the time latency moved.</li>
-</ul>
-</details>
-<details class="note">
-<summary>Task 4 · Record your hypothesis</summary>
-<ul>
-<li>Ask the agent to write a short summary: the <strong>root cause</strong>, the <strong>two
+<li>Ask the agent to write a short summary: the <strong>likely cause</strong>, the <strong>two
   independent signals</strong> behind it, and the <strong>least-disruptive recovery</strong> you'd
   propose (do not perform it).</li>
 <li>Keep it where Challenge 3 can use it: leave it in the chat thread, or save

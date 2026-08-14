@@ -1720,7 +1720,7 @@
 <h1 id="challenge-3-controlled-recovery-and-change-correlation">Challenge 3 · Controlled Recovery and Change Correlation<a class="headerlink" href="#challenge-3-controlled-recovery-and-change-correlation" title="Permanent link">&para;</a></h1>
 <div class="admonition abstract">
 <p class="admonition-title">Challenge 03 of 08 · Act II: Human-Guided Operations</p>
-<p><strong>Run mode:</strong> Review → approved write · <strong>Access:</strong> approval-gated write</p>
+<p><strong>Run mode:</strong> Review → approved write · <strong>Governance:</strong> every action approved by you</p>
 <p><strong>Stage:</strong> Foundation → <strong>Operations</strong> → Engineering → Autonomous → Major Incident</p>
 </div>
 <p><strong>Situation.</strong> Two things hit in quick succession. Your check-in hypothesis is solid
@@ -1747,9 +1747,13 @@ applying a reversible rollback, and verifying both from telemetry.</p>
 </code></pre></div>
 </div>
 <h3 id="tasks">Tasks<a class="headerlink" href="#tasks" title="Permanent link">&para;</a></h3>
+<p><strong>Part A — finish the check-in incident</strong></p>
 <ol>
 <li><strong>Plan the fix.</strong> Ask the agent to turn your hypothesis into a concrete <code>booking</code> remediation plan and name the permission it needs.</li>
 <li><strong>Recover under approval.</strong> Keep the agent in Review, approve the least-disruptive fix, then confirm latency is back to baseline.</li>
+</ol>
+<p><strong>Part B — the flight board goes dark</strong></p>
+<ol>
 <li><strong>Triage the flight board.</strong> Find out how <code>flight-ops</code> is failing from pod status and events.</li>
 <li><strong>Correlate and roll back.</strong> Line the outage up with the recent change, apply a reversible rollback, and check the board recovers.</li>
 </ol>
@@ -1760,14 +1764,14 @@ applying a reversible rollback, and verifying both from telemetry.</p>
 <p>Turn my check-in hypothesis into a concrete remediation plan for the <code>booking</code>
 service that restores normal response times without rebuilding the service, and
 tell me exactly what permission the action needs. Then, for <code>flight-ops</code>,
-correlate the outage time with recent deployment/rollout history and the GitHub
-change record, and propose the least-disruptive <strong>reversible</strong> rollback for my
-approval.</p>
+correlate the outage time with deployment and rollout history — including the
+recorded change cause — and propose the least-disruptive <strong>reversible</strong> rollback
+for my approval.</p>
 </div>
 <h3 id="success-criteria">Success criteria<a class="headerlink" href="#success-criteria" title="Permanent link">&para;</a></h3>
 <ul>
-<li>Check-in is remediated with a least-disruptive action you approved in <strong>Review</strong> mode (not ungoverned automation); <code>booking</code> is healthy and latency is back to baseline.</li>
-<li><code>flight-ops</code>'s failure mode is identified and linked to a recent change/rollout; the recovery is reversible and doesn't touch unrelated resources.</li>
+<li>Check-in is remediated with a least-disruptive action you approved in <strong>Review</strong> mode (not ungoverned automation); <code>booking</code> is healthy, latency is back to baseline, and <strong>the CPU limit the change reduced is back where it was</strong> — compensating with extra <abbr title="Running copies (pods) of a service; more replicas share the load.">replicas</abbr> is not a fix.</li>
+<li><code>flight-ops</code>'s failure mode is identified and linked to a recent change/rollout; the recovery is reversible and doesn't touch unrelated resources, and the service is back on its previous image.</li>
 <li>Both tiles are green, <code>/api/flights</code> responds, and <code>check-challenge.ps1 3</code> passes.</li>
 </ul>
 <div class="admonition success">
@@ -1786,9 +1790,11 @@ autoscaler to absorb the surge; it shouldn't touch the database, Redis, or nodes
 <details>
 <summary>Hint: restore the flight board</summary>
 <p>Confirm how <code>flight-ops</code> is failing in <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> first, then line up the moment the tile
-went red with deployment / rollout history and the repo's recent changes. Closeness
-in time is your strongest lead, and returning to the last good state is usually the
-fix.</p>
+went red with deployment and rollout history. Closeness in time is your strongest
+lead, and returning to the last good state is usually the fix.</p>
+<p>Not every change arrives through git. This one was applied straight to the cluster,
+so the rollout history <em>is</em> the change record — which is exactly why teams insist
+changes go through a pipeline that leaves one.</p>
 </details>
 <div class="admonition question">
 <p class="admonition-title">Stuck? Step-by-step for each task</p>
@@ -1813,7 +1819,9 @@ the exact clicks, open the matching task below.</p>
   Permissions decide what the agent can reach; run mode decides whether it
   asks first.</li>
 </ul>
-<p>Then verify <code>booking</code> latency is back to baseline.</p>
+<p>Then verify <code>booking</code> latency is back to baseline, and confirm the change was
+actually reverted rather than worked around — the resource limits should match
+what the service was sized for, not a smaller value propped up by more pods.</p>
 </details>
 <details class="note">
 <summary>Task 3 · Triage the flight board</summary>
@@ -1828,9 +1836,9 @@ the exact clicks, open the matching task below.</p>
 <details class="note">
 <summary>Task 4 · Correlate and roll back</summary>
 <ul>
-<li>Line the outage time up with <strong>deployment / rollout history</strong> and the repo's
-  recent changes: <code>kubectl rollout history deploy/flight-ops -n aetherion</code>,
-  plus your fork's commits.</li>
+<li>Line the outage time up with <strong>deployment / rollout history</strong>:
+  <code>kubectl rollout history deploy/flight-ops -n aetherion</code> shows the new
+  revision and the change cause recorded with it.</li>
 <li>Apply a <strong>reversible</strong> rollback to the last good revision (for example
   <code>kubectl rollout undo deploy/flight-ops -n aetherion</code>), then confirm the
   board updates and <code>/api/flights</code> responds.</li>
