@@ -63,8 +63,12 @@ if ($Fault -eq "badimage") {
 
 if ($Fault -eq "cpu-starve") {
     Write-Host "Applying tightened CPU limits to '$Service'..." -ForegroundColor Yellow
-    kubectl set resources deploy/$Service -n $ns -c $Service --requests=cpu=25m,memory=128Mi --limits=cpu=100m,memory=256Mi | Out-Null
-    kubectl annotate deploy/$Service -n $ns kubernetes.io/change-cause="cost optimisation: reduce cpu request/limit" --overwrite | Out-Null
+    kubectl set resources deploy/$Service -n $ns -c $Service --requests=cpu=25m,memory=128Mi --limits=cpu=50m,memory=256Mi | Out-Null
+    kubectl annotate deploy/$Service -n $ns kubernetes.io/change-cause="cost optimisation: reduce cpu request/limit and cap autoscaling" --overwrite | Out-Null
+    # The same cost-optimisation change caps how far the service may scale out,
+    # so the autoscaler can no longer compensate for the smaller limit.
+    $hpaPatch = (@{ spec = @{ maxReplicas = 2 } } | ConvertTo-Json -Compress)
+    kubectl patch hpa $Service -n $ns --type=merge -p $hpaPatch 2>$null | Out-Null
     kubectl rollout status deploy/$Service -n $ns --timeout=120s
     Write-Host "CPU limits applied to '$Service'." -ForegroundColor Green
     return

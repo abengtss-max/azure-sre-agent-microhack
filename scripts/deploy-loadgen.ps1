@@ -42,7 +42,7 @@ $apiKey = $state.apimSubscriptionKey
 if ([string]::IsNullOrWhiteSpace($apiKey)) {
     throw "APIM subscription key not found in state. Run 03-deploy-app.ps1 first."
 }
-$vus = if ($Vus -gt 0) { $Vus } elseif ($Mode -eq 'surge') { 120 } elseif ($Mode -eq 'crew-burst') { 150 } else { 25 }
+$vus = if ($Vus -gt 0) { $Vus } elseif ($Mode -eq 'surge') { 120 } elseif ($Mode -eq 'crew-burst') { 250 } else { 25 }
 
 # --- Separate, un-monitored resource group -----------------------------------
 if ((az group exists --name $LoadGenResourceGroup) -eq 'true') {

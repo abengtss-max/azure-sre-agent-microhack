@@ -18,7 +18,7 @@ const API_KEY = __ENV.API_KEY || '';
 
 const normalVus = parseInt(__ENV.VUS || '25', 10);
 const surgeVus = parseInt(__ENV.VUS || '120', 10);
-const burstVus = parseInt(__ENV.VUS || '150', 10);
+const burstVus = parseInt(__ENV.VUS || '250', 10);
 
 // A crew-roster rush (shift handover) concentrates traffic on one service.
 const crewBurstOptions = {

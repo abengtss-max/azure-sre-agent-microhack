@@ -39,7 +39,10 @@ if (Test-Path $envFile) {
 # PG_POOL_MAX comes from the aetherion-config ConfigMap; drop any deployment override.
 kubectl set env deploy/crew-scheduling -n $ns PG_POOL_MAX- 2>$null | Out-Null
 foreach ($s in $services) { kubectl delete deploy "$s-v2" -n $ns --ignore-not-found 2>$null | Out-Null }
-Write-Host "  pool override cleared, canary revisions removed" -ForegroundColor Gray
+# Autoscaler ceilings: booking scales to 6, crew-scheduling is capped at 3 by design.
+kubectl patch hpa booking -n $ns --type=merge -p (@{ spec = @{ maxReplicas = 6 } } | ConvertTo-Json -Compress) 2>$null | Out-Null
+kubectl patch hpa crew-scheduling -n $ns --type=merge -p (@{ spec = @{ maxReplicas = 3 } } | ConvertTo-Json -Compress) 2>$null | Out-Null
+Write-Host "  pool override cleared, canary revisions removed, autoscaler ceilings restored" -ForegroundColor Gray
 
 # Return the load generator to its normal level (challenges 2 & 7 set surge).
 & (Join-Path $PSScriptRoot "deploy-loadgen.ps1") -Mode normal 2>$null | Out-Null
