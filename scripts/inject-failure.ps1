@@ -1,3 +1,4 @@
+#Requires -Version 7.0
 # Aetherion AirOps - inject a failure for a MicroHack challenge.
 #
 # Usage:

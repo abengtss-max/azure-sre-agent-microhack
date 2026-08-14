@@ -1,3 +1,4 @@
+#Requires -Version 7.0
 # Aetherion AirOps - one-shot environment provisioning wrapper.
 # Runs the full environment build end to end so attendees only run ONE command:
 #

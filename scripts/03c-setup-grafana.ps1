@@ -1,3 +1,4 @@
+#Requires -Version 7.0
 # Aetherion AirOps - provision the Grafana "Environment Overview" dashboard.
 # Imports a ready-made dashboard wired to this environment's Azure Monitor data
 # source and sets it as the Grafana HOME dashboard, so attendees land straight

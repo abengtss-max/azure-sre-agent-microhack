@@ -1,3 +1,4 @@
+#Requires -Version 7.0
 # Aetherion AirOps - run the k6 load generator OUTSIDE the monitored environment.
 #
 # Why: the Azure SRE Agent can inspect the hack AKS cluster and its resource group.

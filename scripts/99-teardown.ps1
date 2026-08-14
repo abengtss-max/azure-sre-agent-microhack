@@ -1,3 +1,4 @@
+#Requires -Version 7.0
 # Aetherion AirOps - tear down microhack environment(s).
 # Each microhack is a pair: the hack resource group plus its '<rg>-loadgen' group.
 # In a shared subscription there may be several (each provision creates a suffixed RG), so

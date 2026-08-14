@@ -19,6 +19,9 @@ Thumbs.db
 
 .publish-cache/
 
+# Internal, never-committed planning / brainstorming notes (local only)
+internal-planning/
+
 # Compiled Bicep ARM output
 infra/main.json
 publish/overlays/infra/main.json

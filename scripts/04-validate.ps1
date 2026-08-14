@@ -1,3 +1,4 @@
+#Requires -Version 7.0
 # Aetherion AirOps - validate the running environment end to end.
 
 [CmdletBinding()]

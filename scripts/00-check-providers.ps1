@@ -1,3 +1,4 @@
+#Requires -Version 7.0
 # Aetherion AirOps - resource provider preflight
 # Registers every Azure resource provider the environment needs BEFORE deployment
 # so the Bicep deployment never fails halfway on an unregistered provider.

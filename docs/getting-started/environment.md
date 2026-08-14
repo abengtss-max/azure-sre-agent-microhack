@@ -21,6 +21,11 @@ winget install --id Git.Git --exact --accept-source-agreements --accept-package-
 
 After installs complete, restart your terminal so the commands are available on PATH.
 
+!!! warning "Run every command in PowerShell 7 (`pwsh`)"
+    Windows PowerShell 5.1 is the default on Windows and is **not** supported: the
+    scripts stop with a version error. Start your session with `pwsh` and confirm
+    with `$PSVersionTable.PSVersion` (must be 7.0 or later).
+
 ## 2. Get the two repositories
 
 You use **two** repositories in this MicroHack:

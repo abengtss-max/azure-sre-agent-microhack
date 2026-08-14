@@ -1,3 +1,4 @@
+#Requires -Version 7.0
 # Aetherion AirOps - deploy infrastructure (Bicep)
 # Creates the resource group and deploys infra/main.bicep, then saves outputs
 # (plus the generated PG password) to scripts/.env.aetherion.json for later steps.
@@ -18,9 +19,19 @@ $bicep = Join-Path $repoRoot "infra/main.bicep"
 $envFile = Join-Path $PSScriptRoot ".env.aetherion.json"
 
 Write-Host "Resolving signed-in identity..." -ForegroundColor Cyan
-$deployerObjectId = az ad signed-in-user show --query id -o tsv
+$deployerObjectId = az ad signed-in-user show --query id -o tsv 2>$null
 if ([string]::IsNullOrWhiteSpace($deployerObjectId)) {
-    throw "Could not resolve signed-in user object id. Run 'az login' first."
+    # Microsoft Graph is often blocked by Conditional Access / CAE ("TokenCreatedWithOutdatedPolicies"),
+    # so fall back to the 'oid' claim of the ARM access token, which needs no Graph call.
+    $armToken = az account get-access-token --query accessToken -o tsv 2>$null
+    if (-not [string]::IsNullOrWhiteSpace($armToken)) {
+        $payload = $armToken.Split('.')[1].Replace('-', '+').Replace('_', '/')
+        $payload = $payload.PadRight([int][Math]::Ceiling($payload.Length / 4) * 4, '=')
+        $deployerObjectId = ([Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($payload)) | ConvertFrom-Json).oid
+    }
+}
+if ([string]::IsNullOrWhiteSpace($deployerObjectId)) {
+    throw "Could not resolve the signed-in identity. Sign in again with: az login --scope https://graph.microsoft.com//.default"
 }
 
 # Generate a strong PostgreSQL admin password for this disposable environment.

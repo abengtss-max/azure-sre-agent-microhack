@@ -1,3 +1,4 @@
+#Requires -Version 7.0
 # Aetherion AirOps - enable HTTPS on the gateway domain.
 #
 # Modern, non-nginx TLS: cert-manager + Let's Encrypt + Envoy Gateway (Gateway API).

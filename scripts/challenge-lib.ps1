@@ -34,10 +34,28 @@ function Get-AetherionState {
     return Get-Content $script:EnvFile -Raw | ConvertFrom-Json
 }
 
+function Get-AetherionGatewayIp {
+    if (Test-Path $script:EnvFile) {
+        $st = Get-AetherionState
+        if (-not [string]::IsNullOrWhiteSpace($st.gatewayIp)) { return $st.gatewayIp }
+    }
+
+    $gatewayIp = $null
+    try {
+        $gatewayIp = kubectl get service gateway -n $script:NS `
+            -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>$null
+    } catch { }
+
+    if ([string]::IsNullOrWhiteSpace($gatewayIp)) {
+        throw "State file not found at '$script:EnvFile', and the gateway IP could not be discovered from the current Kubernetes context. Provision the environment or select its AKS context first."
+    }
+    return $gatewayIp.Trim()
+}
+
 function Get-AetherionStatus {
     # Aggregated per-service health from the gateway (internal HTTP, no cert needed).
-    $st = Get-AetherionState
-    return Invoke-RestMethod -Uri "http://$($st.gatewayIp)/api/status" -TimeoutSec 15
+    $gatewayIp = Get-AetherionGatewayIp
+    return Invoke-RestMethod -Uri "http://$gatewayIp/api/status" -TimeoutSec 15
 }
 
 function Test-ServiceHealthy([string]$Service) {

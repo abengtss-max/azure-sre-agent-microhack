@@ -1,3 +1,4 @@
+#Requires -Version 7.0
 # Aetherion AirOps - reset all injected failures back to a clean, healthy baseline.
 #
 # Resets every service profile, removes the APIM throttle policy, and returns the

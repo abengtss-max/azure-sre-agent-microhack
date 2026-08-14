@@ -1,3 +1,4 @@
+#Requires -Version 7.0
 # Aetherion AirOps - build and push the container image using ACR Tasks
 # No local Docker required: 'az acr build' builds in Azure.
 

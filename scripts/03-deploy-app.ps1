@@ -1,3 +1,4 @@
+#Requires -Version 7.0
 # Aetherion AirOps - deploy the application to AKS and wire up APIM + k6
 # Fetches secrets, creates the k8s secret, deploys manifests, waits for the
 # gateway public IP, points APIM at it, and starts the k6 load generator.
