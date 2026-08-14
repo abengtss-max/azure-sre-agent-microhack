@@ -30,14 +30,14 @@ After installs complete, restart your terminal so the commands are available on 
 
 You use **two** repositories in this MicroHack:
 
-**a) Clone the lab repo** — it drives the hack (challenges + scripts):
+**a) Clone the lab repo.** It drives the hack (challenges + scripts):
 
 ```powershell
 git clone https://github.com/abengtss-max/azure-sre-agent-microhack.git
 cd azure-sre-agent-microhack
 ```
 
-**b) Fork the application repo** — this is the Aetherion AirOps *application*
+**b) Fork the application repo.** This is the Aetherion AirOps *application*
 source that the Azure SRE Agent connects to for change correlation. Fork it to
 **your own account** so the agent can read its history and open pull requests:
 
@@ -46,15 +46,15 @@ source that the Azure SRE Agent connects to for change correlation. Fork it to
 
 You'll connect the SRE Agent to **your fork** in Challenge 1.
 
-!!! danger "Connect the agent to your fork — never to the lab repo"
-    **Never connect the Azure SRE Agent to the lab repo — it contains the
+!!! danger "Connect the agent to your fork, never to the lab repo"
+    **Never connect the Azure SRE Agent to the lab repo because it contains the
     challenge material** and would spoil every investigation. Connect the agent
     **only to your fork of `aetherion-airops-platform`**.
 
 ## 3. Check you have access
 
 - **Azure subscription** with **Owner** (or Contributor + User Access
-  Administrator) — the provisioner deploys infrastructure and assigns the agent's
+    Administrator). The provisioner deploys infrastructure and assigns the agent's
   managed identity.
 - This repository cloned locally and opened in VS Code.
 
@@ -69,24 +69,23 @@ az account set --subscription "<subscription-id>"
 ./scripts/provision-environment.ps1
 ```
 
-That's it. The script is idempotent — safe to re-run if a step fails. It runs
-preflight → deploy infrastructure → build & push images → deploy the app →
+That's it. It runs preflight → deploy infrastructure → build & push images → deploy the app →
 validate, then opens the Operations Center, Grafana, and the resource group in
-your browser.
+your browser. The script is idempotent and safe to re-run if a step fails.
 
 Each run provisions into a **uniquely named** resource group,
 `rg-aetherion-microhack-<suffix>` (for example `rg-aetherion-microhack-a7c3`), in
-`swedencentral`. The script **prints the exact name** when it finishes — use that
+`swedencentral`. The script **prints the exact name** when it finishes. Use that
 name wherever these docs mention *your resource group*, and when you scope the
 Azure SRE Agent to it. Because every run is unique, multiple attendees can share a
 single subscription and you can safely re-provision without collisions.
 
 Override the base name or region with `-ResourceGroup`, `-Location`, or
-`-NamePrefix` — the unique suffix is always appended.
+`-NamePrefix`; the unique suffix is always appended.
 
 !!! warning "Re-provisioning leaves the previous environment running"
     Because each run creates a **new** suffixed resource group, re-provisioning
-    does **not** replace your earlier environment — the previous one keeps running
+    does **not** replace your earlier environment. The previous one keeps running
     (and billing), and a stray copy can confuse the agent if you scope it to the
     wrong one. If you re-provision, either reuse the environment you already have,
     or tear down the old ones. The teardown script lists every
@@ -98,12 +97,12 @@ Override the base name or region with `-ResourceGroup`, `-Location`, or
     ./scripts/99-teardown.ps1 -All   # delete all lab environments
     ```
 
-    Always scope the Azure SRE Agent to your **current** resource group — the name
+    Always scope the Azure SRE Agent to your **current** resource group, using the name
     the provisioner printed when it finished.
 
 ## 5. What gets deployed
 
-[![Aetherion AirOps — Azure SRE Agent MicroHack environment architecture](../assets/architecture/aetherion-architecture.png){ .arch-diagram loading=lazy }](../assets/architecture/aetherion-architecture.png)
+[![Aetherion AirOps: Azure SRE Agent MicroHack environment architecture](../assets/architecture/aetherion-architecture.png){ .arch-diagram loading=lazy }](../assets/architecture/aetherion-architecture.png)
 
 *Request/data flow runs left to right (solid blue); telemetry and control flow to
 observability and the Azure SRE Agent (dashed purple); alerting is shown in red.
@@ -112,7 +111,7 @@ observability and the Azure SRE Agent (dashed purple); alerting is shown in red.
 | Layer | Resources |
 |-------|-----------|
 | Edge | Azure API Management (subscription-key auth, rate limiting) |
-| Compute | AKS cluster `aetherion-aks`, namespace `aetherion` — 6 microservices + in-cluster Redis cache |
+| Compute | AKS cluster `aetherion-aks`, namespace `aetherion`: 6 microservices + in-cluster Redis cache |
 | Data | Azure Database for PostgreSQL Flexible Server · in-cluster Redis cache |
 | Observability | Application Insights `aetherion-appi` · Log Analytics `aetherion-law` · Azure Managed Grafana |
 | Agent | Azure SRE Agent `aetherion-sre-agent` |
@@ -147,7 +146,7 @@ Re-run the check on its own at any time:
 | Compute | All microservices | AKS `aetherion-aks`, namespace `aetherion` |
 | Load generator | Produces synthetic traffic during the workshop | Azure Container Instance in a separate resource group (not monitored by the agent) |
 | Change history | Resource and deployment changes | Azure Activity Log + GitHub repo |
-| Azure SRE Agent | Investigate, plan, and remediate — with approval, or bounded autonomy | Azure portal → `aetherion-sre-agent` |
+| Azure SRE Agent | Investigate, plan, and remediate with approval or bounded autonomy | Azure portal → `aetherion-sre-agent` |
 
 Microservices: `gateway`, `flight-ops`, `crew-scheduling`, `booking`, `baggage`,
 `telemetry-ingest`. Synthetic workshop traffic is generated externally by the load
