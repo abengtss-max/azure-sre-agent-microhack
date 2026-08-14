@@ -1,7 +1,7 @@
 # Challenge 3 · Controlled Recovery and Change Correlation
 
 !!! abstract "Challenge 03 of 08 · Act II: Human-Guided Operations"
-    **Run mode:** Review → approved write · **Access:** scoped write on approval
+    **Run mode:** Review → approved write · **Access:** approval-gated write
 
     **Stage:** Foundation → **Operations** → Engineering → Autonomous → Major Incident
 
@@ -36,7 +36,7 @@ applying a reversible rollback, and verifying both from telemetry.
 ### Tasks
 
 1. **Plan the fix.** Ask the agent to turn your hypothesis into a concrete `booking` remediation plan and name the permission it needs.
-2. **Recover under approval.** Apply the least-disruptive fix with your approval (on-behalf-of, or a narrow scoped role), then confirm latency is back to baseline.
+2. **Recover under approval.** Keep the agent in Review, approve the least-disruptive fix, then confirm latency is back to baseline.
 3. **Triage the flight board.** Find out how `flight-ops` is failing from pod status and events.
 4. **Correlate and roll back.** Line the outage up with the recent change, apply a reversible rollback, and check the board recovers.
 
@@ -53,7 +53,7 @@ applying a reversible rollback, and verifying both from telemetry.
 
 ### Success criteria
 
-- Check-in is remediated with a least-disruptive action governed by approval or a scoped role (not ungoverned automation); `booking` is healthy and latency is back to baseline.
+- Check-in is remediated with a least-disruptive action you approved in **Review** mode (not ungoverned automation); `booking` is healthy and latency is back to baseline.
 - `flight-ops`'s failure mode is identified and linked to a recent change/rollout; the recovery is reversible and doesn't touch unrelated resources.
 - Both tiles are green, `/api/flights` responds, and `check-challenge.ps1 3` passes.
 
@@ -93,13 +93,12 @@ fix.
           change and the **permission** the action needs.
 
     ??? note "Task 2 · Recover under approval"
-        Apply the least-disruptive fix one of two governed ways:
-
-        - **On-behalf-of:** keep the agent in **Review**, and select **Approve** when
-          it proposes the write; it runs once, with your permission.
-        - **Scoped role:** grant the agent's managed identity a **narrow** write role
-          on just the affected resource (portal → resource group → **Access control
-          (IAM)**), then let it act with its own identity.
+        - Keep the agent in **Review**. When it proposes the write, select **Approve**:
+          it runs once, with your approval, and the action is recorded.
+        - Note *what* gated that write. The recovery is a Kubernetes operation, so it
+          was your **run mode** that held it for approval, not the agent's Azure role.
+          Permissions decide what the agent can reach; run mode decides whether it
+          asks first.
 
         Then verify `booking` latency is back to baseline.
 
