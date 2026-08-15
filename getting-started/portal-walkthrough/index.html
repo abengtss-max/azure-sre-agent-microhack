@@ -2164,7 +2164,9 @@ run mode (section F), not from the role.</p>
    the agent's inherited set but are not offered in the panel. Any selection you
    make therefore risks dropping cluster access. Scope specialists with
    Instructions.</li>
-<li><strong>Create</strong>, then invoke it and ask for a scoped namespace triage.</li>
+<li><strong>Create</strong>, then use it by asking the main agent to <strong>delegate to it by name</strong>
+   ("delegate this to your <code>aks-triage</code> subagent"). Asking the agent to "act as"
+   a specialist does not invoke the subagent — it just adopts the persona.</li>
 </ol>
 <p>The <strong>Form / YAML</strong> toggle edits the same definition and exposes
 <code>handoff_description</code>, <code>agent_type</code> and <code>enable_skills</code>.</p>

@@ -1754,10 +1754,23 @@ its guardrails intact.</p>
 <p><img alt="Challenge 5 storyboard: Sam and Aria engineer a specialist subagent and reusable skill" class="story-panel" loading="lazy" src="../../assets/storyboard/img-challenge-5.webp" /></p>
 <h3 id="suggested-azure-sre-agent-prompt">Suggested Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent prompt<a class="headerlink" href="#suggested-azure-sre-agent-prompt" title="Permanent link">&para;</a></h3>
 <div class="admonition quote">
-<p class="admonition-title">Paste into the agent chat (your new <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> specialist)</p>
-<p>Act as my <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> reliability specialist for the <code>aetherion</code> namespace: triage pod
-status, events, rollout history and dependency health, then summarize the
-namespace's health and the most likely causes. Keep it scoped to <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr>.</p>
+<p class="admonition-title">Paste into the agent chat</p>
+<p>Delegate this to your <code>aks-triage</code> subagent rather than handling it yourself.
+Triage pod status, events, rollout history and dependency health for the
+<code>aetherion</code> namespace, and have the specialist return a scoped health
+assessment with likely causes and the evidence behind them. Tell me
+explicitly which agent produced the answer.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Ask for the subagent by name, or you won't get it</p>
+<p>Wording like <em>"act as my <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> reliability specialist"</em> does <strong>not</strong> invoke the
+subagent. The main agent simply adopts the persona and does the work itself,
+and the answer looks convincing enough that you'd never notice.</p>
+<p>Delegating explicitly — <em>"delegate this to your <code>aks-triage</code> subagent"</em> — does
+invoke it. You'll see a <strong>Parallel subagent execution</strong> step in the thread,
+and asking <em>"which agent produced the answer"</em> gives you a straight answer to
+check against. There is no slash-command syntax; delegation is natural
+language.</p>
 </div>
 <h3 id="success-criteria">Success criteria<a class="headerlink" href="#success-criteria" title="Permanent link">&para;</a></h3>
 <ul>
@@ -1883,9 +1896,10 @@ shows extra keys worth knowing about:</p>
   the one you are about to author.</li>
 </ul>
 </details>
-<p>Then invoke the specialist and ask for a namespace-health summary with
-likely causes. Judge it on one question: would this have sped up a real <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr>
-incident?</p>
+<p>Then invoke the specialist by <strong>delegating to it by name</strong> and ask for a
+namespace-health summary with likely causes. Confirm it actually ran — the
+thread shows a <em>Parallel subagent execution</em> step — and judge it on one
+question: would this have sped up a real <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> incident?</p>
 </details>
 <details class="note">
 <summary>Task 2 · Encode the skill</summary>
