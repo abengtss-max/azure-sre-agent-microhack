@@ -133,24 +133,61 @@ you'll want both in the final incident.
 
         **Skills** — leave inherited. Do not select anything here.
 
-        **Tools** — leave inherited. Do not select anything here either, and this
-        is the one that will catch you out:
+        **Tools** — this is the part that decides whether the specialist actually
+        works, and there is a trap in it.
 
         !!! warning "Selecting tools replaces the inherited set"
             The dialog says the agent inherits 46 global tools and that selecting
-            tools *overrides* the defaults. It means exactly that — your selection
-            replaces all 46, it does not add to them.
+            tools *overrides* the defaults. It means replaces, not adds. If you
+            select three tools, the specialist has three tools — and if the cluster
+            tools aren't among them, your AKS specialist cannot read the cluster.
 
-            Searching the tool picker for "AKS" or "Kubernetes" returns nothing
-            useful, because **`kubectl` is not in the tool picker**. Cluster access
-            reaches the agent through a separate execution channel — the same one
-            that produces the `kubectl` approval prompts you have been approving
-            since Challenge 1.
+            Also: **searching the picker for "AKS" or "Kubernetes" finds nothing.**
+            The tools are named after the CLI, not the service. Search
+            **`kubectl`**.
 
-            So if you pick tools here to "scope it to AKS", you achieve the
-            opposite: you strip the specialist of the cluster access it needs and
-            leave it with whatever unrelated handful you selected. Scope this
-            specialist with its **Instructions**, and leave Tools inherited.
+        The cluster tools live under the **Azure Operation** category:
+
+        | Tool | Take it? |
+        |---|---|
+        | `RunKubectlReadCommand` | **Yes** — this is the specialist's core capability |
+        | `RunKubectlWriteCommand` | **No** — see below |
+
+        Leaving `RunKubectlWriteCommand` out is the whole point. Challenge 5 builds
+        an investigator while the platform is green, so make it read-only
+        *structurally* rather than by asking politely in the instructions. A
+        specialist that cannot write cannot be talked into writing. It earns the
+        write tool later, once you've seen it reason well.
+
+        A good minimum selection, if you curate:
+
+        ```text
+        Azure Operation
+          RunKubectlReadCommand
+          RunAzCliReadCommands
+
+        Log Query
+          QueryAppInsightsByResourceId
+          QueryLogAnalyticsByResourceId
+
+        Knowledge Base
+          GetChangeHistory
+          SearchIncidentKnowledge
+          SearchMemory
+
+        system-mcp-monitor
+          system-mcp-monitor_monitor_metrics_query
+          system-mcp-monitor_monitor_resource_log_query
+        ```
+
+        That gives it the cluster, the telemetry to corroborate what it sees, the
+        change history to correlate a rollout against a symptom, and memory so it
+        can recall an earlier RCA — which is exactly what Challenge 7 asks it to do.
+
+        !!! tip "Not sure? Leave Tools untouched"
+            Inheriting all 46 is a perfectly good answer for this challenge. You
+            lose the read-only guarantee, but you cannot accidentally cripple the
+            specialist. Curating is the better lesson; inheriting is the safer one.
 
         **Hooks** — nothing needed for this challenge.
 
