@@ -120,15 +120,32 @@ outage was masking.
           by business tier: situational awareness (flight board) and legal-to-fly
           (crew) first, not by whichever alert is loudest.
 
+        !!! warning "The board cannot see your front door"
+            The Operations Center polls each service **directly**, inside the
+            cluster. It has no view of API Management. So the board can read fully
+            green while every partner and mobile customer is getting a 500 at the
+            edge — which is exactly what happens in this incident.
+
+            Validated: an agent told to "read the whole board" recovered all four
+            in-cluster faults, declared the incident stable, and never mentioned the
+            front door once. It was not wrong about the board. The board was
+            incomplete.
+
+            Treat the internal board and the customer-facing path as two separate
+            questions, and always ask the second one. That is Task 5.
+
     ??? note "Task 3 · Check the agent's memory"
         - Ask the agent whether a similar crew-scheduling / check-in incident has
           happened before; let session insights surface the earlier RCA and the fix
           that worked.
 
     ??? note "Task 4 · Delegate and recover"
-        - Invoke your **AKS specialist subagent** for pod / rollout triage, and apply
-          your **crew recovery skill** for the sanctioned recovery — crew is failing
-          the same way it did in Challenge 4, so the skill should carry.
+        - Hand AKS triage to your specialist by **delegating to it by name**
+          ("delegate this to your `aks-triage` subagent"), and **name your crew
+          recovery skill** when you want it applied — crew is failing the same way it
+          did in Challenge 4, so the skill carries. Asking the agent to "act as" a
+          specialist does not invoke the subagent, and a skill does not reliably fire
+          on its own.
         - Keep actions governed and follow the runbooks: fix the layer that is
           actually saturated, never delete the database.
 

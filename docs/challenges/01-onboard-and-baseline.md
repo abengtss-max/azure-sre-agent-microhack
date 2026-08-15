@@ -141,6 +141,19 @@ read-only check so the agent watches for drift on its own.
         setup, so the "won't change anything" guarantee comes from **Review mode**,
         not from the role being read-only.
 
+        **Grant one extra permission.** Setup leaves the agent with read-only
+        access to API Management, which is enough to diagnose an edge fault but not
+        to repair one. Run this once, after the agent exists:
+
+        ```powershell
+        ./scripts/grant-agent-apim-access.ps1
+        ```
+
+        It grants **API Management Service Contributor** scoped to the API
+        Management service alone, never the resource group. Skip it and the agent
+        will correctly localise the front-door failure in Challenge 7 and then
+        report that RBAC blocks the fix.
+
         **Confirm scope.** Ask *"List the resources in my resource group and
         summarize what this application does."* Then ask it to **restart a
         deployment**. In Review mode it must ask for approval, not act.
