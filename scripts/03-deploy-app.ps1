@@ -41,6 +41,18 @@ kubectl apply -f $tmp
 Write-Host "Waiting for deployments to become available..." -ForegroundColor Cyan
 kubectl rollout status deploy/gateway -n $ns --timeout=300s
 
+# Schema migrations ship with the deployment, not with the application start-up,
+# so a pod restart never silently rebuilds a missing index.
+Write-Host "Applying database migrations..." -ForegroundColor Cyan
+. (Join-Path $PSScriptRoot 'lib-dbjob.ps1')
+kubectl rollout status deploy/crew-scheduling -n $ns --timeout=300s | Out-Null
+if (Invoke-AetherionDbSql -Sql 'CREATE INDEX IF NOT EXISTS idx_crew_roster_duty ON crew_roster (assigned, flight_no, crew_member);' -Name 'migrate-crew-index') {
+    Write-Host "  crew roster duty index in place" -ForegroundColor Gray
+}
+else {
+    Write-Host "  WARNING: crew roster index migration did not complete - crew scheduling will be slow." -ForegroundColor Yellow
+}
+
 Write-Host "Waiting for gateway public IP..." -ForegroundColor Cyan
 $gwIp = ""
 for ($i = 0; $i -lt 60; $i++) {

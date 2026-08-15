@@ -33,20 +33,19 @@ if (Test-Path $envFile) {
 # PG_POOL_MAX comes from the aetherion-config ConfigMap; drop any deployment override.
 kubectl set env deploy/crew-scheduling -n $ns PG_POOL_MAX- 2>$null | Out-Null
 foreach ($s in $services) { kubectl delete deploy "$s-v2" -n $ns --ignore-not-found 2>$null | Out-Null }
-# Autoscaler ceilings: booking scales to 6, crew-scheduling is capped at 3 by design.
-kubectl patch hpa booking -n $ns --type=merge -p (@{ spec = @{ maxReplicas = 6 } } | ConvertTo-Json -Compress) 2>$null | Out-Null
-kubectl patch hpa crew-scheduling -n $ns --type=merge -p (@{ spec = @{ maxReplicas = 3 } } | ConvertTo-Json -Compress) 2>$null | Out-Null
+# Autoscaler bounds: booking runs 2-6, crew-scheduling is capped at 3 by design.
+kubectl patch hpa booking -n $ns --type=merge -p (@{ spec = @{ minReplicas = 2; maxReplicas = 6 } } | ConvertTo-Json -Compress) 2>$null | Out-Null
+kubectl patch hpa crew-scheduling -n $ns --type=merge -p (@{ spec = @{ minReplicas = 2; maxReplicas = 3 } } | ConvertTo-Json -Compress) 2>$null | Out-Null
 Write-Host "  pool override cleared, canary revisions removed, autoscaler ceilings restored" -ForegroundColor Gray
 
-# The baseline estate has no index behind the crew duty lookup - that is the
-# latent weakness Challenge 4 exposes - so a reset removes one if a previous run
-# created it, along with any maintenance jobs left behind.
+# The platform ships with an index behind the crew duty lookup; a challenge may
+# have removed it. Restore it, and clear any maintenance jobs left behind.
 kubectl delete jobs -n $ns -l component=db-maintenance --ignore-not-found 2>$null | Out-Null
-if (Invoke-AetherionDbSql -Sql 'DROP INDEX IF EXISTS idx_crew_roster_duty;' -Name 'reset-crew-index') {
-    Write-Host "  crew roster index removed (baseline state)" -ForegroundColor Gray
+if (Invoke-AetherionDbSql -Sql 'CREATE INDEX IF NOT EXISTS idx_crew_roster_duty ON crew_roster (assigned, flight_no, crew_member);' -Name 'reset-crew-index') {
+    Write-Host "  crew roster index restored" -ForegroundColor Gray
 }
 else {
-    Write-Host "  WARNING: could not reset the crew roster index - Challenge 4 may already be solved." -ForegroundColor Yellow
+    Write-Host "  WARNING: could not restore the crew roster index - crew scheduling will stay slow." -ForegroundColor Yellow
 }
 
 # Return the load generator to its normal level (challenges 2 & 7 set surge).

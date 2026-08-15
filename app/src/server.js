@@ -28,13 +28,23 @@ app.get('/health/live', (req, res) => {
 });
 
 app.get('/health/ready', async (req, res) => {
-  // crew-scheduling/booking/telemetry depend on the database
+  // Readiness answers "can this pod serve", not "is the database fast". A slow
+  // dependency must not eject every replica from the Service - that turns a
+  // degradation into an outage and stops the remedy from ever taking effect.
   if (['crew-scheduling', 'booking', 'telemetry-ingest'].includes(ROLE) && db.isConfigured()) {
     try {
       const pool = db.getPool();
-      await pool.query('SELECT 1');
+      await Promise.race([
+        pool.query('SELECT 1'),
+        new Promise((resolve) => setTimeout(() => resolve('slow'), 1000))
+      ]);
     } catch (err) {
-      return res.status(503).json({ status: 'not-ready', reason: 'database unreachable' });
+      // Only a hard failure (refused, unresolvable, rejected credentials) means
+      // this pod genuinely cannot serve.
+      const hard = ['ECONNREFUSED', 'ENOTFOUND', 'EHOSTUNREACH', '28P01', '3D000'];
+      if (hard.includes(err.code)) {
+        return res.status(503).json({ status: 'not-ready', reason: 'database unreachable' });
+      }
     }
   }
   res.json({ status: 'ready', role: ROLE });
@@ -101,8 +111,16 @@ function registerRoleRoutes() {
       app.get('/api/bookings/count', async (req, res) => {
         try {
           const pool = db.getPool();
-          const { rows } = pool ? await pool.query('SELECT count(*)::int AS c FROM bookings') : { rows: [{ c: 0 }] };
-          res.json({ bookings: rows[0].c });
+          if (!pool) return res.json({ bookings: 0 });
+          // The reservations table only grows, so the dashboard counter uses the
+          // planner's row estimate rather than scanning it on every request.
+          const { rows } = await pool.query(
+            "SELECT reltuples::bigint AS c FROM pg_class WHERE relname = 'bookings'"
+          );
+          const estimate = rows.length ? Number(rows[0].c) : -1;
+          if (estimate >= 0) return res.json({ bookings: estimate });
+          const exact = await pool.query('SELECT count(*)::int AS c FROM bookings');
+          res.json({ bookings: exact.rows[0].c });
         } catch (err) {
           res.status(500).json({ error: err.message });
         }
@@ -178,6 +196,55 @@ function registerGatewayRoutes() {
     }
   }
 
+  // A single probe samples an instantaneous queue depth, so one reading swings
+  // wildly on a service that is steadily degraded. Keep a short window per
+  // service and report percentiles, the way an operator would read a dashboard.
+  const WINDOW = 12;
+  const history = {};
+  const latest = {};
+
+  function summarise(name) {
+    const h = history[name] || [];
+    if (!h.length) return null;
+
+    const sorted = h.map((x) => x.latencyMs).sort((a, b) => a - b);
+    const at = (q) => sorted[Math.min(sorted.length - 1, Math.max(0, Math.ceil(sorted.length * q) - 1))];
+    const failures = h.filter((x) => !x.ok).length;
+    const errorRatePct = +((failures / h.length) * 100).toFixed(1);
+    const last = h[h.length - 1];
+
+    return {
+      // A service is down when it is mostly failing, not because one probe
+      // caught it mid-restart.
+      ok: errorRatePct < 50,
+      status: last.status,
+      latencyMs: at(0.95),
+      p50Ms: at(0.5),
+      p95Ms: at(0.95),
+      lastMs: last.latencyMs,
+      errorRatePct,
+      samples: h.length
+    };
+  }
+
+  async function sampleAll() {
+    await Promise.all(
+      Object.entries(services).map(async ([name, url]) => {
+        const result = await probe(url, PROBES[name]);
+        const h = history[name] || (history[name] = []);
+        h.push(result);
+        if (h.length > WINDOW) h.shift();
+        latest[name] = result;
+      })
+    );
+  }
+
+  // Poll continuously so the board reflects the platform's recent behaviour
+  // rather than whatever a single request happened to catch.
+  setInterval(() => {
+    sampleAll().catch(() => {});
+  }, 5000).unref();
+
   // Derive executive/business/operational signals from the REAL probe results so
   // every panel reflects the live state of the platform.
   function deriveSignals(health) {
@@ -185,12 +252,13 @@ function registerGatewayRoutes() {
     const total = values.length || 1;
     const down = values.filter((h) => !h.ok).length;
     // Aetherion's latency budget for a passenger-facing path is 400ms.
-    const slow = values.filter((h) => h.ok && h.latencyMs > 400).length;
+    const slow = values.filter((h) => h.ok && h.p95Ms > 400).length;
+    const flaky = values.filter((h) => h.ok && h.errorRatePct > 0).length;
 
-    const score = Math.min(100, down * 32 + slow * 20 + (down + slow ? 6 : 4));
+    const score = Math.min(100, down * 32 + slow * 20 + flaky * 12 + (down + slow + flaky ? 6 : 4));
     const level = score >= 60 ? 'HIGH' : score >= 25 ? 'MEDIUM' : 'LOW';
 
-    const latencies = values.map((h) => h.latencyMs || 0).sort((a, b) => a - b);
+    const latencies = values.map((h) => h.p95Ms || 0).sort((a, b) => a - b);
     const p95Ms = latencies.length ? latencies[Math.min(latencies.length - 1, Math.ceil(latencies.length * 0.95) - 1)] : 0;
     const errorRatePct = +((down / total) * 100).toFixed(2);
     const availabilityPct = +Math.max(0, 100 - down * 0.7 - slow * 0.15).toFixed(2);
@@ -201,7 +269,9 @@ function registerGatewayRoutes() {
       const label = LABELS[name] || name;
       if (!h.ok) {
         incidents.push({ sev: CORE[name] || 'SEV-2', title: `${label} unavailable`, status: 'Investigating', service: name });
-      } else if (h.latencyMs > 1500) {
+      } else if (h.errorRatePct > 0) {
+        incidents.push({ sev: 'SEV-3', title: `${label} intermittent errors`, status: 'Investigating', service: name });
+      } else if (h.p95Ms > 400) {
         incidents.push({ sev: 'SEV-3', title: `${label} elevated latency`, status: 'Monitoring', service: name });
       }
     }
@@ -231,10 +301,11 @@ function registerGatewayRoutes() {
   }
 
   app.get('/api/status', async (req, res) => {
-    const entries = await Promise.all(
-      Object.entries(services).map(async ([name, url]) => [name, await probe(url, PROBES[name])])
-    );
-    const health = Object.fromEntries(entries);
+    if (!Object.keys(history).length) await sampleAll();
+    const health = {};
+    for (const name of Object.keys(services)) {
+      health[name] = summarise(name) || { ok: false, status: 0, latencyMs: 0, p50Ms: 0, p95Ms: 0, errorRatePct: 100, samples: 0 };
+    }
     const healthy = Object.values(health).every((h) => h.ok);
     const derived = deriveSignals(health);
     trackEvent('ops_status_poll', { healthy: String(healthy), risk: derived.risk.level });

@@ -42,7 +42,17 @@ $apiKey = $state.apimSubscriptionKey
 if ([string]::IsNullOrWhiteSpace($apiKey)) {
     throw "APIM subscription key not found in state. Run 03-deploy-app.ps1 first."
 }
-$vus = if ($Vus -gt 0) { $Vus } elseif ($Mode -eq 'surge') { 120 } elseif ($Mode -eq 'crew-burst') { 250 } elseif ($Mode -eq 'major') { 200 } else { 25 }
+# Aetherion's own stations and mobile backend reach the platform directly, so a
+# fault at the partner front door does not take the workload idle.
+$directUrl = if ([string]::IsNullOrWhiteSpace($state.gatewayIp)) { '' } else { "http://$($state.gatewayIp)" }
+$vus = if ($Vus -gt 0) { $Vus } elseif ($Mode -eq 'surge') { 200 } elseif ($Mode -eq 'crew-burst') { 150 } elseif ($Mode -eq 'major') { 80 } else { 25 }
+# Aetherion's own stations and mobile backend carry most of a departure wave;
+# partner API traffic is the smaller share. During a major incident that split
+# matters, because a fault at the partner front door must not take the platform
+# idle and hide everything behind it.
+$internalVus = if ($Mode -eq 'major') { 60 } else { 12 }
+$crewVus = if ($Mode -eq 'major') { 120 } else { 0 }
+$checkInVus = if ($Mode -eq 'major') { 120 } else { 0 }
 
 # --- Separate, un-monitored resource group -----------------------------------
 if ((az group exists --name $LoadGenResourceGroup) -eq 'true') {
@@ -54,24 +64,32 @@ az group create --name $LoadGenResourceGroup --location $Location --only-show-er
 
 # --- Carry the k6 script into the container via an ACI secret volume ---------
 # No storage account (governed subs disable storage shared-key, which ACI Azure
-# Files needs) and no registry auth (grafana/k6 is public). The secret value is
-# the base64 of the script; ACI mounts the decoded file at /scripts/k6-load.js.
-$scriptB64 = [Convert]::ToBase64String([System.IO.File]::ReadAllBytes((Join-Path $repoRoot "load/k6-load.js")))
+# Files needs) and no registry auth (grafana/k6 is public). The script is gzipped
+# before base64 because the whole thing travels on the command line, which has a
+# hard length limit on Windows.
+$scriptBytes = [System.IO.File]::ReadAllBytes((Join-Path $repoRoot "load/k6-load.js"))
+$ms = New-Object System.IO.MemoryStream
+$gz = New-Object System.IO.Compression.GZipStream($ms, [System.IO.Compression.CompressionLevel]::Optimal)
+$gz.Write($scriptBytes, 0, $scriptBytes.Length)
+$gz.Dispose()
+$scriptB64 = [Convert]::ToBase64String($ms.ToArray())
+$ms.Dispose()
 
 Write-Host "Redeploying k6 load generator on Azure Container Instance (mode=$Mode, vus=$vus)..." -ForegroundColor Cyan
 az container delete -g $LoadGenResourceGroup -n aetherion-k6 --yes --only-show-errors 2>$null | Out-Null
 az container create `
     -g $LoadGenResourceGroup -n aetherion-k6 `
     --image grafana/k6:latest `
-    --os-type Linux --cpu 1 --memory 1.5 `
+    --os-type Linux --cpu 2 --memory 2 `
     --restart-policy Always `
-    --command-line "sh -c 'base64 -d /scripts/k6-load.js > /tmp/k6-load.js && k6 run /tmp/k6-load.js'" `
-    --environment-variables BASE_URL="$baseUrl" MODE="$Mode" VUS="$vus" `
+    --command-line "sh -c 'base64 -d /scripts/k6-load.js.gz > /tmp/k6.gz && gunzip -c /tmp/k6.gz > /tmp/k6-load.js && k6 run /tmp/k6-load.js'" `
+    --environment-variables BASE_URL="$baseUrl" DIRECT_URL="$directUrl" MODE="$Mode" VUS="$vus" INTERNAL_VUS="$internalVus" CREW_VUS="$crewVus" CHECKIN_VUS="$checkInVus" `
     --secure-environment-variables API_KEY="$apiKey" `
-    --secrets "k6-load.js=$scriptB64" `
+    --secrets "k6-load.js.gz=$scriptB64" `
     --secrets-mount-path /scripts `
     --only-show-errors | Out-Null
 
 Write-Host "k6 load generator running in '$LoadGenResourceGroup' - hidden from the SRE Agent." -ForegroundColor Green
-Write-Host "  Target : $baseUrl" -ForegroundColor Gray
-Write-Host "  Mode   : $Mode ($vus VUs)" -ForegroundColor Gray
+Write-Host "  Partner  : $baseUrl" -ForegroundColor Gray
+if ($directUrl) { Write-Host "  Internal : $directUrl ($internalVus mixed$(if ($crewVus -gt 0) { ", $crewVus crew sign-on, $checkInVus check-in" }))" -ForegroundColor Gray }
+Write-Host "  Mode     : $Mode ($vus VUs)" -ForegroundColor Gray

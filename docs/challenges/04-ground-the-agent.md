@@ -5,11 +5,12 @@
 
     **Stage:** Foundation → **Operations** → Engineering → Autonomous → Major Incident
 
-**Situation.** Crew scheduling is failing (the `crew-scheduling` tile is red while
-every other service stays healthy), and duty managers can't confirm who is legal to
-fly the evening wave. Out of the box the agent gives generic advice, and a generic
-"restart the database" is exactly what Aetherion's runbooks forbid. The fastest path
-to the right answer is to ground the agent in your own knowledge.
+**Situation.** Crew scheduling is failing (the `crew-scheduling` tile is red) and duty
+managers can't confirm who is legal to fly the evening wave. The services that share
+its database are wobbling too, so "the database is down" is the obvious call — and
+it's wrong. Out of the box the agent gives generic advice, and a generic "restart the
+database" is exactly what Aetherion's runbooks forbid. The fastest path to the right
+answer is to ground the agent in your own knowledge.
 
 **Mission.** Ground the SRE Agent in Aetherion's architecture and runbooks so it
 recommends the sanctioned fix, then recover `crew-scheduling` with that
@@ -20,7 +21,7 @@ non-destructive remediation and verify service is restored.
 <div class="grid cards why-cards" markdown>
 
 - :material-book-open-variant: **Ground the agent**: load Aetherion's runbooks and architecture
-- :material-target: **Right layer, right fix**: scaling the wrong tier cannot fix a saturated one
+- :material-target: **Origin, not symptom**: a shared dependency spreads pain far beyond the culprit
 - :material-shield-alert-outline: **Respect guardrails**: repair the query path, never delete the database
 - :material-account-clock-outline: **Legal to fly**: restore crew scheduling before the evening wave
 
@@ -34,7 +35,7 @@ non-destructive remediation and verify service is restored.
 
 ### Tasks
 
-1. **Confirm the blast radius.** Check that only `crew-scheduling` is down. One red service isn't the whole database failing.
+1. **Find the origin.** Several database-backed services look unhappy. Work out which one is *causing* it and which are just sharing the damage.
 2. **Ground the agent.** Load Aetherion's `knowledge/` runbooks, then re-ask the remediation question and watch the advice change.
 3. **Apply the sanctioned fix.** Repair the query path the runbook points to (never delete the database), then confirm crew scheduling recovers.
 
@@ -43,15 +44,16 @@ non-destructive remediation and verify service is restored.
 ### Suggested Azure SRE Agent prompt
 
 !!! quote "Paste into the agent chat"
-    `crew-scheduling` is timing out on its database calls while its database-backed
-    peers stay healthy, and the pods themselves are not CPU-bound. Using the
-    Aetherion runbooks I've loaded: what is the sanctioned remediation? Cite the
-    guardrail and give me a plan I can approve. Do not delete or restart the
-    database.
+    `crew-scheduling` is timing out and the other database-backed services are
+    slower than usual, but the pods themselves are not CPU-bound and the database
+    is not down. Work out which service's queries are saturating the shared
+    database. Then, using the Aetherion runbooks I've loaded: what is the
+    sanctioned remediation? Cite the guardrail and give me a plan I can approve. Do
+    not delete or restart the database.
 
 ### Success criteria
 
-- Only `crew-scheduling` is identified as affected, and you can say **which layer** is saturated.
+- You can name the **origin** — the service whose queries are saturating the shared database — and explain why its neighbours are suffering without being at fault.
 - The grounded agent cites the runbook guardrail (repair the query path, never delete the database) and you apply that non-destructive fix under approval.
 - `/api/crew` is back **inside the 400 ms latency budget while the roster rush is still running** — that is what `check-challenge.ps1 4` grades. A tile that is merely answering again is not a pass.
 
@@ -67,8 +69,12 @@ non-destructive remediation and verify service is restored.
 
 <details markdown="1"><summary>Hint: how wide is the blast radius?</summary>
 
-Only `crew-scheduling` is red while its database-backed peers stay healthy, which
-rules out a whole-database outage. The problem is local to one service.
+More than one service is unhappy, but they are not equally unhappy — and they have
+something in common. Ask what they share, then ask which of them is *using* that
+shared thing hardest. The one generating the load is the origin; the rest are
+collateral.
+
+A database that is busy is not the same as a database that is broken.
 </details>
 
 <details markdown="1"><summary>Hint: let the runbooks answer</summary>
@@ -85,15 +91,16 @@ work to the part that is already at its limit.
     Give each task a genuine attempt first, and skim the hints above. When you want
     the exact clicks, open the matching task below.
 
-    ??? note "Task 1 · Confirm the blast radius"
-        - Read the Operations Center: is **only** `crew-scheduling` red, or are its
-          database-backed peers (`booking`, `telemetry-ingest`) failing too?
-        - If just one service is down, a whole-database outage is ruled out, so the
-          fault is local to that service's workload — or to what that workload asks
-          the database to do.
-        - Compare the two layers: pod CPU (`kubectl top pods -n aetherion`) against
-          the PostgreSQL server's CPU in the portal. They will not agree, and the
-          disagreement is the finding.
+    ??? note "Task 1 · Find the origin"
+        - Read the Operations Center: `crew-scheduling` is red, and its
+          database-backed peers (`booking`, `telemetry-ingest`) are slower than
+          their baseline. `baggage`, which touches no database, is untouched — that
+          contrast is the clue.
+        - Compare the layers: pod CPU (`kubectl top pods -n aetherion`) against the
+          PostgreSQL server's CPU in the portal. The pods are comfortable and the
+          database is not, so the constraint is the work being sent to it.
+        - Now ask which service is sending that work. Only one is running a request
+          rush against a table it can no longer read efficiently.
 
     ??? note "Task 2 · Ground the agent"
         - In the agent, open **Builder → Knowledge Sources** and add Aetherion's

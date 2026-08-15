@@ -25,7 +25,8 @@ function pushFeed(text, level = 'info') {
 function classify(h) {
   if (!h) return 'muted';
   if (!h.ok) return 'red';
-  if (h.latencyMs > 1500) return 'amber';
+  if (h.errorRatePct > 0) return 'amber';
+  if (h.latencyMs > 400) return 'amber';
   return 'green';
 }
 
@@ -51,7 +52,7 @@ function renderTiles(services) {
     div.innerHTML = `
       <h3>${label}</h3>
       <div class="state">${state}</div>
-      <div class="meta">${h.ok ? `${h.latencyMs} ms` : `HTTP ${h.status || 'timeout'}`}</div>`;
+      <div class="meta">${h.ok ? `p95 ${h.latencyMs} ms${h.errorRatePct > 0 ? ` · ${h.errorRatePct}% errors` : ''}` : `HTTP ${h.status || 'timeout'}`}</div>`;
     tiles.appendChild(div);
 
     // Emit feed events when a service changes state

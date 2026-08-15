@@ -59,23 +59,35 @@ function Get-AetherionStatus {
 }
 
 function Test-ServiceHealthy([string]$Service, [int]$MaxLatencyMs = 0) {
-    $s = Get-AetherionStatus
-    $node = $s.services.$Service
-    if (-not ($node -and $node.ok)) { return $false }
-    if ($MaxLatencyMs -le 0) { return $true }
-    # Answering with HTTP 200 is not the same as being recovered, so a service is
-    # only healthy once it is back inside the latency budget. Sampled twice so a
-    # single noisy probe can't fail an otherwise recovered service.
-    if ([int]$node.latencyMs -le $MaxLatencyMs) { return $true }
-    Start-Sleep -Seconds 3
-    $again = (Get-AetherionStatus).services.$Service
-    return [bool]($again -and $again.ok -and [int]$again.latencyMs -le $MaxLatencyMs)
+    # The gateway reports a rolling window, so a service that has just recovered
+    # still carries its bad samples for about a minute. Wait that out - but
+    # require two consecutive good reads, so a single lucky window can't pass a
+    # service that is still degraded.
+    $deadline = (Get-Date).AddSeconds(120)
+    $streak = 0
+    while ($true) {
+        $node = (Get-AetherionStatus).services.$Service
+        $good = [bool]($node -and $node.ok -and ($MaxLatencyMs -le 0 -or [int]$node.latencyMs -le $MaxLatencyMs))
+        if ($good) {
+            $streak++
+            if ($streak -ge 2) { return $true }
+        }
+        else { $streak = 0 }
+        if ((Get-Date) -ge $deadline) { return $false }
+        Start-Sleep -Seconds 10
+    }
 }
 
 function Get-ServiceLatencyMs([string]$Service) {
     $node = (Get-AetherionStatus).services.$Service
     if (-not $node) { return -1 }
-    return [int]$node.latencyMs
+    return [int]$node.p95Ms
+}
+
+function Get-ServiceErrorRate([string]$Service) {
+    $node = (Get-AetherionStatus).services.$Service
+    if (-not $node) { return -1 }
+    return [double]$node.errorRatePct
 }
 
 function Get-PoolMax([string]$Service) {
@@ -235,7 +247,7 @@ $script:Challenges = [ordered]@{
             $okFlight = (Test-ServiceHealthy 'flight-ops')
             $tagFlight = Get-ImageTag 'flight-ops'
             $pass = ($okBook -and $cpuBook -ge 500 -and $okFlight -and $tagFlight -eq 'latest')
-            @{ Pass = $pass; Detail = "booking healthy=$okBook (${latBook}ms) cpuLimit=${cpuBook}m | flight-ops healthy=$okFlight image=:$tagFlight" }
+            @{ Pass = $pass; Detail = "booking healthy=$okBook (p95 ${latBook}ms) cpuLimit=${cpuBook}m | flight-ops healthy=$okFlight image=:$tagFlight" }
         }
     }
 
@@ -245,9 +257,10 @@ $script:Challenges = [ordered]@{
         Start = {
             Invoke-Fault 'crew-scheduling' 'slow-query'
             Set-Load 'crew-burst'
-            Write-Host "INCIDENT P2: crew scheduling requests hang then error; only this service is affected." -ForegroundColor Yellow
-            Write-Host "The sanctioned remediation lives in Aetherion's runbooks - ground the agent in the"
-            Write-Host "knowledge base so it recommends the approved fix (repair the query path, never delete the database)."
+            Write-Host "INCIDENT P2: crew scheduling is timing out, and the services sharing its database" -ForegroundColor Yellow
+            Write-Host "are slowing down with it. The database is busy, not broken - find which service is"
+            Write-Host "causing it. The sanctioned remediation lives in Aetherion's runbooks, so ground the"
+            Write-Host "agent in the knowledge base (repair the query path, never delete the database)."
         }
         Check = {
             $ok   = (Test-ServiceHealthy 'crew-scheduling' 400)
@@ -296,12 +309,13 @@ $script:Challenges = [ordered]@{
             Write-Host "major incident auto-triggers an investigation instead of waiting for a human."
         }
         Check = {
-            $ok     = (Test-ServiceHealthy 'baggage')
+            $ok     = (Test-ServiceHealthy 'baggage' 400)
+            $err    = Get-ServiceErrorRate 'baggage'
             $canary = Test-CanaryPresent 'baggage'
             $auto = Confirm-SelfAttest 'Did the agent remediate baggage while running in Autonomous mode (you supervised, did not fix it by hand)?'
             $cost = Confirm-SelfAttest 'Have you reviewed agent consumption and produced a cost-aware operating model (not just the cheapest option)?'
             $plan = Confirm-SelfAttest 'Have you created a Sev1-filtered major-incident response plan on the agent (bound to the aetherion-major-incident alert) so the next major incident auto-triggers an investigation?'
-            @{ Pass = ($ok -and (-not $canary) -and $auto -and $cost -and $plan); Detail = "baggage healthy=$ok canaryStillServing=$canary autonomous=$auto cost-model=$cost responsePlan=$plan" }
+            @{ Pass = ($ok -and $err -eq 0 -and (-not $canary) -and $auto -and $cost -and $plan); Detail = "baggage healthy=$ok errorRate=$err% canaryStillServing=$canary autonomous=$auto cost-model=$cost responsePlan=$plan" }
         }
     }
 
@@ -331,7 +345,7 @@ $script:Challenges = [ordered]@{
         }
         Check = {
             $tagFlight = Get-ImageTag 'flight-ops'
-            $okCrew    = Test-ServiceHealthy 'crew-scheduling' 400
+            $okCrew    = Test-ServiceHealthy 'crew-scheduling' 800
             $latCrew   = Get-ServiceLatencyMs 'crew-scheduling'
             $cpuBook   = Get-CpuLimitMilli 'booking'
             $apimOk    = Test-ApimHealthy
