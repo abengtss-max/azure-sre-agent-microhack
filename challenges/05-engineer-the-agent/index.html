@@ -1875,9 +1875,10 @@ shows extra keys worth knowing about:</p>
 <li><code>handoff_description</code> — when the main agent should delegate to this
   specialist. Worth writing, because it is what makes the subagent
   usable in Challenge 7.</li>
-<li><code>agent_type</code> — check this before you create. Challenge 5 is a
-  <strong>Review</strong>-mode challenge, so a subagent left as <code>Autonomous</code> has
-  quietly been given more latitude than the rest of your setup.</li>
+<li><code>agent_type</code> — the <em>kind</em> of subagent: <code>Autonomous</code>, <code>Orchestrator</code>
+  or <code>Activity</code>. The portal hardcodes new subagents to <code>Autonomous</code>,
+  and it is <strong>not</strong> the Review / Autonomous run mode — that is a
+  separate agent-level setting. Leave it as generated.</li>
 <li><code>enable_skills</code> — whether the specialist can load skills, including
   the one you are about to author.</li>
 </ul>
