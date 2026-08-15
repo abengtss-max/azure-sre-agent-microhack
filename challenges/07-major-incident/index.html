@@ -1856,6 +1856,19 @@ the exact clicks, open the matching task below.</p>
   by business tier: situational awareness (flight board) and legal-to-fly
   (crew) first, not by whichever alert is loudest.</li>
 </ul>
+<div class="admonition warning">
+<p class="admonition-title">The board cannot see your <abbr title="The single public entry point (API Management) through which all client traffic passes.">front door</abbr></p>
+<p>The Operations Center polls each service <strong>directly</strong>, inside the
+cluster. It has no view of API Management. So the board can read fully
+green while every partner and mobile customer is getting a 500 at the
+edge — which is exactly what happens in this incident.</p>
+<p>Validated: an agent told to "read the whole board" recovered all four
+in-cluster faults, declared the incident stable, and never mentioned the
+<abbr title="The single public entry point (API Management) through which all client traffic passes.">front door</abbr> once. It was not wrong about the board. The board was
+incomplete.</p>
+<p>Treat the internal board and the customer-facing path as two separate
+questions, and always ask the second one. That is Task 5.</p>
+</div>
 </details>
 <details class="note">
 <summary>Task 3 · Check the agent's memory</summary>
@@ -1868,9 +1881,12 @@ the exact clicks, open the matching task below.</p>
 <details class="note">
 <summary>Task 4 · Delegate and recover</summary>
 <ul>
-<li>Invoke your <strong><abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> specialist subagent</strong> for pod / rollout triage, and apply
-  your <strong>crew recovery skill</strong> for the sanctioned recovery — crew is failing
-  the same way it did in Challenge 4, so the skill should carry.</li>
+<li>Hand <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> triage to your specialist by <strong>delegating to it by name</strong>
+  ("delegate this to your <code>aks-triage</code> subagent"), and <strong>name your crew
+  recovery skill</strong> when you want it applied — crew is failing the same way it
+  did in Challenge 4, so the skill carries. Asking the agent to "act as" a
+  specialist does not invoke the subagent, and a skill does not reliably fire
+  on its own.</li>
 <li>Keep actions governed and follow the runbooks: fix the layer that is
   actually saturated, never delete the database.</li>
 </ul>

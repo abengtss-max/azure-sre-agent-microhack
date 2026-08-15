@@ -1850,6 +1850,15 @@ access. Choose <strong>Full setup</strong> and connect:</p>
 Its identity is granted Monitoring Contributor plus a reader bundle at
 setup, so the "won't change anything" guarantee comes from <strong><abbr title="SRE Agent run mode where it proposes a plan and waits for your approval before any write.">Review mode</abbr></strong>,
 not from the role being read-only.</p>
+<p><strong>Grant one extra permission.</strong> Setup leaves the agent with read-only
+access to API Management, which is enough to diagnose an edge fault but not
+to repair one. Run this once, after the agent exists:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="nb">grant-agent</span><span class="n">-apim-access</span><span class="p">.</span><span class="n">ps1</span>
+</code></pre></div>
+<p>It grants <strong>API Management Service Contributor</strong> scoped to the API
+Management service alone, never the resource group. Skip it and the agent
+will correctly localise the front-door failure in Challenge 7 and then
+report that <abbr title="Role-Based Access Control — Azure's permission model; roles decide what an identity may do.">RBAC</abbr> blocks the fix.</p>
 <p><strong>Confirm scope.</strong> Ask <em>"List the resources in my resource group and
 summarize what this application does."</em> Then ask it to <strong>restart a
 deployment</strong>. In <abbr title="SRE Agent run mode where it proposes a plan and waits for your approval before any write.">Review mode</abbr> it must ask for approval, not act.</p>
