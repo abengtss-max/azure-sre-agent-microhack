@@ -206,11 +206,12 @@ Reference: [Team onboarding & memory](https://learn.microsoft.com/en-us/azure/sr
    `aetherion` namespace: pod status, events, rollout history, dependency
    health."* Say how it should behave and what it should do when the evidence
    points outside its scope, not just what it covers.
-4. **Skills** and **Tools** are inherited from the agent's globals, and selecting
-   either *overrides* the inherited set rather than adding to it. The cluster
-   tools are `RunKubectlReadCommand` and `RunKubectlWriteCommand` under **Azure
-   Operation** — search `kubectl`, not "AKS". For a read-only investigator, take
-   the read tool and leave the write tool out.
+4. **Leave Skills and Tools inherited.** Selecting either *overrides* the
+   inherited set rather than adding to it, and the picker does not list every
+   inherited tool — `RunKubectlReadCommand` and `RunKubectlWriteCommand` are in
+   the agent's inherited set but are not offered in the panel. Any selection you
+   make therefore risks dropping cluster access. Scope specialists with
+   Instructions.
 5. **Create**, then invoke it and ask for a scoped namespace triage.
 
 The **Form / YAML** toggle edits the same definition and exposes

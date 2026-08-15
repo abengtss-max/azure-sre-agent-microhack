@@ -133,61 +133,45 @@ you'll want both in the final incident.
 
         **Skills** — leave inherited. Do not select anything here.
 
-        **Tools** — this is the part that decides whether the specialist actually
-        works, and there is a trap in it.
+        **Tools** — leave inherited. Do not select anything here either. This is
+        the one that will catch you out:
 
-        !!! warning "Selecting tools replaces the inherited set"
+        !!! warning "Selecting tools replaces the inherited set — and the picker is incomplete"
             The dialog says the agent inherits 46 global tools and that selecting
-            tools *overrides* the defaults. It means replaces, not adds. If you
-            select three tools, the specialist has three tools — and if the cluster
-            tools aren't among them, your AKS specialist cannot read the cluster.
+            tools *overrides* the defaults. It means replaces, not adds. Select
+            three tools and the specialist has three tools.
 
-            Also: **searching the picker for "AKS" or "Kubernetes" finds nothing.**
-            The tools are named after the CLI, not the service. Search
-            **`kubectl`**.
+            That would be fine if the picker showed everything. It doesn't. The
+            agent's inherited set includes **`RunKubectlReadCommand`** and
+            **`RunKubectlWriteCommand`** under *Azure Operation* — the tools that
+            give it the cluster — but searching the picker for `kubectl`, `AKS` or
+            `Kubernetes` returns nothing.
 
-        The cluster tools live under the **Azure Operation** category:
+            So any selection you make in that panel silently drops cluster access,
+            and your AKS specialist ends up unable to read AKS. Scope this
+            specialist with its **Instructions**, and leave Tools alone.
 
-        | Tool | Take it? |
-        |---|---|
-        | `RunKubectlReadCommand` | **Yes** — this is the specialist's core capability |
-        | `RunKubectlWriteCommand` | **No** — see below |
+        ??? tip "Verify the inherited tools for yourself"
+            The picker is not the source of truth. Ask the agent's own API:
 
-        Leaving `RunKubectlWriteCommand` out is the whole point. Challenge 5 builds
-        an investigator while the platform is green, so make it read-only
-        *structurally* rather than by asking politely in the instructions. A
-        specialist that cannot write cannot be talked into writing. It earns the
-        write tool later, once you've seen it reason well.
+            ```powershell
+            $base = az resource show -g <resource-group> -n <agent-name> `
+              --resource-type Microsoft.App/agents --api-version 2026-01-01 `
+              --query properties.agentEndpoint -o tsv
 
-        A good minimum selection, if you curate:
+            $tok = az account get-access-token --resource https://azuresre.ai `
+              --query accessToken -o tsv
 
-        ```text
-        Azure Operation
-          RunKubectlReadCommand
-          RunAzCliReadCommands
+            $r = Invoke-RestMethod "$base/api/v2/agent/tools" `
+              -Headers @{ Authorization = "Bearer $tok" }
 
-        Log Query
-          QueryAppInsightsByResourceId
-          QueryLogAnalyticsByResourceId
+            $r.data | Where-Object enabled | Select-Object category, name |
+              Sort-Object category, name
+            ```
 
-        Knowledge Base
-          GetChangeHistory
-          SearchIncidentKnowledge
-          SearchMemory
-
-        system-mcp-monitor
-          system-mcp-monitor_monitor_metrics_query
-          system-mcp-monitor_monitor_resource_log_query
-        ```
-
-        That gives it the cluster, the telemetry to corroborate what it sees, the
-        change history to correlate a rollout against a symptom, and memory so it
-        can recall an earlier RCA — which is exactly what Challenge 7 asks it to do.
-
-        !!! tip "Not sure? Leave Tools untouched"
-            Inheriting all 46 is a perfectly good answer for this challenge. You
-            lose the read-only guarantee, but you cannot accidentally cripple the
-            specialist. Curating is the better lesson; inheriting is the safer one.
+            The token audience must be `https://azuresre.ai`; an ARM token is
+            rejected. The count of enabled tools should match the number the
+            dialog quotes.
 
         **Hooks** — nothing needed for this challenge.
 
