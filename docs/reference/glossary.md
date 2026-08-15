@@ -19,7 +19,7 @@ any underlined acronym to see its meaning in place.
 | **Review mode** | Run mode where the agent proposes a plan and waits for explicit human approval before any write. The default. |
 | **Autonomous mode** | Run mode where the agent executes approved classes of action without pausing. Used only for well-understood, validated faults. |
 | **Skill** | A packaged, reusable runbook (a `SKILL.md`) the agent auto-loads by context, matched on the skill's description. |
-| **Subagent** | A specialist custom agent you invoke for deep domain reasoning, created on the **Agent Canvas** with its own instructions, skills and tools. |
+| **Subagent** | A specialist custom agent created on the **Agent Canvas**, with its own instructions and tools. You use it by asking the main agent to delegate to it by name. |
 | **Knowledge base** | The `.md` / `.txt` files (in `knowledge/`) that ground the agent in Aetherion's architecture and runbooks. |
 | **SRE Agent Administrator** | The human role that approves changes to what the agent *is* — new skills, run-mode changes, permission grants. |
 | **Operations Center** | The live GUI showing service health, operational-risk gauge, flight map, incidents and business impact. |

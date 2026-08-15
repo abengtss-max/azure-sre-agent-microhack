@@ -212,7 +212,9 @@ Reference: [Team onboarding & memory](https://learn.microsoft.com/en-us/azure/sr
    the agent's inherited set but are not offered in the panel. Any selection you
    make therefore risks dropping cluster access. Scope specialists with
    Instructions.
-5. **Create**, then invoke it and ask for a scoped namespace triage.
+5. **Create**, then use it by asking the main agent to **delegate to it by name**
+   ("delegate this to your `aks-triage` subagent"). Asking the agent to "act as"
+   a specialist does not invoke the subagent — it just adopts the persona.
 
 The **Form / YAML** toggle edits the same definition and exposes
 `handoff_description`, `agent_type` and `enable_skills`.

@@ -43,10 +43,23 @@ its guardrails intact.
 
 ### Suggested Azure SRE Agent prompt
 
-!!! quote "Paste into the agent chat (your new AKS specialist)"
-    Act as my AKS reliability specialist for the `aetherion` namespace: triage pod
-    status, events, rollout history and dependency health, then summarize the
-    namespace's health and the most likely causes. Keep it scoped to AKS.
+!!! quote "Paste into the agent chat"
+    Delegate this to your `aks-triage` subagent rather than handling it yourself.
+    Triage pod status, events, rollout history and dependency health for the
+    `aetherion` namespace, and have the specialist return a scoped health
+    assessment with likely causes and the evidence behind them. Tell me
+    explicitly which agent produced the answer.
+
+!!! warning "Ask for the subagent by name, or you won't get it"
+    Wording like *"act as my AKS reliability specialist"* does **not** invoke the
+    subagent. The main agent simply adopts the persona and does the work itself,
+    and the answer looks convincing enough that you'd never notice.
+
+    Delegating explicitly — *"delegate this to your `aks-triage` subagent"* — does
+    invoke it. You'll see a **Parallel subagent execution** step in the thread,
+    and asking *"which agent produced the answer"* gives you a straight answer to
+    check against. There is no slash-command syntax; delegation is natural
+    language.
 
 ### Success criteria
 
@@ -191,9 +204,10 @@ you'll want both in the final incident.
             - `enable_skills` — whether the specialist can load skills, including
               the one you are about to author.
 
-        Then invoke the specialist and ask for a namespace-health summary with
-        likely causes. Judge it on one question: would this have sped up a real AKS
-        incident?
+        Then invoke the specialist by **delegating to it by name** and ask for a
+        namespace-health summary with likely causes. Confirm it actually ran — the
+        thread shows a *Parallel subagent execution* step — and judge it on one
+        question: would this have sped up a real AKS incident?
 
     ??? note "Task 2 · Encode the skill"
         Exactly the same path — **Builder → Agent Canvas** — but click
