@@ -40,9 +40,13 @@ spec:
             - { name: PGDATABASE, valueFrom: { configMapKeyRef: { name: aetherion-config, key: PGDATABASE } } }
             - { name: PGPORT, valueFrom: { configMapKeyRef: { name: aetherion-config, key: PGPORT } } }
             - { name: PGSSLMODE, value: "require" }
-          command: ["psql", "-v", "ON_ERROR_STOP=1", "-c", "$Sql"]
+          command: ["psql", "-v", "ON_ERROR_STOP=1", "-c", "__SQL__"]
           resources: { requests: { cpu: "50m", memory: "64Mi" }, limits: { cpu: "500m", memory: "256Mi" } }
 "@
+
+    # Substituted rather than interpolated: SQL routinely contains $ (dollar-quoted
+    # blocks), which an expandable string would eat.
+    $manifest = $manifest.Replace('__SQL__', $Sql)
 
     $manifest | kubectl apply -f - 2>$null | Out-Null
     kubectl wait --for=condition=complete "job/$jobName" -n $ns --timeout="${TimeoutSec}s" 2>$null | Out-Null

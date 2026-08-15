@@ -81,11 +81,14 @@ if ($Fault -eq "cpu-starve") {
 }
 
 if ($Fault -eq "slow-query") {
-    # Removes the index behind the crew duty lookup, the way a maintenance script
-    # that rebuilds the roster table would. The query still returns correct data,
-    # it just falls back to scanning every retained duty record.
+    # Removes every supporting index on the roster table, the way a maintenance
+    # script that rebuilds it would. The query still returns correct data, it just
+    # falls back to scanning every retained duty record. Dropping by shape rather
+    # than by name matters: a previous recovery may have created an index of its
+    # own, and leaving it behind would silently prevent the incident.
+    $dropAll = 'DO $do$ DECLARE r record; BEGIN FOR r IN SELECT indexname FROM pg_indexes WHERE tablename = ''crew_roster'' AND indexname <> ''crew_roster_pkey'' LOOP EXECUTE ''DROP INDEX IF EXISTS '' || quote_ident(r.indexname); END LOOP; END $do$;'
     Write-Host "Dropping the crew roster duty index..." -ForegroundColor Yellow
-    if (Invoke-AetherionDbSql -Sql 'DROP INDEX IF EXISTS idx_crew_roster_duty;' -Name 'crew-roster-reindex') {
+    if (Invoke-AetherionDbSql -Sql $dropAll -Name 'crew-roster-reindex') {
         Write-Host "Crew duty lookup is now unindexed." -ForegroundColor Green
     }
     else {
