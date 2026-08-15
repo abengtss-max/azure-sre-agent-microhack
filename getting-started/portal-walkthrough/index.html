@@ -2156,14 +2156,17 @@ run mode (section F), not from the role.</p>
 <li><strong>Custom agent name</strong> — e.g. <code>aks-triage</code>.</li>
 <li><strong>Instructions</strong> — a <strong>narrow remit</strong>: <em>"<abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> reliability triage for the
    <code>aetherion</code> namespace: pod status, events, rollout history, dependency
-   health."</em> Say how it should behave, not just what it covers.</li>
-<li><strong>Skills</strong> and <strong>Tools</strong> are <strong>inherited</strong> from the agent's globals by default.
-   Selecting either here <em>overrides</em> the inheritance rather than adding to it —
-   narrowing <strong>Tools</strong> is the real way to keep a specialist scoped.</li>
+   health."</em> Say how it should behave and what it should do when the evidence
+   points outside its scope, not just what it covers.</li>
+<li><strong>Leave Skills and Tools inherited.</strong> The dialog warns that selecting either
+   overrides the defaults — it replaces the inherited set rather than adding to
+   it. <code>kubectl</code> is not in the tool picker (cluster access comes over a separate
+   execution channel), so picking tools to "scope" a specialist removes the
+   access it needs. Scope it with Instructions.</li>
 <li><strong>Create</strong>, then invoke it and ask for a scoped namespace triage.</li>
 </ol>
-<p>The <strong>Form / YAML</strong> toggle edits the same definition if you'd rather author it as
-code.</p>
+<p>The <strong>Form / YAML</strong> toggle edits the same definition and exposes
+<code>handoff_description</code>, <code>agent_type</code> and <code>enable_skills</code>.</p>
 <p>Reference: <a href="https://learn.microsoft.com/en-us/azure/sre-agent/sub-agents">Subagents &amp; extensibility</a></p>
 <hr />
 <h2 id="k-skill">K · Create a reusable skill<a class="headerlink" href="#k-skill" title="Permanent link">&para;</a></h2>
