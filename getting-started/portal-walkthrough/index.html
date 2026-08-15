@@ -2158,11 +2158,11 @@ run mode (section F), not from the role.</p>
    <code>aetherion</code> namespace: pod status, events, rollout history, dependency
    health."</em> Say how it should behave and what it should do when the evidence
    points outside its scope, not just what it covers.</li>
-<li><strong>Leave Skills and Tools inherited.</strong> The dialog warns that selecting either
-   overrides the defaults — it replaces the inherited set rather than adding to
-   it. <code>kubectl</code> is not in the tool picker (cluster access comes over a separate
-   execution channel), so picking tools to "scope" a specialist removes the
-   access it needs. Scope it with Instructions.</li>
+<li><strong>Skills</strong> and <strong>Tools</strong> are inherited from the agent's globals, and selecting
+   either <em>overrides</em> the inherited set rather than adding to it. The cluster
+   tools are <code>RunKubectlReadCommand</code> and <code>RunKubectlWriteCommand</code> under <strong>Azure
+   Operation</strong> — search <code>kubectl</code>, not "<abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr>". For a read-only investigator, take
+   the read tool and leave the write tool out.</li>
 <li><strong>Create</strong>, then invoke it and ask for a scoped namespace triage.</li>
 </ol>
 <p>The <strong>Form / YAML</strong> toggle edits the same definition and exposes

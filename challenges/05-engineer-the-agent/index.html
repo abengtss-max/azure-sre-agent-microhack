@@ -1829,22 +1829,68 @@ whether the specialist is worth having. Paste this, then adjust to taste:</p>
 green; the specialist earns write access later, once you have seen it
 reason well.</p>
 <p><strong>Skills</strong> — leave inherited. Do not select anything here.</p>
-<p><strong>Tools</strong> — leave inherited. Do not select anything here either, and this
-is the one that will catch you out:</p>
+<p><strong>Tools</strong> — this is the part that decides whether the specialist actually
+works, and there is a trap in it.</p>
 <div class="admonition warning">
 <p class="admonition-title">Selecting tools replaces the inherited set</p>
 <p>The dialog says the agent inherits 46 global tools and that selecting
-tools <em>overrides</em> the defaults. It means exactly that — your selection
-replaces all 46, it does not add to them.</p>
-<p>Searching the tool picker for "<abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr>" or "Kubernetes" returns nothing
-useful, because <strong><code>kubectl</code> is not in the tool picker</strong>. Cluster access
-reaches the agent through a separate execution channel — the same one
-that produces the <code>kubectl</code> approval prompts you have been approving
-since Challenge 1.</p>
-<p>So if you pick tools here to "scope it to <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr>", you achieve the
-opposite: you strip the specialist of the cluster access it needs and
-leave it with whatever unrelated handful you selected. Scope this
-specialist with its <strong>Instructions</strong>, and leave Tools inherited.</p>
+tools <em>overrides</em> the defaults. It means replaces, not adds. If you
+select three tools, the specialist has three tools — and if the cluster
+tools aren't among them, your <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> specialist cannot read the cluster.</p>
+<p>Also: <strong>searching the picker for "<abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr>" or "Kubernetes" finds nothing.</strong>
+The tools are named after the CLI, not the service. Search
+<strong><code>kubectl</code></strong>.</p>
+</div>
+<p>The cluster tools live under the <strong>Azure Operation</strong> category:</p>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Take it?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>RunKubectlReadCommand</code></td>
+<td><strong>Yes</strong> — this is the specialist's core capability</td>
+</tr>
+<tr>
+<td><code>RunKubectlWriteCommand</code></td>
+<td><strong>No</strong> — see below</td>
+</tr>
+</tbody>
+</table>
+<p>Leaving <code>RunKubectlWriteCommand</code> out is the whole point. Challenge 5 builds
+an investigator while the platform is green, so make it read-only
+<em>structurally</em> rather than by asking politely in the instructions. A
+specialist that cannot write cannot be talked into writing. It earns the
+write tool later, once you've seen it reason well.</p>
+<p>A good minimum selection, if you curate:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>Azure Operation
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>  RunKubectlReadCommand
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>  RunAzCliReadCommands
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>Log Query
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>  QueryAppInsightsByResourceId
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>  QueryLogAnalyticsByResourceId
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>Knowledge Base
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>  GetChangeHistory
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>  SearchIncidentKnowledge
+<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>  SearchMemory
+<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>
+<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>system-mcp-monitor
+<a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a>  system-mcp-monitor_monitor_metrics_query
+<a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a>  system-mcp-monitor_monitor_resource_log_query
+</code></pre></div>
+<p>That gives it the cluster, the telemetry to corroborate what it sees, the
+change history to correlate a rollout against a symptom, and memory so it
+can recall an earlier RCA — which is exactly what Challenge 7 asks it to do.</p>
+<div class="admonition tip">
+<p class="admonition-title">Not sure? Leave Tools untouched</p>
+<p>Inheriting all 46 is a perfectly good answer for this challenge. You
+lose the read-only guarantee, but you cannot accidentally cripple the
+specialist. Curating is the better lesson; inheriting is the safer one.</p>
 </div>
 <p><strong>Hooks</strong> — nothing needed for this challenge.</p>
 <p>Then select <strong>Create</strong>.</p>
@@ -1873,59 +1919,59 @@ incident?</p>
 <strong>+ Create skill</strong> instead. (<strong>Builder → Skill Builder</strong> in the left-hand
 menu takes you to the same place.)</p>
 <p><strong>Name</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>crew-query-path-recovery
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>crew-query-path-recovery
 </code></pre></div>
 <p><strong>Description</strong> — behind the <strong>Edit</strong> link, and the field most people skim.
 Skills auto-load by context, and this description is what the agent matches
 on when it decides whether the skill is relevant. Describe <em>when to reach
 for it</em>, not what it does:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>Use when crew scheduling is slow or timing out and the pods themselves look
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>healthy and underutilised — the symptom of a saturated shared database
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>rather than a saturated workload. Also use when several services sharing one
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>database degrade together while unrelated services stay fast.
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>Use when crew scheduling is slow or timing out and the pods themselves look
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>healthy and underutilised — the symptom of a saturated shared database
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>rather than a saturated workload. Also use when several services sharing one
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>database degrade together while unrelated services stay fast.
 </code></pre></div>
 <p><strong>SKILL.md</strong> — the editor on the right is pre-scaffolded with <code>name</code> and
 <code>description</code> frontmatter and a placeholder comment. Fill in the frontmatter
 and replace the comment:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>---
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>name: crew-query-path-recovery
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="gu">description: Recover crew scheduling when a saturated shared database, not the workload, is the bottleneck.</span>
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="gu">---</span>
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>
-<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="gu">## When this applies</span>
-<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>
-<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="sb">`crew-scheduling`</span> is slow or timing out, but its pods are healthy, not
-<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>restarting, and using little CPU. Peer services sharing the same PostgreSQL
-<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>server are also degraded; services that do not share it are unaffected.
-<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>
-<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="gu">## Diagnose before acting</span>
-<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a>
-<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="k">1.</span> Confirm the pods are waiting, not working: check pod CPU against requests
-<a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a>   and confirm no restarts.
-<a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a><span class="k">2.</span> Confirm the autoscaler is not the constraint. If CPU is below target the
-<a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a>   autoscaler will refuse to add replicas, and it is right to refuse.
-<a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a><span class="k">3.</span> Confirm the database is the saturated layer: check PostgreSQL CPU.
-<a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a><span class="k">4.</span> Identify the query path behind the crew duty lookup and whether it is
-<a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a>   supported by an index.
-<a id="__codelineno-6-21" name="__codelineno-6-21" href="#__codelineno-6-21"></a>
-<a id="__codelineno-6-22" name="__codelineno-6-22" href="#__codelineno-6-22"></a><span class="gu">## Remedy</span>
-<a id="__codelineno-6-23" name="__codelineno-6-23" href="#__codelineno-6-23"></a>
-<a id="__codelineno-6-24" name="__codelineno-6-24" href="#__codelineno-6-24"></a>Repair the query path — restore the missing index supporting the crew duty
-<a id="__codelineno-6-25" name="__codelineno-6-25" href="#__codelineno-6-25"></a>lookup. Build it without taking a disruptive lock on a live table.
-<a id="__codelineno-6-26" name="__codelineno-6-26" href="#__codelineno-6-26"></a>
-<a id="__codelineno-6-27" name="__codelineno-6-27" href="#__codelineno-6-27"></a>Verify by re-measuring crew latency under the same load, not by checking
-<a id="__codelineno-6-28" name="__codelineno-6-28" href="#__codelineno-6-28"></a>that a pod restarted.
-<a id="__codelineno-6-29" name="__codelineno-6-29" href="#__codelineno-6-29"></a>
-<a id="__codelineno-6-30" name="__codelineno-6-30" href="#__codelineno-6-30"></a><span class="gu">## Guardrails</span>
-<a id="__codelineno-6-31" name="__codelineno-6-31" href="#__codelineno-6-31"></a>
-<a id="__codelineno-6-32" name="__codelineno-6-32" href="#__codelineno-6-32"></a><span class="k">-</span><span class="w"> </span>Never delete or restart the database. It is a shared dependency and the
-<a id="__codelineno-6-33" name="__codelineno-6-33" href="#__codelineno-6-33"></a>  blast radius is every service on it.
-<a id="__codelineno-6-34" name="__codelineno-6-34" href="#__codelineno-6-34"></a><span class="k">-</span><span class="w"> </span>Do not scale the layer that is merely waiting. Adding replicas to
-<a id="__codelineno-6-35" name="__codelineno-6-35" href="#__codelineno-6-35"></a>  <span class="sb">`crew-scheduling`</span> adds connections to an already-saturated database and
-<a id="__codelineno-6-36" name="__codelineno-6-36" href="#__codelineno-6-36"></a>  makes it worse.
-<a id="__codelineno-6-37" name="__codelineno-6-37" href="#__codelineno-6-37"></a><span class="k">-</span><span class="w"> </span>Any write is proposed for approval first, never applied unilaterally.
-<a id="__codelineno-6-38" name="__codelineno-6-38" href="#__codelineno-6-38"></a><span class="k">-</span><span class="w"> </span>If the evidence does not show database saturation, this skill does not
-<a id="__codelineno-6-39" name="__codelineno-6-39" href="#__codelineno-6-39"></a>  apply — stop and say so.
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>---
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>name: crew-query-path-recovery
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="gu">description: Recover crew scheduling when a saturated shared database, not the workload, is the bottleneck.</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="gu">---</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="gu">## When this applies</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="sb">`crew-scheduling`</span> is slow or timing out, but its pods are healthy, not
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>restarting, and using little CPU. Peer services sharing the same PostgreSQL
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>server are also degraded; services that do not share it are unaffected.
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>
+<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="gu">## Diagnose before acting</span>
+<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a>
+<a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a><span class="k">1.</span> Confirm the pods are waiting, not working: check pod CPU against requests
+<a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a>   and confirm no restarts.
+<a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a><span class="k">2.</span> Confirm the autoscaler is not the constraint. If CPU is below target the
+<a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a>   autoscaler will refuse to add replicas, and it is right to refuse.
+<a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a><span class="k">3.</span> Confirm the database is the saturated layer: check PostgreSQL CPU.
+<a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a><span class="k">4.</span> Identify the query path behind the crew duty lookup and whether it is
+<a id="__codelineno-7-20" name="__codelineno-7-20" href="#__codelineno-7-20"></a>   supported by an index.
+<a id="__codelineno-7-21" name="__codelineno-7-21" href="#__codelineno-7-21"></a>
+<a id="__codelineno-7-22" name="__codelineno-7-22" href="#__codelineno-7-22"></a><span class="gu">## Remedy</span>
+<a id="__codelineno-7-23" name="__codelineno-7-23" href="#__codelineno-7-23"></a>
+<a id="__codelineno-7-24" name="__codelineno-7-24" href="#__codelineno-7-24"></a>Repair the query path — restore the missing index supporting the crew duty
+<a id="__codelineno-7-25" name="__codelineno-7-25" href="#__codelineno-7-25"></a>lookup. Build it without taking a disruptive lock on a live table.
+<a id="__codelineno-7-26" name="__codelineno-7-26" href="#__codelineno-7-26"></a>
+<a id="__codelineno-7-27" name="__codelineno-7-27" href="#__codelineno-7-27"></a>Verify by re-measuring crew latency under the same load, not by checking
+<a id="__codelineno-7-28" name="__codelineno-7-28" href="#__codelineno-7-28"></a>that a pod restarted.
+<a id="__codelineno-7-29" name="__codelineno-7-29" href="#__codelineno-7-29"></a>
+<a id="__codelineno-7-30" name="__codelineno-7-30" href="#__codelineno-7-30"></a><span class="gu">## Guardrails</span>
+<a id="__codelineno-7-31" name="__codelineno-7-31" href="#__codelineno-7-31"></a>
+<a id="__codelineno-7-32" name="__codelineno-7-32" href="#__codelineno-7-32"></a><span class="k">-</span><span class="w"> </span>Never delete or restart the database. It is a shared dependency and the
+<a id="__codelineno-7-33" name="__codelineno-7-33" href="#__codelineno-7-33"></a>  blast radius is every service on it.
+<a id="__codelineno-7-34" name="__codelineno-7-34" href="#__codelineno-7-34"></a><span class="k">-</span><span class="w"> </span>Do not scale the layer that is merely waiting. Adding replicas to
+<a id="__codelineno-7-35" name="__codelineno-7-35" href="#__codelineno-7-35"></a>  <span class="sb">`crew-scheduling`</span> adds connections to an already-saturated database and
+<a id="__codelineno-7-36" name="__codelineno-7-36" href="#__codelineno-7-36"></a>  makes it worse.
+<a id="__codelineno-7-37" name="__codelineno-7-37" href="#__codelineno-7-37"></a><span class="k">-</span><span class="w"> </span>Any write is proposed for approval first, never applied unilaterally.
+<a id="__codelineno-7-38" name="__codelineno-7-38" href="#__codelineno-7-38"></a><span class="k">-</span><span class="w"> </span>If the evidence does not show database saturation, this skill does not
+<a id="__codelineno-7-39" name="__codelineno-7-39" href="#__codelineno-7-39"></a>  apply — stop and say so.
 </code></pre></div>
 <p><strong>Files</strong> — <code>SKILL.md</code> on its own is enough. You can attach more files or a
 folder if you want to split a longer procedure up.</p>
