@@ -1723,20 +1723,20 @@
 <p><strong>Run mode:</strong> Review · <strong>Access:</strong> read-only investigation</p>
 <p><strong>Stage:</strong> Foundation → <strong>Operations</strong> → Engineering → Autonomous → Major Incident</p>
 </div>
-<p><strong>Situation:</strong> Passengers are reporting that online check-in keeps failing — some
-attempts work, others time out or error — and the <strong>booking / check-in</strong> tile is
-flipping between degraded and down just as traffic climbs toward a departure peak.
-Is check-in buckling under the surge, or did something change? A change on the
-passenger path mid-surge is what turns a slowdown into an outage. This incident
-stays <strong>open</strong> into Challenge 3, here you detect and investigate, you do not fix.</p>
-<p><strong>Mission:</strong> Confirm the check-in failures from live signals and form a
+<p><strong>Situation:</strong> Passengers are reporting that online check-in has slowed to a crawl —
+requests that used to be instant now take seconds — and the <strong>booking / check-in</strong>
+tile has gone amber just as traffic climbs toward a departure peak. Is check-in
+buckling under the surge, or did something change? A change on the passenger path
+mid-surge is what turns a slowdown into an outage. This incident stays <strong>open</strong> into
+Challenge 3, here you detect and investigate, you do not fix.</p>
+<p><strong>Mission:</strong> Confirm the check-in slowdown from live signals and form a
 hypothesis for the likely cause, backed by at least two independent signals,
 without changing anything in production.</p>
 <p><strong>Why this matters</strong></p>
 <div class="grid cards why-cards">
 <ul>
 <li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 22v-2h3v-3h2v3.5c0 .39-.16.74-.46 1.04s-.65.46-1.04.46zM7 22H3.5c-.39 0-.74-.16-1.04-.46S2 20.89 2 20.5V17h2v3h3zM17 2h3.5c.39 0 .74.16 1.04.46s.46.65.46 1.04V7h-2V4h-3zM7 2v2H4v3H2V3.5c0-.39.16-.74.46-1.04S3.11 2 3.5 2zm3.5 4C13 6 15 8 15 10.5c0 .88-.25 1.7-.69 2.4l3.26 3.26-1.41 1.41-3.26-3.26c-.7.44-1.52.69-2.4.69C8 15 6 13 6 10.5S8 6 10.5 6m0 2a2.5 2.5 0 0 0 0 5 2.5 2.5 0 0 0 0-5"/></svg></span> <strong>Confirm the symptom</strong>: tell a real regression apart from load</li>
-<li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m16 11.78 4.24-7.33 1.73 1-5.23 9.05-6.51-3.75L5.46 19H22v2H2V3h2v14.54L9.5 8z"/></svg></span> <strong>Correlate signals</strong>: failures and latency against CPU, <abbr title="Running copies (pods) of a service; more replicas share the load.">replicas</abbr> and request load</li>
+<li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m16 11.78 4.24-7.33 1.73 1-5.23 9.05-6.51-3.75L5.46 19H22v2H2V3h2v14.54L9.5 8z"/></svg></span> <strong>Correlate signals</strong>: latency against CPU, <abbr title="Running copies (pods) of a service; more replicas share the load.">replicas</abbr> and request load</li>
 <li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 11c0 5.55-3.84 10.74-9 12-5.16-1.26-9-6.45-9-12V5l9-4 9 4zm-9 10c3.75-1 7-5.46 7-9.78V6.3l-7-3.12L5 6.3v4.92C5 15.54 8.25 20 12 21m-2-4-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9"/></svg></span> <strong>Zero production risk</strong>: a rigorous read-only investigation</li>
 <li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11h3v2h-3zM1 11h3v2H1zM13 1v3h-2V1zM4.92 3.5l2.13 2.14-1.42 1.41L3.5 4.93zm12.03 2.13 2.12-2.13 1.43 1.43-2.13 2.12zM12 6a6 6 0 0 1 6 6c0 2.22-1.21 4.16-3 5.2V19a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-1.8c-1.79-1.04-3-2.98-3-5.2a6 6 0 0 1 6-6m2 15v1a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-1zm-3-3h2v-2.13c1.73-.44 3-2.01 3-3.87a4 4 0 0 0-4-4 4 4 0 0 0-4 4c0 1.86 1.27 3.43 3 3.87z"/></svg></span> <strong>Defensible hypothesis</strong>: the evidence that speeds the approved fix</li>
 </ul>
@@ -1746,21 +1746,21 @@ without changing anything in production.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="nb">start-challenge</span><span class="p">.</span><span class="n">ps1</span> <span class="n">2</span>   <span class="c"># open the incident</span>
 </code></pre></div>
 <p>Starting Challenge 2 injects the first incident. Give it two or three minutes:
-check-in starts failing for a share of requests, and the tile moves between
-degraded and down rather than settling — which is itself a clue.</p>
+check-in latency climbs from milliseconds to seconds and stays there, while
+the service keeps answering every request successfully — which is itself a clue.</p>
 </div>
 <h3 id="tasks">Tasks<a class="headerlink" href="#tasks" title="Permanent link">&para;</a></h3>
 <ol>
-<li><strong>Confirm the symptom.</strong> Compare check-in failures and latency now to your Challenge 1 baseline, using the Operations Center and <abbr title="Dashboarding tool used here to visualise AKS and Application Insights metrics.">Grafana</abbr>, and trust the measured delta.</li>
-<li><strong>Correlate read-only.</strong> Have the agent line up <code>booking</code> failures and request duration against CPU, <abbr title="Running copies (pods) of a service; more replicas share the load.">replicas</abbr>, restarts and request load.</li>
+<li><strong>Confirm the symptom.</strong> Compare check-in latency now to your Challenge 1 baseline, using the Operations Center and <abbr title="Dashboarding tool used here to visualise AKS and Application Insights metrics.">Grafana</abbr>, and trust the measured delta.</li>
+<li><strong>Correlate read-only.</strong> Have the agent line up <code>booking</code> request duration against CPU, <abbr title="Running copies (pods) of a service; more replicas share the load.">replicas</abbr>, dependency calls and request load.</li>
 <li><strong>Record your hypothesis.</strong> Capture the likely cause, the two signals behind it, and the recovery you'd propose (without performing it).</li>
 </ol>
 <p><img alt="Challenge 2 storyboard: Sam and Aria detect and investigate the incident read-only" class="story-panel" loading="lazy" src="../../assets/storyboard/img-challenge-2.webp" /></p>
 <h3 id="suggested-azure-sre-agent-prompt">Suggested Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent prompt<a class="headerlink" href="#suggested-azure-sre-agent-prompt" title="Permanent link">&para;</a></h3>
 <div class="admonition quote">
 <p class="admonition-title">Paste into the agent chat</p>
-<p>Analyze the check-in / booking path read-only. Correlate <code>booking</code> failures and
-request duration with CPU, <abbr title="One running copy (pod) of a service; more replicas share the load.">replica</abbr> count, container restarts and request load
+<p>Analyze the check-in / booking path read-only. Correlate <code>booking</code> request
+duration with CPU, <abbr title="One running copy (pod) of a service; more replicas share the load.">replica</abbr> count, dependency call durations and request load
 over the last 30 minutes, and check recent deployments and rollout history for
 changes in the same window. Compare the live workload against what the
 repository's manifest declares. Give me the most likely cause with supporting
@@ -1775,8 +1775,8 @@ image files directly and folds client-side timing into its investigation.</p>
 </div>
 <h3 id="success-criteria">Success criteria<a class="headerlink" href="#success-criteria" title="Permanent link">&para;</a></h3>
 <ul>
-<li>You've confirmed the failures and can name the affected service and user-facing path.</li>
-<li>You can name the most likely cause, backed by at least two independent signals, and separate the surge from <strong>the change that reduced capacity</strong>.</li>
+<li>You've confirmed the slowdown and can name the affected service and user-facing path.</li>
+<li>You can name the most likely cause, backed by at least two independent signals, and separate the surge from <strong>the change that caused it</strong>.</li>
 <li>You've made no change to production.</li>
 </ul>
 <div class="admonition success">
@@ -1788,17 +1788,18 @@ image files directly and folds client-side timing into its investigation.</p>
 <h3 id="hints">Hints<a class="headerlink" href="#hints" title="Permanent link">&para;</a></h3>
 <details>
 <summary>Hint: confirm and correlate</summary>
-<p>Start from the delta against your baseline. Line up failures and request duration
-with CPU, <abbr title="Running copies (pods) of a service; more replicas share the load.">replicas</abbr>, restarts and request load over the same window.</p>
+<p>Start from the delta against your baseline. Line up request duration with CPU,
+<abbr title="Running copies (pods) of a service; more replicas share the load.">replicas</abbr> and request load over the same window.</p>
 </details>
 <details>
 <summary>Hint: capacity, or something else?</summary>
-<p>Busy alone doesn't make a service fail — a service that can no longer keep up with
-busy does. Check what the container is allowed to use, whether the autoscaler is
-still free to add <abbr title="Running copies (pods) of a service; more replicas share the load.">replicas</abbr>, and whether the pods are being restarted. Then compare
-the <strong>live</strong> workload against what the repository's manifest declares; the gap
-between them is the finding. You're done when you can describe the symptom precisely
-and defend a hypothesis, not when it's fixed.</p>
+<p>A service starved of CPU is <em>busy</em>. This one isn't — CPU is low, no pod has
+restarted, and every request still succeeds. It is <strong>waiting</strong> on something. Work
+out what <code>booking</code> talks to besides its database, and how long each of those calls
+is taking. Then compare the live workload against what the repository's manifest
+declares; the gap between them is the finding.</p>
+<p>You're done when you can describe the symptom precisely and defend a hypothesis,
+not when it's fixed.</p>
 </details>
 <div class="admonition question">
 <p class="admonition-title">Stuck? Step-by-step for each task</p>
@@ -1808,23 +1809,23 @@ the exact clicks, open the matching task below.</p>
 <summary>Task 1 · Confirm the symptom</summary>
 <ul>
 <li>Open the <strong>Operations Center</strong> and note the <strong>booking / check-in</strong> tile: its
-  error rate, its p95, and how often it changes state. Then open the
+  p95, its error rate, and how steady the numbers are. Then open the
   <strong><abbr title="Dashboarding tool used here to visualise AKS and Application Insights metrics.">Grafana</abbr></strong> dashboard for the same window — the two together are your
   evidence, not the agent's summary.</li>
 <li>Compare that to the baseline you captured in Challenge 1. Requests that
-  used to succeed in single-digit milliseconds are now failing outright.</li>
+  took single-digit milliseconds now take seconds, and they all still
+  succeed. A clean, flat, elevated latency is rarely load.</li>
 </ul>
 </details>
 <details class="note">
 <summary>Task 2 · Correlate read-only</summary>
 <ul>
 <li>In the agent chat, paste the <strong>suggested prompt</strong> above (or ask it to
-  correlate <code>booking</code> failures and request duration with CPU, <abbr title="One running copy (pod) of a service; more replicas share the load.">replica</abbr> count,
-  restarts and request load over the last 30 minutes).</li>
-<li>Watch for the disagreement between signals: a container pinned at its CPU
-  limit, an autoscaler that is no longer allowed to add capacity, and pods
-  being restarted because they can't answer their own health checks — that is
-  a very different story from "we're simply busy".</li>
+  correlate <code>booking</code> request duration with CPU, <abbr title="One running copy (pod) of a service; more replicas share the load.">replica</abbr> count, dependency
+  call durations and request load over the last 30 minutes).</li>
+<li>Watch for the disagreement between signals: latency up sharply while CPU,
+  <abbr title="Running copies (pods) of a service; more replicas share the load.">replicas</abbr> and error rate are all normal. Something is being <em>waited on</em>,
+  not overloaded.</li>
 <li>Ask it to compare the running workload with the manifest in the connected
   repository. A live value that no longer matches the checked-in one is the
   strongest single piece of evidence you will find.</li>

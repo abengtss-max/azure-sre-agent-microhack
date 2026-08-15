@@ -1820,9 +1820,15 @@ the exact clicks, open the matching task below.</p>
 <li>Be specific about where that evidence lives. The workload changes are in
   <strong>rollout history</strong> (<code>kubectl rollout history deploy/&lt;svc&gt; -n aetherion</code>)
   with the change cause recorded against each revision; the API Management
-  policy change is in the <strong>Azure <abbr title="Azure's record of control-plane changes (who changed what, and when).">Activity Log</abbr></strong>. In-cluster changes never
+  policy change is in the <strong>Azure <abbr title="Azure's record of control-plane changes (who changed what, and when).">Activity Log</abbr></strong> as a
+  <code>Set Product policy configuration</code> operation. In-cluster changes never
   reach the <abbr title="Azure's record of control-plane changes (who changed what, and when).">Activity Log</abbr> — which is itself worth calling out as a gap in the
   handover.</li>
+<li>If the agent reports that it found nothing, ask it to query the Activity
+  Log at <strong>subscription scope</strong> rather than filtering by resource group. The
+  API Management policy operation is not always attributed to the resource
+  group, so a resource-group-scoped query can come back empty even though
+  the events are there.</li>
 </ul>
 </details>
 <details class="note">
