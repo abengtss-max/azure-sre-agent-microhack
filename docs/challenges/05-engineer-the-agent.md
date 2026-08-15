@@ -233,8 +233,10 @@ you'll want both in the final incident.
         ```
 
         **SKILL.md** — the editor on the right is pre-scaffolded with `name` and
-        `description` frontmatter and a placeholder comment. Fill in the frontmatter
-        and replace the comment:
+        `description` frontmatter and a placeholder comment. The finished file is
+        in the repository you cloned, at
+        `skills/crew-query-path-recovery/SKILL.md` — paste it in, or drag the file
+        onto the **Files** panel:
 
         ```markdown
         ---
