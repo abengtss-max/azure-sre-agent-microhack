@@ -2177,8 +2177,9 @@ run mode (section F), not from the role.</p>
 <li>Same place: <strong>Builder → Agent Canvas → + Create skill</strong> (or <strong>Builder → Skill
    Builder</strong>).</li>
 <li><strong>Name</strong> it, then click <strong>Edit</strong> on <strong>Description</strong> and describe <em>when the
-   skill should be reached for</em>. Skills auto-load by context, so the description
-   is what the agent matches on — a vague one means it never loads.</li>
+   skill should be reached for</em>. The description is what the agent matches the
+   situation against, so a vague one means the skill is never considered. Do not
+   assume a skill fires on its own — name it when you want it used.</li>
 <li>In the pre-scaffolded <strong>SKILL.md</strong>, fill in the <code>name</code> / <code>description</code>
    frontmatter and encode a well-defined procedure (e.g. the crew query-path
    recovery) as steps, keeping the guardrails (confirm which layer is saturated,

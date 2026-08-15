@@ -1749,7 +1749,7 @@ its guardrails intact.</p>
 <ol>
 <li><strong>Build the specialist.</strong> Create an <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> triage subagent for the <code>aetherion</code> namespace and invoke it to summarize namespace health and likely causes.</li>
 <li><strong>Encode the skill.</strong> Capture the crew query-path recovery from Challenge 4 as a reusable skill, guardrails intact, and confirm it loads.</li>
-<li><strong>Know when to use which.</strong> Be able to say when you'd reach for the subagent (invoke to investigate) versus the skill (auto-loads a procedure).</li>
+<li><strong>Know when to use which.</strong> Be able to say when you'd reach for the subagent (delegate to it to investigate) versus the skill (a procedure the agent can draw on).</li>
 </ol>
 <p><img alt="Challenge 5 storyboard: Sam and Aria engineer a specialist subagent and reusable skill" class="story-panel" loading="lazy" src="../../assets/storyboard/img-challenge-5.webp" /></p>
 <h3 id="suggested-azure-sre-agent-prompt">Suggested Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent prompt<a class="headerlink" href="#suggested-azure-sre-agent-prompt" title="Permanent link">&para;</a></h3>
@@ -1797,8 +1797,8 @@ broad. Judge it by whether its output would actually speed up a real <abbr title
 the guardrails (diagnose which layer is saturated, repair the query path, never
 delete or restart the database). Be careful not to encode "scale it" as the answer —
 Challenge 4 is precisely the case where scaling cannot work.</p>
-<p>Skills auto-load and encode a procedure; subagents are invoked and investigate, so
-you'll want both in the final incident.</p>
+<p>Skills encode a procedure the agent can draw on; subagents are delegated to and
+investigate. You'll want both in the final incident.</p>
 </details>
 <div class="admonition question">
 <p class="admonition-title">Stuck? Step-by-step for each task</p>
@@ -1910,9 +1910,8 @@ menu takes you to the same place.)</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>crew-query-path-recovery
 </code></pre></div>
 <p><strong>Description</strong> — behind the <strong>Edit</strong> link, and the field most people skim.
-Skills auto-load by context, and this description is what the agent matches
-on when it decides whether the skill is relevant. Describe <em>when to reach
-for it</em>, not what it does:</p>
+This description is what the agent matches on when deciding whether the
+skill is relevant, so describe <em>when to reach for it</em>, not what it does:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>Use when crew scheduling is slow or timing out and the pods themselves look
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>healthy and underutilised — the symptom of a saturated shared database
 <a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>rather than a saturated workload. Also use when several services sharing one
@@ -1976,11 +1975,25 @@ keeping.</p>
 <details class="note">
 <summary>Task 3 · Know when to use which</summary>
 <ul>
-<li>A <strong>subagent</strong> is something you <em>invoke</em> to investigate a domain (your <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr>
-  specialist).</li>
-<li>A <strong>skill</strong> <em>auto-loads</em> when relevant and encodes a <em>procedure</em> (the
-  query-path recovery). You'll want both in the final incident.</li>
+<li>A <strong>subagent</strong> is something you <em>delegate to</em> by name, to investigate a
+  domain (your <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> specialist).</li>
+<li>A <strong>skill</strong> encodes a <em>procedure</em> (the query-path recovery) that the
+  agent can draw on when the situation matches its description.</li>
 </ul>
+<div class="admonition warning">
+<p class="admonition-title">Don't assume a skill fires on its own</p>
+<p>Skills are described as loading by context, but in validation this one
+did <strong>not</strong> activate during a live investigation of exactly the
+incident it was written for — the agent solved it from first
+principles and never referenced the skill.</p>
+<p>Asked directly which skills applied, it named
+<code>crew-query-path-recovery</code> and matched it correctly. So the skill was
+registered, enabled and well described; it simply wasn't reached for
+unprompted.</p>
+<p>Practical consequence: in Challenge 7, <strong>name the skill</strong> when you want
+it used rather than assuming it will fire. Treat a skill as a procedure
+you can call on, not a guaranteed reflex.</p>
+</div>
 </details>
 </div>
 <h3 id="reference">Reference<a class="headerlink" href="#reference" title="Permanent link">&para;</a></h3>
