@@ -115,17 +115,21 @@ function Get-ImageTag([string]$Service) {
     return ($v.Split(':')[-1]).Trim()
 }
 
-function Get-CpuLimitMilli([string]$Service) {
-    $v = kubectl get deploy $Service -n $script:NS -o jsonpath='{.spec.template.spec.containers[0].resources.limits.cpu}' 2>$null
+function Get-CpuLimitMilli([string]$Service) {    $v = kubectl get deploy $Service -n $script:NS -o jsonpath='{.spec.template.spec.containers[0].resources.limits.cpu}' 2>$null
     if ([string]::IsNullOrWhiteSpace($v)) { return 0 }
     $v = $v.Trim()
     if ($v.EndsWith('m')) { return [int]($v.TrimEnd('m')) }
     return [int]([double]$v * 1000)
 }
 
+function Get-HpaMax([string]$Service) {
+    $v = kubectl get hpa $Service -n $script:NS -o jsonpath='{.spec.maxReplicas}' 2>$null
+    if ([string]::IsNullOrWhiteSpace($v)) { return 0 }
+    return [int]$v
+}
+
 # A second revision rolled out behind the same Service (challenge 6).
-function Test-CanaryPresent([string]$Service) {
-    $v = kubectl get deploy "$Service-v2" -n $script:NS -o jsonpath='{.spec.replicas}' 2>$null
+function Test-CanaryPresent([string]$Service) {    $v = kubectl get deploy "$Service-v2" -n $script:NS -o jsonpath='{.spec.replicas}' 2>$null
     if ([string]::IsNullOrWhiteSpace($v)) { return $false }
     return ([int]$v -gt 0)
 }
@@ -217,7 +221,7 @@ $script:Challenges = [ordered]@{
         Start = {
             Invoke-Fault 'booking' 'cpu-starve'
             Set-Load 'surge'
-            Write-Host "INCIDENT P2 (open): passengers report online check-in and booking are slow." -ForegroundColor Yellow
+            Write-Host "INCIDENT P2 (open): passengers report online check-in is failing intermittently." -ForegroundColor Yellow
             Write-Host "Complaints are rising as a passenger surge builds. Root cause is unknown."
             Write-Host "Detect and characterize the symptom, then form a root-cause hypothesis from"
             Write-Host "telemetry and logs - all READ-ONLY. Do NOT fix it yet; the next challenge resolves it."
@@ -244,10 +248,11 @@ $script:Challenges = [ordered]@{
             $okBook   = (Test-ServiceHealthy 'booking' 400)
             $latBook  = Get-ServiceLatencyMs 'booking'
             $cpuBook  = Get-CpuLimitMilli 'booking'
+            $hpaBook  = Get-HpaMax 'booking'
             $okFlight = (Test-ServiceHealthy 'flight-ops')
             $tagFlight = Get-ImageTag 'flight-ops'
-            $pass = ($okBook -and $cpuBook -ge 500 -and $okFlight -and $tagFlight -eq 'latest')
-            @{ Pass = $pass; Detail = "booking healthy=$okBook (p95 ${latBook}ms) cpuLimit=${cpuBook}m | flight-ops healthy=$okFlight image=:$tagFlight" }
+            $pass = ($okBook -and $cpuBook -ge 500 -and $hpaBook -ge 6 -and $okFlight -and $tagFlight -eq 'latest')
+            @{ Pass = $pass; Detail = "booking healthy=$okBook (p95 ${latBook}ms) cpuLimit=${cpuBook}m hpaMax=$hpaBook | flight-ops healthy=$okFlight image=:$tagFlight" }
         }
     }
 

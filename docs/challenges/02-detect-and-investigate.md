@@ -5,13 +5,14 @@
 
     **Stage:** Foundation → **Operations** → Engineering → Autonomous → Major Incident
 
-**Situation:** Passengers are reporting long check-in waits and the **booking /
-check-in** tile is drifting from green toward amber just as traffic climbs toward a
-departure peak. Is check-in broken, or simply busy? A change on the passenger path
-mid-surge is what turns a slowdown into an outage. This incident stays **open** into
-Challenge 3, here you detect and investigate, you do not fix.
+**Situation:** Passengers are reporting that online check-in keeps failing — some
+attempts work, others time out or error — and the **booking / check-in** tile is
+flipping between degraded and down just as traffic climbs toward a departure peak.
+Is check-in buckling under the surge, or did something change? A change on the
+passenger path mid-surge is what turns a slowdown into an outage. This incident
+stays **open** into Challenge 3, here you detect and investigate, you do not fix.
 
-**Mission:** Confirm the check-in degradation from live signals and form a
+**Mission:** Confirm the check-in failures from live signals and form a
 hypothesis for the likely cause, backed by at least two independent signals,
 without changing anything in production.
 
@@ -19,10 +20,10 @@ without changing anything in production.
 
 <div class="grid cards why-cards" markdown>
 
-- :material-magnify-scan: **Confirm the symptom**: Tell a real regression apart from load
-- :material-chart-line: **Correlate signals**: Latency against CPU, replicas and request load
-- :material-shield-check-outline: **Zero production risk**: A rigorous read-only investigation
-- :material-lightbulb-on-outline: **Defensible hypothesis**: The evidence that speeds the approved fix
+- :material-magnify-scan: **Confirm the symptom**: tell a real regression apart from load
+- :material-chart-line: **Correlate signals**: failures and latency against CPU, replicas and request load
+- :material-shield-check-outline: **Zero production risk**: a rigorous read-only investigation
+- :material-lightbulb-on-outline: **Defensible hypothesis**: the evidence that speeds the approved fix
 
 </div>
 
@@ -32,15 +33,14 @@ without changing anything in production.
     ./scripts/start-challenge.ps1 2   # open the incident
     ```
 
-    Starting Challenge 2 injects the first incident. The check-in tile flickers
-    rather than turning solidly amber — the slowdown is intermittent and
-    load-correlated, so the clearest evidence is in the telemetry (P95 against your
-    baseline, and CPU throttling), not in a single tile reading.
+    Starting Challenge 2 injects the first incident. Give it two or three minutes:
+    check-in starts failing for a share of requests, and the tile moves between
+    degraded and down rather than settling — which is itself a clue.
 
 ### Tasks
 
-1. **Confirm the symptom.** Compare check-in latency now to your Challenge 1 baseline, using the Operations Center and Grafana, and trust the measured delta.
-2. **Correlate read-only.** Have the agent line up `booking` request duration against CPU, replicas, and request load.
+1. **Confirm the symptom.** Compare check-in failures and latency now to your Challenge 1 baseline, using the Operations Center and Grafana, and trust the measured delta.
+2. **Correlate read-only.** Have the agent line up `booking` failures and request duration against CPU, replicas, restarts and request load.
 3. **Record your hypothesis.** Capture the likely cause, the two signals behind it, and the recovery you'd propose (without performing it).
 
 ![Challenge 2 storyboard: Sam and Aria detect and investigate the incident read-only](../assets/storyboard/img-challenge-2.webp){ .story-panel loading=lazy }
@@ -48,11 +48,12 @@ without changing anything in production.
 ### Suggested Azure SRE Agent prompt
 
 !!! quote "Paste into the agent chat"
-    Analyze the check-in / booking path read-only. Correlate `booking` request
-    duration with CPU, CPU throttling, replica count, and request load over the last
-    30 minutes, and check recent deployments and rollout history for changes in the
-    same window. Give me the most likely cause with supporting evidence, and change
-    nothing.
+    Analyze the check-in / booking path read-only. Correlate `booking` failures and
+    request duration with CPU, replica count, container restarts and request load
+    over the last 30 minutes, and check recent deployments and rollout history for
+    changes in the same window. Compare the live workload against what the
+    repository's manifest declares. Give me the most likely cause with supporting
+    evidence, and change nothing.
 
 !!! tip "Optional: feed the agent a HAR trace or screenshot"
     If a partner reports the failure from their side, capture a **HAR** (HTTP
@@ -62,8 +63,8 @@ without changing anything in production.
 
 ### Success criteria
 
-- You've confirmed the degradation and can name the affected service and user-facing path.
-- You can name the most likely cause, backed by at least two independent signals, and separate the load-driven latency from **the change that reduced capacity**.
+- You've confirmed the failures and can name the affected service and user-facing path.
+- You can name the most likely cause, backed by at least two independent signals, and separate the surge from **the change that reduced capacity**.
 - You've made no change to production.
 
 !!! success "Verify your work"
@@ -78,17 +79,18 @@ without changing anything in production.
 
 <details markdown="1"><summary>Hint: confirm and correlate</summary>
 
-Start from the delta against your baseline. Line up request duration
-with CPU, replicas, and request load over the same window.
+Start from the delta against your baseline. Line up failures and request duration
+with CPU, replicas, restarts and request load over the same window.
 </details>
 
 <details markdown="1"><summary>Hint: capacity, or something else?</summary>
 
-Busy alone doesn't make a service slow — a service that can't keep up with busy
-does. Check whether the container is being **throttled against its CPU limit**, and
-whether the autoscaler is able to add replicas or has hit a ceiling. Then look at
-what **changed** on the booking path around the time latency moved. You're done when
-you can describe the symptom precisely and defend a hypothesis, not when it's fixed.
+Busy alone doesn't make a service fail — a service that can no longer keep up with
+busy does. Check what the container is allowed to use, whether the autoscaler is
+still free to add replicas, and whether the pods are being restarted. Then compare
+the **live** workload against what the repository's manifest declares; the gap
+between them is the finding. You're done when you can describe the symptom precisely
+and defend a hypothesis, not when it's fixed.
 </details>
 
 !!! question "Stuck? Step-by-step for each task"
@@ -96,19 +98,24 @@ you can describe the symptom precisely and defend a hypothesis, not when it's fi
     the exact clicks, open the matching task below.
 
     ??? note "Task 1 · Confirm the symptom"
-        - Open the **Operations Center** and note the **booking / check-in** tile and
-          its current P95 latency, then open the **Grafana** dashboard for the same
-          window — the two together are your evidence, not the agent's summary.
-        - Compare that to the baseline you captured in Challenge 1. A jump from
-          milliseconds to seconds is a real regression, not just load.
+        - Open the **Operations Center** and note the **booking / check-in** tile: its
+          error rate, its p95, and how often it changes state. Then open the
+          **Grafana** dashboard for the same window — the two together are your
+          evidence, not the agent's summary.
+        - Compare that to the baseline you captured in Challenge 1. Requests that
+          used to succeed in single-digit milliseconds are now failing outright.
 
     ??? note "Task 2 · Correlate read-only"
         - In the agent chat, paste the **suggested prompt** above (or ask it to
-          correlate `booking` request duration with CPU, CPU throttling, replica
-          count, and request load over the last 30 minutes).
+          correlate `booking` failures and request duration with CPU, replica count,
+          restarts and request load over the last 30 minutes).
         - Watch for the disagreement between signals: a container pinned at its CPU
-          limit while the autoscaler cannot add capacity is a very different story
-          from "we're simply busy".
+          limit, an autoscaler that is no longer allowed to add capacity, and pods
+          being restarted because they can't answer their own health checks — that is
+          a very different story from "we're simply busy".
+        - Ask it to compare the running workload with the manifest in the connected
+          repository. A live value that no longer matches the checked-in one is the
+          strongest single piece of evidence you will find.
         - Stay read-only, you're gathering evidence, changing nothing.
 
     ??? note "Task 3 · Record your hypothesis"

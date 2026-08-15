@@ -66,15 +66,15 @@ if ($Fault -eq "badimage") {
 
 if ($Fault -eq "cpu-starve") {
     Write-Host "Applying tightened CPU limits to '$Service'..." -ForegroundColor Yellow
-    kubectl set resources deploy/$Service -n $ns -c $Service --requests=cpu=20m,memory=128Mi --limits=cpu=80m,memory=256Mi | Out-Null
-    kubectl annotate deploy/$Service -n $ns kubernetes.io/change-cause="cost optimisation: reduce cpu request/limit and pin to a single replica" --overwrite | Out-Null
-    # The same cost-optimisation change pins the service to one replica, so the
-    # autoscaler can no longer compensate for the smaller limit. It also keeps
-    # capacity constant: a service flipping between one and two replicas produces
-    # a different symptom every minute, which is impossible to investigate.
-    $hpaPatch = (@{ spec = @{ minReplicas = 1; maxReplicas = 1 } } | ConvertTo-Json -Compress)
+    kubectl set resources deploy/$Service -n $ns -c $Service --requests=cpu=10m,memory=128Mi --limits=cpu=40m,memory=256Mi | Out-Null
+    kubectl annotate deploy/$Service -n $ns kubernetes.io/change-cause="cost optimisation: reduce cpu request/limit and fix the replica count" --overwrite | Out-Null
+    # The same cost-optimisation change fixes the replica count, so the autoscaler
+    # can no longer compensate. Holding it constant also matters for the symptom:
+    # a service flipping between one and two replicas halves and doubles capacity
+    # every minute, which produces a different incident every time you look.
+    $hpaPatch = (@{ spec = @{ minReplicas = 2; maxReplicas = 2 } } | ConvertTo-Json -Compress)
     kubectl patch hpa $Service -n $ns --type=merge -p $hpaPatch 2>$null | Out-Null
-    kubectl scale deploy/$Service -n $ns --replicas=1 2>$null | Out-Null
+    kubectl scale deploy/$Service -n $ns --replicas=2 2>$null | Out-Null
     kubectl rollout status deploy/$Service -n $ns --timeout=120s
     Write-Host "CPU limits applied to '$Service'." -ForegroundColor Green
     return

@@ -26,10 +26,14 @@ crew-scheduling degradation to date.
 
 1. Compare the layers. Application pod CPU low **and** database CPU high means
    the constraint is the database, not the workload.
-2. Confirm the access path is unindexed:
+2. Confirm the access path is unindexed. From any database session - or from a
+   service pod that already holds credentials - check the indexes on the table
+   and the plan for the duty lookup:
 
    ```sql
-   EXPLAIN ANALYZE
+   SELECT indexname, indexdef FROM pg_indexes WHERE tablename = 'crew_roster';
+
+   EXPLAIN
    SELECT flight_no, crew_member, role, assigned
      FROM crew_roster
     WHERE assigned = true AND role <> 'Cabin Crew'
@@ -41,15 +45,23 @@ crew-scheduling degradation to date.
 
 ### Remediate (in order)
 
-1. **Fix the query path.** Add the supporting index. The maintenance job ships
-   with the platform and builds the index without locking the table:
+1. **Fix the query path.** Add an index that supports the duty lookup. Build it
+   with `CONCURRENTLY` so the table stays writable:
+
+   ```sql
+   CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_crew_roster_duty
+     ON crew_roster (assigned, flight_no, crew_member);
+   ```
+
+   A maintenance job that applies exactly this ships with the platform, for
+   operators working from a terminal:
 
    ```bash
    kubectl create -f k8s/maintenance/crew-roster-index.yaml
    ```
 
-   This is a schema change: apply it **under approval**, and expect latency to
-   recover within a minute of the job completing.
+   Either route is acceptable. This is a schema change: apply it **under
+   approval**, and expect latency to recover within a minute.
 2. Do **not** scale pods or widen `PG_POOL_MAX` to escape this. Pool capacity
    already exceeds what the server can absorb, so more concurrency pushes more
    work at a saturated database and can make it worse.
