@@ -37,7 +37,7 @@ its guardrails intact.
 
 1. **Build the specialist.** Create an AKS triage subagent for the `aetherion` namespace and invoke it to summarize namespace health and likely causes.
 2. **Encode the skill.** Capture the crew query-path recovery from Challenge 4 as a reusable skill, guardrails intact, and confirm it loads.
-3. **Know when to use which.** Be able to say when you'd reach for the subagent (invoke to investigate) versus the skill (auto-loads a procedure).
+3. **Know when to use which.** Be able to say when you'd reach for the subagent (delegate to it to investigate) versus the skill (a procedure the agent can draw on).
 
 ![Challenge 5 storyboard: Sam and Aria engineer a specialist subagent and reusable skill](../assets/storyboard/img-challenge-5.webp){ .story-panel loading=lazy }
 
@@ -91,8 +91,8 @@ the guardrails (diagnose which layer is saturated, repair the query path, never
 delete or restart the database). Be careful not to encode "scale it" as the answer —
 Challenge 4 is precisely the case where scaling cannot work.
 
-Skills auto-load and encode a procedure; subagents are invoked and investigate, so
-you'll want both in the final incident.
+Skills encode a procedure the agent can draw on; subagents are delegated to and
+investigate. You'll want both in the final incident.
 </details>
 
 !!! question "Stuck? Step-by-step for each task"
@@ -221,9 +221,8 @@ you'll want both in the final incident.
         ```
 
         **Description** — behind the **Edit** link, and the field most people skim.
-        Skills auto-load by context, and this description is what the agent matches
-        on when it decides whether the skill is relevant. Describe *when to reach
-        for it*, not what it does:
+        This description is what the agent matches on when deciding whether the
+        skill is relevant, so describe *when to reach for it*, not what it does:
 
         ```text
         Use when crew scheduling is slow or timing out and the pods themselves look
@@ -294,10 +293,25 @@ you'll want both in the final incident.
         keeping.
 
     ??? note "Task 3 · Know when to use which"
-        - A **subagent** is something you *invoke* to investigate a domain (your AKS
-          specialist).
-        - A **skill** *auto-loads* when relevant and encodes a *procedure* (the
-          query-path recovery). You'll want both in the final incident.
+        - A **subagent** is something you *delegate to* by name, to investigate a
+          domain (your AKS specialist).
+        - A **skill** encodes a *procedure* (the query-path recovery) that the
+          agent can draw on when the situation matches its description.
+
+        !!! warning "Don't assume a skill fires on its own"
+            Skills are described as loading by context, but in validation this one
+            did **not** activate during a live investigation of exactly the
+            incident it was written for — the agent solved it from first
+            principles and never referenced the skill.
+
+            Asked directly which skills applied, it named
+            `crew-query-path-recovery` and matched it correctly. So the skill was
+            registered, enabled and well described; it simply wasn't reached for
+            unprompted.
+
+            Practical consequence: in Challenge 7, **name the skill** when you want
+            it used rather than assuming it will fire. Treat a skill as a procedure
+            you can call on, not a guaranteed reflex.
 
 ### Reference
 

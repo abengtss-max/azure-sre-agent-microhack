@@ -228,8 +228,9 @@ Reference: [Subagents & extensibility](https://learn.microsoft.com/en-us/azure/s
 1. Same place: **Builder → Agent Canvas → + Create skill** (or **Builder → Skill
    Builder**).
 2. **Name** it, then click **Edit** on **Description** and describe *when the
-   skill should be reached for*. Skills auto-load by context, so the description
-   is what the agent matches on — a vague one means it never loads.
+   skill should be reached for*. The description is what the agent matches the
+   situation against, so a vague one means the skill is never considered. Do not
+   assume a skill fires on its own — name it when you want it used.
 3. In the pre-scaffolded **SKILL.md**, fill in the `name` / `description`
    frontmatter and encode a well-defined procedure (e.g. the crew query-path
    recovery) as steps, keeping the guardrails (confirm which layer is saturated,
