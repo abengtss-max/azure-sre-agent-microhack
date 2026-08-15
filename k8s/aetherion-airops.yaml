@@ -22,6 +22,7 @@ data:
   PGPORT: "5432"
   REDIS_PORT: "6379"
   REDIS_TLS: "false"
+  REDIS_HOST: "redis"
   PG_POOL_MAX: "5"
 ---
 # ---------------- redis (in-cluster cache) ----------------
@@ -191,7 +192,6 @@ spec:
             - { name: PGHOST, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: PGHOST } } }
             - { name: PGUSER, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: PGUSER } } }
             - { name: PGPASSWORD, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: PGPASSWORD } } }
-            - { name: REDIS_HOST, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: REDIS_HOST } } }
             - { name: REDIS_PASSWORD, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: REDIS_PASSWORD } } }
             - { name: APPLICATIONINSIGHTS_CONNECTION_STRING, valueFrom: { secretKeyRef: { name: aetherion-secrets, key: APPLICATIONINSIGHTS_CONNECTION_STRING } } }
           readinessProbe: { httpGet: { path: /health/ready, port: 8080 }, initialDelaySeconds: 5, periodSeconds: 10, timeoutSeconds: 5, failureThreshold: 6 }

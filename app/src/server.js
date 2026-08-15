@@ -102,7 +102,7 @@ function registerRoleRoutes() {
             ]);
           }
           const rc = await redisLib.getClient();
-          if (rc) await rc.set(`session:${pnr}`, JSON.stringify({ passenger, flightNo }), { EX: 900 });
+          if (rc) await redisLib.cacheSet(`session:${pnr}`, JSON.stringify({ passenger, flightNo }), 900);
           res.json({ pnr, passenger, flightNo, status: 'confirmed' });
         } catch (err) {
           res.status(500).json({ error: err.message });
@@ -110,17 +110,25 @@ function registerRoleRoutes() {
       });
       app.get('/api/bookings/count', async (req, res) => {
         try {
+          // The counter is served from the cache; the reservations table only
+          // grows, so it is refreshed from the planner's row estimate rather
+          // than scanned on every request.
+          const cached = await redisLib.cacheGet('bookings:count');
+          if (cached !== null && cached !== undefined) {
+            return res.json({ bookings: Number(cached), cached: true });
+          }
           const pool = db.getPool();
           if (!pool) return res.json({ bookings: 0 });
-          // The reservations table only grows, so the dashboard counter uses the
-          // planner's row estimate rather than scanning it on every request.
           const { rows } = await pool.query(
             "SELECT reltuples::bigint AS c FROM pg_class WHERE relname = 'bookings'"
           );
-          const estimate = rows.length ? Number(rows[0].c) : -1;
-          if (estimate >= 0) return res.json({ bookings: estimate });
-          const exact = await pool.query('SELECT count(*)::int AS c FROM bookings');
-          res.json({ bookings: exact.rows[0].c });
+          let count = rows.length ? Number(rows[0].c) : -1;
+          if (count < 0) {
+            const exact = await pool.query('SELECT count(*)::int AS c FROM bookings');
+            count = exact.rows[0].c;
+          }
+          await redisLib.cacheSet('bookings:count', String(count), 10);
+          res.json({ bookings: count, cached: false });
         } catch (err) {
           res.status(500).json({ error: err.message });
         }

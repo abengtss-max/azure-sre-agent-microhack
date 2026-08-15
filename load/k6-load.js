@@ -65,8 +65,17 @@ export const options = {
 
 const errorRate = new Rate('aetherion_errors');
 
-function headers(direct) {
-  const h = { 'Content-Type': 'application/json' };
+// Aetherion's own clients identify themselves; partner traffic arrives through
+// the published API.
+const CLIENTS = {
+  partner: 'Aetherion-PartnerAPI/3.2',
+  station: 'Aetherion-StationOps/4.7',
+  crew: 'Aetherion-CrewApp/2.9 (iOS)',
+  checkin: 'Aetherion-Kiosk/5.1'
+};
+
+function headers(direct, client) {
+  const h = { 'Content-Type': 'application/json', 'User-Agent': client || CLIENTS.partner };
   if (API_KEY && !direct) h['Ocp-Apim-Subscription-Key'] = API_KEY;
   return h;
 }
@@ -79,7 +88,7 @@ function track(res) {
 
 // One pass of the operational journey against the given entry point.
 function journey(base, direct, crewRepeats) {
-  const h = headers(direct);
+  const h = headers(direct, direct ? CLIENTS.station : CLIENTS.partner);
 
   // Journey 1: passenger browses the flight board
   group('browse-flights', () => {
@@ -118,7 +127,7 @@ export function partnerTraffic() {
   // platform, so the crew path carries the concurrency on its own.
   if (MODE === 'crew-burst') {
     group('crew-scheduling', () => {
-      const res = http.get(`${BASE_URL}/api/crew`, { headers: headers(false) });
+      const res = http.get(`${BASE_URL}/api/crew`, { headers: headers(false, CLIENTS.crew) });
       check(res, { 'crew ok': (r) => track(r) });
     });
     sleep(Math.random() * 0.2);
@@ -133,14 +142,14 @@ export function internalTraffic() {
 
 // Crews signing on for the departure wave pull the roster and little else.
 export function crewSignOn() {
-  const res = http.get(`${DIRECT_URL}/api/crew`, { headers: headers(true) });
+  const res = http.get(`${DIRECT_URL}/api/crew`, { headers: headers(true, CLIENTS.crew) });
   check(res, { 'crew ok': (r) => track(r) });
   sleep(Math.random() * 0.3);
 }
 
 // Passengers checking in at desks and kiosks.
 export function checkIn() {
-  const h = headers(true);
+  const h = headers(true, CLIENTS.checkin);
   const payload = JSON.stringify({ passenger: `PAX-${__VU}-${__ITER}`, flightNo: `AE${100 + (__ITER % 30)}` });
   track(http.post(`${DIRECT_URL}/api/book`, payload, { headers: h }));
   track(http.get(`${DIRECT_URL}/api/bookings/count`, { headers: h }));

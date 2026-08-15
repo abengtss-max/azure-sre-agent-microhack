@@ -41,4 +41,35 @@ async function getClient() {
   return connecting;
 }
 
-module.exports = { getClient, isConfigured };
+// Callers must not hang on the cache. A read that exceeds this budget is treated
+// as a miss and served from the source of truth instead.
+const CACHE_TIMEOUT_MS = parseInt(process.env.REDIS_TIMEOUT_MS || '1500', 10);
+
+function withTimeout(promise) {
+  return Promise.race([
+    promise,
+    new Promise((resolve) => setTimeout(() => resolve(null), CACHE_TIMEOUT_MS))
+  ]).catch(() => null);
+}
+
+async function cacheGet(key) {
+  return withTimeout(
+    (async () => {
+      const c = await getClient();
+      if (!c) return null;
+      return c.get(key);
+    })()
+  );
+}
+
+async function cacheSet(key, value, ttlSeconds) {
+  return withTimeout(
+    (async () => {
+      const c = await getClient();
+      if (!c) return null;
+      return c.set(key, value, { EX: ttlSeconds });
+    })()
+  );
+}
+
+module.exports = { getClient, isConfigured, cacheGet, cacheSet, CACHE_TIMEOUT_MS };

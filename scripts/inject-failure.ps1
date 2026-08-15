@@ -17,7 +17,7 @@ param(
     [string]$Service,
 
     [Parameter(Mandatory = $true)]
-    [ValidateSet("bad-backend", "badimage", "cpu-starve", "canary", "slow-query")]
+    [ValidateSet("bad-backend", "badimage", "cpu-starve", "canary", "slow-query", "cache-endpoint")]
     [string]$Fault
 )
 
@@ -77,6 +77,19 @@ if ($Fault -eq "cpu-starve") {
     kubectl scale deploy/$Service -n $ns --replicas=2 2>$null | Out-Null
     kubectl rollout status deploy/$Service -n $ns --timeout=120s
     Write-Host "CPU limits applied to '$Service'." -ForegroundColor Green
+    return
+}
+
+if ($Fault -eq "cache-endpoint") {
+    # A cache migration repoints the service at an address that accepts nothing.
+    # Every cached read waits out the client's timeout and then falls back to the
+    # database, so the service gets slower without burning CPU - which is what a
+    # misrouted dependency actually looks like.
+    Write-Host "Repointing '$Service' at the new cache endpoint..." -ForegroundColor Yellow
+    kubectl set env deploy/$Service -n $ns REDIS_HOST=redis-cache-prod.aetherion.internal | Out-Null
+    kubectl annotate deploy/$Service -n $ns kubernetes.io/change-cause="cache migration: move booking to the shared cache endpoint" --overwrite | Out-Null
+    kubectl rollout status deploy/$Service -n $ns --timeout=180s
+    Write-Host "Cache endpoint updated on '$Service'." -ForegroundColor Green
     return
 }
 

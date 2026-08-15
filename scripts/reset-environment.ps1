@@ -32,6 +32,8 @@ if (Test-Path $envFile) {
 }
 # PG_POOL_MAX comes from the aetherion-config ConfigMap; drop any deployment override.
 kubectl set env deploy/crew-scheduling -n $ns PG_POOL_MAX- 2>$null | Out-Null
+# Same for the cache endpoint: the ConfigMap holds the real one.
+kubectl set env deploy/booking -n $ns REDIS_HOST- 2>$null | Out-Null
 foreach ($s in $services) { kubectl delete deploy "$s-v2" -n $ns --ignore-not-found 2>$null | Out-Null }
 # Autoscaler bounds: booking runs 2-6, crew-scheduling is capped at 3 by design.
 kubectl patch hpa booking -n $ns --type=merge -p (@{ spec = @{ minReplicas = 2; maxReplicas = 6 } } | ConvertTo-Json -Compress) 2>$null | Out-Null

@@ -122,8 +122,15 @@ function Get-CpuLimitMilli([string]$Service) {    $v = kubectl get deploy $Servi
     return [int]([double]$v * 1000)
 }
 
-function Get-HpaMax([string]$Service) {
-    $v = kubectl get hpa $Service -n $script:NS -o jsonpath='{.spec.maxReplicas}' 2>$null
+function Get-EnvOverride([string]$Service, [string]$Name) {
+    # Only literal env entries on the deployment - the ConfigMap value is the baseline.
+    $v = kubectl get deploy $Service -n $script:NS `
+        -o jsonpath="{.spec.template.spec.containers[0].env[?(@.name=='$Name')].value}" 2>$null
+    if ([string]::IsNullOrWhiteSpace($v)) { return '' }
+    return $v.Trim()
+}
+
+function Get-HpaMax([string]$Service) {    $v = kubectl get hpa $Service -n $script:NS -o jsonpath='{.spec.maxReplicas}' 2>$null
     if ([string]::IsNullOrWhiteSpace($v)) { return 0 }
     return [int]$v
 }
@@ -219,9 +226,9 @@ $script:Challenges = [ordered]@{
         Title = 'Detect and Investigate Without Touching Production'
         Kind  = 'fault'
         Start = {
-            Invoke-Fault 'booking' 'cpu-starve'
+            Invoke-Fault 'booking' 'cache-endpoint'
             Set-Load 'surge'
-            Write-Host "INCIDENT P2 (open): passengers report online check-in is failing intermittently." -ForegroundColor Yellow
+            Write-Host "INCIDENT P2 (open): passengers report online check-in has slowed to a crawl." -ForegroundColor Yellow
             Write-Host "Complaints are rising as a passenger surge builds. Root cause is unknown."
             Write-Host "Detect and characterize the symptom, then form a root-cause hypothesis from"
             Write-Host "telemetry and logs - all READ-ONLY. Do NOT fix it yet; the next challenge resolves it."
@@ -247,12 +254,11 @@ $script:Challenges = [ordered]@{
         Check = {
             $okBook   = (Test-ServiceHealthy 'booking' 400)
             $latBook  = Get-ServiceLatencyMs 'booking'
-            $cpuBook  = Get-CpuLimitMilli 'booking'
-            $hpaBook  = Get-HpaMax 'booking'
+            $cacheOk  = (Get-EnvOverride 'booking' 'REDIS_HOST') -eq ''
             $okFlight = (Test-ServiceHealthy 'flight-ops')
             $tagFlight = Get-ImageTag 'flight-ops'
-            $pass = ($okBook -and $cpuBook -ge 500 -and $hpaBook -ge 6 -and $okFlight -and $tagFlight -eq 'latest')
-            @{ Pass = $pass; Detail = "booking healthy=$okBook (p95 ${latBook}ms) cpuLimit=${cpuBook}m hpaMax=$hpaBook | flight-ops healthy=$okFlight image=:$tagFlight" }
+            $pass = ($okBook -and $cacheOk -and $okFlight -and $tagFlight -eq 'latest')
+            @{ Pass = $pass; Detail = "booking healthy=$okBook (p95 ${latBook}ms) cacheEndpointRestored=$cacheOk | flight-ops healthy=$okFlight image=:$tagFlight" }
         }
     }
 

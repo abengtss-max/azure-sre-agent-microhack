@@ -37,7 +37,7 @@ applying a reversible rollback, and verifying both from telemetry.
 **Part A — finish the check-in incident**
 
 1. **Plan the fix.** Ask the agent to turn your hypothesis into a concrete `booking` remediation plan and name the permission it needs.
-2. **Recover under approval.** Keep the agent in Review, approve the least-disruptive fix, then confirm check-in is serving cleanly again.
+2. **Recover under approval.** Keep the agent in Review, approve the least-disruptive fix, then confirm latency is back to baseline.
 
 **Part B — the flight board goes dark**
 
@@ -50,16 +50,15 @@ applying a reversible rollback, and verifying both from telemetry.
 
 !!! quote "Paste into the agent chat"
     Turn my check-in hypothesis into a concrete remediation plan for the `booking`
-    service. Restore it to exactly what the repository's manifest declares — CPU
-    request/limit and autoscaler bounds — rather than to an intermediate value you
-    choose, and tell me exactly what permission the action needs. Then, for
-    `flight-ops`, correlate the outage time with deployment and rollout history —
-    including the recorded change cause — and propose the least-disruptive
-    **reversible** rollback for my approval.
+    service. Restore it to exactly what the repository's manifest declares rather
+    than to a value you choose, and tell me exactly what permission the action
+    needs. Then, for `flight-ops`, correlate the outage time with deployment and
+    rollout history — including the recorded change cause — and propose the
+    least-disruptive **reversible** rollback for my approval.
 
 ### Success criteria
 
-- Check-in is remediated with a least-disruptive action you approved in **Review** mode (not ungoverned automation); `booking` is healthy, errors are back to zero, and **the CPU limit and autoscaler bounds the change altered are back where the manifest says they should be** — compensating around them is not a fix.
+- Check-in is remediated with a least-disruptive action you approved in **Review** mode (not ungoverned automation); `booking` is healthy, latency is back to baseline, and **the setting the change altered matches what the repository declares** — compensating around it is not a fix.
 - `flight-ops`'s failure mode is identified and linked to a recent change/rollout; the recovery is reversible and doesn't touch unrelated resources, and the service is back on its previous image.
 - Both tiles are green, `/api/flights` responds, and `check-challenge.ps1 3` passes.
 
@@ -109,10 +108,10 @@ changes go through a pipeline that leaves one.
           Permissions decide what the agent can reach; run mode decides whether it
           asks first.
 
-        Then verify `booking` is serving cleanly again, and confirm the change was
-        actually reverted rather than worked around — the resource limits and
-        autoscaler bounds should match what the repository's manifest declares, not a
-        smaller value propped up by something else.
+        Then verify `booking` latency is back to baseline, and confirm the change was
+        actually reverted rather than worked around — the running configuration
+        should match what the repository's manifest declares, with no leftover
+        override on the deployment.
 
     ??? note "Task 3 · Triage the flight board"
         - Check `flight-ops` pod status and recent events:

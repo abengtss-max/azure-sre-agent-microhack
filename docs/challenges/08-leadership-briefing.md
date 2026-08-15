@@ -106,9 +106,15 @@ handled faster next time.
         - Be specific about where that evidence lives. The workload changes are in
           **rollout history** (`kubectl rollout history deploy/<svc> -n aetherion`)
           with the change cause recorded against each revision; the API Management
-          policy change is in the **Azure Activity Log**. In-cluster changes never
+          policy change is in the **Azure Activity Log** as a
+          `Set Product policy configuration` operation. In-cluster changes never
           reach the Activity Log — which is itself worth calling out as a gap in the
           handover.
+        - If the agent reports that it found nothing, ask it to query the Activity
+          Log at **subscription scope** rather than filtering by resource group. The
+          API Management policy operation is not always attributed to the resource
+          group, so a resource-group-scoped query can come back empty even though
+          the events are there.
 
     ??? note "Task 4 · Generate the executive PDF"
         - Ask the agent to render the leadership briefing as a formatted **PDF** with
