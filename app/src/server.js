@@ -1,6 +1,7 @@
 'use strict';
 
 const path = require('path');
+const http = require('http');
 const express = require('express');
 const { initTelemetry, trackEvent, trackMetric } = require('./lib/telemetry');
 const db = require('./lib/db');
@@ -8,6 +9,66 @@ const redisLib = require('./lib/redis');
 
 const ROLE = (process.env.ROLE || 'gateway').toLowerCase();
 const PORT = parseInt(process.env.PORT || '8080', 10);
+
+// A Kubernetes Service load-balances per TCP connection, not per request, so a
+// pooled keep-alive client pins every call to whichever pod it first reached.
+// The gateway would then poll and proxy to a single replica and never see the
+// others. Opening a connection per call keeps traffic spread across endpoints.
+const serviceAgent = new http.Agent({ keepAlive: false, maxSockets: 64 });
+
+function callService(target, { method = 'GET', body = null, timeoutMs = 6000 } = {}) {
+  return new Promise((resolve) => {
+    const started = Date.now();
+    let url;
+    try {
+      url = new URL(target);
+    } catch (err) {
+      resolve({ ok: false, status: 0, latencyMs: 0, error: 'BadTarget', body: '' });
+      return;
+    }
+
+    const payload = body === null ? null : Buffer.from(body);
+    const req = http.request(
+      {
+        agent: serviceAgent,
+        protocol: url.protocol,
+        hostname: url.hostname,
+        port: url.port || 80,
+        path: url.pathname + url.search,
+        method,
+        headers: payload
+          ? { 'content-type': 'application/json', 'content-length': payload.length }
+          : { 'content-type': 'application/json' }
+      },
+      (res) => {
+        const chunks = [];
+        res.on('data', (c) => chunks.push(c));
+        res.on('end', () =>
+          resolve({
+            ok: res.statusCode >= 200 && res.statusCode < 400,
+            status: res.statusCode,
+            latencyMs: Date.now() - started,
+            contentType: res.headers['content-type'],
+            body: Buffer.concat(chunks).toString('utf8')
+          })
+        );
+      }
+    );
+
+    req.setTimeout(timeoutMs, () => req.destroy(new Error('timeout')));
+    req.on('error', (err) =>
+      resolve({
+        ok: false,
+        status: 0,
+        latencyMs: Date.now() - started,
+        error: err.message === 'timeout' ? 'TimeoutError' : err.code || 'RequestError',
+        body: ''
+      })
+    );
+    if (payload) req.write(payload);
+    req.end();
+  });
+}
 
 initTelemetry(ROLE);
 
@@ -187,21 +248,12 @@ function registerGatewayRoutes() {
   };
 
   async function probe(url, spec) {
-    const start = Date.now();
-    try {
-      const controller = new AbortController();
-      const t = setTimeout(() => controller.abort(), 4000);
-      const opts = { method: spec.method, signal: controller.signal };
-      if (spec.method === 'POST') {
-        opts.headers = { 'content-type': 'application/json' };
-        opts.body = '{}';
-      }
-      const r = await fetch(`${url}${spec.path}`, opts);
-      clearTimeout(t);
-      return { ok: r.ok, status: r.status, latencyMs: Date.now() - start };
-    } catch (err) {
-      return { ok: false, status: 0, latencyMs: Date.now() - start, error: err.name };
-    }
+    const r = await callService(`${url}${spec.path}`, {
+      method: spec.method,
+      body: spec.method === 'POST' ? '{}' : null,
+      timeoutMs: 4000
+    });
+    return { ok: r.ok, status: r.status, latencyMs: r.latencyMs, error: r.error };
   }
 
   // A single probe samples an instantaneous queue depth, so one reading swings
@@ -343,20 +395,22 @@ function registerGatewayRoutes() {
   for (const route of PROXY_ROUTES) {
     app[route.method](route.path, async (req, res) => {
       const start = Date.now();
-      try {
-        const controller = new AbortController();
-        const t = setTimeout(() => controller.abort(), 6000);
-        const opts = { method: req.method, signal: controller.signal, headers: { 'content-type': 'application/json' } };
-        if (req.method === 'POST') opts.body = JSON.stringify(req.body || {});
-        const r = await fetch(`${route.target}${req.path}`, opts);
-        clearTimeout(t);
-        const body = await r.text();
-        const ct = r.headers.get('content-type');
-        if (ct) res.set('content-type', ct);
-        res.status(r.status).send(body);
-      } catch (err) {
-        res.status(502).json({ error: 'upstream_unreachable', service: route.path, detail: err.name, latencyMs: Date.now() - start });
+      const r = await callService(`${route.target}${req.path}`, {
+        method: req.method,
+        body: req.method === 'POST' ? JSON.stringify(req.body || {}) : null,
+        timeoutMs: 6000
+      });
+      if (r.status === 0) {
+        res.status(502).json({
+          error: 'upstream_unreachable',
+          service: route.path,
+          detail: r.error,
+          latencyMs: Date.now() - start
+        });
+        return;
       }
+      if (r.contentType) res.set('content-type', r.contentType);
+      res.status(r.status).send(r.body);
     });
   }
 
