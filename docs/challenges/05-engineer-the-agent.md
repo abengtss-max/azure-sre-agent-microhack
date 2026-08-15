@@ -87,20 +87,59 @@ you'll want both in the final incident.
     the exact clicks, open the matching task below.
 
     ??? note "Task 1 · Build the specialist"
-        - In the agent, go to **Builder → Subagent builder → Create → Custom Agent**.
-          Name it (e.g. `aks-triage`) and give it a one-line remit: triage pod
-          status, events, rollout history, and dependency health for the
-          `aetherion` namespace.
-        - Invoke it explicitly and ask for a namespace-health summary with likely
-          causes. Judge it on whether it would speed a real AKS incident.
+        Both the subagent and the skill are created from the same place: in the
+        agent, open **Builder** in the left-hand menu, then **Agent Canvas**. The
+        canvas shows what your agent is made of — incident response plans,
+        subagents, and the tools attached to them.
+
+        1. Click **+ Create subagent**. The **Create a custom agent** dialog opens.
+        2. **Custom agent name** — something you'll recognise when you invoke it,
+           e.g. `aks-triage`.
+        3. **Instructions** — this is the remit, and it is the field that decides
+           whether the specialist is worth having. Describe what it does *and how it
+           should behave*: triage pod status, events, rollout history and dependency
+           health for the `aetherion` namespace; stay inside AKS rather than
+           wandering into APIM or the database; report likely causes with the
+           evidence behind them. **Refine with AI** and **View AI suggestions** will
+           tighten your wording if you want them.
+        4. **Skills** — by default the subagent inherits every global skill.
+           Choosing skills here **overrides** that inheritance rather than adding to
+           it, so leave it inherited unless you deliberately want a narrower set.
+        5. **Tools** — same inheritance rule. This is the honest way to enforce
+           "keep it scoped to AKS": narrow the tools rather than relying on the
+           instructions alone.
+        6. **Hooks** — not needed for this challenge.
+        7. **Create**.
+
+        Prefer authoring it as code? The **Form / YAML** toggle at the top of the
+        dialog edits the same definition.
+
+        Then invoke the specialist and ask for a namespace-health summary with
+        likely causes. Judge it on one question: would this have sped up a real AKS
+        incident?
 
     ??? note "Task 2 · Encode the skill"
-        - **Builder → Subagent builder → Create → Skill.** In `SKILL.md`, write the
-          crew query-path steps from Challenge 4 (confirm which layer is saturated,
-          then repair the query path under approval) and the guardrail (never
-          delete/restart the DB, and don't scale the layer that is merely waiting).
-        - Save it and confirm it appears in the **Skills** list and loads when
-          relevant.
+        Exactly the same path — **Builder → Agent Canvas** — but click
+        **+ Create skill** instead. (**Builder → Skill Builder** in the left-hand
+        menu takes you to the same place.)
+
+        1. **Name** — e.g. `crew-query-path-recovery`.
+        2. **Description** — click **Edit**. This is what the agent matches against
+           when it decides whether the skill is relevant, so describe *when to reach
+           for it*, not what it does. A vague description is the usual reason a
+           skill never loads.
+        3. **SKILL.md** — the editor on the right is pre-scaffolded with `name` and
+           `description` frontmatter and a comment marking where the instructions
+           go. Fill in the frontmatter, then write the crew query-path steps from
+           Challenge 4 below it: confirm which layer is actually saturated, then
+           repair the query path under approval. Bake in the guardrails — never
+           delete or restart the database, and don't scale the layer that is merely
+           waiting.
+        4. **Files** — you can attach more files or folders, but `SKILL.md` on its
+           own is enough here.
+        5. **Tools** — optional, and the dialog itself advises configuring tools on
+           the agent instead for more consistent behaviour.
+        6. **Create**.
 
     ??? note "Task 3 · Know when to use which"
         - A **subagent** is something you *invoke* to investigate a domain (your AKS

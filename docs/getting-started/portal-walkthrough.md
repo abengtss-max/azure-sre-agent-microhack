@@ -200,12 +200,18 @@ Reference: [Team onboarding & memory](https://learn.microsoft.com/en-us/azure/sr
 
 ## J · Create a specialist subagent { #j-subagent }
 
-1. In the agent, open **Subagents** (or extensibility) → **Create**.
-2. Give it a **narrow remit in one sentence** — e.g. *"AKS reliability triage for
-   the `aetherion` namespace: pod status, events, rollout history, dependency
-   health."*
-3. Save it, then **invoke it explicitly** in chat (e.g. `/agent aks`) and ask for
-   a scoped namespace triage.
+1. In the agent, open **Builder → Agent Canvas**, then click **+ Create subagent**.
+2. **Custom agent name** — e.g. `aks-triage`.
+3. **Instructions** — a **narrow remit**: *"AKS reliability triage for the
+   `aetherion` namespace: pod status, events, rollout history, dependency
+   health."* Say how it should behave, not just what it covers.
+4. **Skills** and **Tools** are **inherited** from the agent's globals by default.
+   Selecting either here *overrides* the inheritance rather than adding to it —
+   narrowing **Tools** is the real way to keep a specialist scoped.
+5. **Create**, then invoke it and ask for a scoped namespace triage.
+
+The **Form / YAML** toggle edits the same definition if you'd rather author it as
+code.
 
 Reference: [Subagents & extensibility](https://learn.microsoft.com/en-us/azure/sre-agent/sub-agents)
 
@@ -213,12 +219,16 @@ Reference: [Subagents & extensibility](https://learn.microsoft.com/en-us/azure/s
 
 ## K · Create a reusable skill { #k-skill }
 
-1. In the agent, open **Skills** → **Create**.
-2. Encode a well-defined procedure (e.g. the crew query-path recovery) as steps,
-   keeping the guardrails (confirm which layer is saturated, repair the query
-   path, **never** delete the database).
-3. Save it. Skills **auto-load** by context and are capped at **5 concurrent** —
-   remove any you don't need.
+1. Same place: **Builder → Agent Canvas → + Create skill** (or **Builder → Skill
+   Builder**).
+2. **Name** it, then click **Edit** on **Description** and describe *when the
+   skill should be reached for*. Skills auto-load by context, so the description
+   is what the agent matches on — a vague one means it never loads.
+3. In the pre-scaffolded **SKILL.md**, fill in the `name` / `description`
+   frontmatter and encode a well-defined procedure (e.g. the crew query-path
+   recovery) as steps, keeping the guardrails (confirm which layer is saturated,
+   repair the query path, **never** delete the database).
+4. **Create**.
 
 Reference: [Skills](https://learn.microsoft.com/en-us/azure/sre-agent/skills)
 
