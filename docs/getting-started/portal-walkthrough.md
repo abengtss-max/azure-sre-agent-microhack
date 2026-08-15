@@ -204,14 +204,17 @@ Reference: [Team onboarding & memory](https://learn.microsoft.com/en-us/azure/sr
 2. **Custom agent name** — e.g. `aks-triage`.
 3. **Instructions** — a **narrow remit**: *"AKS reliability triage for the
    `aetherion` namespace: pod status, events, rollout history, dependency
-   health."* Say how it should behave, not just what it covers.
-4. **Skills** and **Tools** are **inherited** from the agent's globals by default.
-   Selecting either here *overrides* the inheritance rather than adding to it —
-   narrowing **Tools** is the real way to keep a specialist scoped.
+   health."* Say how it should behave and what it should do when the evidence
+   points outside its scope, not just what it covers.
+4. **Leave Skills and Tools inherited.** The dialog warns that selecting either
+   overrides the defaults — it replaces the inherited set rather than adding to
+   it. `kubectl` is not in the tool picker (cluster access comes over a separate
+   execution channel), so picking tools to "scope" a specialist removes the
+   access it needs. Scope it with Instructions.
 5. **Create**, then invoke it and ask for a scoped namespace triage.
 
-The **Form / YAML** toggle edits the same definition if you'd rather author it as
-code.
+The **Form / YAML** toggle edits the same definition and exposes
+`handoff_description`, `agent_type` and `enable_skills`.
 
 Reference: [Subagents & extensibility](https://learn.microsoft.com/en-us/azure/sre-agent/sub-agents)
 

@@ -92,27 +92,82 @@ you'll want both in the final incident.
         canvas shows what your agent is made of — incident response plans,
         subagents, and the tools attached to them.
 
-        1. Click **+ Create subagent**. The **Create a custom agent** dialog opens.
-        2. **Custom agent name** — something you'll recognise when you invoke it,
-           e.g. `aks-triage`.
-        3. **Instructions** — this is the remit, and it is the field that decides
-           whether the specialist is worth having. Describe what it does *and how it
-           should behave*: triage pod status, events, rollout history and dependency
-           health for the `aetherion` namespace; stay inside AKS rather than
-           wandering into APIM or the database; report likely causes with the
-           evidence behind them. **Refine with AI** and **View AI suggestions** will
-           tighten your wording if you want them.
-        4. **Skills** — by default the subagent inherits every global skill.
-           Choosing skills here **overrides** that inheritance rather than adding to
-           it, so leave it inherited unless you deliberately want a narrower set.
-        5. **Tools** — same inheritance rule. This is the honest way to enforce
-           "keep it scoped to AKS": narrow the tools rather than relying on the
-           instructions alone.
-        6. **Hooks** — not needed for this challenge.
-        7. **Create**.
+        Click **+ Create subagent**. The **Create a custom agent** dialog opens.
+        Fill it in as follows.
 
-        Prefer authoring it as code? The **Form / YAML** toggle at the top of the
-        dialog edits the same definition.
+        **Custom agent name**
+
+        ```text
+        aks-triage
+        ```
+
+        **Instructions** — this is the remit, and it is the field that decides
+        whether the specialist is worth having. Paste this, then adjust to taste:
+
+        ```text
+        You are an AKS reliability specialist for the `aetherion` namespace.
+
+        Scope: Azure Kubernetes Service only. Investigate pod status, container
+        restarts, Kubernetes events, deployment rollout history and the health of
+        dependencies as seen from inside the cluster. Do not investigate API
+        Management or the database yourself — if the evidence points outside AKS,
+        say so and hand back.
+
+        Method: gather evidence before concluding. Prefer `kubectl` output,
+        Kubernetes events and rollout history over inference. When a workload looks
+        unhealthy, always check whether a recent rollout explains it, and report the
+        revision and its change cause.
+
+        Output: a short namespace health summary, the affected workloads, the
+        evidence you relied on, likely causes ranked by confidence, and the
+        recommended next step. Distinguish clearly between what you observed and
+        what you inferred. If required data is unavailable, say what is missing
+        rather than assuming.
+
+        Constraints: read-only. Propose remediation, never apply it.
+        ```
+
+        The last line matters. Challenge 5 builds a tool while the platform is
+        green; the specialist earns write access later, once you have seen it
+        reason well.
+
+        **Skills** — leave inherited. Do not select anything here.
+
+        **Tools** — leave inherited. Do not select anything here either, and this
+        is the one that will catch you out:
+
+        !!! warning "Selecting tools replaces the inherited set"
+            The dialog says the agent inherits 46 global tools and that selecting
+            tools *overrides* the defaults. It means exactly that — your selection
+            replaces all 46, it does not add to them.
+
+            Searching the tool picker for "AKS" or "Kubernetes" returns nothing
+            useful, because **`kubectl` is not in the tool picker**. Cluster access
+            reaches the agent through a separate execution channel — the same one
+            that produces the `kubectl` approval prompts you have been approving
+            since Challenge 1.
+
+            So if you pick tools here to "scope it to AKS", you achieve the
+            opposite: you strip the specialist of the cluster access it needs and
+            leave it with whatever unrelated handful you selected. Scope this
+            specialist with its **Instructions**, and leave Tools inherited.
+
+        **Hooks** — nothing needed for this challenge.
+
+        Then select **Create**.
+
+        ??? tip "The YAML tab exposes three fields the form hides"
+            The **Form / YAML** toggle edits the same definition, but the YAML view
+            shows extra keys worth knowing about:
+
+            - `handoff_description` — when the main agent should delegate to this
+              specialist. Worth writing, because it is what makes the subagent
+              usable in Challenge 7.
+            - `agent_type` — check this before you create. Challenge 5 is a
+              **Review**-mode challenge, so a subagent left as `Autonomous` has
+              quietly been given more latitude than the rest of your setup.
+            - `enable_skills` — whether the specialist can load skills, including
+              the one you are about to author.
 
         Then invoke the specialist and ask for a namespace-health summary with
         likely causes. Judge it on one question: would this have sped up a real AKS
@@ -123,23 +178,82 @@ you'll want both in the final incident.
         **+ Create skill** instead. (**Builder → Skill Builder** in the left-hand
         menu takes you to the same place.)
 
-        1. **Name** — e.g. `crew-query-path-recovery`.
-        2. **Description** — click **Edit**. This is what the agent matches against
-           when it decides whether the skill is relevant, so describe *when to reach
-           for it*, not what it does. A vague description is the usual reason a
-           skill never loads.
-        3. **SKILL.md** — the editor on the right is pre-scaffolded with `name` and
-           `description` frontmatter and a comment marking where the instructions
-           go. Fill in the frontmatter, then write the crew query-path steps from
-           Challenge 4 below it: confirm which layer is actually saturated, then
-           repair the query path under approval. Bake in the guardrails — never
-           delete or restart the database, and don't scale the layer that is merely
-           waiting.
-        4. **Files** — you can attach more files or folders, but `SKILL.md` on its
-           own is enough here.
-        5. **Tools** — optional, and the dialog itself advises configuring tools on
-           the agent instead for more consistent behaviour.
-        6. **Create**.
+        **Name**
+
+        ```text
+        crew-query-path-recovery
+        ```
+
+        **Description** — behind the **Edit** link, and the field most people skim.
+        Skills auto-load by context, and this description is what the agent matches
+        on when it decides whether the skill is relevant. Describe *when to reach
+        for it*, not what it does:
+
+        ```text
+        Use when crew scheduling is slow or timing out and the pods themselves look
+        healthy and underutilised — the symptom of a saturated shared database
+        rather than a saturated workload. Also use when several services sharing one
+        database degrade together while unrelated services stay fast.
+        ```
+
+        **SKILL.md** — the editor on the right is pre-scaffolded with `name` and
+        `description` frontmatter and a placeholder comment. Fill in the frontmatter
+        and replace the comment:
+
+        ```markdown
+        ---
+        name: crew-query-path-recovery
+        description: Recover crew scheduling when a saturated shared database, not the workload, is the bottleneck.
+        ---
+
+        ## When this applies
+
+        `crew-scheduling` is slow or timing out, but its pods are healthy, not
+        restarting, and using little CPU. Peer services sharing the same PostgreSQL
+        server are also degraded; services that do not share it are unaffected.
+
+        ## Diagnose before acting
+
+        1. Confirm the pods are waiting, not working: check pod CPU against requests
+           and confirm no restarts.
+        2. Confirm the autoscaler is not the constraint. If CPU is below target the
+           autoscaler will refuse to add replicas, and it is right to refuse.
+        3. Confirm the database is the saturated layer: check PostgreSQL CPU.
+        4. Identify the query path behind the crew duty lookup and whether it is
+           supported by an index.
+
+        ## Remedy
+
+        Repair the query path — restore the missing index supporting the crew duty
+        lookup. Build it without taking a disruptive lock on a live table.
+
+        Verify by re-measuring crew latency under the same load, not by checking
+        that a pod restarted.
+
+        ## Guardrails
+
+        - Never delete or restart the database. It is a shared dependency and the
+          blast radius is every service on it.
+        - Do not scale the layer that is merely waiting. Adding replicas to
+          `crew-scheduling` adds connections to an already-saturated database and
+          makes it worse.
+        - Any write is proposed for approval first, never applied unilaterally.
+        - If the evidence does not show database saturation, this skill does not
+          apply — stop and say so.
+        ```
+
+        **Files** — `SKILL.md` on its own is enough. You can attach more files or a
+        folder if you want to split a longer procedure up.
+
+        **Tools** — leave empty. The dialog itself advises configuring tools on the
+        agent rather than the skill, for more consistent behaviour.
+
+        Then select **Create**.
+
+        The guardrails are the point of this task. A skill that says "crew is slow,
+        add replicas" would be actively harmful here — Challenge 4 is precisely the
+        case where scaling cannot work. Encoding *why not* is what makes it worth
+        keeping.
 
     ??? note "Task 3 · Know when to use which"
         - A **subagent** is something you *invoke* to investigate a domain (your AKS
