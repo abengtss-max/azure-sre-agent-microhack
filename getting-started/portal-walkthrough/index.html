@@ -2152,23 +2152,32 @@ run mode (section F), not from the role.</p>
 <hr />
 <h2 id="j-subagent">J · Create a specialist subagent<a class="headerlink" href="#j-subagent" title="Permanent link">&para;</a></h2>
 <ol>
-<li>In the agent, open <strong>Subagents</strong> (or extensibility) → <strong>Create</strong>.</li>
-<li>Give it a <strong>narrow remit in one sentence</strong> — e.g. <em>"<abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> reliability triage for
-   the <code>aetherion</code> namespace: pod status, events, rollout history, dependency
-   health."</em></li>
-<li>Save it, then <strong>invoke it explicitly</strong> in chat (e.g. <code>/agent aks</code>) and ask for
-   a scoped namespace triage.</li>
+<li>In the agent, open <strong>Builder → Agent Canvas</strong>, then click <strong>+ Create subagent</strong>.</li>
+<li><strong>Custom agent name</strong> — e.g. <code>aks-triage</code>.</li>
+<li><strong>Instructions</strong> — a <strong>narrow remit</strong>: <em>"<abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> reliability triage for the
+   <code>aetherion</code> namespace: pod status, events, rollout history, dependency
+   health."</em> Say how it should behave, not just what it covers.</li>
+<li><strong>Skills</strong> and <strong>Tools</strong> are <strong>inherited</strong> from the agent's globals by default.
+   Selecting either here <em>overrides</em> the inheritance rather than adding to it —
+   narrowing <strong>Tools</strong> is the real way to keep a specialist scoped.</li>
+<li><strong>Create</strong>, then invoke it and ask for a scoped namespace triage.</li>
 </ol>
+<p>The <strong>Form / YAML</strong> toggle edits the same definition if you'd rather author it as
+code.</p>
 <p>Reference: <a href="https://learn.microsoft.com/en-us/azure/sre-agent/sub-agents">Subagents &amp; extensibility</a></p>
 <hr />
 <h2 id="k-skill">K · Create a reusable skill<a class="headerlink" href="#k-skill" title="Permanent link">&para;</a></h2>
 <ol>
-<li>In the agent, open <strong>Skills</strong> → <strong>Create</strong>.</li>
-<li>Encode a well-defined procedure (e.g. the crew query-path recovery) as steps,
-   keeping the guardrails (confirm which layer is saturated, repair the query
-   path, <strong>never</strong> delete the database).</li>
-<li>Save it. Skills <strong>auto-load</strong> by context and are capped at <strong>5 concurrent</strong> —
-   remove any you don't need.</li>
+<li>Same place: <strong>Builder → Agent Canvas → + Create skill</strong> (or <strong>Builder → Skill
+   Builder</strong>).</li>
+<li><strong>Name</strong> it, then click <strong>Edit</strong> on <strong>Description</strong> and describe <em>when the
+   skill should be reached for</em>. Skills auto-load by context, so the description
+   is what the agent matches on — a vague one means it never loads.</li>
+<li>In the pre-scaffolded <strong>SKILL.md</strong>, fill in the <code>name</code> / <code>description</code>
+   frontmatter and encode a well-defined procedure (e.g. the crew query-path
+   recovery) as steps, keeping the guardrails (confirm which layer is saturated,
+   repair the query path, <strong>never</strong> delete the database).</li>
+<li><strong>Create</strong>.</li>
 </ol>
 <p>Reference: <a href="https://learn.microsoft.com/en-us/azure/sre-agent/skills">Skills</a></p>
 <hr />

@@ -1793,25 +1793,60 @@ you'll want both in the final incident.</p>
 the exact clicks, open the matching task below.</p>
 <details class="note">
 <summary>Task 1 · Build the specialist</summary>
-<ul>
-<li>In the agent, go to <strong>Builder → Subagent builder → Create → Custom Agent</strong>.
-  Name it (e.g. <code>aks-triage</code>) and give it a one-line remit: triage pod
-  status, events, rollout history, and dependency health for the
-  <code>aetherion</code> namespace.</li>
-<li>Invoke it explicitly and ask for a namespace-health summary with likely
-  causes. Judge it on whether it would speed a real <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> incident.</li>
-</ul>
+<p>Both the subagent and the skill are created from the same place: in the
+agent, open <strong>Builder</strong> in the left-hand menu, then <strong>Agent Canvas</strong>. The
+canvas shows what your agent is made of — incident response plans,
+subagents, and the tools attached to them.</p>
+<ol>
+<li>Click <strong>+ Create subagent</strong>. The <strong>Create a custom agent</strong> dialog opens.</li>
+<li><strong>Custom agent name</strong> — something you'll recognise when you invoke it,
+   e.g. <code>aks-triage</code>.</li>
+<li><strong>Instructions</strong> — this is the remit, and it is the field that decides
+   whether the specialist is worth having. Describe what it does <em>and how it
+   should behave</em>: triage pod status, events, rollout history and dependency
+   health for the <code>aetherion</code> namespace; stay inside <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> rather than
+   wandering into <abbr title="Azure API Management — the API &quot;front door&quot; that authenticates and rate-limits traffic to the services.">APIM</abbr> or the database; report likely causes with the
+   evidence behind them. <strong>Refine with AI</strong> and <strong>View AI suggestions</strong> will
+   tighten your wording if you want them.</li>
+<li><strong>Skills</strong> — by default the subagent inherits every global skill.
+   Choosing skills here <strong>overrides</strong> that inheritance rather than adding to
+   it, so leave it inherited unless you deliberately want a narrower set.</li>
+<li><strong>Tools</strong> — same inheritance rule. This is the honest way to enforce
+   "keep it scoped to <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr>": narrow the tools rather than relying on the
+   instructions alone.</li>
+<li><strong>Hooks</strong> — not needed for this challenge.</li>
+<li><strong>Create</strong>.</li>
+</ol>
+<p>Prefer authoring it as code? The <strong>Form / YAML</strong> toggle at the top of the
+dialog edits the same definition.</p>
+<p>Then invoke the specialist and ask for a namespace-health summary with
+likely causes. Judge it on one question: would this have sped up a real <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr>
+incident?</p>
 </details>
 <details class="note">
 <summary>Task 2 · Encode the skill</summary>
-<ul>
-<li><strong>Builder → Subagent builder → Create → Skill.</strong> In <code>SKILL.md</code>, write the
-  crew query-path steps from Challenge 4 (confirm which layer is saturated,
-  then repair the query path under approval) and the guardrail (never
-  delete/restart the DB, and don't scale the layer that is merely waiting).</li>
-<li>Save it and confirm it appears in the <strong>Skills</strong> list and loads when
-  relevant.</li>
-</ul>
+<p>Exactly the same path — <strong>Builder → Agent Canvas</strong> — but click
+<strong>+ Create skill</strong> instead. (<strong>Builder → Skill Builder</strong> in the left-hand
+menu takes you to the same place.)</p>
+<ol>
+<li><strong>Name</strong> — e.g. <code>crew-query-path-recovery</code>.</li>
+<li><strong>Description</strong> — click <strong>Edit</strong>. This is what the agent matches against
+   when it decides whether the skill is relevant, so describe <em>when to reach
+   for it</em>, not what it does. A vague description is the usual reason a
+   skill never loads.</li>
+<li><strong>SKILL.md</strong> — the editor on the right is pre-scaffolded with <code>name</code> and
+   <code>description</code> frontmatter and a comment marking where the instructions
+   go. Fill in the frontmatter, then write the crew query-path steps from
+   Challenge 4 below it: confirm which layer is actually saturated, then
+   repair the query path under approval. Bake in the guardrails — never
+   delete or restart the database, and don't scale the layer that is merely
+   waiting.</li>
+<li><strong>Files</strong> — you can attach more files or folders, but <code>SKILL.md</code> on its
+   own is enough here.</li>
+<li><strong>Tools</strong> — optional, and the dialog itself advises configuring tools on
+   the agent instead for more consistent behaviour.</li>
+<li><strong>Create</strong>.</li>
+</ol>
 </details>
 <details class="note">
 <summary>Task 3 · Know when to use which</summary>
