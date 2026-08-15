@@ -1731,8 +1731,8 @@ by, so this is a <strong><abbr title="Priority 1 — a critical, business-stoppi
 recurrence.</p>
 <p><strong>Mission.</strong> Recover check-in with the least-disruptive action under human approval,
 then restore the flight board by correlating the outage with a recent change and
-applying a reversible rollback, and verifying both from telemetry.</p>
-<p><strong>Why this matters</strong></p>
+applying a reversible rollback, and verifying both from telemetry.
+<strong>Why this matters</strong></p>
 <div class="grid cards why-cards">
 <ul>
 <li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m21.1 12.5 1.4 1.41-6.53 6.59L12.5 17l1.4-1.41 2.07 2.08zM11 4a4 4 0 0 1 4 4 4 4 0 0 1-4 4 4 4 0 0 1-4-4 4 4 0 0 1 4-4m0 2a2 2 0 0 0-2 2 2 2 0 0 0 2 2 2 2 0 0 0 2-2 2 2 0 0 0-2-2m0 7c.68 0 1.5.09 2.41.26l-1.67 1.67-.74-.03c-2.97 0-6.1 1.46-6.1 2.1v1.1h6.2L13 20H3v-3c0-2.66 5.33-4 8-4"/></svg></span> <strong>Human-in-the-loop</strong>: approve the least-disruptive write</li>
@@ -1750,7 +1750,7 @@ applying a reversible rollback, and verifying both from telemetry.</p>
 <p><strong>Part A — finish the check-in incident</strong></p>
 <ol>
 <li><strong>Plan the fix.</strong> Ask the agent to turn your hypothesis into a concrete <code>booking</code> remediation plan and name the permission it needs.</li>
-<li><strong>Recover under approval.</strong> Keep the agent in Review, approve the least-disruptive fix, then confirm latency is back to baseline.</li>
+<li><strong>Recover under approval.</strong> Keep the agent in Review, approve the least-disruptive fix, then confirm check-in is serving cleanly again.</li>
 </ol>
 <p><strong>Part B — the flight board goes dark</strong></p>
 <ol>
@@ -1762,15 +1762,16 @@ applying a reversible rollback, and verifying both from telemetry.</p>
 <div class="admonition quote">
 <p class="admonition-title">Paste into the agent chat</p>
 <p>Turn my check-in hypothesis into a concrete remediation plan for the <code>booking</code>
-service that restores normal response times without rebuilding the service, and
-tell me exactly what permission the action needs. Then, for <code>flight-ops</code>,
-correlate the outage time with deployment and rollout history — including the
-recorded change cause — and propose the least-disruptive <strong>reversible</strong> rollback
-for my approval.</p>
+service. Restore it to exactly what the repository's manifest declares — CPU
+request/limit and autoscaler bounds — rather than to an intermediate value you
+choose, and tell me exactly what permission the action needs. Then, for
+<code>flight-ops</code>, correlate the outage time with deployment and rollout history —
+including the recorded change cause — and propose the least-disruptive
+<strong>reversible</strong> rollback for my approval.</p>
 </div>
 <h3 id="success-criteria">Success criteria<a class="headerlink" href="#success-criteria" title="Permanent link">&para;</a></h3>
 <ul>
-<li>Check-in is remediated with a least-disruptive action you approved in <strong>Review</strong> mode (not ungoverned automation); <code>booking</code> is healthy, latency is back to baseline, and <strong>the CPU limit the change reduced is back where it was</strong> — compensating with extra <abbr title="Running copies (pods) of a service; more replicas share the load.">replicas</abbr> is not a fix.</li>
+<li>Check-in is remediated with a least-disruptive action you approved in <strong>Review</strong> mode (not ungoverned automation); <code>booking</code> is healthy, errors are back to zero, and <strong>the CPU limit and autoscaler bounds the change altered are back where the manifest says they should be</strong> — compensating around them is not a fix.</li>
 <li><code>flight-ops</code>'s failure mode is identified and linked to a recent change/rollout; the recovery is reversible and doesn't touch unrelated resources, and the service is back on its previous image.</li>
 <li>Both tiles are green, <code>/api/flights</code> responds, and <code>check-challenge.ps1 3</code> passes.</li>
 </ul>
@@ -1819,9 +1820,10 @@ the exact clicks, open the matching task below.</p>
   Permissions decide what the agent can reach; run mode decides whether it
   asks first.</li>
 </ul>
-<p>Then verify <code>booking</code> latency is back to baseline, and confirm the change was
-actually reverted rather than worked around — the resource limits should match
-what the service was sized for, not a smaller value propped up by more pods.</p>
+<p>Then verify <code>booking</code> is serving cleanly again, and confirm the change was
+actually reverted rather than worked around — the resource limits and
+autoscaler bounds should match what the repository's manifest declares, not a
+smaller value propped up by something else.</p>
 </details>
 <details class="note">
 <summary>Task 3 · Triage the flight board</summary>
