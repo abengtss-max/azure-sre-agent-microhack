@@ -1753,7 +1753,7 @@ investigation, before you reach Challenge 7.</p>
 <li><strong>Decide the bounds, then hand over.</strong> Judge whether this incident is safe to automate, switch to <strong>Autonomous</strong> mode, let the agent fix it end-to-end, then review the action log.</li>
 <li><strong>See where AAUs go.</strong> Inspect the agent's consumption by thread type and purpose.</li>
 <li><strong>Design a cost-aware model.</strong> Name concrete reductions without losing reliability or investigation quality.</li>
-<li><strong>Arm the Sev1 response plan.</strong> Bind the pre-provisioned <code>aetherion-major-incident</code> alert so the next major incident auto-triggers. Do this now, before Challenge 7.</li>
+<li><strong>Arm the Sev1 response plan.</strong> Connect Azure Monitor as an incident platform, then bind a <strong>Sev1</strong> plan to the pre-provisioned <code>aetherion-major-incident</code> alert so the next major incident auto-triggers. Do this now, before Challenge 7.</li>
 </ol>
 <p><img alt="Challenge 6 storyboard: Sam, Priya and Aria review autonomous recovery and cost governance" class="story-panel" loading="lazy" src="../../assets/storyboard/img-challenge-6.webp" /></p>
 <h3 id="suggested-azure-sre-agent-prompt">Suggested Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent prompt<a class="headerlink" href="#suggested-azure-sre-agent-prompt" title="Permanent link">&para;</a></h3>
@@ -1833,7 +1833,7 @@ is an ordinary, reversible rollback, and it is the sanctioned fix here.</p>
 <details class="note">
 <summary>Task 3 · See where AAUs go</summary>
 <ul>
-<li>In the agent, open <strong>Settings → Agent consumption</strong> and read the breakdown
+<li>In the agent, open <strong>Settings → Agent Consumption</strong> and read the breakdown
   by thread type (Chats, Incidents, Scheduled tasks, Triggers) and by thread.</li>
 </ul>
 </details>
@@ -1849,12 +1849,79 @@ is an ordinary, reversible rollback, and it is the sanctioned fix here.</p>
 </details>
 <details class="note">
 <summary>Task 5 · Arm the Sev1 response plan</summary>
-<ul>
-<li><strong>Builder → Incident response plans → New.</strong> Filter by severity <strong>Sev1</strong> so
-  it matches the pre-provisioned <code>aetherion-major-incident</code> alert exactly, and
-  route it to your agent.</li>
-<li>Do this <strong>now</strong>. Challenge 7 depends on it auto-triggering.</li>
-</ul>
+<p><strong>Connect an incident platform first.</strong> Response plans do not exist until
+you do, and this catches people out.</p>
+<ol>
+<li><strong>Incidents</strong> in the left-hand menu → <strong>Triggers + response plans</strong>.</li>
+<li><strong>Connect an incident platform</strong> → <strong>Azure Monitor</strong> → <strong>Save</strong>. It
+   configures itself from your agent's scope, so there is nothing to fill in.</li>
+<li><strong>Add a response plan</strong>.</li>
+</ol>
+<p>Fill it in as follows:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Incident response plan name</td>
+<td><code>aetherion-major-incident-sev1</code></td>
+</tr>
+<tr>
+<td><strong>Severity</strong></td>
+<td><strong>Sev1</strong></td>
+</tr>
+<tr>
+<td>Title contains / does not contain</td>
+<td>leave empty</td>
+</tr>
+<tr>
+<td><strong>Response subagent</strong></td>
+<td><strong>leave empty</strong></td>
+</tr>
+<tr>
+<td><strong>Agent autonomy level</strong></td>
+<td><strong>Review</strong></td>
+</tr>
+<tr>
+<td><strong>Alert reinvestigation cooldown</strong></td>
+<td><strong>disable it</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Then <strong>Next</strong> to see <strong>Incidents preview</strong>, and create.</p>
+<p><strong>Severity is the whole match.</strong> The environment pre-provisions
+<code>aetherion-major-incident</code> at <strong>Sev1</strong>, so a plan filtered to anything else
+catches nothing and a broader plan fires on everything. Leave the title
+filters empty — they are an extra way to miss the alert, not an extra
+safeguard.</p>
+<div class="admonition tip">
+<p class="admonition-title">Why not route it to your <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> specialist?</p>
+<p>The <strong>Response subagent</strong> dropdown is populated by the subagent you
+built in Challenge 5, so it is tempting to select <code>aks-triage</code> here.
+Don't.</p>
+<p>Challenge 7's incident spans <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr>, API Management <strong>and</strong> PostgreSQL.
+Handing the auto-triggered investigation to an <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr>-only specialist
+scopes it to one tier of a four-tier incident. Leave it empty so the
+main agent commands the whole board, and delegate to the specialist
+<em>within</em> the incident instead.</p>
+<p>Deciding <em>not</em> to use a tool you just built is a real operational
+judgement, and this is the moment to make it.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Turn the cooldown off for this workshop</p>
+<p><strong>Alert reinvestigation cooldown</strong> defaults to enabled at 3 hours: the
+plan skips reinvestigation if the same plan already started one inside
+that window. Sensible in production, wrong here — re-run Challenge 7
+and the plan silently will not fire the second time.</p>
+</div>
+<p><strong>Autonomy level is per plan</strong>, separate from the agent's own run mode.
+Choose <strong>Review</strong> so the auto-triggered investigation proposes rather than
+acts: Challenge 7 puts you in command, and you decide what gets approved.</p>
+<p>Do this <strong>now</strong>. Challenge 7 depends on it auto-triggering.</p>
 </details>
 </div>
 <h3 id="reference">Reference<a class="headerlink" href="#reference" title="Permanent link">&para;</a></h3>
