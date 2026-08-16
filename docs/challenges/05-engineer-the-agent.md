@@ -10,15 +10,17 @@ repeated the same Kubernetes triage (pod status, events, rollout history, depend
 health) and the same crew query-path recovery across several incidents. Both
 investigation *and* recovery are perfect candidates to make reusable.
 
-**Mission.** Build a custom AKS-focused specialist subagent and use it for a scoped
-investigation, then encode the crew query-path recovery as a reusable skill with
-its guardrails intact.
+**Mission.** Build a custom AKS-focused specialist subagent, **scope it to the tools it
+actually needs** rather than letting it inherit everything, use it for a scoped
+investigation, then encode the crew query-path recovery as a reusable skill with its
+guardrails intact.
 
 **Why this matters**
 
 <div class="grid cards why-cards" markdown>
 
 - :material-robot-outline: **Specialist subagent**: scoped AKS triage on demand
+- :material-tune-variant: **Scoped, not inherited**: 8 tools instead of 46, and read-only *enforced*
 - :material-cog-sync-outline: **Reusable skill**: encode the sanctioned recovery once
 - :material-shield-check-outline: **Guardrails baked in**: fix the saturated layer, never delete the database
 - :material-rocket-launch-outline: **Faster next time**: handle recurrences without re-deriving steps
@@ -35,7 +37,7 @@ its guardrails intact.
 
 ### Tasks
 
-1. **Build the specialist.** Create an AKS triage subagent for the `aetherion` namespace and invoke it to summarize namespace health and likely causes.
+1. **Build the specialist.** Create an AKS triage subagent for the `aetherion` namespace, **scope it to the eight tools it needs**, verify what it actually got, then invoke it to summarize namespace health and likely causes.
 2. **Encode the skill.** Capture the crew query-path recovery from Challenge 4 as a reusable skill, guardrails intact, and confirm it loads.
 3. **Know when to use which.** Be able to say when you'd reach for the subagent (delegate to it to investigate) versus the skill (a procedure the agent can draw on).
 
@@ -63,7 +65,8 @@ its guardrails intact.
 
 ### Success criteria
 
-- A custom AKS-specialist subagent exists and you've invoked it for a scoped investigation that produces genuinely useful triage.
+- A custom AKS-specialist subagent exists, is **scoped to a deliberate tool set rather than inheriting all 46**, and you verified via the API that `RunKubectlReadCommand` is present and `RunKubectlWriteCommand` is not.
+- You've invoked it for a scoped investigation that produces genuinely useful triage.
 - A reusable skill captures the sanctioned recovery, loads/applies correctly, and matches the runbook guardrails.
 - You can explain when to reach for the subagent versus the skill, and `check-challenge.ps1 5` passes.
 
@@ -81,7 +84,13 @@ its guardrails intact.
 <details markdown="1"><summary>Hint: scope the specialist</summary>
 
 Decide the specialist's remit in one sentence before you build it; narrow beats
-broad. Judge it by whether its output would actually speed up a real AKS incident.
+broad. Then make that remit real: a subagent that inherits every tool the main agent
+has is a persona in a costume, and its "read-only" constraint is a polite request.
+
+Work out its tool list from evidence, not taste. Look at what an AKS investigation
+actually used in Challenges 2 to 4, and give it exactly that. Judge the result by
+whether its output would speed up a real AKS incident, and by whether it is now
+*incapable* of doing the things you never wanted it to do.
 </details>
 
 <details markdown="1"><summary>Hint: encode the recovery</summary>
@@ -140,51 +149,101 @@ investigate. You'll want both in the final incident.
         Constraints: read-only. Propose remediation, never apply it.
         ```
 
-        The last line matters. Challenge 5 builds a tool while the platform is
-        green; the specialist earns write access later, once you have seen it
-        reason well.
+        The last line is a *request*. On its own, nothing enforces it. You are
+        about to make it real.
 
-        **Skills**: leave inherited. Do not select anything here.
+        **Skills**: leave inherited. Scoping skills is the same idea as scoping
+        tools, and one axis is enough to learn it on.
 
-        **Tools**: leave inherited. Do not select anything here either. This is
-        the one that will catch you out:
+        **Tools**: this is where the specialist actually becomes a specialist.
 
-        !!! warning "Selecting tools replaces the inherited set, and the picker is incomplete"
-            The dialog says the agent inherits 46 global tools and that selecting
-            tools *overrides* the defaults. It means replaces, not adds. Select
-            three tools and the specialist has three tools.
+        !!! danger "A subagent that inherits everything is not a specialist"
+            Leave this panel alone and the canvas will tell you the truth:
+            **`Inherits 46 tools · 38 skills`**. Identical capability to the main
+            agent, differing only by a prompt. That is a persona, not a specialist.
 
-            That would be fine if the picker showed everything. It doesn't. The
-            agent's inherited set includes **`RunKubectlReadCommand`** and
-            **`RunKubectlWriteCommand`** under *Azure Operation*, the two tools that
-            give it the cluster, but searching the picker for `kubectl`, `AKS` or
-            `Kubernetes` returns nothing.
+            There are four axes you can specialise on, and they are not equal:
 
-            So any selection you make in that panel silently drops cluster access,
-            and your AKS specialist ends up unable to read AKS. Scope this
-            specialist with its **Instructions**, and leave Tools alone.
+            | Axis | Effect | Enforced? |
+            |---|---|---|
+            | **Instructions** | Remit, method, output contract | **No.** Advisory |
+            | **Tools** | What it can physically call | **Yes** |
+            | **Skills** | What procedures it can draw on | **Yes** |
+            | **Autonomy** | Whether it acts or proposes | **Yes** |
 
-        ??? tip "Verify the inherited tools for yourself"
-            The picker is not the source of truth. Ask the agent's own API:
+            Your instructions say *read-only*. Scoping the tools is what makes that
+            true rather than requested.
 
-            ```powershell
-            $base = az resource show -g <resource-group> -n <agent-name> `
-              --resource-type Microsoft.App/agents --api-version 2026-01-01 `
-              --query properties.agentEndpoint -o tsv
+        **Select exactly these eight tools.** They are what an AKS triage
+        investigation actually used across Challenges 2 to 4, and nothing more:
 
-            $tok = az account get-access-token --resource https://azuresre.ai `
-              --query accessToken -o tsv
+        | Tool | Category | Why the specialist needs it |
+        |---|---|---|
+        | `RunKubectlReadCommand` | Azure Operation | Pods, events, rollout history. The core of the job |
+        | `RunAzCliReadCommands` | Azure Operation | Read cluster and workload configuration |
+        | `system-mcp-monitor_monitor_metrics_query` | *(uncategorised)* | CPU, memory, restart counts |
+        | `system-mcp-monitor_monitor_metrics_definitions` | *(uncategorised)* | Discover which metrics exist before querying |
+        | `system-mcp-monitor_monitor_resource_log_query` | *(uncategorised)* | Container logs |
+        | `system-mcp-monitor_monitor_activitylog_list` | *(uncategorised)* | Correlate platform-level changes |
+        | `SearchIncidentKnowledge` | Knowledge Base | The runbooks you grounded in Challenge 4 |
+        | `SearchMemory` | Knowledge Base | Recall earlier incidents. Challenge 7 depends on this |
 
-            $r = Invoke-RestMethod "$base/api/v2/agent/tools" `
-              -Headers @{ Authorization = "Bearer $tok" }
+        **Now look at what you deliberately left out**, because the exclusions are
+        the design:
 
-            $r.data | Where-Object enabled | Select-Object category, name |
-              Sort-Object category, name
-            ```
+        | Excluded | Why |
+        |---|---|
+        | `RunKubectlWriteCommand` | **This is the one.** The specialist now *cannot* change the cluster. Read-only stops being a sentence in a prompt |
+        | `RunAzCliWriteCommands` | Same reasoning, at the Azure layer |
+        | `UploadKnowledgeDocument` | It reads the knowledge base. It does not get to rewrite it |
+        | Scheduled task tools | A triage specialist has no business creating schedules |
+        | Most Workspace Operation tools | File writes and terminal access are not triage |
 
-            The token audience must be `https://azuresre.ai`; an ARM token is
-            rejected. The count of enabled tools should match the number the
-            dialog quotes.
+        Eight tools instead of forty-six. Every one of them justifiable in a
+        sentence. That is the difference between a specialist and a costume.
+
+        !!! warning "Selecting tools REPLACES the inherited set. It does not add to it"
+            The dialog says selecting tools *overrides* the defaults. It means
+            replaces. Select three tools and the specialist has three tools, full
+            stop. There is no partial inheritance.
+
+            This is why the list above has to be complete rather than a highlight
+            reel, and why you must verify it afterwards.
+
+        !!! tip "If you cannot find a tool in the picker"
+            Search for the **exact tool name** as written above, not the technology.
+            Searching `kubectl`, `AKS` or `Kubernetes` does not reliably match
+            `RunKubectlReadCommand`. If search comes up empty, browse the
+            **Azure Operation** category directly.
+
+            The Monitor tools are prefixed `system-mcp-monitor_` because they come
+            from a built-in MCP server that ships with the agent. You have been using
+            MCP tools since Challenge 1 without knowing it.
+
+        **Verify what the specialist actually got. Do not trust the dialog.**
+        The picker is not the source of truth. Ask the agent's own API:
+
+        ```powershell
+        $base = az resource show -g <resource-group> -n <agent-name> `
+          --resource-type Microsoft.App/agents --api-version 2026-01-01 `
+          --query properties.agentEndpoint -o tsv
+
+        $tok = az account get-access-token --resource https://azuresre.ai `
+          --query accessToken -o tsv
+
+        $r = Invoke-RestMethod "$base/api/v2/agent/tools" `
+          -Headers @{ Authorization = "Bearer $tok" }
+
+        $r.data | Where-Object enabled | Select-Object category, name |
+          Sort-Object category, name
+        ```
+
+        The token audience must be `https://azuresre.ai`; an ARM token is rejected.
+
+        This is the check that matters: **`RunKubectlReadCommand` must be present
+        and `RunKubectlWriteCommand` must be absent.** If the write tool is still
+        there, your specialist can change the cluster no matter what its
+        instructions claim.
 
         **Hooks**: nothing needed for this challenge.
 

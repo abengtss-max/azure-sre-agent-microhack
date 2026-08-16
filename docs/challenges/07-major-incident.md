@@ -193,6 +193,12 @@ outage was masking.
         > Delegate this to your `aks-triage` subagent: which workloads in the
         > `aetherion` namespace are unhealthy, and why?
 
+        Expect it to investigate and then **hand back rather than fix**. You scoped
+        it without `RunKubectlWriteCommand` in Challenge 5, so it physically cannot
+        change the cluster. It reports; you and the main agent act on it. That split
+        is deliberate, and under incident pressure it is worth noticing that you do
+        not have to trust a prompt to keep it in its lane.
+
         For the crew tier:
 
         > Use the `crew-query-path-recovery` skill to restore crew scheduling.

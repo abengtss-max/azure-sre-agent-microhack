@@ -436,12 +436,18 @@ $script:Challenges = [ordered]@{
             Write-Host "Nothing is broken in this challenge; there is no fault to find." -ForegroundColor Gray
             Write-Host "Create a custom subagent specialized in AKS triage for the aetherion namespace,"
             Write-Host "then encode the crew query-path recovery as a reusable skill (with guardrails)."
+            Write-Host ""
+            Write-Host "  Scope the subagent's TOOLS, do not leave them inherited. A subagent with all 46" -ForegroundColor Gray
+            Write-Host "  tools is a persona, not a specialist, and its 'read-only' instruction is only a" -ForegroundColor Gray
+            Write-Host "  request. Removing RunKubectlWriteCommand is what makes read-only true." -ForegroundColor Gray
+            Write-Host ""
             Write-Host "You will lean on both in the final incident."
         }
         Check = {
             $sub   = Confirm-SelfAttest 'Did you create an AKS-specialist subagent and use it for a scoped investigation?'
+            $scoped = Confirm-SelfAttest 'Did you scope its tools (not inherited) and verify RunKubectlReadCommand is present and RunKubectlWriteCommand is absent?'
             $skill = Confirm-SelfAttest 'Did you author a reusable recovery skill (crew query path, guardrails intact) and confirm it loads?'
-            @{ Pass = ($sub -and $skill); Detail = "AKS specialist created+used=$sub, reusable skill authored=$skill" }
+            @{ Pass = ($sub -and $scoped -and $skill); Detail = "AKS specialist created+used=$sub, tools scoped+verified=$scoped, reusable skill authored=$skill" }
         }
     }
 
