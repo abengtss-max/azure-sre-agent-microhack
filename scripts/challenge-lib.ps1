@@ -182,6 +182,51 @@ function Confirm-SelfAttest([string]$Prompt) {
 }
 
 # ---------------------------------------------------------------------------
+# Agent / alerting verification (real checks, not self-attestation)
+# ---------------------------------------------------------------------------
+function Get-AetherionSubscriptionId {
+    $st = Get-AetherionState
+    if ($st.logAnalyticsId -match '/subscriptions/([0-9a-fA-F-]{36})/') { return $Matches[1] }
+    return (az account show --query id -o tsv 2>$null)
+}
+
+function Get-AgentResource {
+    $st = Get-AetherionState
+    $j = az resource list -g $st.resourceGroup --resource-type Microsoft.App/agents -o json 2>$null
+    if (-not $j) { return $null }
+    $agents = $j | ConvertFrom-Json
+    if (-not $agents -or $agents.Count -eq 0) { return $null }
+    $full = az resource show --ids $agents[0].id --api-version 2026-01-01 -o json 2>$null
+    if (-not $full) { return $null }
+    return ($full | ConvertFrom-Json)
+}
+
+# The response plan list is not exposed on the ARM resource, but connecting an
+# incident platform is its hard prerequisite - no connection, no plan, no trigger.
+function Test-IncidentPlatformConnected {
+    $a = Get-AgentResource
+    if (-not $a) { return $false }
+    return ($a.properties.incidentManagementConfiguration.type -eq 'AzMonitor')
+}
+
+# Proves the alert -> response plan path actually works, rather than asking.
+function Test-MajorIncidentAlertFired([int]$WithinHours = 2) {
+    $st  = Get-AetherionState
+    $sub = Get-AetherionSubscriptionId
+    $rule = $st.incidentAlertName; if (-not $rule) { $rule = 'aetherion-major-incident' }
+    $uri = "https://management.azure.com/subscriptions/$sub" +
+           "/providers/Microsoft.AlertsManagement/alerts" +
+           "?api-version=2019-05-05-preview&timeRange=${WithinHours}h"
+    $j = az rest --method get --uri $uri -o json 2>$null
+    if (-not $j) { return $false }
+    foreach ($al in ($j | ConvertFrom-Json).value) {
+        $e = $al.properties.essentials
+        if ($e.alertRule -match [regex]::Escape($rule) -and $e.severity -eq 'Sev1') { return $true }
+    }
+    return $false
+}
+
+# ---------------------------------------------------------------------------
 # Challenge catalogue (scenario-driven, 8-challenge storyline)
 #   Start = scriptblock that injects the fault / narrates the scenario
 #   Check = scriptblock returning @{ Pass = [bool]; Detail = 'string' }
@@ -325,8 +370,13 @@ $script:Challenges = [ordered]@{
             $canary = Test-CanaryPresent 'baggage'
             $auto = Confirm-SelfAttest 'Did the agent remediate baggage while running in Autonomous mode (you supervised, did not fix it by hand)?'
             $cost = Confirm-SelfAttest 'Have you reviewed agent consumption and produced a cost-aware operating model (not just the cheapest option)?'
-            $plan = Confirm-SelfAttest 'Have you created a Sev1-filtered major-incident response plan on the agent (bound to the aetherion-major-incident alert) so the next major incident auto-triggers an investigation?'
-            @{ Pass = ($ok -and $err -eq 0 -and (-not $canary) -and $auto -and $cost -and $plan); Detail = "baggage healthy=$ok errorRate=$err% canaryStillServing=$canary autonomous=$auto cost-model=$cost responsePlan=$plan" }
+            $conn = Test-IncidentPlatformConnected
+            if (-not $conn) {
+                Write-Host "  Azure Monitor is not connected as an incident platform, so no response plan can exist." -ForegroundColor Yellow
+                Write-Host "  Incidents -> Triggers + response plans -> Connect an incident platform -> Azure Monitor." -ForegroundColor Yellow
+            }
+            $plan = $conn -and (Confirm-SelfAttest 'Is your Sev1 response plan listed under Incidents -> Triggers + response plans with Status On and Severity Sev1?')
+            @{ Pass = ($ok -and $err -eq 0 -and (-not $canary) -and $auto -and $cost -and $plan); Detail = "baggage healthy=$ok errorRate=$err% canaryStillServing=$canary autonomous=$auto cost-model=$cost platformConnected=$conn responsePlan=$plan" }
         }
     }
 
@@ -360,11 +410,16 @@ $script:Challenges = [ordered]@{
             $latCrew   = Get-ServiceLatencyMs 'crew-scheduling'
             $cpuBook   = Get-CpuLimitMilli 'booking'
             $apimOk    = Test-ApimHealthy
+            $fired     = Test-MajorIncidentAlertFired 4
             $s         = Get-AetherionStatus
             $allOk     = $true
             foreach ($p in $s.services.PSObject.Properties) { if (-not $p.Value.ok) { $allOk = $false } }
-            $pass = ($allOk -and $apimOk -and $tagFlight -eq 'latest' -and $okCrew -and $cpuBook -ge 500)
-            @{ Pass = $pass; Detail = "overall=$($s.overall) apimOk=$apimOk flight=:$tagFlight crew=${latCrew}ms bookingCpu=${cpuBook}m" }
+            if (-not $fired) {
+                Write-Host "  No Sev1 'major incident' alert fired in the last 4h - the auto-trigger path did not exercise." -ForegroundColor Yellow
+                Write-Host "  Check the Sev1 response plan from challenge 6 before running this again." -ForegroundColor Yellow
+            }
+            $pass = ($allOk -and $apimOk -and $tagFlight -eq 'latest' -and $okCrew -and $cpuBook -ge 500 -and $fired)
+            @{ Pass = $pass; Detail = "overall=$($s.overall) apimOk=$apimOk flight=:$tagFlight crew=${latCrew}ms bookingCpu=${cpuBook}m alertFired=$fired" }
         }
     }
 
