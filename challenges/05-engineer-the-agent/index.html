@@ -1824,13 +1824,15 @@
 repeated the same Kubernetes triage (pod status, events, rollout history, dependency
 health) and the same crew query-path recovery across several incidents. Both
 investigation <em>and</em> recovery are perfect candidates to make reusable.</p>
-<p><strong>Mission.</strong> Build a custom <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr>-focused specialist subagent and use it for a scoped
-investigation, then encode the crew query-path recovery as a reusable skill with
-its guardrails intact.</p>
+<p><strong>Mission.</strong> Build a custom <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr>-focused specialist subagent, <strong>scope it to the tools it
+actually needs</strong> rather than letting it inherit everything, use it for a scoped
+investigation, then encode the crew query-path recovery as a reusable skill with its
+guardrails intact.</p>
 <p><strong>Why this matters</strong></p>
 <div class="grid cards why-cards">
 <ul>
 <li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17.5 15.5c0 1.11-.89 2-2 2s-2-.89-2-2 .9-2 2-2 2 .9 2 2m-9-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.89 2-2-.89-2-2-2M23 15v3c0 .55-.45 1-1 1h-1v1c0 1.11-.89 2-2 2H5a2 2 0 0 1-2-2v-1H2c-.55 0-1-.45-1-1v-3c0-.55.45-1 1-1h1c0-3.87 3.13-7 7-7h1V5.73c-.6-.34-1-.99-1-1.73 0-1.1.9-2 2-2s2 .9 2 2c0 .74-.4 1.39-1 1.73V7h1c3.87 0 7 3.13 7 7h1c.55 0 1 .45 1 1m-2 1h-2v-2c0-2.76-2.24-5-5-5h-4c-2.76 0-5 2.24-5 5v2H3v1h2v3h14v-3h2z"/></svg></span> <strong>Specialist subagent</strong>: scoped <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> triage on demand</li>
+<li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8 13c-1.86 0-3.41 1.28-3.86 3H2v2h2.14c.45 1.72 2 3 3.86 3s3.41-1.28 3.86-3H22v-2H11.86c-.45-1.72-2-3-3.86-3m0 6c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2M19.86 6c-.45-1.72-2-3-3.86-3s-3.41 1.28-3.86 3H2v2h10.14c.45 1.72 2 3 3.86 3s3.41-1.28 3.86-3H22V6zM16 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2"/></svg></span> <strong>Scoped, not inherited</strong>: 8 tools instead of 46, and read-only <em>enforced</em></li>
 <li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11.7 20h-.4l-.4-2.6c-1.2-.2-2.2-.9-3-1.8l-2.4 1-.8-1.3 2.1-1.6q-.6-1.8 0-3.6L4.7 8.7l.8-1.3 2.4 1q1.2-1.35 3-1.8l.3-2.6h1.5l.4 2.6c1.2.2 2.3.9 3 1.8l2.4-1 .8 1.3-2.1 1.5q.3.9.3 1.8h.5c.5 0 1 .1 1.5.2V12l-.1-1 2.1-1.6c.2-.2.2-.4.1-.6l-2-3.5c-.1-.3-.3-.3-.6-.3l-2.5 1c-.5-.4-1.1-.7-1.7-1l-.4-2.7c.1-.1-.2-.3-.4-.3h-4c-.2 0-.5.2-.5.4l-.4 2.7c-.6.2-1.1.6-1.7.9L5 5c-.3 0-.5 0-.7.3l-2 3.5c-.1.2 0 .4.2.6L4.6 11l-.1 1 .1 1-2.1 1.7c-.2.2-.2.4-.1.6l2 3.5c.1.2.3.2.6.2l2.5-1c.5.4 1.1.7 1.7 1l.4 2.7c0 .2.2.4.5.4h2.5c-.5-.7-.7-1.4-.9-2.1m4.3-7.7V12c0-2.2-1.8-4-4-4s-4 1.8-4 4 1.8 4 4 4c.7-1.7 2.2-3.1 4-3.7m-6-.3c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2m8 2.5V13l-2.2 2.2 2.2 2.2V16c1.4 0 2.5 1.1 2.5 2.5 0 .4-.1.8-.3 1.1l1.1 1.1c1.2-1.8.7-4.3-1.1-5.5-.6-.5-1.4-.7-2.2-.7m0 6.5c-1.4 0-2.5-1.1-2.5-2.5 0-.4.1-.8.3-1.1l-1.1-1.1c-1.2 1.8-.7 4.3 1.1 5.5.7.4 1.4.7 2.2.7V24l2.2-2.2-2.2-2.3z"/></svg></span> <strong>Reusable skill</strong>: encode the sanctioned recovery once</li>
 <li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 11c0 5.55-3.84 10.74-9 12-5.16-1.26-9-6.45-9-12V5l9-4 9 4zm-9 10c3.75-1 7-5.46 7-9.78V6.3l-7-3.12L5 6.3v4.92C5 15.54 8.25 20 12 21m-2-4-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9"/></svg></span> <strong>Guardrails baked in</strong>: fix the saturated layer, never delete the database</li>
 <li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m13.13 22.19-1.63-3.83c1.57-.58 3.04-1.36 4.4-2.27zM5.64 12.5l-3.83-1.63 6.1-2.77C7 9.46 6.22 10.93 5.64 12.5M19.22 4c.28 0 .53 0 .74.05.17 1.39-.02 4.25-3.3 7.53-1.7 1.71-3.73 3.02-6.01 3.89l-2.15-2.1c.92-2.31 2.23-4.34 3.92-6.03C15.18 4.58 17.64 4 19.22 4m0-2c-1.98 0-4.98.69-8.22 3.93-2.19 2.19-3.5 4.6-4.35 6.71-.28.75-.09 1.57.46 2.13l2.13 2.12c.38.38.89.61 1.42.61.23 0 .47-.06.7-.15A19.1 19.1 0 0 0 18.07 13c5.66-5.66 3.54-10.61 3.54-10.61S20.7 2 19.22 2m-4.68 7.46c-.78-.78-.78-2.05 0-2.83s2.05-.78 2.83 0c.77.78.78 2.05 0 2.83s-2.05.78-2.83 0m-5.66 7.07-1.41-1.41zM6.24 22l3.64-3.64c-.34-.09-.67-.24-.97-.45L4.83 22zM2 22h1.41l4.77-4.76-1.42-1.41L2 20.59zm0-2.83 4.09-4.08c-.21-.3-.36-.62-.45-.97L2 17.76z"/></svg></span> <strong>Faster next time</strong>: handle recurrences without re-deriving steps</li>
@@ -1844,7 +1846,7 @@ its guardrails intact.</p>
 </div>
 <h3 id="tasks">Tasks<a class="headerlink" href="#tasks" title="Permanent link">&para;</a></h3>
 <ol>
-<li><strong>Build the specialist.</strong> Create an <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> triage subagent for the <code>aetherion</code> namespace and invoke it to summarize namespace health and likely causes.</li>
+<li><strong>Build the specialist.</strong> Create an <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> triage subagent for the <code>aetherion</code> namespace, <strong>scope it to the eight tools it needs</strong>, verify what it actually got, then invoke it to summarize namespace health and likely causes.</li>
 <li><strong>Encode the skill.</strong> Capture the crew query-path recovery from Challenge 4 as a reusable skill, guardrails intact, and confirm it loads.</li>
 <li><strong>Know when to use which.</strong> Be able to say when you'd reach for the subagent (delegate to it to investigate) versus the skill (a procedure the agent can draw on).</li>
 </ol>
@@ -1871,7 +1873,8 @@ language.</p>
 </div>
 <h3 id="success-criteria">Success criteria<a class="headerlink" href="#success-criteria" title="Permanent link">&para;</a></h3>
 <ul>
-<li>A custom <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr>-specialist subagent exists and you've invoked it for a scoped investigation that produces genuinely useful triage.</li>
+<li>A custom <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr>-specialist subagent exists, is <strong>scoped to a deliberate tool set rather than inheriting all 46</strong>, and you verified via the API that <code>RunKubectlReadCommand</code> is present and <code>RunKubectlWriteCommand</code> is not.</li>
+<li>You've invoked it for a scoped investigation that produces genuinely useful triage.</li>
 <li>A reusable skill captures the sanctioned recovery, loads/applies correctly, and matches the runbook guardrails.</li>
 <li>You can explain when to reach for the subagent versus the skill, and <code>check-challenge.ps1 5</code> passes.</li>
 </ul>
@@ -1886,7 +1889,12 @@ so the check asks you to confirm what you built:</p>
 <details>
 <summary>Hint: scope the specialist</summary>
 <p>Decide the specialist's remit in one sentence before you build it; narrow beats
-broad. Judge it by whether its output would actually speed up a real <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> incident.</p>
+broad. Then make that remit real: a subagent that inherits every tool the main agent
+has is a persona in a costume, and its "read-only" constraint is a polite request.</p>
+<p>Work out its tool list from evidence, not taste. Look at what an <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> investigation
+actually used in Challenges 2 to 4, and give it exactly that. Judge the result by
+whether its output would speed up a real <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> incident, and by whether it is now
+<em>incapable</em> of doing the things you never wanted it to do.</p>
 </details>
 <details>
 <summary>Hint: encode the recovery</summary>
@@ -1935,29 +1943,158 @@ whether the specialist is worth having. Paste this, then adjust to taste:</p>
 <a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a>
 <a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a>Constraints: read-only. Propose remediation, never apply it.
 </code></pre></div>
-<p>The last line matters. Challenge 5 builds a tool while the platform is
-green; the specialist earns write access later, once you have seen it
-reason well.</p>
-<p><strong>Skills</strong>: leave inherited. Do not select anything here.</p>
-<p><strong>Tools</strong>: leave inherited. Do not select anything here either. This is
-the one that will catch you out:</p>
-<div class="admonition warning">
-<p class="admonition-title">Selecting tools replaces the inherited set, and the picker is incomplete</p>
-<p>The dialog says the agent inherits 46 global tools and that selecting
-tools <em>overrides</em> the defaults. It means replaces, not adds. Select
-three tools and the specialist has three tools.</p>
-<p>That would be fine if the picker showed everything. It doesn't. The
-agent's inherited set includes <strong><code>RunKubectlReadCommand</code></strong> and
-<strong><code>RunKubectlWriteCommand</code></strong> under <em>Azure Operation</em>, the two tools that
-give it the cluster, but searching the picker for <code>kubectl</code>, <code>AKS</code> or
-<code>Kubernetes</code> returns nothing.</p>
-<p>So any selection you make in that panel silently drops cluster access,
-and your <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> specialist ends up unable to read <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr>. Scope this
-specialist with its <strong>Instructions</strong>, and leave Tools alone.</p>
+<p>The last line is a <em>request</em>. On its own, nothing enforces it. You are
+about to make it real.</p>
+<p><strong>Skills</strong>: leave inherited. Scoping skills is the same idea as scoping
+tools, and one axis is enough to learn it on.</p>
+<p><strong>Tools</strong>: this is where the specialist actually becomes a specialist.</p>
+<div class="admonition danger">
+<p class="admonition-title">A subagent that inherits everything is not a specialist</p>
+<p>Leave this panel alone and the canvas will tell you the truth:
+<strong><code>Inherits 46 tools · 38 skills</code></strong>. Identical capability to the main
+agent, differing only by a prompt. That is a persona, not a specialist.</p>
+<p>There are four axes you can specialise on, and they are not equal:</p>
+<table>
+<thead>
+<tr>
+<th>Axis</th>
+<th>Effect</th>
+<th>Enforced?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Instructions</strong></td>
+<td>Remit, method, output contract</td>
+<td><strong>No.</strong> Advisory</td>
+</tr>
+<tr>
+<td><strong>Tools</strong></td>
+<td>What it can physically call</td>
+<td><strong>Yes</strong></td>
+</tr>
+<tr>
+<td><strong>Skills</strong></td>
+<td>What procedures it can draw on</td>
+<td><strong>Yes</strong></td>
+</tr>
+<tr>
+<td><strong>Autonomy</strong></td>
+<td>Whether it acts or proposes</td>
+<td><strong>Yes</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Your instructions say <em>read-only</em>. Scoping the tools is what makes that
+true rather than requested.</p>
 </div>
-<details class="tip">
-<summary>Verify the inherited tools for yourself</summary>
-<p>The picker is not the source of truth. Ask the agent's own API:</p>
+<p><strong>Select exactly these eight tools.</strong> They are what an <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> triage
+investigation actually used across Challenges 2 to 4, and nothing more:</p>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Category</th>
+<th>Why the specialist needs it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>RunKubectlReadCommand</code></td>
+<td>Azure Operation</td>
+<td>Pods, events, rollout history. The core of the job</td>
+</tr>
+<tr>
+<td><code>RunAzCliReadCommands</code></td>
+<td>Azure Operation</td>
+<td>Read cluster and workload configuration</td>
+</tr>
+<tr>
+<td><code>system-mcp-monitor_monitor_metrics_query</code></td>
+<td><em>(uncategorised)</em></td>
+<td>CPU, memory, restart counts</td>
+</tr>
+<tr>
+<td><code>system-mcp-monitor_monitor_metrics_definitions</code></td>
+<td><em>(uncategorised)</em></td>
+<td>Discover which metrics exist before querying</td>
+</tr>
+<tr>
+<td><code>system-mcp-monitor_monitor_resource_log_query</code></td>
+<td><em>(uncategorised)</em></td>
+<td>Container logs</td>
+</tr>
+<tr>
+<td><code>system-mcp-monitor_monitor_activitylog_list</code></td>
+<td><em>(uncategorised)</em></td>
+<td>Correlate platform-level changes</td>
+</tr>
+<tr>
+<td><code>SearchIncidentKnowledge</code></td>
+<td>Knowledge Base</td>
+<td>The runbooks you grounded in Challenge 4</td>
+</tr>
+<tr>
+<td><code>SearchMemory</code></td>
+<td>Knowledge Base</td>
+<td>Recall earlier incidents. Challenge 7 depends on this</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Now look at what you deliberately left out</strong>, because the exclusions are
+the design:</p>
+<table>
+<thead>
+<tr>
+<th>Excluded</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>RunKubectlWriteCommand</code></td>
+<td><strong>This is the one.</strong> The specialist now <em>cannot</em> change the cluster. Read-only stops being a sentence in a prompt</td>
+</tr>
+<tr>
+<td><code>RunAzCliWriteCommands</code></td>
+<td>Same reasoning, at the Azure layer</td>
+</tr>
+<tr>
+<td><code>UploadKnowledgeDocument</code></td>
+<td>It reads the <abbr title="Markdown/text files that ground the agent in Aetherion's own architecture and runbooks.">knowledge base</abbr>. It does not get to rewrite it</td>
+</tr>
+<tr>
+<td>Scheduled task tools</td>
+<td>A triage specialist has no business creating schedules</td>
+</tr>
+<tr>
+<td>Most Workspace Operation tools</td>
+<td>File writes and terminal access are not triage</td>
+</tr>
+</tbody>
+</table>
+<p>Eight tools instead of forty-six. Every one of them justifiable in a
+sentence. That is the difference between a specialist and a costume.</p>
+<div class="admonition warning">
+<p class="admonition-title">Selecting tools REPLACES the inherited set. It does not add to it</p>
+<p>The dialog says selecting tools <em>overrides</em> the defaults. It means
+replaces. Select three tools and the specialist has three tools, full
+stop. There is no partial inheritance.</p>
+<p>This is why the list above has to be complete rather than a highlight
+reel, and why you must verify it afterwards.</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">If you cannot find a tool in the picker</p>
+<p>Search for the <strong>exact tool name</strong> as written above, not the technology.
+Searching <code>kubectl</code>, <code>AKS</code> or <code>Kubernetes</code> does not reliably match
+<code>RunKubectlReadCommand</code>. If search comes up empty, browse the
+<strong>Azure Operation</strong> category directly.</p>
+<p>The Monitor tools are prefixed <code>system-mcp-monitor_</code> because they come
+from a built-in MCP server that ships with the agent. You have been using
+MCP tools since Challenge 1 without knowing it.</p>
+</div>
+<p><strong>Verify what the specialist actually got. Do not trust the dialog.</strong>
+The picker is not the source of truth. Ask the agent's own API:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nv">$base</span> <span class="p">=</span> <span class="n">az</span> <span class="n">resource</span> <span class="n">show</span> <span class="n">-g</span> <span class="p">&lt;</span><span class="n">resource-group</span><span class="p">&gt;</span> <span class="n">-n</span> <span class="p">&lt;</span><span class="n">agent-name</span><span class="p">&gt;</span> <span class="p">`</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>  <span class="p">-</span><span class="n">-resource-type</span> <span class="n">Microsoft</span><span class="p">.</span><span class="n">App</span><span class="p">/</span><span class="n">agents</span> <span class="p">-</span><span class="n">-api-version</span> <span class="n">2026</span><span class="p">-</span><span class="n">01</span><span class="p">-</span><span class="n">01</span> <span class="p">`</span>
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>  <span class="p">-</span><span class="n">-query</span> <span class="n">properties</span><span class="p">.</span><span class="n">agentEndpoint</span> <span class="n">-o</span> <span class="n">tsv</span>
@@ -1971,10 +2108,11 @@ specialist with its <strong>Instructions</strong>, and leave Tools alone.</p>
 <a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="nv">$r</span><span class="p">.</span><span class="n">data</span> <span class="p">|</span> <span class="nb">Where-Object</span> <span class="n">enabled</span> <span class="p">|</span> <span class="nb">Select-Object</span> <span class="n">category</span><span class="p">,</span> <span class="n">name</span> <span class="p">|</span>
 <a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>  <span class="nb">Sort-Object</span> <span class="n">category</span><span class="p">,</span> <span class="n">name</span>
 </code></pre></div>
-<p>The token audience must be <code>https://azuresre.ai</code>; an ARM token is
-rejected. The count of enabled tools should match the number the
-dialog quotes.</p>
-</details>
+<p>The token audience must be <code>https://azuresre.ai</code>; an ARM token is rejected.</p>
+<p>This is the check that matters: <strong><code>RunKubectlReadCommand</code> must be present
+and <code>RunKubectlWriteCommand</code> must be absent.</strong> If the write tool is still
+there, your specialist can change the cluster no matter what its
+instructions claim.</p>
 <p><strong>Hooks</strong>: nothing needed for this challenge.</p>
 <p>Then select <strong>Create</strong>.</p>
 <details class="tip">

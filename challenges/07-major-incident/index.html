@@ -2026,6 +2026,11 @@ than the first.</p>
 <p>Delegate this to your <code>aks-triage</code> subagent: which workloads in the
 <code>aetherion</code> namespace are unhealthy, and why?</p>
 </blockquote>
+<p>Expect it to investigate and then <strong>hand back rather than fix</strong>. You scoped
+it without <code>RunKubectlWriteCommand</code> in Challenge 5, so it physically cannot
+change the cluster. It reports; you and the main agent act on it. That split
+is deliberate, and under incident pressure it is worth noticing that you do
+not have to trust a prompt to keep it in its lane.</p>
 <p>For the crew tier:</p>
 <blockquote>
 <p>Use the <code>crew-query-path-recovery</code> skill to restore crew scheduling.</p>
