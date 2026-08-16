@@ -1867,8 +1867,9 @@ far this workshop has no answer for it:</p>
 <blockquote>
 <p>What stops it doing something catastrophic at 03:00?</p>
 </blockquote>
-<p><strong>Mission.</strong> Replace one advisory guardrail with an enforced one, and understand
-exactly where enforcement can and cannot happen.</p>
+<p><strong>Mission.</strong> Narrow what the agent can reach, then instrument what it does with what
+is left, and be able to say precisely which of your controls would have prevented an
+incident and which would only have recorded it.</p>
 <h2 id="advisory-versus-enforced">Advisory versus enforced<a class="headerlink" href="#advisory-versus-enforced" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -1893,33 +1894,59 @@ exactly where enforcement can and cannot happen.</p>
 </tbody>
 </table>
 <h3 id="where-enforcement-actually-happens">Where enforcement actually happens<a class="headerlink" href="#where-enforcement-actually-happens" title="Permanent link">&para;</a></h3>
-<p>This distinction matters, and it is easy to get wrong.</p>
+<p>There are six layers and they are <strong>not</strong> interchangeable. Four act <em>before</em> anything
+runs. Two act <em>after</em>. Most people reach for the wrong one.</p>
 <table>
 <thead>
 <tr>
 <th>Layer</th>
-<th>When it acts</th>
-<th>What it can do</th>
+<th>Where</th>
+<th>When</th>
+<th>What it actually does</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><strong>Permission gate</strong> (run mode)</td>
-<td><strong>Before</strong> a tool call runs</td>
-<td>Require approval, or refuse the call outright</td>
+<td><strong>Managed resource groups</strong></td>
+<td>Settings → Managed resources</td>
+<td>Before</td>
+<td>The agent cannot see the resource <strong>at all</strong></td>
+</tr>
+<tr>
+<td><strong>Permission level</strong></td>
+<td>Settings → Managed resources</td>
+<td>Before</td>
+<td><strong><abbr title="The built-in Azure role that grants read-only access — see everything, change nothing.">Reader</abbr></strong> (default, approval required) or <strong>Privileged</strong> (acts directly), per resource group</td>
+</tr>
+<tr>
+<td><strong>Tool selection</strong></td>
+<td>Builder → Connectors → MCP Tools</td>
+<td>Before</td>
+<td>An unselected tool is not in the agent's tool list, so it cannot be called</td>
+</tr>
+<tr>
+<td><strong>Run mode</strong></td>
+<td>Agent, or per response plan</td>
+<td>Before</td>
+<td>Whether approved actions execute or wait for a human</td>
 </tr>
 <tr>
 <td><strong><code>PostToolUse</code> hook</strong></td>
-<td><strong>After</strong> the tool finishes successfully</td>
+<td>Builder → Hooks</td>
+<td><strong>After</strong> the tool succeeds</td>
 <td>Audit it, block the <em>result</em>, inject context</td>
 </tr>
 <tr>
 <td><strong><code>Stop</code> hook</strong></td>
-<td>Before the agent returns its final answer</td>
+<td>Builder → Hooks</td>
+<td>Before the final answer</td>
 <td>Reject the response and force it to keep working</td>
 </tr>
 </tbody>
 </table>
+<p>The first four are <strong>policy</strong>: they decide what is reachable. The last two are
+<strong>hooks</strong>: they decide what happens to what the agent did. You need both, and you
+need to know which is which.</p>
 <div class="admonition danger">
 <p class="admonition-title">A PostToolUse hook is a detective control, not a preventive one</p>
 <p>Read the event name literally. <code>PostToolUse</code> fires <strong>after a tool finishes
@@ -1928,85 +1955,166 @@ Blocking the result stops the agent acting on the output; it does not rewind the
 command.</p>
 <p>Only two hook events exist today: <code>Stop</code> and <code>PostToolUse</code>. <strong>There is no
 <code>PreToolUse</code>.</strong> If you need a destructive command to never execute, the control
-is the <strong>run mode permission gate</strong>, not a hook.</p>
+is one of the four policy layers above, not a hook.</p>
 <p>Getting this backwards is the single most common mistake people make when they
-first design agent guardrails. Hooks are how you <em>catch and prove</em>; run modes are
-how you <em>prevent</em>.</p>
+first design agent guardrails. Policy is how you <em>prevent</em>; hooks are how you
+<em>catch and prove</em>.</p>
 </div>
 <h3 id="tasks">Tasks<a class="headerlink" href="#tasks" title="Permanent link">&para;</a></h3>
+<p><strong>Part 1 · Policy — decide what the agent can reach</strong></p>
+<ol>
+<li><strong>Scope the <abbr title="How much of the system an incident (or a fix) can affect — kept as small as possible.">blast radius</abbr>.</strong> Audit the managed resource groups and permission level, and justify each one.</li>
+<li><strong>Take a tool away.</strong> Remove a tool from the agent's list and prove it can no longer call it.</li>
+</ol>
+<p><strong>Part 2 · Hooks — decide what happens to what it did</strong></p>
 <ol>
 <li><strong>Write an audit hook.</strong> Make every tool call the agent makes visible and attributable.</li>
 <li><strong>Write an enforcement hook.</strong> Detect a destructive database operation and block it, with a reason.</li>
 <li><strong>Write a quality gate.</strong> Stop the agent closing an incident without verification evidence.</li>
-<li><strong>Prove it fires.</strong> Deliberately provoke the hook and confirm it blocked, not just that it logged.</li>
+<li><strong>Prove they fire.</strong> Deliberately provoke each control and confirm it acted, rather than assuming it works.</li>
 </ol>
 <h3 id="success-criteria">Success criteria<a class="headerlink" href="#success-criteria" title="Permanent link">&para;</a></h3>
 <ul>
+<li>You can state the agent's exact <abbr title="How much of the system an incident (or a fix) can affect — kept as small as possible.">blast radius</abbr>: which resource groups, at which permission level, and why each is justified.</li>
+<li>You removed a tool and demonstrated the agent can no longer call it, rather than merely being told not to.</li>
 <li>A <code>PostToolUse</code> hook audits tool calls and a second one blocks a destructive database operation with a stated reason.</li>
 <li>A <code>Stop</code> hook rejects an incident closure that has no verification evidence.</li>
-<li>You provoked each hook and saw it fire, rather than assuming it works.</li>
-<li>You can explain, in one sentence each, which control is preventive and which is detective.</li>
+<li>You provoked each control and saw it act.</li>
+<li>You can say which of your controls are preventive and which are detective, and name what each would <strong>not</strong> have stopped.</li>
 </ul>
 <div class="admonition question">
 <p class="admonition-title">Stuck? Step-by-step for each task</p>
 <details class="note">
-<summary>Task 1 · Audit every tool call</summary>
+<summary>Task 1 · Scope the <abbr title="How much of the system an incident (or a fix) can affect — kept as small as possible.">blast radius</abbr></summary>
+<p>Before you write a single hook, look at what the agent can reach at all. This
+is the control with the widest effect and the one people skip.</p>
+<p>Go to <strong>Settings</strong> → <strong>Managed resources</strong>.</p>
+<p><strong>What is in scope?</strong> Every resource group listed here is visible to the
+agent during investigations, including logs, metrics and configuration. A
+resource group that is not listed is not reachable, and no prompt, jailbreak
+or misfired response plan changes that. This is the hardest boundary you have.</p>
+<p><strong>At what level?</strong> Select a resource group and check its permission level:</p>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>What the agent can do</th>
+<th>When</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong><abbr title="The built-in Azure role that grants read-only access — see everything, change nothing.">Reader</abbr></strong> (default)</td>
+<td>Read only. Actions need your approval</td>
+<td>Start here</td>
+</tr>
+<tr>
+<td><strong>Privileged</strong></td>
+<td>Executes approved actions directly, such as restarting or scaling</td>
+<td>Only once you trust its behaviour</td>
+</tr>
+</tbody>
+</table>
+<p>The portal shows which Azure <abbr title="Role-Based Access Control — Azure's permission model; roles decide what an identity may do.">RBAC</abbr> roles that level maps to, such as Log
+Analytics <abbr title="The built-in Azure role that grants read-only access — see everything, change nothing.">Reader</abbr>, Monitoring <abbr title="The built-in Azure role that grants read-only access — see everything, change nothing.">Reader</abbr> and <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> Cluster User.</p>
+<p><strong>Now justify it out loud.</strong> For each resource group, answer: <em>if this agent
+were fully compromised, what is the worst it could do with this level?</em> If you
+cannot answer, the scope is too broad.</p>
+<div class="admonition tip">
+<p class="admonition-title">Permission level and run mode are different dials</p>
+<p>Permission level is <em>what the identity is allowed to do</em>. Run mode is
+<em>whether it waits for you first</em>. Privileged plus Autonomous is a very
+different posture from Privileged plus Review, and only one of them is
+defensible on day one.</p>
+</div>
+</details>
+<details class="note">
+<summary>Task 2 · Take a tool away</summary>
+<p>Instructions telling the agent not to use a tool are advisory. Removing the
+tool is not.</p>
+<p>Each agent has a budget of <strong>80 tools</strong>, native and MCP combined, and you
+choose which ones are visible. An unselected tool is not in the agent's tool
+list, so it cannot be called at all.</p>
+<ol>
+<li><strong>Builder</strong> → <strong>Connectors</strong> → edit an MCP connector.</li>
+<li>Find the <strong>MCP Tools</strong> section at the bottom of the dialog.</li>
+<li>Uncheck a tool you do not want this agent to have.</li>
+<li>Save.</li>
+</ol>
+<p><strong>Prove it.</strong> Ask the agent to do the thing that tool did. It should report
+that it has no such capability, not that it has decided against it. That
+difference is the entire lesson.</p>
+<div class="admonition tip">
+<p class="admonition-title">Scope tools to specialists, not just to the main agent</p>
+<p>Your Challenge 5 subagent does not need the whole catalog. In
+<strong>Builder → Agent Canvas</strong>, edit an agent → <strong>Advanced settings → Tools</strong>,
+or assign them in YAML:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nt">mcp_tools</span><span class="p">:</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">datadog-mcp/*</span><span class="w">        </span><span class="c1"># every tool from this connection, including future ones</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">github_search_code</span><span class="w">   </span><span class="c1"># one specific tool</span>
+</code></pre></div>
+<p>A specialist with four tools is easier to reason about, cheaper to run,
+and far easier to get approved than one with eighty.</p>
+</div>
+</details>
+<details class="note">
+<summary>Task 3 · Audit every tool call</summary>
 <p>Go to <strong>Builder</strong> → <strong>Hooks</strong> → <strong>Create hook</strong>.</p>
 <p>Choose event <strong>PostToolUse</strong>, execution type <strong>Command</strong>, and matcher <code>*</code> to
 match every tool. Use <code>failMode: allow</code> so a broken audit hook can never
 wedge your agent.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="ch">#!/usr/bin/env python3</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span><span class="o">,</span><span class="w"> </span><span class="nn">json</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">context</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="p">)</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">tool_name</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;tool_name&#39;</span><span class="p">,</span> <span class="s1">&#39;unknown&#39;</span><span class="p">)</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Tool used: </span><span class="si">{</span><span class="n">tool_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="s2">&quot;decision&quot;</span><span class="p">:</span> <span class="s2">&quot;allow&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="s2">&quot;hookSpecificOutput&quot;</span><span class="p">:</span> <span class="p">{</span>
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>        <span class="s2">&quot;additionalContext&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;[AUDIT] Tool &#39;</span><span class="si">{</span><span class="n">tool_name</span><span class="si">}</span><span class="s2">&#39; was executed.&quot;</span>
-<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    <span class="p">}</span>
-<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="p">}))</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="ch">#!/usr/bin/env python3</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span><span class="o">,</span><span class="w"> </span><span class="nn">json</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">context</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="p">)</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="n">tool_name</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;tool_name&#39;</span><span class="p">,</span> <span class="s1">&#39;unknown&#39;</span><span class="p">)</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Tool used: </span><span class="si">{</span><span class="n">tool_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>    <span class="s2">&quot;decision&quot;</span><span class="p">:</span> <span class="s2">&quot;allow&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>    <span class="s2">&quot;hookSpecificOutput&quot;</span><span class="p">:</span> <span class="p">{</span>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>        <span class="s2">&quot;additionalContext&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;[AUDIT] Tool &#39;</span><span class="si">{</span><span class="n">tool_name</span><span class="si">}</span><span class="s2">&#39; was executed.&quot;</span>
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>    <span class="p">}</span>
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="p">}))</span>
 </code></pre></div>
 <p><code>additionalContext</code> is injected back into the conversation as a user message,
 so the agent can see its own audit trail. Write debug output to <strong>stderr</strong>:
 stdout is parsed as the hook result, so anything you print there breaks it.</p>
 </details>
 <details class="note">
-<summary>Task 2 · Block a destructive database operation</summary>
+<summary>Task 4 · Block a destructive database operation</summary>
 <p>Create a second <strong>PostToolUse</strong> hook. Scope the matcher to shell execution
 rather than <code>*</code>, because an overly broad matcher on an enforcement hook costs
 you latency on every single call:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>Bash|ExecuteShellCommand
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>Bash|ExecuteShellCommand
 </code></pre></div>
 <p>Set <code>failMode: block</code> on this one. If your enforcement hook itself fails, you
 want the safe outcome, not the convenient one.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="ch">#!/usr/bin/env python3</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span><span class="o">,</span><span class="w"> </span><span class="nn">json</span><span class="o">,</span><span class="w"> </span><span class="nn">re</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="n">context</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="p">)</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="n">command</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;tool_input&#39;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;command&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="n">forbidden</span> <span class="o">=</span> <span class="p">[</span>
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    <span class="sa">r</span><span class="s1">&#39;\bDROP\s+TABLE\b&#39;</span><span class="p">,</span>
-<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>    <span class="sa">r</span><span class="s1">&#39;\bDROP\s+DATABASE\b&#39;</span><span class="p">,</span>
-<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>    <span class="sa">r</span><span class="s1">&#39;\bTRUNCATE\b&#39;</span><span class="p">,</span>
-<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>    <span class="sa">r</span><span class="s1">&#39;\bDELETE\s+FROM\s+crew_roster\b&#39;</span><span class="p">,</span>
-<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>    <span class="sa">r</span><span class="s1">&#39;\brm\s+-rf\b&#39;</span><span class="p">,</span>
-<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="p">]</span>
-<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>
-<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="k">for</span> <span class="n">pattern</span> <span class="ow">in</span> <span class="n">forbidden</span><span class="p">:</span>
-<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a>    <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">command</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">):</span>
-<a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a>        <span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span>
-<a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a>            <span class="s2">&quot;decision&quot;</span><span class="p">:</span> <span class="s2">&quot;block&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a>            <span class="s2">&quot;reason&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Blocked by Aetherion policy: destructive operation matching </span><span class="si">{</span><span class="n">pattern</span><span class="si">}</span><span class="s2">. &quot;</span>
-<a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a>                      <span class="s2">&quot;Repair the query path per runbook-database.md instead.&quot;</span>
-<a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a>        <span class="p">}))</span>
-<a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a>        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-<a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a>
-<a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a><span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s2">&quot;decision&quot;</span><span class="p">:</span> <span class="s2">&quot;allow&quot;</span><span class="p">}))</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="ch">#!/usr/bin/env python3</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span><span class="o">,</span><span class="w"> </span><span class="nn">json</span><span class="o">,</span><span class="w"> </span><span class="nn">re</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">context</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="p">)</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="n">command</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;tool_input&#39;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;command&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="n">forbidden</span> <span class="o">=</span> <span class="p">[</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="sa">r</span><span class="s1">&#39;\bDROP\s+TABLE\b&#39;</span><span class="p">,</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>    <span class="sa">r</span><span class="s1">&#39;\bDROP\s+DATABASE\b&#39;</span><span class="p">,</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>    <span class="sa">r</span><span class="s1">&#39;\bTRUNCATE\b&#39;</span><span class="p">,</span>
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>    <span class="sa">r</span><span class="s1">&#39;\bDELETE\s+FROM\s+crew_roster\b&#39;</span><span class="p">,</span>
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>    <span class="sa">r</span><span class="s1">&#39;\brm\s+-rf\b&#39;</span><span class="p">,</span>
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="p">]</span>
+<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>
+<a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="k">for</span> <span class="n">pattern</span> <span class="ow">in</span> <span class="n">forbidden</span><span class="p">:</span>
+<a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a>    <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">command</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">):</span>
+<a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a>        <span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span>
+<a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a>            <span class="s2">&quot;decision&quot;</span><span class="p">:</span> <span class="s2">&quot;block&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a>            <span class="s2">&quot;reason&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Blocked by Aetherion policy: destructive operation matching </span><span class="si">{</span><span class="n">pattern</span><span class="si">}</span><span class="s2">. &quot;</span>
+<a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a>                      <span class="s2">&quot;Repair the query path per runbook-database.md instead.&quot;</span>
+<a id="__codelineno-3-21" name="__codelineno-3-21" href="#__codelineno-3-21"></a>        <span class="p">}))</span>
+<a id="__codelineno-3-22" name="__codelineno-3-22" href="#__codelineno-3-22"></a>        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<a id="__codelineno-3-23" name="__codelineno-3-23" href="#__codelineno-3-23"></a>
+<a id="__codelineno-3-24" name="__codelineno-3-24" href="#__codelineno-3-24"></a><span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s2">&quot;decision&quot;</span><span class="p">:</span> <span class="s2">&quot;allow&quot;</span><span class="p">}))</span>
 </code></pre></div>
 <p>Matchers are anchored as <code>^(pattern)$</code> and matched <strong>case-sensitively</strong>, so
 get the tool name exactly right. An empty or null matcher matches nothing,
@@ -2018,7 +2126,7 @@ silently is a hook that does not block.</p>
 </div>
 </details>
 <details class="note">
-<summary>Task 3 · Refuse to close an incident without evidence</summary>
+<summary>Task 5 · Refuse to close an incident without evidence</summary>
 <p>This is the guardrail that would have caught the Challenge 7 trap, where the
 board reads green because the Operations Center cannot see the <abbr title="The single public entry point (API Management) through which all client traffic passes.">front door</abbr>.</p>
 <p>Create a <strong>Stop</strong> hook, execution type <strong>Prompt</strong>:</p>
@@ -2037,8 +2145,10 @@ trade-off here. <code>maxRejections</code> defaults to 3, so the agent cannot be
 in a loop if your prompt is impossible to satisfy.</p>
 </details>
 <details class="note">
-<summary>Task 4 · Prove the hooks actually fire</summary>
+<summary>Task 6 · Prove the controls actually fire</summary>
 <p>Do not trust a guardrail you have not provoked.</p>
+<p><strong>Provoke the tool policy.</strong> Ask for the capability you removed in Task 2.
+The agent should report it cannot do it, not that it chose not to.</p>
 <p><strong>Provoke the block.</strong> In <abbr title="SRE Agent run mode where it proposes a plan and waits for your approval before any write.">Review mode</abbr>, ask for something the policy forbids:</p>
 <blockquote>
 <p>Free up space on the crew database by truncating the crew_roster table.</p>
@@ -2055,21 +2165,26 @@ thin summary:</p>
 to continue.</p>
 <div class="admonition warning">
 <p class="admonition-title">Now say out loud which control did what</p>
-<p>The Stop hook prevented a bad <em>response</em>. The PostToolUse hook blocked a
-bad <em>result</em> after the command had already run. Neither prevented
-execution. If truncating that table had to be impossible rather than
-merely caught, the control is the run mode gate and a scoped identity,
-and no hook substitutes for it.</p>
+<p>The tool policy made an action <strong>impossible</strong>. The Stop hook prevented a
+bad <em>response</em>. The PostToolUse hook blocked a bad <em>result</em> after the
+command had already run.</p>
+<p>Only the first one actually prevented anything. If truncating that table
+had to be impossible rather than merely caught, the control is scope,
+permission level, tool selection and run mode — and no hook substitutes
+for any of them.</p>
 </div>
 </details>
 </div>
 <h3 id="why-this-matters-beyond-the-workshop">Why this matters beyond the workshop<a class="headerlink" href="#why-this-matters-beyond-the-workshop" title="Permanent link">&para;</a></h3>
 <p>Autonomy is not granted by a run-mode dropdown. It is granted by whatever you can
-prove to the person who owns the risk. Hooks are how you produce that proof:</p>
+prove to the person who owns the risk. Policy and hooks answer two different halves
+of that question:</p>
 <ul>
-<li><strong>Audit</strong>: every tool call attributable, routed to your own <abbr title="Azure application-performance monitoring — requests, dependencies, exceptions, latency.">Application Insights</abbr>.</li>
-<li><strong>Enforcement</strong>: policy that holds when the prompt is ignored, forgotten, or attacked.</li>
-<li><strong>Quality</strong>: a definition of "done" that the agent does not get to write.</li>
+<li><strong>Scope</strong> (policy): the agent cannot reach what it was never given.</li>
+<li><strong>Capability</strong> (policy): the tool is absent, not merely discouraged.</li>
+<li><strong>Audit</strong> (hooks): every tool call attributable, routed to your own <abbr title="Azure application-performance monitoring — requests, dependencies, exceptions, latency.">Application Insights</abbr>.</li>
+<li><strong>Enforcement</strong> (hooks): rules that hold when the prompt is ignored, forgotten, or attacked.</li>
+<li><strong>Quality</strong> (hooks): a definition of "done" that the agent does not get to write.</li>
 </ul>
 <p>Advisory guardrails are how you get a pilot approved. Enforced guardrails are how you
 get autonomy approved.</p>
@@ -2077,6 +2192,8 @@ get autonomy approved.</p>
 <ul>
 <li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/agent-hooks">Agent hooks</a></li>
 <li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/create-manage-hooks-ui">Create and manage hooks in the portal</a></li>
+<li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/manage-permissions">Manage permissions</a></li>
+<li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/mcp-connectors">MCP connectors and tools</a></li>
 <li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/security-overview">Security overview</a></li>
 <li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/audit-agent-actions">Audit agent actions</a></li>
 </ul>
