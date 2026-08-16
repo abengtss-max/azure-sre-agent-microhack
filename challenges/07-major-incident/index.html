@@ -1843,8 +1843,11 @@ the exact clicks, open the matching task below.</p>
 <details class="note">
 <summary>Task 1 · Confirm the Sev1 plan is live</summary>
 <ul>
-<li>Open <strong>Builder → Incident response plans</strong> and confirm your Sev1 plan (from
-  Challenge 6) is <strong>On</strong> and filtered to match <code>aetherion-major-incident</code>.</li>
+<li>Open <strong>Incidents → Triggers + response plans</strong> and confirm your Sev1 plan
+  (from Challenge 6) shows <strong>Status: On</strong> and <strong>Severity: Sev1</strong>.</li>
+<li><strong>Subagent name</strong> should read <em>Set up</em> — that means none is bound, which is
+  what you want. This incident spans four tiers; an <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr>-only specialist would
+  scope the auto-investigation to one of them.</li>
 <li>If it's missing, create it <strong>before</strong> running the start command, otherwise
   the alert won't auto-trigger the investigation.</li>
 </ul>
