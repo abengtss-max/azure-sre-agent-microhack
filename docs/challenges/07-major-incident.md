@@ -110,8 +110,11 @@ outage was masking.
     the exact clicks, open the matching task below.
 
     ??? note "Task 1 · Confirm the Sev1 plan is live"
-        - Open **Builder → Incident response plans** and confirm your Sev1 plan (from
-          Challenge 6) is **On** and filtered to match `aetherion-major-incident`.
+        - Open **Incidents → Triggers + response plans** and confirm your Sev1 plan
+          (from Challenge 6) shows **Status: On** and **Severity: Sev1**.
+        - **Subagent name** should read *Set up* — that means none is bound, which is
+          what you want. This incident spans four tiers; an AKS-only specialist would
+          scope the auto-investigation to one of them.
         - If it's missing, create it **before** running the start command, otherwise
           the alert won't auto-trigger the investigation.
 

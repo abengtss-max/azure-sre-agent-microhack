@@ -134,7 +134,8 @@ Challenge 7.
         1. **Incidents** in the left-hand menu → **Triggers + response plans**.
         2. **Connect an incident platform** → **Azure Monitor** → **Save**. It
            configures itself from your agent's scope, so there is nothing to fill in.
-        3. **Add a response plan**.
+           You'll see **Azure Monitor is connected** in the top right when it's done.
+        3. **+ Create a response plan**.
 
         Fill it in as follows:
 
