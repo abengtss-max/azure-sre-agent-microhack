@@ -538,9 +538,10 @@ $script:Challenges = [ordered]@{
             Write-Host "(impact, root cause, recovery, risk, lessons), then have the agent render the briefing as a PDF with a"
             Write-Host "timeline chart. Distinguish symptom, root cause, mitigation and corrective action."
             Write-Host ""
-            Write-Host "  Then close the loop for real: add the GitHub Connector (Builder -> Connectors)" -ForegroundColor Gray
-            Write-Host "  and have the agent publish the RCA as an issue on your fork. It has been reading" -ForegroundColor Gray
-            Write-Host "  that repo all day without ever being able to write to it." -ForegroundColor Gray
+            Write-Host "  Then close the loop for real: add the GitHub Connector and file the RCA as an" -ForegroundColor Gray
+            Write-Host "  issue, then connect the GitHub MCP server and have the agent branch, commit and" -ForegroundColor Gray
+            Write-Host "  open a pull request. It has been reading that repo all day without ever being" -ForegroundColor Gray
+            Write-Host "  able to change a line of it." -ForegroundColor Gray
         }
         Check = {
             $s = Get-AetherionStatus
@@ -549,7 +550,8 @@ $script:Challenges = [ordered]@{
             if (-not $allOk) { return @{ Pass = $false; Detail = "platform not fully healthy yet (overall=$($s.overall)) - resolve challenge 7 first" } }
             $done = Confirm-SelfAttest 'Have you produced an executive leadership briefing AND an engineering RCA handover for the major incident?'
             $pub  = Confirm-SelfAttest 'Did the agent publish the RCA as an issue on your fork of aetherion-airops-platform?'
-            @{ Pass = ($allOk -and $done -and $pub); Detail = "platform healthy=$allOk, briefing + handover produced=$done, RCA published to repo=$pub" }
+            $mcp  = Confirm-SelfAttest 'Did you connect an MCP server and have the agent open a pull request on your fork through it?'
+            @{ Pass = ($allOk -and $done -and $pub -and $mcp); Detail = "platform healthy=$allOk, briefing + handover produced=$done, RCA published to repo=$pub, MCP pull request opened=$mcp" }
         }
     }
 }

@@ -1,7 +1,7 @@
 # Challenge 8 · Boarding Resumes: Brief Airline Leadership
 
 !!! abstract "Challenge 08 of 08 · Act V: Major Incident"
-    **Run mode:** Review · **Access:** read-only summarization, plus one governed write back to your repo
+    **Run mode:** Review · **Access:** read-only summarization, plus governed writes back to your repo
 
     **Stage:** Foundation → Operations → Engineering → Autonomous → **Major Incident**
 
@@ -23,7 +23,8 @@ incident starts from what you learned in this one.
 - :material-podium: **Impact-first**: what happened and what it cost, for executives
 - :material-clipboard-text-clock-outline: **Precise handover**: actions, verification and open risks for the next on-call
 - :material-file-chart-outline: **Boardroom-ready**: an auto-generated PDF with a timeline chart
-- :material-source-pull: **Close the loop**: the agent writes the RCA back to the repo it reads from
+- :material-connection: **Extend with MCP**: connect a tool server and manage the tool budget
+- :material-source-pull: **Close the loop**: the agent opens a PR against the repo it reads from
 
 </div>
 
@@ -41,7 +42,8 @@ incident starts from what you learned in this one.
 2. **Write the leadership briefing.** Short, impact-first, non-technical, for the operations director.
 3. **Write the engineering RCA handover.** Precise actions, verification, open risks, and change evidence for the next on-call.
 4. **Generate the executive PDF.** Have the agent render the briefing (with a timeline chart) via its Python sandbox.
-5. **Publish the RCA back to the repo.** Give the agent write access and have it file the RCA as an issue on your fork, so the knowledge outlives the chat thread.
+5. **Publish the RCA back to the repo.** Add the GitHub Connector and have the agent file the RCA as an issue on your fork.
+6. **Connect an MCP server and open the PR.** Add GitHub MCP, manage the tool budget, then have the agent branch, commit and raise a pull request that fixes the runbook that failed you.
 
 ![Challenge 8 storyboard: Sam and Elena brief airline leadership as boarding resumes](../assets/storyboard/img-challenge-8.webp){ .story-panel loading=lazy }
 
@@ -63,6 +65,7 @@ incident starts from what you learned in this one.
 - The leadership briefing covers impact, root cause, recovery, cost/risk, and lessons learned; the engineering RCA handover captures actions, verification, remaining risk, and change evidence from rollout history and the Activity Log.
 - The agent produced a **downloadable PDF** of the leadership briefing (with a timeline chart) via its Python sandbox.
 - The agent **filed the RCA as an issue on your fork**, so the record survives the chat thread.
+- An **MCP server is connected**, you scoped its tools against the 80-tool budget, and the agent used those tools to **branch, commit and open a pull request** improving the runbook that failed during Challenge 7.
 - Symptom, root cause, contributing factors, immediate mitigation, and permanent corrective action are clearly separated, and `check-challenge.ps1 8` passes.
 
 !!! success "Verify your work"
@@ -185,30 +188,108 @@ the repository, where the whole team, and the next agent, can find it.
         what it is about to publish before you do. This is going into a repository
         with your name on it.
 
-        **Stretch: make it a pull request.** Filing an issue records what happened.
-        A pull request changes what happens next. Ask it to improve the runbook that
-        let you down during Challenge 7:
+        **Filing an issue records what happened. It does not change what happens
+        next.** For that you need to change a file, and the GitHub Connector cannot
+        do it: creating a pull request through the connector requires **the source
+        branch to already exist with the changes committed**. It opens a PR between
+        branches that are already there. It does not create a branch and commit files
+        for you.
 
-        > Open a pull request against `<your-org>/aetherion-airops-platform` that
-        > adds the verification step we were missing to the crew-scheduling runbook,
-        > and reference the RCA issue you just created.
+        That missing capability is the whole point of Task 6.
 
-        !!! warning "The PR path is preview, and it has a real limitation"
-            Creating a pull request requires **Review** or **Autonomous** run mode,
-            and **the source branch must already exist with the changes committed**.
-            The connector opens a PR between branches that are already there; it does
-            not create a branch and commit files for you.
+    ??? note "Task 6 · Connect an MCP server and open the pull request"
+        The agent has five ways to be extended: skills and subagents (you built both
+        in Challenge 5), Python tools (it just rendered your PDF with one), hooks, and
+        **MCP servers**. MCP is the one you have not touched, and it is how the agent
+        reaches anything Microsoft did not build a connector for.
 
-            If the agent reports that it has written the change locally but cannot
-            push it, that is this limitation, not a broken setup. To get the full
-            branch-commit-PR flow you need the **GitHub MCP** connector instead.
+        **The Model Context Protocol** is an open standard. An MCP server wraps a
+        service and exposes its capabilities as tools the agent discovers and calls.
+        The agent ships connectors for GitHub, Datadog, Splunk, New Relic, Dynatrace
+        and Elasticsearch, and will talk to any custom server you point it at.
 
-            The issue in the required step above is enough to complete the
-            challenge. Treat the PR as the stretch goal it is.
+        You are connecting GitHub, because it is the one you already have credentials
+        for and it is the one that unblocks the PR.
+
+        **Connect it.**
+
+        1. **Builder** → **Connectors** → **Add connector**.
+        2. Choose the **GitHub** partner card. Transport is **Streamable-HTTP** and
+           the URL is prefilled.
+        3. Provide a **Personal Access Token**. For partner connectors the auth
+           method is fixed; you supply the credential.
+        4. Connect.
+
+        **Watch what happens next, because this is what makes MCP different from a
+        hand-built integration.** The agent immediately calls the server's tool
+        listing and registers everything it finds. You did not tell it what tools
+        exist. It asked.
+
+        A **Select tools** step appears with every discovered tool preselected, up to
+        your remaining capacity.
+
+        !!! warning "You have a budget of 80 tools, and it is shared"
+            The limit is 80 tools per agent, native and MCP combined, and the picker
+            shows a coloured capacity bar: blue to 70%, yellow to 90%, red above. At
+            the cap, unchecked tools are disabled until you free space.
+
+            This is a real design constraint, not a formality. Connect three chatty
+            servers with everything selected and you will exhaust the budget and
+            degrade the agent's tool selection. Take only the tools this agent needs.
+
+            Deselect the tools you do not need for this task. You want file and
+            pull-request capability, not the entire catalog.
+
+        Tools are registered with a **namespaced** name, such as
+        `github-mcp_create_branch`, so two servers exposing a `search` tool never
+        collide.
+
+        **Now do the thing the connector could not.** Ask for the full
+        branch-commit-PR flow in one instruction:
+
+        > Using your GitHub MCP tools, create a branch called
+        > `rca/crew-verification` on `<your-org>/aetherion-airops-platform`, commit a
+        > change to the crew-scheduling runbook that adds the verification step we
+        > were missing during Challenge 7, and open a pull request against `main`
+        > that references the RCA issue you filed. Show me the diff before you push.
+
+        Approve it in Review mode, then open the PR on GitHub. **The agent changed a
+        file in your repository.** That is the loop closing: it read the repo in
+        Challenge 1 and it improves the repo in Challenge 8.
+
+        !!! tip "Check the connection health while you are here"
+            **Builder → Connectors** shows live status for each server. The agent
+            pings every Streamable-HTTP server every 60 seconds and reconnects
+            transparently before a tool call if a connection dropped, so a transient
+            failure mid-investigation is invisible to you.
+
+            | Status | Meaning |
+            |---|---|
+            | **Connected** | Healthy, tools ready |
+            | **Disconnected** | Temporary, auto-recovery in progress |
+            | **Failed** | Unrecoverable. Check URL, credentials, network |
+
+            **Failed** with valid-looking settings is almost always the token: a PAT
+            without pull-request scope connects fine and then fails on write.
+
+        !!! note "Why not just use MCP for everything?"
+            You have now used three different GitHub connections, on purpose:
+
+            | Connection | Used in | For |
+            |---|---|---|
+            | **Code Access** | Challenge 1 | Read and correlate. No writes |
+            | **GitHub Connector** | Task 5 | Issues, and PRs between existing branches |
+            | **GitHub MCP** | Task 6 | The full tool catalog, including branch and commit |
+
+            MCP is the most capable and the least constrained, which is exactly why
+            it is the one you should scope most carefully. The bonus track picks this
+            up: the tool budget you just managed is also a security control.
 
 ### Reference
 
 - [Connect GitHub](https://learn.microsoft.com/en-us/azure/sre-agent/github-connector)
+- [MCP connectors and tools](https://learn.microsoft.com/en-us/azure/sre-agent/mcp-connectors)
+- [Set up an MCP connector](https://learn.microsoft.com/en-us/azure/sre-agent/mcp-connector)
 - [Track incident value](https://learn.microsoft.com/en-us/azure/sre-agent/track-incident-value)
 - [Monitor agent usage](https://learn.microsoft.com/en-us/azure/sre-agent/monitor-agent-usage)
 - [Memory and knowledge](https://learn.microsoft.com/en-us/azure/sre-agent/memory)

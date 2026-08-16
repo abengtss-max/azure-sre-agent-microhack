@@ -128,10 +128,16 @@ need to know which is which.
         choose which ones are visible. An unselected tool is not in the agent's tool
         list, so it cannot be called at all.
 
-        1. **Builder** → **Connectors** → edit an MCP connector.
+        1. **Builder** → **Connectors** → edit the **GitHub MCP** connector you added
+           in [Challenge 8](08-leadership-briefing.md).
         2. Find the **MCP Tools** section at the bottom of the dialog.
         3. Uncheck a tool you do not want this agent to have.
         4. Save.
+
+        In Challenge 8 you scoped that connector for capability, to stay inside the
+        tool budget. You are now scoping the same dial for **security**. It is the
+        same control serving two purposes, which is exactly why it gets overlooked as
+        a guardrail.
 
         **Prove it.** Ask the agent to do the thing that tool did. It should report
         that it has no such capability, not that it has decided against it. That
