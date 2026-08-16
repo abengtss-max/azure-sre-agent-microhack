@@ -1659,13 +1659,13 @@
 
 <h1 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h1>
 <p>Common friction points during setup and delivery. For live application incidents,
-that <em>is</em> the hack — start from the <a href="../../getting-started/environment/">Operations Center</a>
+that <em>is</em> the hack. Start from the <a href="../../getting-started/environment/">Operations Center</a>
 and let the agent investigate.</p>
 <h2 id="setup">Setup<a class="headerlink" href="#setup" title="Permanent link">&para;</a></h2>
 <details class="question">
 <summary>Provisioning fails on a missing resource provider</summary>
 <p>Run <code>./scripts/00-check-providers.ps1</code>. It registers the required providers
-idempotently. Registration can take a few minutes to propagate — re-run the
+idempotently. Registration can take a few minutes to propagate, so re-run the
 failed script afterwards.</p>
 </details>
 <details class="question">
@@ -1688,13 +1688,13 @@ Let's Encrypt). Until the certificate is issued, use the direct
 <h2 id="during-the-hack">During the hack<a class="headerlink" href="#during-the-hack" title="Permanent link">&para;</a></h2>
 <details class="question">
 <summary>The agent cannot see or act on a resource</summary>
-<p>This is almost always <abbr title="Role-Based Access Control — Azure's permission model; roles decide what an identity may do.">RBAC</abbr>. The agent acts through its <strong>own <abbr title="An Azure identity for a workload (here, the agent) so it can authenticate without stored secrets.">managed identity</abbr></strong> —
-grant <abbr title="The built-in Azure role that grants read-only access — see everything, change nothing.">Reader</abbr> broadly and narrow write roles only where remediation is intended.
+<p>This is almost always <abbr title="Role-Based Access Control — Azure's permission model; roles decide what an identity may do.">RBAC</abbr>. The agent acts through its <strong>own <abbr title="An Azure identity for a workload (here, the agent) so it can authenticate without stored secrets.">managed identity</abbr></strong>.
+Grant <abbr title="The built-in Azure role that grants read-only access — see everything, change nothing.">Reader</abbr> broadly and narrow write roles only where remediation is intended.
 See <a href="../../getting-started/sre-agent-fundamentals/"><abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent basics</a>.</p>
 </details>
 <details class="question">
 <summary>The agent proposes a plan but never executes</summary>
-<p>That is <strong><abbr title="SRE Agent run mode where it proposes a plan and waits for your approval before any write.">Review mode</abbr></strong> working as designed — it waits for explicit approval.
+<p>That is <strong><abbr title="SRE Agent run mode where it proposes a plan and waits for your approval before any write.">Review mode</abbr></strong> working as designed. It waits for explicit approval.
 Approve the plan, or promote the fault class to <strong>Autonomous</strong> once you trust it.</p>
 </details>
 <details class="question">

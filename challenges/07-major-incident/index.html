@@ -1794,7 +1794,7 @@ approved or bounded actions, and verify recovery service by service.</p>
 plan matches incoming alerts <strong>by severity</strong>, so your filter must be <code>Sev1</code> to
 catch it; a broader filter fires on everything, a mismatched one catches nothing.</p>
 <p>The plan shapes the <em>experience</em>, not the grade: <code>check-challenge.ps1 7</code> marks
-the platform's end state, so you can still pass without it — you'll just have
+the platform's end state, so you can still pass without it. You'll just have
 driven the whole incident by hand.</p>
 </div>
 <p><img alt="Challenge 7 storyboard: Sam, Aria and Elena restore global check-in before peak departure" class="story-panel" loading="lazy" src="../../assets/storyboard/img-challenge-7.webp" /></p>
@@ -1833,7 +1833,7 @@ problem is at the API <abbr title="The single public entry point (API Management
 customer-facing.</p>
 <p>Expect the board to get <em>worse</em> once the <abbr title="The single public entry point (API Management) through which all client traffic passes.">front door</abbr> is fixed: with traffic flowing
 again, the degradations further back become visible. That is normal in a layered
-incident — restoring the edge doesn't create new faults, it reveals the ones the
+incident. Restoring the edge doesn't create new faults, it reveals the ones the
 outage was masking.</p>
 </details>
 <div class="admonition question">
@@ -1845,7 +1845,7 @@ the exact clicks, open the matching task below.</p>
 <ul>
 <li>Open <strong>Incidents → Triggers + response plans</strong> and confirm your Sev1 plan
   (from Challenge 6) shows <strong>Status: On</strong> and <strong>Severity: Sev1</strong>.</li>
-<li><strong>Subagent name</strong> should read <em>Set up</em> — that means none is bound, which is
+<li><strong>Subagent name</strong> should read <em>Set up</em>, meaning none is bound, which is
   what you want. This incident spans four tiers; an <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr>-only specialist would
   scope the auto-investigation to one of them.</li>
 <li>If it's missing, create it <strong>before</strong> running the start command, otherwise
@@ -1864,7 +1864,7 @@ the exact clicks, open the matching task below.</p>
 <p>The Operations Center polls each service <strong>directly</strong>, inside the
 cluster. It has no view of API Management. So the board can read fully
 green while every partner and mobile customer is getting a 500 at the
-edge — which is exactly what happens in this incident.</p>
+edge, which is exactly what happens in this incident.</p>
 <p>Validated: an agent told to "read the whole board" recovered all four
 in-cluster faults, declared the incident stable, and never mentioned the
 <abbr title="The single public entry point (API Management) through which all client traffic passes.">front door</abbr> once. It was not wrong about the board. The board was
@@ -1875,21 +1875,32 @@ questions, and always ask the second one. That is Task 5.</p>
 </details>
 <details class="note">
 <summary>Task 3 · Check the agent's memory</summary>
-<ul>
-<li>Ask the agent whether a similar crew-scheduling / check-in incident has
-  happened before; let session insights surface the earlier RCA and the fix
-  that worked.</li>
-</ul>
+<p>Ask it directly, in the same thread as the investigation:</p>
+<blockquote>
+<p>Have you investigated a crew-scheduling or check-in slowdown on this
+platform before? Recall what the root cause was and which fix worked.</p>
+</blockquote>
+<p>If you saved a hypothesis in Challenge 2 or grounded the runbooks in
+Challenge 4, session insights should surface the earlier RCA and the fix.
+That is the point of the exercise: the second incident should cost less
+than the first.</p>
 </details>
 <details class="note">
 <summary>Task 4 · Delegate and recover</summary>
+<p>Name both the subagent and the skill explicitly. Neither fires on its own.</p>
+<p>For the <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> tier:</p>
+<blockquote>
+<p>Delegate this to your <code>aks-triage</code> subagent: which workloads in the
+<code>aetherion</code> namespace are unhealthy, and why?</p>
+</blockquote>
+<p>For the crew tier:</p>
+<blockquote>
+<p>Use the <code>crew-query-path-recovery</code> skill to restore crew scheduling.</p>
+</blockquote>
+<p>Crew is failing the same way it did in Challenge 4, so the skill carries.
+Asking the agent to "act as" a specialist does <strong>not</strong> invoke the subagent,
+it only adopts the persona.</p>
 <ul>
-<li>Hand <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> triage to your specialist by <strong>delegating to it by name</strong>
-  ("delegate this to your <code>aks-triage</code> subagent"), and <strong>name your crew
-  recovery skill</strong> when you want it applied — crew is failing the same way it
-  did in Challenge 4, so the skill carries. Asking the agent to "act as" a
-  specialist does not invoke the subagent, and a skill does not reliably fire
-  on its own.</li>
 <li>Keep actions governed and follow the runbooks: fix the layer that is
   actually saturated, never delete the database.</li>
 </ul>

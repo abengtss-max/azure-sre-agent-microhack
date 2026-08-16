@@ -1788,7 +1788,7 @@ or your environment. Don't claim that stopping an agent ends all billing.</p>
 <summary>Hint: make autonomy safe</summary>
 <p>Confirm the symptom first; you can't judge an autonomous recovery without knowing
 what healthy looks like.</p>
-<p>What makes this one safe to automate isn't a permission setting — it's the shape of
+<p>What makes this one safe to automate isn't a permission setting. It's the shape of
 the incident: one degraded (not down) service, a remedy you can undo in seconds, and
 a <abbr title="How much of the system an incident (or a fix) can affect — kept as small as possible.">blast radius</abbr> you can describe in a sentence. Decide that <em>before</em> you switch mode,
 then switch to Autonomous and resist helping.</p>
@@ -1825,7 +1825,7 @@ the exact clicks, open the matching task below.</p>
 </ul>
 <div class="admonition note">
 <p class="admonition-title">\"Never delete\" applies to data, not to a bad revision</p>
-<p>Aetherion's guardrails forbid deleting <strong>data resources</strong> — databases,
+<p>Aetherion's guardrails forbid deleting <strong>data resources</strong>: databases,
 caches, storage. Removing a workload revision that shouldn't be serving
 is an ordinary, reversible rollback, and it is the sanctioned fix here.</p>
 </div>
@@ -1897,7 +1897,7 @@ you do, and this catches people out.</p>
 <p><strong>Severity is the whole match.</strong> The environment pre-provisions
 <code>aetherion-major-incident</code> at <strong>Sev1</strong>, so a plan filtered to anything else
 catches nothing and a broader plan fires on everything. Leave the title
-filters empty — they are an extra way to miss the alert, not an extra
+filters empty. They are an extra way to miss the alert, not an extra
 safeguard.</p>
 <div class="admonition tip">
 <p class="admonition-title">Why not route it to your <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> specialist?</p>
@@ -1916,7 +1916,7 @@ judgement, and this is the moment to make it.</p>
 <p class="admonition-title">Turn the cooldown off for this workshop</p>
 <p><strong>Alert reinvestigation cooldown</strong> defaults to enabled at 3 hours: the
 plan skips reinvestigation if the same plan already started one inside
-that window. Sensible in production, wrong here — re-run Challenge 7
+that window. Sensible in production, wrong here. Re-run Challenge 7
 and the plan silently will not fire the second time.</p>
 </div>
 <p><strong>Autonomy level is per plan</strong>, separate from the agent's own run mode.

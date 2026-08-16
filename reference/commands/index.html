@@ -1696,7 +1696,7 @@ repository root, signed in with <code>az login</code> and the correct subscripti
 </tr>
 <tr>
 <td><code>./scripts/provision-environment.ps1</code></td>
-<td>End-to-end provisioning wrapper — always provisions into a <strong>uniquely named</strong> <code>rg-aetherion-microhack-&lt;suffix&gt;</code> and prints the name (safe for multiple microhacks in one subscription)</td>
+<td>End-to-end provisioning wrapper. Always provisions into a <strong>uniquely named</strong> <code>rg-aetherion-microhack-&lt;suffix&gt;</code> and prints the name (safe for multiple microhacks in one subscription)</td>
 </tr>
 </tbody>
 </table>
@@ -1738,7 +1738,7 @@ repository root, signed in with <code>az login</code> and the correct subscripti
 </tr>
 <tr>
 <td><code>./scripts/99-teardown.ps1</code></td>
-<td>Lists the microhack(s) in your subscription and lets you pick which to delete — removes the hack resource group <strong>and</strong> its <code>-loadgen</code> pair</td>
+<td>Lists the microhack(s) in your subscription and lets you pick which to delete. Removes the hack resource group <strong>and</strong> its <code>-loadgen</code> pair</td>
 </tr>
 <tr>
 <td><code>./scripts/99-teardown.ps1 -ResourceGroup &lt;rg&gt;</code></td>

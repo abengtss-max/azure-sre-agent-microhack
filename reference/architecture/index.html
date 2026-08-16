@@ -1683,18 +1683,18 @@
 <p>Aetherion AirOps is a microservices estate on Azure Kubernetes Service, fronted
 by Azure API Management, backed by PostgreSQL and Redis, and observed through
 <abbr title="Azure application-performance monitoring — requests, dependencies, exceptions, latency.">Application Insights</abbr>, <abbr title="Azure service that stores and queries container and platform logs.">Log Analytics</abbr> and <abbr title="Dashboarding tool used here to visualise AKS and Application Insights metrics.">Grafana</abbr>. The <strong>Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent</strong> reasons
-across every tier — not just the cluster.</p>
+across every tier, not just the cluster.</p>
 <h2 id="environment-at-a-glance">Environment at a glance<a class="headerlink" href="#environment-at-a-glance" title="Permanent link">&para;</a></h2>
-<p><a href="../../assets/architecture/aetherion-architecture.png"><img alt="Aetherion AirOps — Azure SRE Agent MicroHack environment architecture" class="arch-diagram" loading="lazy" src="../../assets/architecture/aetherion-architecture.png" /></a></p>
+<p><a href="../../assets/architecture/aetherion-architecture.png"><img alt="Aetherion AirOps: Azure SRE Agent MicroHack environment architecture" class="arch-diagram" loading="lazy" src="../../assets/architecture/aetherion-architecture.png" /></a></p>
 <p><em>Request/data flow runs left to right (solid blue); telemetry and control flow to
 observability and the Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent (dashed purple); alerting is shown in red.
 </em><em>Click the diagram to open it full size.</em><em> The agent runs governed remediation back into <abbr title="Azure API Management — the API &quot;front door&quot; that authenticates and rate-limits traffic to the services.">APIM</abbr> and <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr>, correlating change via
 Azure <abbr title="Azure's record of control-plane changes (who changed what, and when).">Activity Log</abbr> and GitHub history.</em></p>
 <h2 id="executive-view">Executive view<a class="headerlink" href="#executive-view" title="Permanent link">&para;</a></h2>
-<p><a href="../../assets/architecture/aetherion-executive.png"><img alt="Aetherion AirOps — executive view: business flow and the Azure SRE Agent" class="arch-diagram" loading="lazy" src="../../assets/architecture/aetherion-executive.png" /></a></p>
+<p><a href="../../assets/architecture/aetherion-executive.png"><img alt="Aetherion AirOps executive view: business flow and the Azure SRE Agent" class="arch-diagram" loading="lazy" src="../../assets/architecture/aetherion-executive.png" /></a></p>
 <p><em>The business-level picture: traffic enters through the API <abbr title="The single public entry point (API Management) through which all client traffic passes.">front door</abbr>, flows to
 the Aetherion AirOps services and their data, and the </em><em>Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent</em><em> watches
-and recovers across every tier — grounded in monitoring, source control and your
+and recovers across every tier, grounded in monitoring, source control and your
 runbooks. </em><em>Click to open full size.</em>**</p>
 <h2 id="where-faults-hide">Where faults hide<a class="headerlink" href="#where-faults-hide" title="Permanent link">&para;</a></h2>
 <p>The symptom almost always appears at the <strong>edge</strong> (<abbr title="Azure API Management — the API &quot;front door&quot; that authenticates and rate-limits traffic to the services.">APIM</abbr> 5xx or timeouts), but the
@@ -1711,17 +1711,17 @@ whole estate.</p>
 </thead>
 <tbody>
 <tr>
-<td>Edge — <abbr title="Azure API Management — the API &quot;front door&quot; that authenticates and rate-limits traffic to the services.">APIM</abbr></td>
+<td>Edge (<abbr title="Azure API Management — the API &quot;front door&quot; that authenticates and rate-limits traffic to the services.">APIM</abbr>)</td>
 <td>A backend override published to the product policy</td>
 <td>Gateway 5xx while services are healthy</td>
 </tr>
 <tr>
-<td>Compute — <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr></td>
+<td>Compute (<abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr>)</td>
 <td>A release pinned to an image that can't be pulled</td>
 <td>Pods never start, the tile goes dark</td>
 </tr>
 <tr>
-<td>Compute — <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr></td>
+<td>Compute (<abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr>)</td>
 <td>A resource limit cut too far</td>
 <td>CPU throttling, latency climbs under load</td>
 </tr>
@@ -1731,7 +1731,7 @@ whole estate.</p>
 <td>A slice of requests fails, the rest succeed</td>
 </tr>
 <tr>
-<td>Data — PostgreSQL</td>
+<td>Data (PostgreSQL)</td>
 <td>A query with no supporting index over a grown table</td>
 <td>Database CPU saturated, pods idle and waiting</td>
 </tr>
@@ -1739,13 +1739,13 @@ whole estate.</p>
 </table>
 <h2 id="observability-plane">Observability plane<a class="headerlink" href="#observability-plane" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Operations Center GUI</strong> — live service health, operational-risk gauge, flight
+<li><strong>Operations Center GUI</strong>: live service health, operational-risk gauge, flight
   map, incidents and business impact. First place to confirm a symptom.</li>
-<li><strong><abbr title="Azure application-performance monitoring — requests, dependencies, exceptions, latency.">Application Insights</abbr></strong> (<code>aetherion-appi</code>) — requests, dependencies,
+<li><strong><abbr title="Azure application-performance monitoring — requests, dependencies, exceptions, latency.">Application Insights</abbr></strong> (<code>aetherion-appi</code>): requests, dependencies,
   exceptions and the application map.</li>
-<li><strong><abbr title="Azure service that stores and queries container and platform logs.">Log Analytics</abbr></strong> (<code>aetherion-law</code>) — container and node logs for deep-dive KQL.</li>
-<li><strong>Azure Managed <abbr title="Dashboarding tool used here to visualise AKS and Application Insights metrics.">Grafana</abbr></strong> — metrics, traces and autoscaling correlation.</li>
-<li><strong>Azure <abbr title="Azure's record of control-plane changes (who changed what, and when).">Activity Log</abbr> + GitHub</strong> — change history for incident correlation.</li>
+<li><strong><abbr title="Azure service that stores and queries container and platform logs.">Log Analytics</abbr></strong> (<code>aetherion-law</code>): container and node logs for deep-dive KQL.</li>
+<li><strong>Azure Managed <abbr title="Dashboarding tool used here to visualise AKS and Application Insights metrics.">Grafana</abbr></strong>: metrics, traces and autoscaling correlation.</li>
+<li><strong>Azure <abbr title="Azure's record of control-plane changes (who changed what, and when).">Activity Log</abbr> + GitHub</strong>: change history for incident correlation.</li>
 </ul>
 
 

@@ -1471,7 +1471,7 @@
   <a href="#the-shift-ahead-challenge-map" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The shift ahead — challenge map
+        The shift ahead: challenge map
       
     </span>
   </a>
@@ -1599,7 +1599,7 @@
   <a href="#the-shift-ahead-challenge-map" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The shift ahead — challenge map
+        The shift ahead: challenge map
       
     </span>
   </a>
@@ -1638,7 +1638,7 @@
 
 
 <h1 id="you-are-the-new-reliability-team-for-a-global-airline-platform">You are the new reliability team for a global airline platform<a class="headerlink" href="#you-are-the-new-reliability-team-for-a-global-airline-platform" title="Permanent link">&para;</a></h1>
-<p><img alt="Aetherion AirOps Global Operations Center — Sam and the Aria SRE agent at the start of a shift, every service healthy" class="story-panel" loading="lazy" src="../../assets/storyboard/img-intro-0.webp" /></p>
+<p><img alt="Aetherion AirOps Global Operations Center: Sam and the Aria SRE agent at the start of a shift, every service healthy" class="story-panel" loading="lazy" src="../../assets/storyboard/img-intro-0.webp" /></p>
 <p>Aetherion AirOps is a fictional, <abbr title="The most business-critical services whose failure has immediate business impact (e.g. check-in, crew scheduling).">Tier 0</abbr> airline operations platform running on
 Microsoft Azure. It is the digital backbone of a global carrier's day-to-day
 flying: it runs flight operations and dispatch, crew scheduling, passenger
@@ -1653,14 +1653,14 @@ baggage, service-level breaches, and reputational damage.</p>
 <p>Today you join Aetherion AirOps as its new Site Reliability Engineering team. You
 will run a shift inside the Global Operations Center, take a series of real
 incidents as they unfold, and use <strong>Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent</strong> to investigate, decide, and
-recover — under the same guardrails a real airline would insist on.</p>
+recover, under the same guardrails a real airline would insist on.</p>
 <blockquote>
 <p>This is an operational and business platform built for learning. It is <strong>not</strong>
 safety-of-flight avionics and it does not control real aircraft. Every fault in
 this MicroHack is deliberately injected and fictional.</p>
 </blockquote>
 <hr />
-<h2 id="the-shift-ahead-challenge-map">The shift ahead — challenge map<a class="headerlink" href="#the-shift-ahead-challenge-map" title="Permanent link">&para;</a></h2>
+<h2 id="the-shift-ahead-challenge-map">The shift ahead: challenge map<a class="headerlink" href="#the-shift-ahead-challenge-map" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
@@ -1720,7 +1720,7 @@ capture early is the evidence you compare against later; the permissions you
 reason about become the approvals you rely on; the knowledge you load changes the
 advice the agent gives; the specialist agent and skill you build are the tools
 you reach for in the final incident.</p>
-<p>Challenges unlock <strong>linearly</strong> — you finish one before the next opens. You drive
+<p>Challenges unlock <strong>linearly</strong>: you finish one before the next opens. You drive
 each challenge yourself with two commands:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="nb">start-challenge</span><span class="p">.</span><span class="n">ps1</span> <span class="p">&lt;</span><span class="n">N</span><span class="p">&gt;</span>   <span class="c"># opens the incident for challenge N (root cause hidden)</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="n">check-challenge</span><span class="p">.</span><span class="n">ps1</span> <span class="p">&lt;</span><span class="n">N</span><span class="p">&gt;</span>   <span class="c"># validates the required end state and unlocks challenge N+1</span>
@@ -1730,17 +1730,17 @@ each challenge yourself with two commands:</p>
   exercise) <strong>without telling you the root cause</strong>. That is your job to find.</li>
 <li><code>check-challenge.ps1</code> verifies the real end state against the live cluster and
   API Management, then unlocks the next challenge. A symptom-only or "wait it
-  out" fix will not pass — the underlying fault must genuinely be cleared.</li>
+  out" fix will not pass. The underlying fault must genuinely be cleared.</li>
 </ul>
 <p><strong>Work from evidence.</strong> Each challenge gives you the scenario, the business
-stakes, the signals you can inspect, the guardrails, and progressive hints —
-enough to investigate and solve it yourself. Start read-only, use the least
+stakes, the signals you can inspect, the guardrails, and progressive hints,
+which is enough to investigate and solve it yourself. Start read-only, use the least
 privilege that gets the job done, and let write actions go through approval
 unless a challenge explicitly enables bounded automation. Verify recovery with
 telemetry after every change, and preserve the evidence you will need for the
 incident summary at the end of the shift.</p>
-<p>Challenges 2 and 3 are <strong>one ongoing incident</strong> — detection and read-only
-investigation, then controlled recovery — before a change-driven flight-board
+<p>Challenges 2 and 3 are <strong>one ongoing incident</strong>: detection and read-only
+investigation, then controlled recovery, before a change-driven flight-board
 outage is layered on top in Challenge 3.</p>
 <hr />
 

@@ -1743,7 +1743,7 @@ its guardrails intact.</p>
 <p class="admonition-title">Start this challenge</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="nb">start-challenge</span><span class="p">.</span><span class="n">ps1</span> <span class="n">5</span>   <span class="c"># open / set up this challenge</span>
 </code></pre></div>
-<p>Challenge 5 injects no fault — the board stays green while you build.</p>
+<p>Challenge 5 injects no fault, so the board stays green while you build.</p>
 </div>
 <h3 id="tasks">Tasks<a class="headerlink" href="#tasks" title="Permanent link">&para;</a></h3>
 <ol>
@@ -1766,7 +1766,7 @@ explicitly which agent produced the answer.</p>
 <p>Wording like <em>"act as my <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> reliability specialist"</em> does <strong>not</strong> invoke the
 subagent. The main agent simply adopts the persona and does the work itself,
 and the answer looks convincing enough that you'd never notice.</p>
-<p>Delegating explicitly — <em>"delegate this to your <code>aks-triage</code> subagent"</em> — does
+<p>Delegating explicitly, by saying <em>"delegate this to your <code>aks-triage</code> subagent"</em>, does
 invoke it. You'll see a <strong>Parallel subagent execution</strong> step in the thread,
 and asking <em>"which agent produced the answer"</em> gives you a straight answer to
 check against. There is no slash-command syntax; delegation is natural
@@ -1780,7 +1780,7 @@ language.</p>
 </ul>
 <div class="admonition success">
 <p class="admonition-title">Verify your work</p>
-<p>Both questions are yours to answer honestly — nothing here changes the platform,
+<p>Both questions are yours to answer honestly. Nothing here changes the platform,
 so the check asks you to confirm what you built:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="n">check-challenge</span><span class="p">.</span><span class="n">ps1</span> <span class="n">5</span>
 </code></pre></div>
@@ -1795,7 +1795,7 @@ broad. Judge it by whether its output would actually speed up a real <abbr title
 <summary>Hint: encode the recovery</summary>
 <p>For the skill, reuse the exact steps from Challenge 4 as the backbone and bake in
 the guardrails (diagnose which layer is saturated, repair the query path, never
-delete or restart the database). Be careful not to encode "scale it" as the answer —
+delete or restart the database). Be careful not to encode "scale it" as the answer,
 Challenge 4 is precisely the case where scaling cannot work.</p>
 <p>Skills encode a procedure the agent can draw on; subagents are delegated to and
 investigate. You'll want both in the final incident.</p>
@@ -1808,21 +1808,21 @@ the exact clicks, open the matching task below.</p>
 <summary>Task 1 · Build the specialist</summary>
 <p>Both the subagent and the skill are created from the same place: in the
 agent, open <strong>Builder</strong> in the left-hand menu, then <strong>Agent Canvas</strong>. The
-canvas shows what your agent is made of — incident response plans,
+canvas shows what your agent is made of: incident response plans,
 subagents, and the tools attached to them.</p>
 <p>Click <strong>+ Create subagent</strong>. The <strong>Create a custom agent</strong> dialog opens.
 Fill it in as follows.</p>
 <p><strong>Custom agent name</strong></p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>aks-triage
 </code></pre></div>
-<p><strong>Instructions</strong> — this is the remit, and it is the field that decides
+<p><strong>Instructions</strong>. This is the remit, and it is the field that decides
 whether the specialist is worth having. Paste this, then adjust to taste:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>You are an AKS reliability specialist for the `aetherion` namespace.
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>Scope: Azure Kubernetes Service only. Investigate pod status, container
 <a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>restarts, Kubernetes events, deployment rollout history and the health of
 <a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>dependencies as seen from inside the cluster. Do not investigate API
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>Management or the database yourself — if the evidence points outside AKS,
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>Management or the database yourself. If the evidence points outside AKS,
 <a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>say so and hand back.
 <a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>
 <a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>Method: gather evidence before concluding. Prefer `kubectl` output,
@@ -1841,18 +1841,18 @@ whether the specialist is worth having. Paste this, then adjust to taste:</p>
 <p>The last line matters. Challenge 5 builds a tool while the platform is
 green; the specialist earns write access later, once you have seen it
 reason well.</p>
-<p><strong>Skills</strong> — leave inherited. Do not select anything here.</p>
-<p><strong>Tools</strong> — leave inherited. Do not select anything here either. This is
+<p><strong>Skills</strong>: leave inherited. Do not select anything here.</p>
+<p><strong>Tools</strong>: leave inherited. Do not select anything here either. This is
 the one that will catch you out:</p>
 <div class="admonition warning">
-<p class="admonition-title">Selecting tools replaces the inherited set — and the picker is incomplete</p>
+<p class="admonition-title">Selecting tools replaces the inherited set, and the picker is incomplete</p>
 <p>The dialog says the agent inherits 46 global tools and that selecting
 tools <em>overrides</em> the defaults. It means replaces, not adds. Select
 three tools and the specialist has three tools.</p>
 <p>That would be fine if the picker showed everything. It doesn't. The
 agent's inherited set includes <strong><code>RunKubectlReadCommand</code></strong> and
-<strong><code>RunKubectlWriteCommand</code></strong> under <em>Azure Operation</em> — the tools that
-give it the cluster — but searching the picker for <code>kubectl</code>, <code>AKS</code> or
+<strong><code>RunKubectlWriteCommand</code></strong> under <em>Azure Operation</em>, the two tools that
+give it the cluster, but searching the picker for <code>kubectl</code>, <code>AKS</code> or
 <code>Kubernetes</code> returns nothing.</p>
 <p>So any selection you make in that panel silently drops cluster access,
 and your <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> specialist ends up unable to read <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr>. Scope this
@@ -1878,27 +1878,27 @@ specialist with its <strong>Instructions</strong>, and leave Tools alone.</p>
 rejected. The count of enabled tools should match the number the
 dialog quotes.</p>
 </details>
-<p><strong>Hooks</strong> — nothing needed for this challenge.</p>
+<p><strong>Hooks</strong>: nothing needed for this challenge.</p>
 <p>Then select <strong>Create</strong>.</p>
 <details class="tip">
 <summary>The YAML tab exposes three fields the form hides</summary>
 <p>The <strong>Form / YAML</strong> toggle edits the same definition, but the YAML view
 shows extra keys worth knowing about:</p>
 <ul>
-<li><code>handoff_description</code> — when the main agent should delegate to this
+<li><code>handoff_description</code>: when the main agent should delegate to this
   specialist. Worth writing, because it is what makes the subagent
   usable in Challenge 7.</li>
-<li><code>agent_type</code> — the <em>kind</em> of subagent: <code>Autonomous</code>, <code>Orchestrator</code>
+<li><code>agent_type</code> sets the <em>kind</em> of subagent: <code>Autonomous</code>, <code>Orchestrator</code>
   or <code>Activity</code>. The portal hardcodes new subagents to <code>Autonomous</code>,
-  and it is <strong>not</strong> the Review / Autonomous run mode — that is a
+  and it is <strong>not</strong> the Review / Autonomous run mode. That is a
   separate agent-level setting. Leave it as generated.</li>
-<li><code>enable_skills</code> — whether the specialist can load skills, including
+<li><code>enable_skills</code>: whether the specialist can load skills, including
   the one you are about to author.</li>
 </ul>
 </details>
 <p>Then invoke the specialist by <strong>delegating to it by name</strong> and ask for a
-namespace-health summary with likely causes. Confirm it actually ran — the
-thread shows a <em>Parallel subagent execution</em> step — and judge it on one
+namespace-health summary with likely causes. Confirm it actually ran, which the
+thread shows as a <em>Parallel subagent execution</em> step, then judge it on one
 question: would this have sped up a real <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> incident?</p>
 <div class="admonition tip">
 <p class="admonition-title">You'll meet this subagent again</p>
@@ -1909,24 +1909,24 @@ to route a major incident to is a decision you'll make there.</p>
 </details>
 <details class="note">
 <summary>Task 2 · Encode the skill</summary>
-<p>Exactly the same path — <strong>Builder → Agent Canvas</strong> — but click
+<p>Exactly the same path, <strong>Builder → Agent Canvas</strong>, but click
 <strong>+ Create skill</strong> instead. (<strong>Builder → Skill Builder</strong> in the left-hand
 menu takes you to the same place.)</p>
 <p><strong>Name</strong></p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>crew-query-path-recovery
 </code></pre></div>
-<p><strong>Description</strong> — behind the <strong>Edit</strong> link, and the field most people skim.
+<p><strong>Description</strong>, behind the <strong>Edit</strong> link, is the field most people skim.
 This description is what the agent matches on when deciding whether the
 skill is relevant, so describe <em>when to reach for it</em>, not what it does:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>Use when crew scheduling is slow or timing out and the pods themselves look
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>healthy and underutilised — the symptom of a saturated shared database
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>healthy and underutilised, the symptom of a saturated shared database
 <a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>rather than a saturated workload. Also use when several services sharing one
 <a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>database degrade together while unrelated services stay fast.
 </code></pre></div>
-<p><strong>SKILL.md</strong> — the editor on the right is pre-scaffolded with <code>name</code> and
+<p><strong>SKILL.md</strong>: the editor on the right is pre-scaffolded with <code>name</code> and
 <code>description</code> frontmatter and a placeholder comment. The finished file is
-in the repository you cloned, at
-<code>skills/crew-query-path-recovery/SKILL.md</code> — paste it in, or drag the file
+    in your <strong>lab clone</strong> (the same repository as the <code>knowledge/</code> folder,
+    not the application fork), at
 onto the <strong>Files</strong> panel:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>---
 <a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>name: crew-query-path-recovery
@@ -1951,7 +1951,7 @@ onto the <strong>Files</strong> panel:</p>
 <a id="__codelineno-7-21" name="__codelineno-7-21" href="#__codelineno-7-21"></a>
 <a id="__codelineno-7-22" name="__codelineno-7-22" href="#__codelineno-7-22"></a><span class="gu">## Remedy</span>
 <a id="__codelineno-7-23" name="__codelineno-7-23" href="#__codelineno-7-23"></a>
-<a id="__codelineno-7-24" name="__codelineno-7-24" href="#__codelineno-7-24"></a>Repair the query path — restore the missing index supporting the crew duty
+<a id="__codelineno-7-24" name="__codelineno-7-24" href="#__codelineno-7-24"></a>Repair the query path by restoring the missing index supporting the crew duty
 <a id="__codelineno-7-25" name="__codelineno-7-25" href="#__codelineno-7-25"></a>lookup. Build it without taking a disruptive lock on a live table.
 <a id="__codelineno-7-26" name="__codelineno-7-26" href="#__codelineno-7-26"></a>
 <a id="__codelineno-7-27" name="__codelineno-7-27" href="#__codelineno-7-27"></a>Verify by re-measuring crew latency under the same load, not by checking
@@ -1966,15 +1966,15 @@ onto the <strong>Files</strong> panel:</p>
 <a id="__codelineno-7-36" name="__codelineno-7-36" href="#__codelineno-7-36"></a>  makes it worse.
 <a id="__codelineno-7-37" name="__codelineno-7-37" href="#__codelineno-7-37"></a><span class="k">-</span><span class="w"> </span>Any write is proposed for approval first, never applied unilaterally.
 <a id="__codelineno-7-38" name="__codelineno-7-38" href="#__codelineno-7-38"></a><span class="k">-</span><span class="w"> </span>If the evidence does not show database saturation, this skill does not
-<a id="__codelineno-7-39" name="__codelineno-7-39" href="#__codelineno-7-39"></a>  apply — stop and say so.
+<a id="__codelineno-7-39" name="__codelineno-7-39" href="#__codelineno-7-39"></a>  apply, stop and say so.
 </code></pre></div>
-<p><strong>Files</strong> — <code>SKILL.md</code> on its own is enough. You can attach more files or a
+<p><strong>Files</strong>: <code>SKILL.md</code> on its own is enough. You can attach more files or a
 folder if you want to split a longer procedure up.</p>
-<p><strong>Tools</strong> — leave empty. The dialog itself advises configuring tools on the
+<p><strong>Tools</strong>: leave empty. The dialog itself advises configuring tools on the
 agent rather than the skill, for more consistent behaviour.</p>
 <p>Then select <strong>Create</strong>.</p>
 <p>The guardrails are the point of this task. A skill that says "crew is slow,
-add <abbr title="Running copies (pods) of a service; more replicas share the load.">replicas</abbr>" would be actively harmful here — Challenge 4 is precisely the
+add <abbr title="Running copies (pods) of a service; more replicas share the load.">replicas</abbr>" would be actively harmful here. Challenge 4 is precisely the
 case where scaling cannot work. Encoding <em>why not</em> is what makes it worth
 keeping.</p>
 </details>
@@ -1990,7 +1990,7 @@ keeping.</p>
 <p class="admonition-title">Don't assume a skill fires on its own</p>
 <p>Skills are described as loading by context, but in validation this one
 did <strong>not</strong> activate during a live investigation of exactly the
-incident it was written for — the agent solved it from first
+incident it was written for. The agent solved it from first
 principles and never referenced the skill.</p>
 <p>Asked directly which skills applied, it named
 <code>crew-query-path-recovery</code> and matched it correctly. So the skill was

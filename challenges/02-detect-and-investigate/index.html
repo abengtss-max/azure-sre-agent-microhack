@@ -1723,8 +1723,8 @@
 <p><strong>Run mode:</strong> Review · <strong>Access:</strong> read-only investigation</p>
 <p><strong>Stage:</strong> Foundation → <strong>Operations</strong> → Engineering → Autonomous → Major Incident</p>
 </div>
-<p><strong>Situation:</strong> Passengers are reporting that online check-in has slowed to a crawl —
-requests that used to be instant now take seconds — and the <strong>booking / check-in</strong>
+<p><strong>Situation:</strong> Passengers are reporting that online check-in has slowed to a crawl.
+Requests that used to be instant now take seconds, and the <strong>booking / check-in</strong>
 tile has gone amber just as traffic climbs toward a departure peak. Is check-in
 buckling under the surge, or did something change? A change on the passenger path
 mid-surge is what turns a slowdown into an outage. This incident stays <strong>open</strong> into
@@ -1747,7 +1747,7 @@ without changing anything in production.</p>
 </code></pre></div>
 <p>Starting Challenge 2 injects the first incident. Give it two or three minutes:
 check-in latency climbs from milliseconds to seconds and stays there, while
-the service keeps answering every request successfully — which is itself a clue.</p>
+the service keeps answering every request successfully, which is itself a clue.</p>
 </div>
 <h3 id="tasks">Tasks<a class="headerlink" href="#tasks" title="Permanent link">&para;</a></h3>
 <ol>
@@ -1793,7 +1793,7 @@ image files directly and folds client-side timing into its investigation.</p>
 </details>
 <details>
 <summary>Hint: capacity, or something else?</summary>
-<p>A service starved of CPU is <em>busy</em>. This one isn't — CPU is low, no pod has
+<p>A service starved of CPU is <em>busy</em>. This one isn't. CPU is low, no pod has
 restarted, and every request still succeeds. It is <strong>waiting</strong> on something. Work
 out what <code>booking</code> talks to besides its database, and how long each of those calls
 is taking. Then compare the live workload against what the repository's manifest
@@ -1810,7 +1810,7 @@ the exact clicks, open the matching task below.</p>
 <ul>
 <li>Open the <strong>Operations Center</strong> and note the <strong>booking / check-in</strong> tile: its
   p95, its error rate, and how steady the numbers are. Then open the
-  <strong><abbr title="Dashboarding tool used here to visualise AKS and Application Insights metrics.">Grafana</abbr></strong> dashboard for the same window — the two together are your
+  <strong><abbr title="Dashboarding tool used here to visualise AKS and Application Insights metrics.">Grafana</abbr></strong> dashboard for the same window. The two together are your
   evidence, not the agent's summary.</li>
 <li>Compare that to the baseline you captured in Challenge 1. Requests that
   took single-digit milliseconds now take seconds, and they all still
@@ -1834,14 +1834,19 @@ the exact clicks, open the matching task below.</p>
 </details>
 <details class="note">
 <summary>Task 3 · Record your hypothesis</summary>
-<ul>
-<li>Ask the agent to write a short summary: the <strong>likely cause</strong>, the <strong>two
-  independent signals</strong> behind it, and the <strong>least-disruptive recovery</strong> you'd
-  propose (do not perform it).</li>
-<li>Keep it where Challenge 3 can use it: leave it in the chat thread, or save
-  it to the agent's <strong>memory</strong> (type <code>/remember …</code> in the chat box, which
-  becomes <code>#remember</code>, or <em>"save this to your knowledge"</em>).</li>
-</ul>
+<p>Paste this into the agent chat:</p>
+<blockquote>
+<p>Summarise this investigation in under 200 words: the likely root cause,
+the two independent signals that support it, and the least-disruptive
+recovery you would propose. Do not perform any remediation.</p>
+</blockquote>
+<p>Then save it so Challenge 3 can pick it up. Either leave it in this chat
+thread, or commit it to memory by typing <code>/remember .</code> in the chat box
+(it becomes <code>#remember</code>), or by saying <em>"save this to your knowledge"</em>.</p>
+<p><strong>Confirm it stuck.</strong> Ask <em>"What do you remember about the check-in
+slowdown?"</em> in a <strong>new</strong> chat thread. If it repeats your hypothesis back,
+it saved. If it doesn't, the summary only exists in the old thread, so
+keep that thread open for Challenge 3.</p>
 </details>
 </div>
 <h3 id="reference">Reference<a class="headerlink" href="#reference" title="Permanent link">&para;</a></h3>

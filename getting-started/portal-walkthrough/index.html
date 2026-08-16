@@ -1569,7 +1569,7 @@
   <a href="#d-setup" class="md-nav__link">
     <span class="md-ellipsis">
       
-        D2 · Set up your agent — connect context
+        D2 · Set up your agent: connect context
       
     </span>
   </a>
@@ -1795,7 +1795,7 @@
   <a href="#d-setup" class="md-nav__link">
     <span class="md-ellipsis">
       
-        D2 · Set up your agent — connect context
+        D2 · Set up your agent: connect context
       
     </span>
   </a>
@@ -1951,7 +1951,7 @@ button is.</p>
 <div class="admonition info">
 <p class="admonition-title">Portal UI may vary</p>
 <p>Azure portal labels and blades occasionally move. When a screen differs from a
-step here, follow the matching step in the linked official doc — the flow
+step here, follow the matching step in the linked official doc. The flow
 is the same. Keep the <a href="https://portal.azure.com">Azure portal</a> open in one tab
 and this page in another.</p>
 </div>
@@ -2009,7 +2009,7 @@ incident.</p>
    <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nv">$st</span> <span class="p">=</span> <span class="nb">Get-Content</span> <span class="p">./</span><span class="n">scripts</span><span class="p">/.</span><span class="n">env</span><span class="p">.</span><span class="n">aetherion</span><span class="p">.</span><span class="n">json</span> <span class="p">|</span> <span class="nb">ConvertFrom-Json</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="k">if</span> <span class="p">(</span><span class="nv">$st</span><span class="p">.</span><span class="n">httpsUrl</span><span class="p">)</span> <span class="p">{</span> <span class="nv">$st</span><span class="p">.</span><span class="n">httpsUrl</span> <span class="p">}</span> <span class="k">else</span> <span class="p">{</span> <span class="s2">&quot;http://</span><span class="p">$(</span><span class="nv">$st</span><span class="p">.</span><span class="n">gatewayIp</span><span class="p">)</span><span class="s2">/&quot;</span> <span class="p">}</span>
 </code></pre></div></li>
-<li>Open that URL (HTTPS if configured). Let the page settle — the flight board,
+<li>Open that URL (HTTPS if configured). Let the page settle. The flight board,
    service tiles and operational-risk gauge should all render.</li>
 <li><strong>Healthy reference:</strong> every service tile is green and the risk gauge is low.
    This is what you compare against when something breaks.</li>
@@ -2027,7 +2027,7 @@ incident.</p>
 <hr />
 <h2 id="d-create-agent">D · Create the <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent<a class="headerlink" href="#d-create-agent" title="Permanent link">&para;</a></h2>
 <p>Do this once, in Challenge 1. <strong>Creating</strong> the agent and <strong>setting it up</strong> are two
-separate steps — Create alone grants no access to your app.</p>
+separate steps. Create alone grants no access to your app.</p>
 <ol>
 <li>In the portal search bar, type <strong>Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent</strong> and select it.</li>
 <li>Select <strong>Create</strong>.</li>
@@ -2037,7 +2037,7 @@ separate steps — Create alone grants no access to your app.</p>
 <li><strong>Name:</strong> <code>aetherion-sre-agent</code>.</li>
 <li><strong>Region:</strong> the closest supported region (e.g. <code>swedencentral</code>).</li>
 <li><strong><abbr title="Azure application-performance monitoring — requests, dependencies, exceptions, latency.">Application Insights</abbr>:</strong> choose <strong>Create new</strong>. The agent provisions its own
-  App Insights + <abbr title="Azure service that stores and queries container and platform logs.">Log Analytics</abbr> for <em>its own</em> telemetry — this is separate from
+  App Insights + <abbr title="Azure service that stores and queries container and platform logs.">Log Analytics</abbr> for <em>its own</em> telemetry. This is separate from
   the app's <code>aetherion-law</code> / <code>aetherion-appi</code>.</li>
 <li><strong>Model provider:</strong> <strong>Azure OpenAI</strong> is a good default (lower cost, stays in
   the EU data boundary).</li>
@@ -2050,7 +2050,7 @@ separate steps — Create alone grants no access to your app.</p>
 <p>Reference: <a href="https://learn.microsoft.com/en-us/azure/sre-agent/create-and-set-up">Create and set up</a>
 · <a href="https://learn.microsoft.com/en-us/azure/sre-agent/complete-setup">Complete your setup</a></p>
 <hr />
-<h2 id="d-setup">D2 · Set up your agent — connect context<a class="headerlink" href="#d-setup" title="Permanent link">&para;</a></h2>
+<h2 id="d-setup">D2 · Set up your agent: connect context<a class="headerlink" href="#d-setup" title="Permanent link">&para;</a></h2>
 <p>In the agent, run <strong>Set up your agent</strong> (<strong>Full setup</strong>) and connect three sources:</p>
 <ol>
 <li><strong>Code</strong> → <strong>GitHub</strong> → sign in → add <strong>your fork</strong> of <code>aetherion-airops-platform</code>
@@ -2066,7 +2066,7 @@ separate steps — Create alone grants no access to your app.</p>
 scope keeps the agent focused on just this application.</p>
 </div>
 <blockquote>
-<p><strong>Knowledge</strong> is connected later, in Challenge 4 — not here.</p>
+<p><strong>Knowledge</strong> is connected later, in Challenge 4, not here.</p>
 </blockquote>
 <hr />
 <h2 id="e-reader">E · Give the agent read-only (<abbr title="The built-in Azure role that grants read-only access — see everything, change nothing.">Reader</abbr>) access<a class="headerlink" href="#e-reader" title="Permanent link">&para;</a></h2>
@@ -2086,7 +2086,7 @@ here only if you skipped the wizard's <em>Azure resources</em> step. <abbr title
 <div class="admonition note">
 <p class="admonition-title">Permissions vs. run mode</p>
 <p>Creating and setting up the agent grants its identity <strong>Monitoring Contributor</strong>
-plus a reader bundle — so the identity is <em>not</em> strictly read-only. The
+plus a reader bundle, so the identity is <em>not</em> strictly read-only. The
 guarantee that it won't change anything without you comes from the <strong>Review</strong>
 run mode (section F), not from the role.</p>
 </div>
@@ -2097,7 +2097,7 @@ run mode (section F), not from the role.</p>
 <li>Open the <strong><code>aetherion-sre-agent</code></strong> resource → <strong>Settings</strong> (or the run-mode
    control in the agent console).</li>
 <li><strong>Review</strong> (default): the agent proposes a plan and waits for your approval
-   before any write. Use this for Acts I–III.</li>
+   before any write. Use this for Acts I-III.</li>
 <li><strong>Autonomous:</strong> the agent executes approved classes of action without pausing.
    Only switch a <strong>specific, validated</strong> fault to Autonomous (Challenge 6).</li>
 <li>Changing run mode is approved by the <strong><abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent Administrator</strong> role.</li>
@@ -2106,12 +2106,12 @@ run mode (section F), not from the role.</p>
 <h2 id="g-ask">G · Ask the agent / start a thread<a class="headerlink" href="#g-ask" title="Permanent link">&para;</a></h2>
 <ol>
 <li>Open the agent resource → the <strong>chat/console</strong>.</li>
-<li>Type a specific question — e.g. <em>"Give an operational baseline for the
+<li>Type a specific question, for example <em>"Give an operational baseline for the
    <code>aetherion</code> namespace: services, ready <abbr title="Running copies (pods) of a service; more replicas share the load.">replicas</abbr>, dependencies, and check-in
    latency."</em></li>
 <li>When the agent proposes a <strong>write</strong> in <abbr title="SRE Agent run mode where it proposes a plan and waits for your approval before any write.">Review mode</abbr>, it shows a plan with an
-   <strong>Approve / Reject</strong> prompt. Read the plan — that plan is your approval
-   artifact — then decide.</li>
+   <strong>Approve / Reject</strong> prompt. Read the plan, because that plan is your approval
+   artifact, then decide.</li>
 </ol>
 <hr />
 <h2 id="h-write">H · Approve a write, or grant a narrow write role<a class="headerlink" href="#h-write" title="Permanent link">&para;</a></h2>
@@ -2121,7 +2121,7 @@ run mode (section F), not from the role.</p>
 <div class="tabbed-block">
 <ol>
 <li>Ask the agent for a <strong>remediation plan</strong>.</li>
-<li>When it prompts, select <strong>Approve</strong> — the action runs using <em>your</em>
+<li>When it prompts, select <strong>Approve</strong>. The action runs using <em>your</em>
    credentials, once, for that step.</li>
 <li>Best when you want a human decision on each change.</li>
 </ol>
@@ -2129,7 +2129,7 @@ run mode (section F), not from the role.</p>
 <div class="tabbed-block">
 <ol>
 <li>Decide the <strong>narrowest</strong> role that covers the action (e.g. a write role on
-   the <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> cluster only — not the whole subscription).</li>
+   the <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> cluster only, not the whole subscription).</li>
 <li>Open the target resource → <strong>Access control (IAM)</strong> → <strong>Add role
    assignment</strong> → pick the role → <strong>Managed identity</strong> →
    <code>aetherion-sre-agent</code> → <strong>Review + assign</strong>.</li>
@@ -2145,7 +2145,7 @@ run mode (section F), not from the role.</p>
 <ol>
 <li>In the agent, open <strong>Knowledge</strong> (team onboarding / memory).</li>
 <li>Upload the Markdown files from this repo's <strong><code>knowledge/</code></strong> folder.</li>
-<li>Re-ask your remediation question — the advice should now cite Aetherion's own
+<li>Re-ask your remediation question. The advice should now cite Aetherion's own
    runbook guardrails instead of generic steps.</li>
 </ol>
 <p>Reference: <a href="https://learn.microsoft.com/en-us/azure/sre-agent/team-onboard">Team onboarding &amp; memory</a></p>
@@ -2153,20 +2153,20 @@ run mode (section F), not from the role.</p>
 <h2 id="j-subagent">J · Create a specialist subagent<a class="headerlink" href="#j-subagent" title="Permanent link">&para;</a></h2>
 <ol>
 <li>In the agent, open <strong>Builder → Agent Canvas</strong>, then click <strong>+ Create subagent</strong>.</li>
-<li><strong>Custom agent name</strong> — e.g. <code>aks-triage</code>.</li>
-<li><strong>Instructions</strong> — a <strong>narrow remit</strong>: <em>"<abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> reliability triage for the
+<li><strong>Custom agent name</strong>: <code>aks-triage</code>.</li>
+<li><strong>Instructions</strong>: a <strong>narrow remit</strong>, <em>"<abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> reliability triage for the
    <code>aetherion</code> namespace: pod status, events, rollout history, dependency
    health."</em> Say how it should behave and what it should do when the evidence
    points outside its scope, not just what it covers.</li>
 <li><strong>Leave Skills and Tools inherited.</strong> Selecting either <em>overrides</em> the
    inherited set rather than adding to it, and the picker does not list every
-   inherited tool — <code>RunKubectlReadCommand</code> and <code>RunKubectlWriteCommand</code> are in
+   inherited tool. <code>RunKubectlReadCommand</code> and <code>RunKubectlWriteCommand</code> are in
    the agent's inherited set but are not offered in the panel. Any selection you
    make therefore risks dropping cluster access. Scope specialists with
    Instructions.</li>
 <li><strong>Create</strong>, then use it by asking the main agent to <strong>delegate to it by name</strong>
    ("delegate this to your <code>aks-triage</code> subagent"). Asking the agent to "act as"
-   a specialist does not invoke the subagent — it just adopts the persona.</li>
+   a specialist does not invoke the subagent. It just adopts the persona.</li>
 </ol>
 <p>The <strong>Form / YAML</strong> toggle edits the same definition and exposes
 <code>handoff_description</code>, <code>agent_type</code> and <code>enable_skills</code>.</p>
@@ -2179,7 +2179,7 @@ run mode (section F), not from the role.</p>
 <li><strong>Name</strong> it, then click <strong>Edit</strong> on <strong>Description</strong> and describe <em>when the
    skill should be reached for</em>. The description is what the agent matches the
    situation against, so a vague one means the skill is never considered. Do not
-   assume a skill fires on its own — name it when you want it used.</li>
+   assume a skill fires on its own. Name it when you want it used.</li>
 <li>In the pre-scaffolded <strong>SKILL.md</strong>, fill in the <code>name</code> / <code>description</code>
    frontmatter and encode a well-defined procedure (e.g. the crew query-path
    recovery) as steps, keeping the guardrails (confirm which layer is saturated,
@@ -2195,8 +2195,8 @@ run mode (section F), not from the role.</p>
 <li>Break usage down by <strong>thread type</strong> and <strong>operational purpose</strong> to see where
    Agent Activity Units go.</li>
 <li>Use only real figures from your environment or the official
-   <a href="https://learn.microsoft.com/en-us/azure/sre-agent/pricing-billing">pricing &amp; billing doc</a>
-   — never invent rates or savings.</li>
+   <a href="https://learn.microsoft.com/en-us/azure/sre-agent/pricing-billing">pricing &amp; billing doc</a>.
+   Never invent rates or savings.</li>
 </ol>
 <hr />
 <h2 id="m-aks">M · Inspect <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> (pods, events, rollout)<a class="headerlink" href="#m-aks" title="Permanent link">&para;</a></h2>
@@ -2234,13 +2234,13 @@ run mode (section F), not from the role.</p>
 <a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="nb">Invoke-WebRequest</span> <span class="s2">&quot;</span><span class="p">$(</span><span class="nv">$st</span><span class="p">.</span><span class="n">apimGatewayUrl</span><span class="p">)</span><span class="s2">/aetherion/api/status&quot;</span> <span class="p">`</span>
 <a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>  <span class="n">-Headers</span> <span class="p">@{</span> <span class="s1">&#39;Ocp-Apim-Subscription-Key&#39;</span> <span class="p">=</span> <span class="nv">$st</span><span class="p">.</span><span class="n">apimSubscriptionKey</span> <span class="p">}</span> <span class="n">-UseBasicParsing</span>
 <a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="c"># Direct to the service (bypasses APIM) — if this is 200, the service is fine</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="c"># Direct to the service (bypasses APIM). If this is 200, the service is fine</span>
 <a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="nb">Invoke-WebRequest</span> <span class="s2">&quot;http://</span><span class="p">$(</span><span class="nv">$st</span><span class="p">.</span><span class="n">gatewayIp</span><span class="p">)</span><span class="s2">/api/status&quot;</span> <span class="n">-UseBasicParsing</span>
 </code></pre></div>
 <p>If <strong>direct</strong> returns 200 but <strong><abbr title="Azure API Management — the API &quot;front door&quot; that authenticates and rate-limits traffic to the services.">APIM</abbr></strong> fails, the fault is an API Management
 policy, not the service.</p>
 <hr />
-<p>Return to any challenge — each one tells you exactly which of these procedures to
+<p>Return to any challenge. Each one tells you exactly which of these procedures to
 run, in order.</p>
 
 

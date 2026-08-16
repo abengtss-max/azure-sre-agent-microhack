@@ -1725,7 +1725,7 @@
 </div>
 <p><strong>Situation.</strong> Crew scheduling is failing (the <code>crew-scheduling</code> tile is red) and duty
 managers can't confirm who is legal to fly the evening wave. The services that share
-its database are wobbling too, so "the database is down" is the obvious call — and
+its database are wobbling too, so "the database is down" is the obvious call, and
 it's wrong. Out of the box the agent gives generic advice, and a generic "restart the
 database" is exactly what Aetherion's runbooks forbid. The fastest path to the right
 answer is to ground the agent in your own knowledge.</p>
@@ -1765,9 +1765,9 @@ not delete or restart the database.</p>
 </div>
 <h3 id="success-criteria">Success criteria<a class="headerlink" href="#success-criteria" title="Permanent link">&para;</a></h3>
 <ul>
-<li>You can name the <strong>origin</strong> — the service whose queries are saturating the shared database — and explain why its neighbours are suffering without being at fault.</li>
+<li>You can name the <strong>origin</strong>, the service whose queries are saturating the shared database, and explain why its neighbours are suffering without being at fault.</li>
 <li>The grounded agent cites the runbook guardrail (repair the query path, never delete the database) and you apply that non-destructive fix under approval.</li>
-<li><code>/api/crew</code> is back <strong>inside the 400 ms latency budget while the roster rush is still running</strong> — that is what <code>check-challenge.ps1 4</code> grades. A tile that is merely answering again is not a pass.</li>
+<li><code>/api/crew</code> is back <strong>inside the 400 ms latency budget while the roster rush is still running</strong>. That is what <code>check-challenge.ps1 4</code> grades. A tile that is merely answering again is not a pass.</li>
 </ul>
 <div class="admonition success">
 <p class="admonition-title">Verify your work</p>
@@ -1778,7 +1778,7 @@ not delete or restart the database.</p>
 <h3 id="hints">Hints<a class="headerlink" href="#hints" title="Permanent link">&para;</a></h3>
 <details>
 <summary>Hint: how wide is the blast radius?</summary>
-<p>More than one service is unhappy, but they are not equally unhappy — and they have
+<p>More than one service is unhappy, but they are not equally unhappy, and they have
 something in common. Ask what they share, then ask which of them is <em>using</em> that
 shared thing hardest. The one generating the load is the origin; the rest are
 collateral.</p>
@@ -1801,7 +1801,7 @@ the exact clicks, open the matching task below.</p>
 <ul>
 <li>Read the Operations Center: <code>crew-scheduling</code> is red, and its
   database-backed peers (<code>booking</code>, <code>telemetry-ingest</code>) are slower than
-  their baseline. <code>baggage</code>, which touches no database, is untouched — that
+  their baseline. <code>baggage</code>, which touches no database, is untouched. That
   contrast is the clue.</li>
 <li>Compare the layers: pod CPU (<code>kubectl top pods -n aetherion</code>) against the
   PostgreSQL server's CPU in the portal. The pods are comfortable and the
@@ -1819,9 +1819,18 @@ the exact clicks, open the matching task below.</p>
   runbooks). The application fork does not contain them.</li>
 <li>Bulk upload can partially fail. Check every file shows <strong>Indexed</strong>, then
   confirm the agent can actually quote a runbook line before relying on it.</li>
-<li>Re-ask the remediation question. The advice should now <strong>cite Aetherion's
-  runbook</strong> instead of generic guidance.</li>
+<li>
+<p>Now ask the same remediation question again, word for word:</p>
+<blockquote>
+<p><code>crew-scheduling</code> is slow while its pods sit idle and the shared
+PostgreSQL server is saturated. What is the sanctioned fix, and what
+am I not allowed to do?</p>
+</blockquote>
+</li>
 </ul>
+<p>The advice should now <strong>cite Aetherion's runbook</strong> by name instead of
+  offering generic Kubernetes guidance. If it still answers generically,
+  the knowledge source is not indexed yet.</p>
 </details>
 <details class="note">
 <summary>Task 3 · Apply the sanctioned fix</summary>
@@ -1829,7 +1838,7 @@ the exact clicks, open the matching task below.</p>
 <li>Follow the runbook: <strong>repair the query path</strong>. Do <strong>not</strong> delete or restart
   the database.</li>
 <li>Note what the autoscaler is doing. It is not adding <abbr title="Running copies (pods) of a service; more replicas share the load.">replicas</abbr>, because pod
-  CPU is below target — the pods are waiting, not working. That rules out
+  CPU is below target: the pods are waiting, not working. That rules out
   scaling as the remedy, and widening the <abbr title="A fixed set of reusable database connections; when it is exhausted, requests queue or fail.">connection pool</abbr> with it.</li>
 <li>The remedy is a schema change, so apply it under approval (keep the agent
   in <strong>Review</strong> and approve the write). Then verify <code>/api/crew</code> is fast

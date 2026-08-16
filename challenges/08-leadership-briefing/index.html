@@ -1743,7 +1743,7 @@ risk.</p>
 <p class="admonition-title">Start this challenge</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="nb">start-challenge</span><span class="p">.</span><span class="n">ps1</span> <span class="n">8</span>   <span class="c"># open / set up this challenge</span>
 </code></pre></div>
-<p>Challenge 8 injects no fault — the platform stays green while you write.</p>
+<p>Challenge 8 injects no fault, so the platform stays green while you write.</p>
 </div>
 <h3 id="tasks">Tasks<a class="headerlink" href="#tasks" title="Permanent link">&para;</a></h3>
 <ol>
@@ -1805,24 +1805,34 @@ the exact clicks, open the matching task below.</p>
 </details>
 <details class="note">
 <summary>Task 2 · Write the leadership briefing</summary>
-<ul>
-<li>Ask the agent for a short, impact-first, non-technical briefing for the
-  operations director: business impact, root cause in plain terms, recovery,
-  cost / risk, and lessons learned.</li>
-</ul>
+<p>Paste this into the agent chat:</p>
+<blockquote>
+<p>Write a briefing for the operations director about today's major
+incident. Lead with business impact, not technology. Cover: what
+passengers experienced and for how long, the root cause in plain
+language, how we recovered, the cost and residual risk, and the lessons
+we are taking forward. Keep it under one page and use no Kubernetes
+jargon.</p>
+</blockquote>
+<p>Judge it the way the director would. If a sentence needs a platform
+engineer to translate it, send it back.</p>
 </details>
 <details class="note">
 <summary>Task 3 · Write the engineering RCA handover</summary>
+<p>Paste this into the agent chat:</p>
+<blockquote>
+<p>Write an engineering RCA handover for the next on-call. List every
+action taken and how each one was verified, the remaining risk, and the
+change-correlation evidence with exact sources. Be precise enough that
+someone who was not here could audit it.</p>
+</blockquote>
 <ul>
-<li>Ask for a precise engineering handover: actions taken and how each was
-  verified, remaining risk, and change-correlation evidence for the next
-  on-call.</li>
 <li>Be specific about where that evidence lives. The workload changes are in
   <strong>rollout history</strong> (<code>kubectl rollout history deploy/&lt;svc&gt; -n aetherion</code>)
   with the change cause recorded against each revision; the API Management
   policy change is in the <strong>Azure <abbr title="Azure's record of control-plane changes (who changed what, and when).">Activity Log</abbr></strong> as a
   <code>Set Product policy configuration</code> operation. In-cluster changes never
-  reach the <abbr title="Azure's record of control-plane changes (who changed what, and when).">Activity Log</abbr> — which is itself worth calling out as a gap in the
+  reach the <abbr title="Azure's record of control-plane changes (who changed what, and when).">Activity Log</abbr>, which is itself worth calling out as a gap in the
   handover.</li>
 <li>If the agent reports that it found nothing, ask it to query the Activity
   Log at <strong>subscription scope</strong> rather than filtering by resource group. The
@@ -1833,11 +1843,14 @@ the exact clicks, open the matching task below.</p>
 </details>
 <details class="note">
 <summary>Task 4 · Generate the executive PDF</summary>
-<ul>
-<li>Ask the agent to render the leadership briefing as a formatted <strong>PDF</strong> with
-  an incident-timeline chart using its built-in <strong>Python sandbox</strong>, then
-  download it.</li>
-</ul>
+<p>Paste this into the agent chat:</p>
+<blockquote>
+<p>Render the leadership briefing as a formatted PDF, including an incident
+timeline chart, using your Python sandbox. Give me a download link.</p>
+</blockquote>
+<p>The agent writes the file in its sandbox and returns a link. If the
+download fails, ask it to list the generated file and give you the link
+again, because the first link can expire.</p>
 </details>
 </div>
 <h3 id="reference">Reference<a class="headerlink" href="#reference" title="Permanent link">&para;</a></h3>
