@@ -238,15 +238,20 @@ function Test-IncidentPlatformConnected {
     return ($a.properties.incidentManagementConfiguration.type -eq 'AzMonitor')
 }
 
-# Creating the agent drops you into a chat before setup finishes, so these two
-# connections are commonly left empty and only bite in challenges 3 and 4.
+# Log Analytics shows up as a connector child resource, not on logConfiguration,
+# which stays null even when the workspace is connected. GitHub is not exposed in
+# ARM at all, so it can only be confirmed in the portal.
 function Get-AgentContextGaps {
     $a = Get-AgentResource
     if (-not $a) { return @('agent') }
-    $gaps = @()
-    if (-not $a.properties.gitHubConfiguration) { $gaps += 'code/GitHub' }
-    if (-not $a.properties.logConfiguration.logAnalyticsConfiguration) { $gaps += 'logs/Log Analytics' }
-    return $gaps
+    $j = az rest --method get --uri "https://management.azure.com$($a.id)/connectors?api-version=2026-01-01" -o json 2>$null
+    if (-not $j) { return @() }
+    $connectors = ($j | ConvertFrom-Json).value
+    $hasLaw = $connectors | Where-Object {
+        $_.properties.dataConnectorType -eq 'LogAnalytics' -and $_.properties.provisioningState -eq 'Succeeded'
+    }
+    if ($hasLaw) { return @() }
+    return @('logs/Log Analytics')
 }
 
 # The agent can diagnose the APIM fault in challenge 7 but not remediate it
@@ -342,8 +347,9 @@ $script:Challenges = [ordered]@{
                 Write-Host "  Reopen the agent's setup wizard and finish those connections." -ForegroundColor Yellow
             }
             $conn = $agent -and (Confirm-SelfAttest 'Is your SRE Agent scoped to the resource group and running in Review mode?')
+            $code = $agent -and (Confirm-SelfAttest 'Does Builder -> Code Access list your aetherion-airops-platform fork as Connected and Ready?')
             $base = Confirm-SelfAttest 'Have you recorded a healthy baseline AND created a scheduled daily health check?'
-            @{ Pass = ($allOk -and $agent -and $apim -and $ctx -and $conn -and $base); Detail = "platform healthy=$allOk, agentExists=$agent, apimAccess=$apim, context=$(if($ctx){'connected'}else{"missing $($gaps -join '+')"}), agent connected=$conn, baseline+schedule=$base" }
+            @{ Pass = ($allOk -and $agent -and $apim -and $ctx -and $conn -and $code -and $base); Detail = "platform healthy=$allOk, agentExists=$agent, apimAccess=$apim, logsConnected=$ctx, codeConnected=$code, agent connected=$conn, baseline+schedule=$base" }
         }
     }
 

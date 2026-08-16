@@ -147,9 +147,15 @@ read-only check so the agent watches for drift on its own.
             **Code** the agent cannot correlate the Challenge 3 rollback to a
             commit, and without **`aetherion-law`** it cannot read container logs.
 
-            Before moving on, go back to the agent resource and confirm all three
-            sources show as connected. If you skipped past the wizard, reopen it
-            from the agent's **Overview** and finish the connections you missed.
+            Verify both before moving on:
+
+            - **Builder → Code Access** should list `github.com` as **Connected**
+              and your `aetherion-airops-platform` fork as **Ready**, with a recent
+              sync time.
+            - **Builder → Connectors** should show a **Log Analytics** connector.
+
+            If either is missing, reopen the setup wizard from the agent's
+            **Overview** and finish the connection you skipped.
 
         **Keep Review mode** so the agent proposes actions and waits for approval.
         Its identity is granted Monitoring Contributor plus a reader bundle at
