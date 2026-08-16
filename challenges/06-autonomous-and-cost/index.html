@@ -469,6 +469,8 @@
       
         
       
+        
+      
     
     
     
@@ -1192,6 +1194,101 @@
   
   
   
+    
+    
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_6" id="__nav_3_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bonus track
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Bonus track
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../bonus-hooks-and-policies/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Enforce the Guardrails · Hooks & Policies
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
     <li class="md-nav__item">
       <a href="../finish/" class="md-nav__link">
         
@@ -1856,6 +1953,10 @@ you do, and this catches people out.</p>
 <li><strong>Connect an incident platform</strong> → <strong>Azure Monitor</strong> → <strong>Save</strong>. It
    configures itself from your agent's scope, so there is nothing to fill in.
    You'll see <strong>Azure Monitor is connected</strong> in the top right when it's done.</li>
+<li><strong>Delete the quickstart plan.</strong> Connecting a platform automatically
+   creates a default <strong>quickstart</strong> response plan. Leave it there and it
+   runs alongside yours, which can route the incident to the wrong agent
+   or process it twice. Select it and delete it before you continue.</li>
 <li><strong>+ Create a response plan</strong>.</li>
 </ol>
 <p>Fill it in as follows:</p>
@@ -1885,7 +1986,7 @@ you do, and this catches people out.</p>
 </tr>
 <tr>
 <td><strong>Agent autonomy level</strong></td>
-<td><strong>Review</strong></td>
+<td><strong>Autonomous</strong></td>
 </tr>
 <tr>
 <td><strong>Alert reinvestigation cooldown</strong></td>
@@ -1919,9 +2020,23 @@ plan skips reinvestigation if the same plan already started one inside
 that window. Sensible in production, wrong here. Re-run Challenge 7
 and the plan silently will not fire the second time.</p>
 </div>
-<p><strong>Autonomy level is per plan</strong>, separate from the agent's own run mode.
-Choose <strong>Review</strong> so the auto-triggered investigation proposes rather than
-acts: Challenge 7 puts you in command, and you decide what gets approved.</p>
+<div class="admonition danger">
+<p class="admonition-title">Choose Autonomous, and understand what you are choosing</p>
+<p>Selecting <strong>Autonomous</strong> shows an information icon. Open it and read the
+<strong><abbr title="SRE Agent run mode where it executes approved classes of action without pausing for each step.">Autonomous mode</abbr> acknowledgment</strong> before you accept: it covers the
+agent's boundaries, the model's limitations, and the fact that scoping
+its access and reviewing its outcomes remain your responsibility.</p>
+<p>In production you would start at <strong>Review</strong> and only promote a plan to
+<strong>Autonomous</strong> once you trust its tool selection. You are promoting it
+after one supervised autonomous recovery in this challenge, which is
+faster than you should move on a real platform. That is a deliberate
+trade so Challenge 7 can show you what unattended response looks like.</p>
+</div>
+<p><strong>Autonomy level is per plan</strong>, separate from the agent's own run mode. At
+<strong>Autonomous</strong>, the auto-triggered investigation can mitigate without waiting
+for you. It will not fix everything: it acts where the fix is unambiguous and
+reversible, and leaves the judgement calls. Challenge 7 is built around that
+split, and your first job there is to audit what it decided to do alone.</p>
 <p>Do this <strong>now</strong>. Challenge 7 depends on it auto-triggering.</p>
 </details>
 </div>
@@ -1933,7 +2048,7 @@ acts: Challenge 7 puts you in command, and you decide what gets approved.</p>
 </ul>
 <div class="admonition success">
 <p class="admonition-title">Up next: the final major incident</p>
-<p>Your Sev1 response plan is armed, so when everything breaks at once, the agent triggers itself and you commandeer the incident.</p>
+<p>Your Sev1 plan is armed at <strong>Autonomous</strong>. When everything breaks at once, the agent triggers itself and starts working the incident before anyone pages you. You arrive second, and your first job is to audit what it already did.</p>
 <p><a class="md-button md-button--primary" href="../07-major-incident/">Proceed to Challenge 7 · Final Major Incident →</a></p>
 </div>
 <hr />

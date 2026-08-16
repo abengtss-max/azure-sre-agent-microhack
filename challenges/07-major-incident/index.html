@@ -469,6 +469,8 @@
       
         
       
+        
+      
     
     
     
@@ -1192,6 +1194,101 @@
   
   
   
+    
+    
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_6" id="__nav_3_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bonus track
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Bonus track
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../bonus-hooks-and-policies/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Enforce the Guardrails · Hooks & Policies
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
     <li class="md-nav__item">
       <a href="../finish/" class="md-nav__link">
         
@@ -1727,6 +1824,10 @@
 a passenger surge: the flight board is dark, crew scheduling is timing out, check-in
 has slowed to a crawl, and the API <abbr title="The single public entry point (API Management) through which all client traffic passes.">front door</abbr> is failing legitimate partner and
 mobile traffic. The risk gauge is pinned. Everything you built today is now in play.</p>
+<p><strong>You are not first on scene.</strong> The Sev1 plan you armed in Challenge 6 matched the
+alert before anyone paged you, and the agent has been working the incident
+unattended. Your first job is not to fix something. It is to find out what has
+already been changed in your absence.</p>
 <table>
 <thead>
 <tr>
@@ -1756,17 +1857,27 @@ mobile traffic. The risk gauge is pinned. Everything you built today is now in p
 <td>The API <abbr title="The single public entry point (API Management) through which all client traffic passes.">front door</abbr> starts failing partner traffic</td>
 </tr>
 <tr>
+<td>18:23</td>
+<td><code>aetherion-major-incident</code> fires at <strong>Sev1</strong> and auto-triggers the agent</td>
+</tr>
+<tr>
 <td>18:25</td>
 <td>Major incident declared. You are incident commander</td>
 </tr>
+<tr>
+<td>18:26</td>
+<td>The agent is already acting on its own in a thread it opened itself</td>
+</tr>
 </tbody>
 </table>
-<p><strong>Mission.</strong> Bring Aetherion AirOps back to full health before peak departure:
-triage by business tier, remediate each fault within the runbook guardrails using
-approved or bounded actions, and verify recovery service by service.</p>
+<p><strong>Mission.</strong> Take handover from the agent, then bring Aetherion AirOps back to full
+health before peak departure: verify what it changed without you, triage the rest by
+business tier, remediate within the runbook guardrails, and verify recovery service
+by service.</p>
 <p><strong>Why this matters</strong></p>
 <div class="grid cards why-cards">
 <ul>
+<li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4.18C9.6 1.84 10.7 1 12 1s2.4.84 2.82 2zm-7 0a1 1 0 0 0-1 1 1 1 0 0 0 1 1 1 1 0 0 0 1-1 1 1 0 0 0-1-1M7 7V5H5v14h14V5h-2v2zm5 2a2 2 0 0 1 2 2 2 2 0 0 1-2 2 2 2 0 0 1-2-2 2 2 0 0 1 2-2m-4 8v-1c0-1.1 1.79-2 4-2s4 .9 4 2v1z"/></svg></span> <strong>Take handover</strong>: audit what an autonomous agent changed while you were away</li>
 <li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1s-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2m-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1M7 7h10V5h2v14H5V5h2zm5 10v-2h5v2zm0-6V9h5v2zm-4 1V9H7V8h2v4zm1.25 2c.41 0 .75.34.75.75 0 .2-.08.39-.21.52L8.12 17H10v1H7v-.92L9 15H7v-1z"/></svg></span> <strong>Triage by impact</strong>: order by business tier, not the loudest alert</li>
 <li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.5 8H12v5l4.28 2.54.72-1.21-3.5-2.08zM13 3a9 9 0 0 0-9 9H1l3.96 4.03L9 12H6a7 7 0 0 1 7-7 7 7 0 0 1 7 7 7 7 0 0 1-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.9 8.9 0 0 0 13 21a9 9 0 0 0 9-9 9 9 0 0 0-9-9"/></svg></span> <strong>Agent memory</strong>: recall the earlier RCA to resolve faster</li>
 <li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 5a3.5 3.5 0 0 0-3.5 3.5A3.5 3.5 0 0 0 12 12a3.5 3.5 0 0 0 3.5-3.5A3.5 3.5 0 0 0 12 5m0 2a1.5 1.5 0 0 1 1.5 1.5A1.5 1.5 0 0 1 12 10a1.5 1.5 0 0 1-1.5-1.5A1.5 1.5 0 0 1 12 7M5.5 8A2.5 2.5 0 0 0 3 10.5c0 .94.53 1.75 1.29 2.18.36.2.77.32 1.21.32s.85-.12 1.21-.32c.37-.21.68-.51.91-.87A5.42 5.42 0 0 1 6.5 8.5v-.28c-.3-.14-.64-.22-1-.22m13 0c-.36 0-.7.08-1 .22v.28c0 1.2-.39 2.36-1.12 3.31.12.19.25.34.4.49a2.482 2.482 0 0 0 1.72.7c.44 0 .85-.12 1.21-.32.76-.43 1.29-1.24 1.29-2.18A2.5 2.5 0 0 0 18.5 8M12 14c-2.34 0-7 1.17-7 3.5V19h14v-1.5c0-2.33-4.66-3.5-7-3.5m-7.29.55C2.78 14.78 0 15.76 0 17.5V19h3v-1.93c0-1.01.69-1.85 1.71-2.52m14.58 0c1.02.67 1.71 1.51 1.71 2.52V19h3v-1.5c0-1.74-2.78-2.72-4.71-2.95M12 16c1.53 0 3.24.5 4.23 1H7.77c.99-.5 2.7-1 4.23-1"/></svg></span> <strong>Delegate &amp; reuse</strong>: your specialist subagent and crew recovery skill</li>
@@ -1780,8 +1891,8 @@ approved or bounded actions, and verify recovery service by service.</p>
 </div>
 <h3 id="tasks">Tasks<a class="headerlink" href="#tasks" title="Permanent link">&para;</a></h3>
 <ol>
-<li><strong>Confirm the Sev1 plan is live.</strong> Check the response plan from Challenge 6 is active so the alert auto-triggers. If you skipped it, create it <strong>before</strong> you start.</li>
-<li><strong>Read the whole board.</strong> Order the work by business impact (situational awareness and legal-to-fly first), not the loudest alert.</li>
+<li><strong>Take handover from the agent.</strong> Find the thread the Sev1 alert opened by itself, read what the agent has already changed unattended, and verify it independently before you trust it.</li>
+<li><strong>Read the whole board.</strong> Order the remaining work by business impact (situational awareness and legal-to-fly first), not the loudest alert.</li>
 <li><strong>Check the agent's memory.</strong> Ask whether a similar incident has happened and let session insights surface the earlier RCA.</li>
 <li><strong>Delegate and recover.</strong> Hand <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> triage to your specialist subagent and reuse your crew recovery skill, keeping every action governed.</li>
 <li><strong>Localize the <abbr title="The single public entry point (API Management) through which all client traffic passes.">front door</abbr>.</strong> Use the direct-vs-<abbr title="Azure API Management — the API &quot;front door&quot; that authenticates and rate-limits traffic to the services.">APIM</abbr> comparison and treat the policy change as customer-facing.</li>
@@ -1793,23 +1904,26 @@ approved or bounded actions, and verify recovery service by service.</p>
 (<code>aetherion-major-incident</code>, on <abbr title="Azure application-performance monitoring — requests, dependencies, exceptions, latency.">Application Insights</abbr> failed requests). A response
 plan matches incoming alerts <strong>by severity</strong>, so your filter must be <code>Sev1</code> to
 catch it; a broader filter fires on everything, a mismatched one catches nothing.</p>
-<p>The plan shapes the <em>experience</em>, not the grade: <code>check-challenge.ps1 7</code> marks
-the platform's end state, so you can still pass without it. You'll just have
-driven the whole incident by hand.</p>
+<p><strong>This one is graded.</strong> <code>check-challenge.ps1 7</code> marks the platform's end state
+<em>and</em> confirms a Sev1 major-incident alert actually fired since you started the
+challenge. Driving the whole incident by hand is not enough on its own.</p>
 </div>
 <p><img alt="Challenge 7 storyboard: Sam, Aria and Elena restore global check-in before peak departure" class="story-panel" loading="lazy" src="../../assets/storyboard/img-challenge-7.webp" /></p>
 <h3 id="suggested-azure-sre-agent-prompt">Suggested Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent prompt<a class="headerlink" href="#suggested-azure-sre-agent-prompt" title="Permanent link">&para;</a></h3>
 <div class="admonition quote">
 <p class="admonition-title">Paste into the agent chat</p>
-<p>Read the whole Aetherion board and give me an incident-command triage: list every
-failing service, order remediation by business tier (situational awareness and
+<p>You picked this incident up before I did. First, list every action you already
+took without my approval and how I can verify each one. Then read the whole
+Aetherion board and give me an incident-command triage: list every service still
+failing, order remediation by business tier (situational awareness and
 legal-to-fly first), and for each name the sanctioned, reversible fix. Have we
 seen a similar crew-scheduling / check-in incident before. Pull the earlier RCA
 from session memory.</p>
 </div>
 <h3 id="success-criteria">Success criteria<a class="headerlink" href="#success-criteria" title="Permanent link">&para;</a></h3>
 <ul>
-<li>All failing services are triaged by priority and restored with sanctioned, reversible actions.</li>
+<li>You can state exactly what the agent changed without your approval, and you verified it from the cluster rather than from its summary.</li>
+<li>All remaining failing services are triaged by priority and restored with sanctioned, reversible actions.</li>
 <li>The API <abbr title="The single public entry point (API Management) through which all client traffic passes.">front door</abbr> serves legitimate traffic again, and every fix is verified from telemetry/health before closing.</li>
 <li>The platform is healthy and <code>check-challenge.ps1 7</code> passes.</li>
 </ul>
@@ -1841,16 +1955,35 @@ outage was masking.</p>
 <p>Give each task a genuine attempt first, and skim the hints above. When you want
 the exact clicks, open the matching task below.</p>
 <details class="note">
-<summary>Task 1 · Confirm the Sev1 plan is live</summary>
-<ul>
-<li>Open <strong>Incidents → Triggers + response plans</strong> and confirm your Sev1 plan
-  (from Challenge 6) shows <strong>Status: On</strong> and <strong>Severity: Sev1</strong>.</li>
-<li><strong>Subagent name</strong> should read <em>Set up</em>, meaning none is bound, which is
-  what you want. This incident spans four tiers; an <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr>-only specialist would
-  scope the auto-investigation to one of them.</li>
-<li>If it's missing, create it <strong>before</strong> running the start command, otherwise
-  the alert won't auto-trigger the investigation.</li>
-</ul>
+<summary>Task 1 · Take handover from the agent</summary>
+<p>The agent started before you did. Treat this exactly like taking handover
+from a colleague who has been on the incident for ten minutes.</p>
+<p><strong>Find the thread it opened by itself.</strong> In the agent's chat list, look for
+a thread whose title starts with <code>[Sev1] aetherion-major-incident</code>. You did
+not create it. The response plan did, off the alert.</p>
+<p><strong>Read what it already changed.</strong> Ask it directly, in that thread:</p>
+<blockquote>
+<p>You picked this incident up before I did. List every action you have
+already taken without my approval, what each one changed, and how I can
+verify it. Then list what you deliberately did not act on, and why.</p>
+</blockquote>
+<p><strong>Verify it yourself. Do not take its word for it.</strong> The whole point of
+autonomy is that you audit the outcome, not the intention:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">kubectl</span> <span class="n">-n</span> <span class="n">aetherion</span> <span class="n">rollout</span> <span class="nb">history </span><span class="n">deployment</span><span class="p">/</span><span class="n">flight-ops</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">kubectl</span> <span class="n">-n</span> <span class="n">aetherion</span> <span class="n">get</span> <span class="n">deploy</span> <span class="n">flight-ops</span> <span class="n">-o</span> <span class="n">jsonpath</span><span class="p">=</span><span class="s1">&#39;{.spec.template.spec.containers[0].image}{&quot;\n&quot;}&#39;</span>
+</code></pre></div>
+<p>Expect it to have acted on <strong>some</strong> tiers and not others. It moves where the
+fix is unambiguous and reversible, and holds where the call is a judgement.
+Those held tiers are your work.</p>
+<div class="admonition tip">
+<p class="admonition-title">If no thread was auto-created</p>
+<p>The plan did not match. Open <strong>Incidents → Triggers + response plans</strong>
+and confirm your Sev1 plan shows <strong>Status: On</strong> and <strong>Severity: Sev1</strong>,
+that <strong>Subagent name</strong> reads <em>Set up</em> (none bound), and that no leftover
+<strong>quickstart</strong> plan is competing with it. Fix it, then re-run the start
+command so the alert fires again. You can still command the incident by
+hand, but the alert has to fire for this challenge to pass.</p>
+</div>
 </details>
 <details class="note">
 <summary>Task 2 · Read the whole board</summary>

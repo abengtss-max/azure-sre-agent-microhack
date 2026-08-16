@@ -12,13 +12,13 @@
         <meta name="author" content="Aetherion AirOps Reliability Engineering">
       
       
-        <link rel="canonical" href="https://abengtss-max.github.io/azure-sre-agent-microhack/reference/commands/">
+        <link rel="canonical" href="https://abengtss-max.github.io/azure-sre-agent-microhack/challenges/bonus-hooks-and-policies/">
       
       
-        <link rel="prev" href="../integrations/">
+        <link rel="prev" href="../08-leadership-briefing/">
       
       
-        <link rel="next" href="../troubleshooting/">
+        <link rel="next" href="../finish/">
       
       
         
@@ -29,7 +29,7 @@
     
     
       
-        <title>Commands - Azure SRE Agent MicroHack</title>
+        <title>Enforce the Guardrails · Hooks & Policies - Azure SRE Agent MicroHack</title>
       
     
     
@@ -71,14 +71,14 @@
   
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Azure SRE Agent MicroHack">
-  <meta property="og:title" content="Commands · Azure SRE Agent MicroHack">
+  <meta property="og:title" content="Enforce the Guardrails · Hooks & Policies · Azure SRE Agent MicroHack">
   <meta property="og:description" content="Hands-on MicroHack: use the Azure SRE Agent to detect, investigate and recover live incidents on the Aetherion AirOps Tier-0 aviation platform.">
   <meta property="og:image" content="https://abengtss-max.github.io/azure-sre-agent-microhack/assets/og-cover.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:url" content="https://abengtss-max.github.io/azure-sre-agent-microhack/reference/commands/">
+  <meta property="og:url" content="https://abengtss-max.github.io/azure-sre-agent-microhack/challenges/bonus-hooks-and-policies/">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Commands · Azure SRE Agent MicroHack">
+  <meta name="twitter:title" content="Enforce the Guardrails · Hooks & Policies · Azure SRE Agent MicroHack">
   <meta name="twitter:description" content="Hands-on MicroHack: use the Azure SRE Agent to detect, investigate and recover live incidents on the Aetherion AirOps Tier-0 aviation platform.">
   <meta name="twitter:image" content="https://abengtss-max.github.io/azure-sre-agent-microhack/assets/og-cover.jpg">
   <link rel="icon" type="image/png" sizes="16x16" href="../../assets/aetherion-airops-favicon-16.png">
@@ -105,7 +105,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#commands" class="md-skip">
+        <a href="#bonus-enforce-the-guardrails-hooks-and-tool-policies" class="md-skip">
           Skip to content
         </a>
       
@@ -140,7 +140,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Commands
+              Enforce the Guardrails · Hooks & Policies
             
           </span>
         </div>
@@ -288,6 +288,8 @@
   
   
   
+    
+  
   
     
     
@@ -295,11 +297,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../../challenges/01-onboard-and-baseline/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../01-onboard-and-baseline/" class="md-tabs__link">
           
   
   
@@ -320,13 +324,11 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../architecture/" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../../reference/architecture/" class="md-tabs__link">
           
   
   
@@ -448,8 +450,10 @@
       
   
   
+    
   
   
+  
     
     
       
@@ -471,19 +475,22 @@
     
     
       
+        
+        
+      
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
         
           
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
             
   
   
@@ -501,7 +508,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -529,17 +536,20 @@
       
       
         
+          
+          
+        
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
       
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1" >
         
           
-          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="">
             
   
   
@@ -575,7 +585,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../challenges/01-onboard-and-baseline/" class="md-nav__link">
+      <a href="../01-onboard-and-baseline/" class="md-nav__link">
         
   
   
@@ -625,17 +635,20 @@
       
       
         
+          
+          
+        
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
       
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
         
           
-          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="">
             
   
   
@@ -671,7 +684,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../challenges/02-detect-and-investigate/" class="md-nav__link">
+      <a href="../02-detect-and-investigate/" class="md-nav__link">
         
   
   
@@ -699,7 +712,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../challenges/03-controlled-recovery/" class="md-nav__link">
+      <a href="../03-controlled-recovery/" class="md-nav__link">
         
   
   
@@ -727,7 +740,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../challenges/04-ground-the-agent/" class="md-nav__link">
+      <a href="../04-ground-the-agent/" class="md-nav__link">
         
   
   
@@ -773,17 +786,20 @@
       
       
         
+          
+          
+        
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
       
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" >
         
           
-          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="">
             
   
   
@@ -819,7 +835,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../challenges/05-engineer-the-agent/" class="md-nav__link">
+      <a href="../05-engineer-the-agent/" class="md-nav__link">
         
   
   
@@ -865,17 +881,20 @@
       
       
         
+          
+          
+        
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
       
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4" >
         
           
-          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="">
             
   
   
@@ -911,7 +930,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../challenges/06-autonomous-and-cost/" class="md-nav__link">
+      <a href="../06-autonomous-and-cost/" class="md-nav__link">
         
   
   
@@ -959,17 +978,20 @@
       
       
         
+          
+          
+        
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
       
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_5" >
         
           
-          <label class="md-nav__link" for="__nav_3_5" id="__nav_3_5_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_5" id="__nav_3_5_label" tabindex="">
             
   
   
@@ -1005,7 +1027,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../challenges/07-major-incident/" class="md-nav__link">
+      <a href="../07-major-incident/" class="md-nav__link">
         
   
   
@@ -1033,7 +1055,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../challenges/08-leadership-briefing/" class="md-nav__link">
+      <a href="../08-leadership-briefing/" class="md-nav__link">
         
   
   
@@ -1066,8 +1088,10 @@
                 
   
   
+    
   
   
+  
     
     
       
@@ -1078,18 +1102,21 @@
     
       
       
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_6" >
         
           
-          <label class="md-nav__link" for="__nav_3_6" id="__nav_3_6_label" tabindex="0">
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_6" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3_6" id="__nav_3_6_label" tabindex="">
             
   
   
@@ -1107,7 +1134,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_6_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_6_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3_6">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1122,10 +1149,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../challenges/bonus-hooks-and-policies/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Enforce the Guardrails · Hooks & Policies
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1141,6 +1195,98 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#advisory-versus-enforced" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Advisory versus enforced
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Advisory versus enforced">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#where-enforcement-actually-happens" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Where enforcement actually happens
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tasks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tasks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#success-criteria" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Success criteria
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-this-matters-beyond-the-workshop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why this matters beyond the workshop
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reference
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1161,7 +1307,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../challenges/finish/" class="md-nav__link">
+      <a href="../finish/" class="md-nav__link">
         
   
   
@@ -1193,10 +1339,8 @@
       
   
   
-    
   
   
-  
     
     
       
@@ -1218,22 +1362,19 @@
     
     
       
-        
-        
-      
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
         
           
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
             
   
   
@@ -1251,7 +1392,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1269,7 +1410,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../architecture/" class="md-nav__link">
+      <a href="../../reference/architecture/" class="md-nav__link">
         
   
   
@@ -1297,7 +1438,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../service-catalog/" class="md-nav__link">
+      <a href="../../reference/service-catalog/" class="md-nav__link">
         
   
   
@@ -1325,7 +1466,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../integrations/" class="md-nav__link">
+      <a href="../../reference/integrations/" class="md-nav__link">
         
   
   
@@ -1350,37 +1491,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Commands
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../reference/commands/" class="md-nav__link">
         
   
   
@@ -1396,59 +1510,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#provisioning" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Provisioning
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#running-the-hack" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Running the hack
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#teardown" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Teardown
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1461,7 +1522,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../troubleshooting/" class="md-nav__link">
+      <a href="../../reference/troubleshooting/" class="md-nav__link">
         
   
   
@@ -1489,7 +1550,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../glossary/" class="md-nav__link">
+      <a href="../../reference/glossary/" class="md-nav__link">
         
   
   
@@ -1531,20 +1592,17 @@
       
       
         
-          
-          
-        
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_7" >
         
           
-          <label class="md-nav__link" for="__nav_4_7" id="__nav_4_7_label" tabindex="">
+          <label class="md-nav__link" for="__nav_4_7" id="__nav_4_7_label" tabindex="0">
             
   
   
@@ -1699,35 +1757,74 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#provisioning" class="md-nav__link">
+  <a href="#advisory-versus-enforced" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Provisioning
+        Advisory versus enforced
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Advisory versus enforced">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#where-enforcement-actually-happens" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Where enforcement actually happens
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#running-the-hack" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#tasks" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Running the hack
+        Tasks
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#teardown" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#success-criteria" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Teardown
+        Success criteria
       
     </span>
   </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-this-matters-beyond-the-workshop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why this matters beyond the workshop
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reference
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1751,99 +1848,243 @@
   
 
 
-<h1 id="commands">Commands<a class="headerlink" href="#commands" title="Permanent link">&para;</a></h1>
-<p>All scripts live in <code>scripts/</code> and are PowerShell 7 (<code>pwsh</code>). Run them from the
-repository root, signed in with <code>az login</code> and the correct subscription selected.
-<code>.sh</code> equivalents exist for the cross-platform ones.</p>
-<h2 id="provisioning">Provisioning<a class="headerlink" href="#provisioning" title="Permanent link">&para;</a></h2>
+<h1 id="bonus-enforce-the-guardrails-hooks-and-tool-policies">Bonus · Enforce the Guardrails: Hooks and Tool Policies<a class="headerlink" href="#bonus-enforce-the-guardrails-hooks-and-tool-policies" title="Permanent link">&para;</a></h1>
+<div class="admonition warning">
+<p class="admonition-title">This is a bonus track, not one of the eight challenges</p>
+<p>Bonus content sits outside the five acts and outside your progress bar. There is
+no storyboard panel and no fault to find. Take it only after
+<a href="../08-leadership-briefing/">Challenge 8</a> is complete, or come back to it later.</p>
+<p><strong>Run mode:</strong> Review · <strong>Governance:</strong> enforced, not advisory</p>
+</div>
+<p><strong>Situation.</strong> In Challenge 6 you armed a response plan at <strong>Autonomous</strong>, and in
+Challenge 7 it acted on a Tier-0 platform before anyone paged you. It worked. It
+worked because the agent chose well, not because anything stopped it choosing badly.</p>
+<p>Every guardrail you have built today is <strong>advisory</strong>. Custom instructions and personas
+shape what the agent <em>tends</em> to do. The runbooks say never to delete the database. It
+complied. Nothing made it comply.</p>
+<p>That is the question every security reviewer asks about autonomous operations, and so
+far this workshop has no answer for it:</p>
+<blockquote>
+<p>What stops it doing something catastrophic at 03:00?</p>
+</blockquote>
+<p><strong>Mission.</strong> Replace one advisory guardrail with an enforced one, and understand
+exactly where enforcement can and cannot happen.</p>
+<h2 id="advisory-versus-enforced">Advisory versus enforced<a class="headerlink" href="#advisory-versus-enforced" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th>Command</th>
-<th>What it does</th>
+<th>Advisory</th>
+<th>Enforced</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>./scripts/00-check-providers.ps1</code></td>
-<td>Verifies and registers required resource providers (idempotent)</td>
+<td>Custom instructions, personas, runbooks</td>
+<td>Run mode gate, hooks</td>
 </tr>
 <tr>
-<td><code>./scripts/01-deploy-infra.ps1 -ResourceGroup &lt;your-rg&gt; -Location eastus</code></td>
-<td>Provisions infrastructure via Bicep</td>
+<td>The agent usually complies</td>
+<td>The action is gated or the result is blocked</td>
 </tr>
 <tr>
-<td><code>./scripts/02-build-push-images.ps1 -ResourceGroup &lt;your-rg&gt;</code></td>
-<td>Builds and pushes the app image to ACR</td>
-</tr>
-<tr>
-<td><code>./scripts/03-deploy-app.ps1 -ResourceGroup &lt;your-rg&gt;</code></td>
-<td>Deploys the app + k6 to <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> and wires <abbr title="Azure API Management — the API &quot;front door&quot; that authenticates and rate-limits traffic to the services.">APIM</abbr> to the gateway</td>
-</tr>
-<tr>
-<td><code>./scripts/03b-setup-https.ps1</code></td>
-<td>Configures HTTPS on the gateway (Let's Encrypt)</td>
-</tr>
-<tr>
-<td><code>./scripts/04-validate.ps1</code></td>
-<td>Validates the estate is healthy and generating traffic (reads the resource group from local state)</td>
-</tr>
-<tr>
-<td><code>./scripts/provision-environment.ps1</code></td>
-<td>End-to-end provisioning wrapper. Always provisions into a <strong>uniquely named</strong> <code>rg-aetherion-microhack-&lt;suffix&gt;</code> and prints the name (safe for multiple microhacks in one subscription)</td>
+<td>Good enough for style and tone</td>
+<td>Required before you grant autonomy</td>
 </tr>
 </tbody>
 </table>
-<h2 id="running-the-hack">Running the hack<a class="headerlink" href="#running-the-hack" title="Permanent link">&para;</a></h2>
+<h3 id="where-enforcement-actually-happens">Where enforcement actually happens<a class="headerlink" href="#where-enforcement-actually-happens" title="Permanent link">&para;</a></h3>
+<p>This distinction matters, and it is easy to get wrong.</p>
 <table>
 <thead>
 <tr>
-<th>Command</th>
-<th>What it does</th>
+<th>Layer</th>
+<th>When it acts</th>
+<th>What it can do</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>./scripts/start-challenge.ps1 &lt;n&gt;</code></td>
-<td>Sets up and briefs challenge <code>n</code></td>
+<td><strong>Permission gate</strong> (run mode)</td>
+<td><strong>Before</strong> a tool call runs</td>
+<td>Require approval, or refuse the call outright</td>
 </tr>
 <tr>
-<td><code>./scripts/check-challenge.ps1 &lt;n&gt;</code></td>
-<td>Validates your work for challenge <code>n</code></td>
+<td><strong><code>PostToolUse</code> hook</strong></td>
+<td><strong>After</strong> the tool finishes successfully</td>
+<td>Audit it, block the <em>result</em>, inject context</td>
 </tr>
 <tr>
-<td><code>./scripts/reset-environment.ps1</code></td>
-<td>Restores a clean, healthy baseline between runs (add <code>-ResetProgress</code> to also re-lock challenges for a fresh run)</td>
+<td><strong><code>Stop</code> hook</strong></td>
+<td>Before the agent returns its final answer</td>
+<td>Reject the response and force it to keep working</td>
 </tr>
 </tbody>
 </table>
-<h2 id="teardown">Teardown<a class="headerlink" href="#teardown" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Command</th>
-<th>What it does</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>./scripts/reset-environment.ps1</code></td>
-<td>Restores a clean, healthy baseline between runs (add <code>-ResetProgress</code> to also re-lock challenges for a fresh run)</td>
-</tr>
-<tr>
-<td><code>./scripts/99-teardown.ps1</code></td>
-<td>Lists the microhack(s) in your subscription and lets you pick which to delete. Removes the hack resource group <strong>and</strong> its <code>-loadgen</code> pair</td>
-</tr>
-<tr>
-<td><code>./scripts/99-teardown.ps1 -ResourceGroup &lt;rg&gt;</code></td>
-<td>Deletes a specific microhack (and its <code>-loadgen</code> pair) non-interactively</td>
-</tr>
-<tr>
-<td><code>./scripts/99-teardown.ps1 -All</code></td>
-<td>Deletes every Aetherion microhack in the subscription</td>
-</tr>
-</tbody>
-</table>
+<div class="admonition danger">
+<p class="admonition-title">A PostToolUse hook is a detective control, not a preventive one</p>
+<p>Read the event name literally. <code>PostToolUse</code> fires <strong>after a tool finishes
+executing successfully</strong>. If the tool dropped a table, the table is already gone.
+Blocking the result stops the agent acting on the output; it does not rewind the
+command.</p>
+<p>Only two hook events exist today: <code>Stop</code> and <code>PostToolUse</code>. <strong>There is no
+<code>PreToolUse</code>.</strong> If you need a destructive command to never execute, the control
+is the <strong>run mode permission gate</strong>, not a hook.</p>
+<p>Getting this backwards is the single most common mistake people make when they
+first design agent guardrails. Hooks are how you <em>catch and prove</em>; run modes are
+how you <em>prevent</em>.</p>
+</div>
+<h3 id="tasks">Tasks<a class="headerlink" href="#tasks" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Write an audit hook.</strong> Make every tool call the agent makes visible and attributable.</li>
+<li><strong>Write an enforcement hook.</strong> Detect a destructive database operation and block it, with a reason.</li>
+<li><strong>Write a quality gate.</strong> Stop the agent closing an incident without verification evidence.</li>
+<li><strong>Prove it fires.</strong> Deliberately provoke the hook and confirm it blocked, not just that it logged.</li>
+</ol>
+<h3 id="success-criteria">Success criteria<a class="headerlink" href="#success-criteria" title="Permanent link">&para;</a></h3>
+<ul>
+<li>A <code>PostToolUse</code> hook audits tool calls and a second one blocks a destructive database operation with a stated reason.</li>
+<li>A <code>Stop</code> hook rejects an incident closure that has no verification evidence.</li>
+<li>You provoked each hook and saw it fire, rather than assuming it works.</li>
+<li>You can explain, in one sentence each, which control is preventive and which is detective.</li>
+</ul>
+<div class="admonition question">
+<p class="admonition-title">Stuck? Step-by-step for each task</p>
+<details class="note">
+<summary>Task 1 · Audit every tool call</summary>
+<p>Go to <strong>Builder</strong> → <strong>Hooks</strong> → <strong>Create hook</strong>.</p>
+<p>Choose event <strong>PostToolUse</strong>, execution type <strong>Command</strong>, and matcher <code>*</code> to
+match every tool. Use <code>failMode: allow</code> so a broken audit hook can never
+wedge your agent.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="ch">#!/usr/bin/env python3</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span><span class="o">,</span><span class="w"> </span><span class="nn">json</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">context</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="p">)</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">tool_name</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;tool_name&#39;</span><span class="p">,</span> <span class="s1">&#39;unknown&#39;</span><span class="p">)</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Tool used: </span><span class="si">{</span><span class="n">tool_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="s2">&quot;decision&quot;</span><span class="p">:</span> <span class="s2">&quot;allow&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="s2">&quot;hookSpecificOutput&quot;</span><span class="p">:</span> <span class="p">{</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>        <span class="s2">&quot;additionalContext&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;[AUDIT] Tool &#39;</span><span class="si">{</span><span class="n">tool_name</span><span class="si">}</span><span class="s2">&#39; was executed.&quot;</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    <span class="p">}</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="p">}))</span>
+</code></pre></div>
+<p><code>additionalContext</code> is injected back into the conversation as a user message,
+so the agent can see its own audit trail. Write debug output to <strong>stderr</strong>:
+stdout is parsed as the hook result, so anything you print there breaks it.</p>
+</details>
+<details class="note">
+<summary>Task 2 · Block a destructive database operation</summary>
+<p>Create a second <strong>PostToolUse</strong> hook. Scope the matcher to shell execution
+rather than <code>*</code>, because an overly broad matcher on an enforcement hook costs
+you latency on every single call:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>Bash|ExecuteShellCommand
+</code></pre></div>
+<p>Set <code>failMode: block</code> on this one. If your enforcement hook itself fails, you
+want the safe outcome, not the convenient one.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="ch">#!/usr/bin/env python3</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span><span class="o">,</span><span class="w"> </span><span class="nn">json</span><span class="o">,</span><span class="w"> </span><span class="nn">re</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="n">context</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="p">)</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="n">command</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;tool_input&#39;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;command&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="n">forbidden</span> <span class="o">=</span> <span class="p">[</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    <span class="sa">r</span><span class="s1">&#39;\bDROP\s+TABLE\b&#39;</span><span class="p">,</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>    <span class="sa">r</span><span class="s1">&#39;\bDROP\s+DATABASE\b&#39;</span><span class="p">,</span>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>    <span class="sa">r</span><span class="s1">&#39;\bTRUNCATE\b&#39;</span><span class="p">,</span>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>    <span class="sa">r</span><span class="s1">&#39;\bDELETE\s+FROM\s+crew_roster\b&#39;</span><span class="p">,</span>
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>    <span class="sa">r</span><span class="s1">&#39;\brm\s+-rf\b&#39;</span><span class="p">,</span>
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="p">]</span>
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>
+<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="k">for</span> <span class="n">pattern</span> <span class="ow">in</span> <span class="n">forbidden</span><span class="p">:</span>
+<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a>    <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">command</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">):</span>
+<a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a>        <span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span>
+<a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a>            <span class="s2">&quot;decision&quot;</span><span class="p">:</span> <span class="s2">&quot;block&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a>            <span class="s2">&quot;reason&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Blocked by Aetherion policy: destructive operation matching </span><span class="si">{</span><span class="n">pattern</span><span class="si">}</span><span class="s2">. &quot;</span>
+<a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a>                      <span class="s2">&quot;Repair the query path per runbook-database.md instead.&quot;</span>
+<a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a>        <span class="p">}))</span>
+<a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a>        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a>
+<a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a><span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s2">&quot;decision&quot;</span><span class="p">:</span> <span class="s2">&quot;allow&quot;</span><span class="p">}))</span>
+</code></pre></div>
+<p>Matchers are anchored as <code>^(pattern)$</code> and matched <strong>case-sensitively</strong>, so
+get the tool name exactly right. An empty or null matcher matches nothing,
+which fails open and silently.</p>
+<div class="admonition tip">
+<p class="admonition-title">Always give a reason</p>
+<p>A rejection without a <code>reason</code> is treated as approval. A hook that blocks
+silently is a hook that does not block.</p>
+</div>
+</details>
+<details class="note">
+<summary>Task 3 · Refuse to close an incident without evidence</summary>
+<p>This is the guardrail that would have caught the Challenge 7 trap, where the
+board reads green because the Operations Center cannot see the <abbr title="The single public entry point (API Management) through which all client traffic passes.">front door</abbr>.</p>
+<p>Create a <strong>Stop</strong> hook, execution type <strong>Prompt</strong>:</p>
+<blockquote>
+<p>Review the response below. It is only acceptable if, for every remediation
+it claims to have performed, it states how that fix was verified from
+telemetry or health output, and it explicitly confirms the customer-facing
+path through API Management, not only in-cluster health.</p>
+<p>$ARGUMENTS</p>
+<p>Respond with:
+- {"ok": true} if it meets both conditions
+- {"ok": false, "reason": "..."} naming exactly what is missing</p>
+</blockquote>
+<p>Prompt hooks default to the <strong>Fast Reasoning</strong> model, which is the right
+trade-off here. <code>maxRejections</code> defaults to 3, so the agent cannot be trapped
+in a loop if your prompt is impossible to satisfy.</p>
+</details>
+<details class="note">
+<summary>Task 4 · Prove the hooks actually fire</summary>
+<p>Do not trust a guardrail you have not provoked.</p>
+<p><strong>Provoke the block.</strong> In <abbr title="SRE Agent run mode where it proposes a plan and waits for your approval before any write.">Review mode</abbr>, ask for something the policy forbids:</p>
+<blockquote>
+<p>Free up space on the crew database by truncating the crew_roster table.</p>
+</blockquote>
+<p>You should see the hook's <code>reason</code> surface rather than the operation
+completing. If it completes, check the matcher first: a case mismatch or an
+empty matcher fails open.</p>
+<p><strong>Provoke the Stop gate.</strong> Ask it to close an incident with a deliberately
+thin summary:</p>
+<blockquote>
+<p>Everything is green again. Write the closure note.</p>
+</blockquote>
+<p>The Stop hook should reject it for missing verification evidence and force it
+to continue.</p>
+<div class="admonition warning">
+<p class="admonition-title">Now say out loud which control did what</p>
+<p>The Stop hook prevented a bad <em>response</em>. The PostToolUse hook blocked a
+bad <em>result</em> after the command had already run. Neither prevented
+execution. If truncating that table had to be impossible rather than
+merely caught, the control is the run mode gate and a scoped identity,
+and no hook substitutes for it.</p>
+</div>
+</details>
+</div>
+<h3 id="why-this-matters-beyond-the-workshop">Why this matters beyond the workshop<a class="headerlink" href="#why-this-matters-beyond-the-workshop" title="Permanent link">&para;</a></h3>
+<p>Autonomy is not granted by a run-mode dropdown. It is granted by whatever you can
+prove to the person who owns the risk. Hooks are how you produce that proof:</p>
+<ul>
+<li><strong>Audit</strong>: every tool call attributable, routed to your own <abbr title="Azure application-performance monitoring — requests, dependencies, exceptions, latency.">Application Insights</abbr>.</li>
+<li><strong>Enforcement</strong>: policy that holds when the prompt is ignored, forgotten, or attacked.</li>
+<li><strong>Quality</strong>: a definition of "done" that the agent does not get to write.</li>
+</ul>
+<p>Advisory guardrails are how you get a pilot approved. Enforced guardrails are how you
+get autonomy approved.</p>
+<h3 id="reference">Reference<a class="headerlink" href="#reference" title="Permanent link">&para;</a></h3>
+<ul>
+<li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/agent-hooks">Agent hooks</a></li>
+<li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/create-manage-hooks-ui">Create and manage hooks in the portal</a></li>
+<li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/security-overview">Security overview</a></li>
+<li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/audit-agent-actions">Audit agent actions</a></li>
+</ul>
+<div class="admonition success">
+<p class="admonition-title">Back to the main track</p>
+<p><a class="md-button md-button--primary" href="../finish/">Finish &amp; wrap up →</a></p>
+</div>
+<hr />
 
 
 
@@ -1879,7 +2120,7 @@ repository root, signed in with <code>az login</code> and the correct subscripti
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../integrations/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Integrations">
+          <a href="../08-leadership-briefing/" class="md-footer__link md-footer__link--prev" aria-label="Previous: 08 · Leadership Briefing">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -1889,20 +2130,20 @@ repository root, signed in with <code>az login</code> and the correct subscripti
                 Previous
               </span>
               <div class="md-ellipsis">
-                Integrations
+                08 · Leadership Briefing
               </div>
             </div>
           </a>
         
         
           
-          <a href="../troubleshooting/" class="md-footer__link md-footer__link--next" aria-label="Next: Troubleshooting">
+          <a href="../finish/" class="md-footer__link md-footer__link--next" aria-label="Next: Finish">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Troubleshooting
+                Finish
               </div>
             </div>
             <div class="md-footer__button md-icon">

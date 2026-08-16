@@ -18,7 +18,7 @@
         <link rel="prev" href="../07-major-incident/">
       
       
-        <link rel="next" href="../finish/">
+        <link rel="next" href="../bonus-hooks-and-policies/">
       
       
         
@@ -456,6 +456,8 @@
   
     
     
+      
+        
       
         
       
@@ -1192,6 +1194,101 @@
   
   
   
+    
+    
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_6" id="__nav_3_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bonus track
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Bonus track
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../bonus-hooks-and-policies/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Enforce the Guardrails · Hooks & Policies
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
     <li class="md-nav__item">
       <a href="../finish/" class="md-nav__link">
         
@@ -1720,16 +1817,17 @@
 <h1 id="challenge-8-boarding-resumes-brief-airline-leadership">Challenge 8 · Boarding Resumes: Brief Airline Leadership<a class="headerlink" href="#challenge-8-boarding-resumes-brief-airline-leadership" title="Permanent link">&para;</a></h1>
 <div class="admonition abstract">
 <p class="admonition-title">Challenge 08 of 08 · Act V: Major Incident</p>
-<p><strong>Run mode:</strong> Review · <strong>Access:</strong> read-only summarization</p>
+<p><strong>Run mode:</strong> Review · <strong>Access:</strong> read-only summarization, plus one governed write back to your repo</p>
 <p><strong>Stage:</strong> Foundation → Operations → Engineering → Autonomous → <strong>Major Incident</strong></p>
 </div>
 <p><strong>Situation.</strong> The platform is stable and the peak departure bank is away safely. A
 major incident isn't closed when the tiles go green; it's closed when leadership
 understands it and the team has captured what to do differently.</p>
-<p><strong>Mission.</strong> Turn the shift's evidence into two artifacts (a concise leadership
-briefing and an engineering RCA handover) that cleanly separate symptom, root cause,
+<p><strong>Mission.</strong> Turn the shift's evidence into three artifacts: a concise leadership
+briefing, an engineering RCA handover that cleanly separates symptom, root cause,
 contributing factors, mitigation, permanent fix, recovery evidence and remaining
-risk.</p>
+risk, and a <strong>durable record published back into the repository</strong> so the next
+incident starts from what you learned in this one.</p>
 <p><strong>Why this matters</strong></p>
 <div class="grid cards why-cards">
 <ul>
@@ -1737,6 +1835,7 @@ risk.</p>
 <li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12 7.09 2.45 1.49-.65-2.81L16 3.89l-2.89-.25L12 1l-1.13 2.64L8 3.89l2.18 1.88-.68 2.81zm-8 6 2.45 1.49-.65-2.81L8 9.89l-2.89-.25L4 7 2.87 9.64 0 9.89l2.18 1.88-.68 2.81zm16-3 2.45 1.49-.65-2.81L24 6.89l-2.89-.25L20 4l-1.13 2.64-2.87.25 2.18 1.88-.68 2.81zM15 23H9V10h6zm-8 0H1v-6h6zm16 0h-6V13h6z"/></svg></span> <strong>Impact-first</strong>: what happened and what it cost, for executives</li>
 <li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 11.11V5a2 2 0 0 0-2-2h-4.18C14.4 1.84 13.3 1 12 1s-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14a2 2 0 0 0 2 2h6.11c1.26 1.24 2.98 2 4.89 2 3.87 0 7-3.13 7-7 0-1.91-.76-3.63-2-4.89M12 3c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1M5 19V5h2v2h10V5h2v4.68c-.91-.43-1.92-.68-3-.68H7v2h4.1c-.6.57-1.06 1.25-1.42 2H7v2h2.08c-.05.33-.08.66-.08 1 0 1.08.25 2.09.68 3zm11 2c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5m.5-4.75 2.86 1.69-.75 1.22L15 17v-5h1.5z"/></svg></span> <strong>Precise handover</strong>: actions, verification and open risks for the next on-call</li>
 <li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8zm4 18H6V4h7v5h5zm-9-7v6H7v-6zm6 2v4h2v-4zm-4-4v8h2v-8z"/></svg></span> <strong>Boardroom-ready</strong>: an auto-generated PDF with a timeline chart</li>
+<li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M6 3a3 3 0 0 1 3 3c0 1.31-.83 2.42-2 2.83v6.34c1.17.41 2 1.52 2 2.83a3 3 0 0 1-3 3 3 3 0 0 1-3-3c0-1.31.83-2.42 2-2.83V8.83A2.99 2.99 0 0 1 3 6a3 3 0 0 1 3-3m0 2a1 1 0 0 0-1 1 1 1 0 0 0 1 1 1 1 0 0 0 1-1 1 1 0 0 0-1-1m0 12a1 1 0 0 0-1 1 1 1 0 0 0 1 1 1 1 0 0 0 1-1 1 1 0 0 0-1-1m15 1a3 3 0 0 1-3 3 3 3 0 0 1-3-3c0-1.31.83-2.42 2-2.83V7h-2v3.25L10.75 6 15 1.75V5h2a2 2 0 0 1 2 2v8.17c1.17.41 2 1.52 2 2.83m-3-1a1 1 0 0 0-1 1 1 1 0 0 0 1 1 1 1 0 0 0 1-1 1 1 0 0 0-1-1"/></svg></span> <strong>Close the loop</strong>: the agent writes the RCA back to the repo it reads from</li>
 </ul>
 </div>
 <div class="admonition example">
@@ -1751,6 +1850,7 @@ risk.</p>
 <li><strong>Write the leadership briefing.</strong> Short, impact-first, non-technical, for the operations director.</li>
 <li><strong>Write the engineering RCA handover.</strong> Precise actions, verification, open risks, and change evidence for the next on-call.</li>
 <li><strong>Generate the executive PDF.</strong> Have the agent render the briefing (with a timeline chart) via its Python sandbox.</li>
+<li><strong>Publish the RCA back to the repo.</strong> Give the agent write access and have it file the RCA as an issue on your fork, so the knowledge outlives the chat thread.</li>
 </ol>
 <p><img alt="Challenge 8 storyboard: Sam and Elena brief airline leadership as boarding resumes" class="story-panel" loading="lazy" src="../../assets/storyboard/img-challenge-8.webp" /></p>
 <h3 id="suggested-azure-sre-agent-prompt">Suggested Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent prompt<a class="headerlink" href="#suggested-azure-sre-agent-prompt" title="Permanent link">&para;</a></h3>
@@ -1770,6 +1870,7 @@ sandbox.</p>
 <li>The platform is healthy at close.</li>
 <li>The leadership briefing covers impact, root cause, recovery, cost/risk, and lessons learned; the engineering RCA handover captures actions, verification, remaining risk, and change evidence from rollout history and the <abbr title="Azure's record of control-plane changes (who changed what, and when).">Activity Log</abbr>.</li>
 <li>The agent produced a <strong>downloadable PDF</strong> of the leadership briefing (with a timeline chart) via its Python sandbox.</li>
+<li>The agent <strong>filed the RCA as an issue on your fork</strong>, so the record survives the chat thread.</li>
 <li>Symptom, root cause, contributing factors, immediate mitigation, and permanent corrective action are clearly separated, and <code>check-challenge.ps1 8</code> passes.</li>
 </ul>
 <div class="admonition success">
@@ -1789,7 +1890,9 @@ outcome; the next on-call wants exact actions, root-cause evidence, and open ris
 <details>
 <summary>Hint: close the loop</summary>
 <p>Feed the lessons learned back into the agent's knowledge / memory so a recurrence is
-handled faster next time.</p>
+handled faster next time. Then get it out of the agent entirely: a record that only
+lives in one agent's memory is still a single point of failure. Task 5 puts it in
+the repository, where the whole team, and the next agent, can find it.</p>
 </details>
 <div class="admonition question">
 <p class="admonition-title">Stuck? Step-by-step for each task</p>
@@ -1852,9 +1955,91 @@ timeline chart, using your Python sandbox. Give me a download link.</p>
 download fails, ask it to list the generated file and give you the link
 again, because the first link can expire.</p>
 </details>
+<details class="note">
+<summary>Task 5 · Publish the RCA back to the repo</summary>
+<p>In Challenge 1 you connected your fork so the agent could <strong>read</strong> it. It has
+been correlating deployments against that repo all day. It still cannot write
+a single character back to it.</p>
+<p>That is not a permissions oversight. GitHub attaches to the agent in three
+separate ways, and you have only set up the first:</p>
+<table>
+<thead>
+<tr>
+<th>Connection</th>
+<th>Where you set it up</th>
+<th>What it grants</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Code Access</strong></td>
+<td>Builder → Code Access</td>
+<td>Read, search, correlate. <strong>No writes</strong></td>
+</tr>
+<tr>
+<td><strong>GitHub Connector</strong></td>
+<td>Builder → Connectors → Add connector</td>
+<td>Create issues, open and merge PRs, trigger Actions</td>
+</tr>
+<tr>
+<td><strong>GitHub MCP</strong></td>
+<td>Builder → Connectors → Add connector</td>
+<td>The full GitHub tool catalog, with approval policies</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Add the GitHub Connector.</strong></p>
+<ol>
+<li><strong>Builder</strong> → <strong>Connectors</strong> → <strong>Add connector</strong> → <strong>GitHub</strong>.</li>
+<li>Authenticate with <strong>OAuth</strong> (browser popup) or a fine-grained <strong>PAT</strong>.</li>
+<li>The token needs issue and pull-request scope, not just <code>repo</code> read. On a
+   fine-grained PAT that is <strong>Issues: Read and write</strong> and
+   <strong>Pull requests: Read and write</strong>.</li>
+<li>Select your fork, <code>&lt;your-org&gt;/aetherion-airops-platform</code>.</li>
+</ol>
+<div class="admonition tip">
+<p class="admonition-title">OAuth tokens keep themselves alive</p>
+<p>GitHub OAuth tokens expire after about eight hours, but the agent
+refreshes them ahead of expiry on its own. You will not get logged out
+mid-workshop.</p>
+</div>
+<p><strong>Now have it file the RCA.</strong> Paste this into the agent chat:</p>
+<blockquote>
+<p>Publish the engineering RCA you just wrote as a GitHub issue on
+<code>https://github.com/&lt;your-org&gt;/aetherion-airops-platform</code>. Title it
+<code>RCA: major incident - global check-in degradation</code>. In the body include
+the timeline, the root cause per affected service, every action taken and
+how it was verified, and a checklist of the corrective actions you would
+recommend. Label it <code>incident</code>.</p>
+</blockquote>
+<p>You are in <strong>Review</strong> mode, so the write is proposed and you approve it. Read
+what it is about to publish before you do. This is going into a repository
+with your name on it.</p>
+<p><strong>Stretch: make it a pull request.</strong> Filing an issue records what happened.
+A pull request changes what happens next. Ask it to improve the runbook that
+let you down during Challenge 7:</p>
+<blockquote>
+<p>Open a pull request against <code>&lt;your-org&gt;/aetherion-airops-platform</code> that
+adds the verification step we were missing to the crew-scheduling runbook,
+and reference the RCA issue you just created.</p>
+</blockquote>
+<div class="admonition warning">
+<p class="admonition-title">The PR path is preview, and it has a real limitation</p>
+<p>Creating a pull request requires <strong>Review</strong> or <strong>Autonomous</strong> run mode,
+and <strong>the source branch must already exist with the changes committed</strong>.
+The connector opens a PR between branches that are already there; it does
+not create a branch and commit files for you.</p>
+<p>If the agent reports that it has written the change locally but cannot
+push it, that is this limitation, not a broken setup. To get the full
+branch-commit-PR flow you need the <strong>GitHub MCP</strong> connector instead.</p>
+<p>The issue in the required step above is enough to complete the
+challenge. Treat the PR as the stretch goal it is.</p>
+</div>
+</details>
 </div>
 <h3 id="reference">Reference<a class="headerlink" href="#reference" title="Permanent link">&para;</a></h3>
 <ul>
+<li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/github-connector">Connect GitHub</a></li>
 <li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/track-incident-value">Track incident value</a></li>
 <li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/monitor-agent-usage">Monitor agent usage</a></li>
 <li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/memory">Memory and knowledge</a></li>
@@ -1919,13 +2104,13 @@ Agent.</p>
         
         
           
-          <a href="../finish/" class="md-footer__link md-footer__link--next" aria-label="Next: Finish">
+          <a href="../bonus-hooks-and-policies/" class="md-footer__link md-footer__link--next" aria-label="Next: Enforce the Guardrails · Hooks &amp; Policies">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Finish
+                Enforce the Guardrails · Hooks & Policies
               </div>
             </div>
             <div class="md-footer__button md-icon">
