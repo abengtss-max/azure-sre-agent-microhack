@@ -1856,9 +1856,15 @@ anyway, just without the context it needs.</p>
 <p>The failure is silent and it surfaces two challenges later: without
 <strong>Code</strong> the agent cannot correlate the Challenge 3 rollback to a
 commit, and without <strong><code>aetherion-law</code></strong> it cannot read container logs.</p>
-<p>Before moving on, go back to the agent resource and confirm all three
-sources show as connected. If you skipped past the wizard, reopen it
-from the agent's <strong>Overview</strong> and finish the connections you missed.</p>
+<p>Verify both before moving on:</p>
+<ul>
+<li><strong>Builder → Code Access</strong> should list <code>github.com</code> as <strong>Connected</strong>
+  and your <code>aetherion-airops-platform</code> fork as <strong>Ready</strong>, with a recent
+  sync time.</li>
+<li><strong>Builder → Connectors</strong> should show a <strong><abbr title="Azure service that stores and queries container and platform logs.">Log Analytics</abbr></strong> connector.</li>
+</ul>
+<p>If either is missing, reopen the setup wizard from the agent's
+<strong>Overview</strong> and finish the connection you skipped.</p>
 </div>
 <p><strong>Keep <abbr title="SRE Agent run mode where it proposes a plan and waits for your approval before any write.">Review mode</abbr></strong> so the agent proposes actions and waits for approval.
 Its identity is granted Monitoring Contributor plus a reader bundle at
