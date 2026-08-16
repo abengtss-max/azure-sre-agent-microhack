@@ -165,15 +165,40 @@ function Set-Load([string]$Mode) {
 # ---------------------------------------------------------------------------
 # Progress / unlock state (Kubernetes ConfigMap: aetherion-progress)
 # ---------------------------------------------------------------------------
+function Set-ProgressValue([string]$Key, [string]$Value) {
+    # Merge-patch so writing one key never clears the others.
+    $patch = @{ data = @{ $Key = $Value } } | ConvertTo-Json -Compress
+    kubectl patch configmap aetherion-progress -n $script:NS --type merge -p $patch 2>$null | Out-Null
+    if ($LASTEXITCODE -ne 0) {
+        kubectl create configmap aetherion-progress -n $script:NS --from-literal="$Key=$Value" 2>$null | Out-Null
+    }
+}
+
+function Get-ProgressValue([string]$Key) {
+    $v = kubectl get configmap aetherion-progress -n $script:NS -o jsonpath="{.data['$Key']}" 2>$null
+    if ([string]::IsNullOrWhiteSpace($v)) { return $null }
+    return $v
+}
+
 function Get-Unlocked {
-    $v = kubectl get configmap aetherion-progress -n $script:NS -o jsonpath='{.data.unlocked}' 2>$null
-    if ([string]::IsNullOrWhiteSpace($v)) { Set-Unlocked 1; return 1 }
+    $v = Get-ProgressValue 'unlocked'
+    if (-not $v) { Set-Unlocked 1; return 1 }
     return [int]$v
 }
 
 function Set-Unlocked([int]$n) {
-    kubectl create configmap aetherion-progress -n $script:NS `
-        --from-literal=unlocked=$n --dry-run=client -o yaml 2>$null | kubectl apply -f - 2>$null | Out-Null
+    Set-ProgressValue 'unlocked' "$n"
+}
+
+function Set-ChallengeStartTime([int]$Number) {
+    Set-ProgressValue "started-$Number" ([DateTime]::UtcNow.ToString('o'))
+}
+
+function Get-ChallengeStartTime([int]$Number) {
+    $v = Get-ProgressValue "started-$Number"
+    if (-not $v) { return $null }
+    try { return [datetime]::Parse($v, $null, [Globalization.DateTimeStyles]::RoundtripKind).ToUniversalTime() }
+    catch { return $null }
 }
 
 function Confirm-SelfAttest([string]$Prompt) {
@@ -193,8 +218,12 @@ function Get-AetherionSubscriptionId {
 function Get-AgentResource {
     $st = Get-AetherionState
     $j = az resource list -g $st.resourceGroup --resource-type Microsoft.App/agents -o json 2>$null
-    if (-not $j) { return $null }
-    $agents = $j | ConvertFrom-Json
+    $agents = if ($j) { $j | ConvertFrom-Json } else { @() }
+    # Attendees sometimes create the agent outside the lab resource group.
+    if (-not $agents -or $agents.Count -eq 0) {
+        $j = az resource list --resource-type Microsoft.App/agents -o json 2>$null
+        $agents = if ($j) { $j | ConvertFrom-Json } else { @() }
+    }
     if (-not $agents -or $agents.Count -eq 0) { return $null }
     $full = az resource show --ids $agents[0].id --api-version 2026-01-01 -o json 2>$null
     if (-not $full) { return $null }
@@ -209,19 +238,44 @@ function Test-IncidentPlatformConnected {
     return ($a.properties.incidentManagementConfiguration.type -eq 'AzMonitor')
 }
 
+# The agent can diagnose the APIM fault in challenge 7 but not remediate it
+# without this role, so catch a missing grant here rather than mid-incident.
+function Test-AgentApimAccess {
+    $st = Get-AetherionState
+    $a  = Get-AgentResource
+    if (-not $a) { return $false }
+    $identityId = $a.properties.actionConfiguration.identity
+    if (-not $identityId) { return $false }
+    $principalId = az identity show --ids $identityId --query principalId -o tsv 2>$null
+    if (-not $principalId) { return $false }
+    $scope = az resource show -g $st.resourceGroup -n $st.apimName `
+        --resource-type Microsoft.ApiManagement/service --query id -o tsv 2>$null
+    if (-not $scope) { return $false }
+    $n = az role assignment list --assignee-object-id $principalId --scope $scope `
+        --query "[?roleDefinitionName=='API Management Service Contributor'] | length(@)" -o tsv 2>$null
+    return ([int]$n -gt 0)
+}
+
 # Proves the alert -> response plan path actually works, rather than asking.
-function Test-MajorIncidentAlertFired([int]$WithinHours = 2) {
-    $st  = Get-AetherionState
-    $sub = Get-AetherionSubscriptionId
+# Scoped to a start time so an earlier challenge's alert cannot satisfy this one.
+function Test-MajorIncidentAlertFired([datetime]$Since) {
+    $st   = Get-AetherionState
+    $sub  = Get-AetherionSubscriptionId
     $rule = $st.incidentAlertName; if (-not $rule) { $rule = 'aetherion-major-incident' }
+    $hours = [Math]::Max(1, [int][Math]::Ceiling(([DateTime]::UtcNow - $Since).TotalHours) + 1)
     $uri = "https://management.azure.com/subscriptions/$sub" +
            "/providers/Microsoft.AlertsManagement/alerts" +
-           "?api-version=2019-05-05-preview&timeRange=${WithinHours}h"
+           "?api-version=2019-05-05-preview&timeRange=${hours}h"
     $j = az rest --method get --uri $uri -o json 2>$null
     if (-not $j) { return $false }
     foreach ($al in ($j | ConvertFrom-Json).value) {
         $e = $al.properties.essentials
-        if ($e.alertRule -match [regex]::Escape($rule) -and $e.severity -eq 'Sev1') { return $true }
+        if ($e.alertRule -notmatch [regex]::Escape($rule)) { continue }
+        if ($e.severity -ne 'Sev1') { continue }
+        $started = $null
+        if ([datetime]::TryParse($e.startDateTime, [ref]$started)) {
+            if ($started.ToUniversalTime() -ge $Since) { return $true }
+        }
     }
     return $false
 }
@@ -261,9 +315,18 @@ $script:Challenges = [ordered]@{
             $allOk = $true
             foreach ($p in $s.services.PSObject.Properties) { if (-not $p.Value.ok) { $allOk = $false } }
             if (-not $allOk) { return @{ Pass = $false; Detail = "platform not fully healthy (overall=$($s.overall))" } }
-            $conn = Confirm-SelfAttest 'Is your SRE Agent connected and scoped to the resource group, running in Review mode?'
+            $agent = [bool](Get-AgentResource)
+            if (-not $agent) {
+                Write-Host "  No Microsoft.App/agents resource found - create the SRE Agent before grading." -ForegroundColor Yellow
+            }
+            $apim = $agent -and (Test-AgentApimAccess)
+            if ($agent -and -not $apim) {
+                Write-Host "  The agent cannot manage API Management, so challenge 7 would be unfixable." -ForegroundColor Yellow
+                Write-Host "  Run: ./scripts/grant-agent-apim-access.ps1" -ForegroundColor Yellow
+            }
+            $conn = $agent -and (Confirm-SelfAttest 'Is your SRE Agent scoped to the resource group and running in Review mode?')
             $base = Confirm-SelfAttest 'Have you recorded a healthy baseline AND created a scheduled daily health check?'
-            @{ Pass = ($allOk -and $conn -and $base); Detail = "platform healthy=$allOk, agent connected=$conn, baseline+schedule=$base" }
+            @{ Pass = ($allOk -and $agent -and $apim -and $conn -and $base); Detail = "platform healthy=$allOk, agentExists=$agent, apimAccess=$apim, agent connected=$conn, baseline+schedule=$base" }
         }
     }
 
@@ -410,13 +473,15 @@ $script:Challenges = [ordered]@{
             $latCrew   = Get-ServiceLatencyMs 'crew-scheduling'
             $cpuBook   = Get-CpuLimitMilli 'booking'
             $apimOk    = Test-ApimHealthy
-            $fired     = Test-MajorIncidentAlertFired 4
+            $since     = Get-ChallengeStartTime 7
+            if (-not $since) { $since = [DateTime]::UtcNow.AddHours(-4) }
+            $fired     = Test-MajorIncidentAlertFired $since
             $s         = Get-AetherionStatus
             $allOk     = $true
             foreach ($p in $s.services.PSObject.Properties) { if (-not $p.Value.ok) { $allOk = $false } }
             if (-not $fired) {
-                Write-Host "  No Sev1 'major incident' alert fired in the last 4h - the auto-trigger path did not exercise." -ForegroundColor Yellow
-                Write-Host "  Check the Sev1 response plan from challenge 6 before running this again." -ForegroundColor Yellow
+                Write-Host "  No Sev1 'major incident' alert fired since this challenge started - the auto-trigger path did not exercise." -ForegroundColor Yellow
+                Write-Host "  Check the Sev1 response plan from challenge 6, then re-run start-challenge 7." -ForegroundColor Yellow
             }
             $pass = ($allOk -and $apimOk -and $tagFlight -eq 'latest' -and $okCrew -and $cpuBook -ge 500 -and $fired)
             @{ Pass = $pass; Detail = "overall=$($s.overall) apimOk=$apimOk flight=:$tagFlight crew=${latCrew}ms bookingCpu=${cpuBook}m alertFired=$fired" }
@@ -467,6 +532,7 @@ function Start-AetherionChallenge([int]$Number) {
     Write-Host ""
     Write-Host "=== Challenge $Number : $($ch.Title) ===" -ForegroundColor Cyan
     Write-Host ""
+    Set-ChallengeStartTime $Number
     & $ch.Start
     Write-Host ""
     if ($ch.Kind -eq 'fault') {

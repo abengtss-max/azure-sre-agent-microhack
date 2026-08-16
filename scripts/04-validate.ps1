@@ -74,6 +74,40 @@ Check "PostgreSQL reachable from booking pod (readiness ok)" {
     return (-not [string]::IsNullOrWhiteSpace($ready) -and [int]$ready -ge 1)
 }
 
+Check "App Insights connection string wired into the app" {
+    $b64 = kubectl get secret aetherion-secrets -n $ns `
+        -o jsonpath='{.data.APPLICATIONINSIGHTS_CONNECTION_STRING}' 2>$null
+    if ([string]::IsNullOrWhiteSpace($b64)) { return $false }
+    $conn = [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($b64))
+    return ($conn -match 'InstrumentationKey=')
+}
+
+Check "Sev1 major-incident alert rule exists and is enabled" {
+    $rule = $state.incidentAlertName
+    if ([string]::IsNullOrWhiteSpace($rule)) { $rule = "$($state.namePrefix)-major-incident" }
+    $j = az monitor metrics alert show -g $ResourceGroup -n $rule -o json 2>$null
+    if (-not $j) { return $false }
+    $a = $j | ConvertFrom-Json
+    return ($a.enabled -eq $true -and [int]$a.severity -eq 1)
+}
+
+# Without request telemetry the Sev1 failed-requests alert can never fire, so
+# challenge 7 would silently never auto-trigger. Ingestion lags a few minutes.
+Check "Request telemetry reaching Application Insights" {
+    $q = 'requests | where timestamp > ago(30m) | summarize n=count()'
+    for ($i = 0; $i -lt 10; $i++) {
+        $j = az monitor app-insights query -g $ResourceGroup -a $state.appInsightsName `
+            --analytics-query $q -o json 2>$null
+        if ($j) {
+            $rows = ($j | ConvertFrom-Json).tables[0].rows
+            if ($rows -and [int]$rows[0][0] -gt 0) { return $true }
+        }
+        if ($i -eq 0) { Write-Host "        waiting for telemetry ingestion..." -ForegroundColor DarkGray }
+        Start-Sleep -Seconds 30
+    }
+    return $false
+}
+
 Write-Host ""
 if ($fail -eq 0) {
     Write-Host "All checks passed. Environment is healthy." -ForegroundColor Green

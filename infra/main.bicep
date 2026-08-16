@@ -266,7 +266,7 @@ resource grafanaAdmin 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
 // -----------------------------------------------------------------------------
 // Major-incident alerting (Challenge 7)
 // A fixed-severity (Sev 1) Azure Monitor alert on Application Insights failed
-// requests. The SRE Agent response plan attendees build in Challenge 7 filters
+// requests. The SRE Agent response plan attendees build in Challenge 6 filters
 // on Severity = Sev1, so this rule must be authored at that exact severity to be
 // caught. The action group makes the alert fully functional in the portal.
 // -----------------------------------------------------------------------------
