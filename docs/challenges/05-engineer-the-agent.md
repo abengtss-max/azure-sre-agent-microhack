@@ -39,7 +39,7 @@ guardrails intact.
 
 1. **Build the specialist.** Create an AKS triage subagent for the `aetherion` namespace, **scope it to the eight tools it needs**, verify what it actually got, then invoke it to summarize namespace health and likely causes.
 2. **Encode the skill.** Capture the crew query-path recovery from Challenge 4 as a reusable skill, guardrails intact, and confirm it loads.
-3. **Know when to use which.** Be able to say when you'd reach for the subagent (delegate to it to investigate) versus the skill (a procedure the agent can draw on).
+3. **Know when to use which.** Decide whether the new skill belongs to the specialist or the main agent, act on that decision, and be able to say when you'd reach for the subagent (delegate to it to investigate) versus the skill (a procedure the agent can draw on).
 
 ![Challenge 5 storyboard: Sam and Aria engineer a specialist subagent and reusable skill](../assets/storyboard/img-challenge-5.webp){ .story-panel loading=lazy }
 
@@ -68,6 +68,7 @@ guardrails intact.
 - A custom AKS-specialist subagent exists, is **scoped to a deliberate tool set rather than inheriting all 46**, and you verified via the API that `RunKubectlReadCommand` is present and `RunKubectlWriteCommand` is not.
 - You've invoked it for a scoped investigation that produces genuinely useful triage.
 - A reusable skill captures the sanctioned recovery, loads/applies correctly, and matches the runbook guardrails.
+- You decided **who owns that skill** and acted on it: it stays with the main agent, not the read-only AKS specialist, and you can give the reason.
 - You can explain when to reach for the subagent versus the skill, and `check-challenge.ps1 5` passes.
 
 !!! success "Verify your work"
@@ -152,8 +153,9 @@ investigate. You'll want both in the final incident.
         The last line is a *request*. On its own, nothing enforces it. You are
         about to make it real.
 
-        **Skills**: leave inherited. Scoping skills is the same idea as scoping
-        tools, and one axis is enough to learn it on.
+        **Skills**: leave inherited **for now**. The skill you are about to author
+        does not exist yet, so there is nothing to decide here. You will come back to
+        this panel in Task 3, and the answer is not the obvious one.
 
         **Tools**: this is where the specialist actually becomes a specialist.
 
@@ -361,6 +363,39 @@ investigate. You'll want both in the final incident.
           domain (your AKS specialist).
         - A **skill** encodes a *procedure* (the query-path recovery) that the
           agent can draw on when the situation matches its description.
+
+        **Now answer the question this challenge sets up.** You built both in the
+        same challenge, so the natural assumption is that they go together: should
+        the `crew-query-path-recovery` skill belong to your `aks-triage` specialist?
+
+        Go back to **Builder → Agent Canvas**, open `aks-triage`, and look at the
+        **Skills** panel. Left inherited, it now holds the crew recovery skill,
+        because it inherits every skill the main agent has.
+
+        **Take it away.** Scope its skills the way you scoped its tools, and leave
+        the crew recovery skill with the main agent.
+
+        Three reasons, and they are worth being able to recite:
+
+        | Reason | Detail |
+        |---|---|
+        | **Remit** | Its own instructions say *do not investigate the database yourself*. The crew problem is a database query path. The skill is outside its lane by definition |
+        | **Capability** | You removed `RunKubectlWriteCommand`. The skill's remedy is to **apply** an index. It cannot execute the procedure it would be holding |
+        | **Ownership** | The main agent commands the whole board and holds the write tools. A procedure belongs where it can actually be carried out |
+
+        !!! tip "The pairing rule, in one line"
+            **A skill belongs to whichever agent has both the remit and the tools to
+            execute it.**
+
+            That is why these two do not pair. Build a `crew-recovery` subagent
+            instead — scoped to the database tier, holding `RunKubectlWriteCommand`
+            — and this exact skill would belong to it and to nothing else. Same
+            skill, different owner, because the owner's remit and tools changed.
+
+        The trap is assuming that things built together belong together. Challenge 7
+        uses both, through deliberately different paths: you **delegate** to the
+        subagent for AKS triage, and you **name** the skill to the main agent for the
+        crew fix.
 
         !!! warning "Don't assume a skill fires on its own"
             Skills are described as loading by context, but in validation this one

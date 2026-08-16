@@ -441,13 +441,18 @@ $script:Challenges = [ordered]@{
             Write-Host "  tools is a persona, not a specialist, and its 'read-only' instruction is only a" -ForegroundColor Gray
             Write-Host "  request. Removing RunKubectlWriteCommand is what makes read-only true." -ForegroundColor Gray
             Write-Host ""
+            Write-Host "  Then decide who owns the skill. Built in the same challenge does not mean they" -ForegroundColor Gray
+            Write-Host "  belong together: a skill belongs to whichever agent has both the remit AND the" -ForegroundColor Gray
+            Write-Host "  tools to execute it." -ForegroundColor Gray
+            Write-Host ""
             Write-Host "You will lean on both in the final incident."
         }
         Check = {
             $sub   = Confirm-SelfAttest 'Did you create an AKS-specialist subagent and use it for a scoped investigation?'
             $scoped = Confirm-SelfAttest 'Did you scope its tools (not inherited) and verify RunKubectlReadCommand is present and RunKubectlWriteCommand is absent?'
             $skill = Confirm-SelfAttest 'Did you author a reusable recovery skill (crew query path, guardrails intact) and confirm it loads?'
-            @{ Pass = ($sub -and $scoped -and $skill); Detail = "AKS specialist created+used=$sub, tools scoped+verified=$scoped, reusable skill authored=$skill" }
+            $owner = Confirm-SelfAttest 'Did you remove the crew recovery skill from the AKS specialist, leaving it with the main agent, and can you say why?'
+            @{ Pass = ($sub -and $scoped -and $skill -and $owner); Detail = "AKS specialist created+used=$sub, tools scoped+verified=$scoped, reusable skill authored=$skill, skill ownership decided=$owner" }
         }
     }
 
