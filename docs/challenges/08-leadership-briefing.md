@@ -31,7 +31,7 @@ risk.
     ./scripts/start-challenge.ps1 8   # open / set up this challenge
     ```
 
-    Challenge 8 injects no fault — the platform stays green while you write.
+    Challenge 8 injects no fault, so the platform stays green while you write.
 
 ### Tasks
 
@@ -95,20 +95,32 @@ handled faster next time.
           per incident, not from memory.
 
     ??? note "Task 2 · Write the leadership briefing"
-        - Ask the agent for a short, impact-first, non-technical briefing for the
-          operations director: business impact, root cause in plain terms, recovery,
-          cost / risk, and lessons learned.
+        Paste this into the agent chat:
+
+        > Write a briefing for the operations director about today's major
+        > incident. Lead with business impact, not technology. Cover: what
+        > passengers experienced and for how long, the root cause in plain
+        > language, how we recovered, the cost and residual risk, and the lessons
+        > we are taking forward. Keep it under one page and use no Kubernetes
+        > jargon.
+
+        Judge it the way the director would. If a sentence needs a platform
+        engineer to translate it, send it back.
 
     ??? note "Task 3 · Write the engineering RCA handover"
-        - Ask for a precise engineering handover: actions taken and how each was
-          verified, remaining risk, and change-correlation evidence for the next
-          on-call.
+        Paste this into the agent chat:
+
+        > Write an engineering RCA handover for the next on-call. List every
+        > action taken and how each one was verified, the remaining risk, and the
+        > change-correlation evidence with exact sources. Be precise enough that
+        > someone who was not here could audit it.
+
         - Be specific about where that evidence lives. The workload changes are in
           **rollout history** (`kubectl rollout history deploy/<svc> -n aetherion`)
           with the change cause recorded against each revision; the API Management
           policy change is in the **Azure Activity Log** as a
           `Set Product policy configuration` operation. In-cluster changes never
-          reach the Activity Log — which is itself worth calling out as a gap in the
+          reach the Activity Log, which is itself worth calling out as a gap in the
           handover.
         - If the agent reports that it found nothing, ask it to query the Activity
           Log at **subscription scope** rather than filtering by resource group. The
@@ -117,9 +129,14 @@ handled faster next time.
           the events are there.
 
     ??? note "Task 4 · Generate the executive PDF"
-        - Ask the agent to render the leadership briefing as a formatted **PDF** with
-          an incident-timeline chart using its built-in **Python sandbox**, then
-          download it.
+        Paste this into the agent chat:
+
+        > Render the leadership briefing as a formatted PDF, including an incident
+        > timeline chart, using your Python sandbox. Give me a download link.
+
+        The agent writes the file in its sandbox and returns a link. If the
+        download fails, ask it to list the generated file and give you the link
+        again, because the first link can expire.
 
 ### Reference
 

@@ -32,7 +32,7 @@ check.
     ./scripts/start-challenge.ps1 1   # sets the scene (Challenge 1 injects no fault)
     ```
 
-    For Challenge 1 the script only prints the scenario — no fault is injected, so
+    For Challenge 1 the script only prints the scenario. No fault is injected, so
     the board stays green.
 
     If your Operations Center is **not** all-green (for example you ran a later
@@ -77,7 +77,7 @@ check.
 !!! success "Verify your work"
 
     The check confirms the platform is healthy, then asks you two yes/no questions
-    about the agent connection and your baseline — answer them honestly, they aren't
+    about the agent connection and your baseline. Answer them honestly, because they aren't
     graded from the environment:
 
     ```powershell
@@ -161,7 +161,7 @@ read-only check so the agent watches for drift on its own.
     ??? note "Task 4 · Capture the baseline"
         - With the board green, paste the baseline prompt (the **Suggested Azure
           SRE Agent prompt** above) into the agent chat.
-        - When it answers, spot-check **2–3 numbers** (replica counts and check-in
+        - When it answers, spot-check **2-3 numbers** (replica counts and check-in
           / booking latency) against the Ops Center tiles and Grafana.
         - If the board was recently degraded, reset and let telemetry settle first,
           or the baseline will record the fault as "normal".

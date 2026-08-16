@@ -5,7 +5,7 @@ not replace it. It grounds its reasoning in your source of truth (code and
 runbooks), receives signals from your monitoring stack, and hands work off to the
 systems your team already lives in.
 
-In this MicroHack, **GitHub** is the hands-on integration — the agent reads the
+In this MicroHack, **GitHub** is the hands-on integration. The agent reads the
 Aetherion AirOps repository to correlate incidents with recent changes. The
 remaining integrations are listed so you understand the wider picture when you take
 the agent back to your own environment.
@@ -21,7 +21,7 @@ the agent back to your own environment.
 
 | Integration | Role |
 |-------------|------|
-| **Azure Monitor / Application Insights / Log Analytics** *(used in this hack)* | Primary signal plane — metrics, traces, logs, and the **Sev1 alert** that triggers a response plan in Challenge 7. |
+| **Azure Monitor / Application Insights / Log Analytics** *(used in this hack)* | Primary signal plane: metrics, traces, logs, and the **Sev1 alert** that triggers a response plan in Challenge 7. |
 | **Grafana** *(used in this hack)* | Dashboards for autoscaling and latency correlation. |
 | **Datadog · Dynatrace · Splunk** | Ingest signals from third-party observability platforms where they are the team's system of record. |
 

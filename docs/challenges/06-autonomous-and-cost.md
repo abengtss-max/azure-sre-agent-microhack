@@ -79,7 +79,7 @@ investigation, before you reach Challenge 7.
 Confirm the symptom first; you can't judge an autonomous recovery without knowing
 what healthy looks like.
 
-What makes this one safe to automate isn't a permission setting — it's the shape of
+What makes this one safe to automate isn't a permission setting. It's the shape of
 the incident: one degraded (not down) service, a remedy you can undo in seconds, and
 a blast radius you can describe in a sentence. Decide that *before* you switch mode,
 then switch to Autonomous and resist helping.
@@ -112,7 +112,7 @@ Challenge 7.
           the agent detect → decide → fix on its own. Review the action log after.
 
         !!! note "\"Never delete\" applies to data, not to a bad revision"
-            Aetherion's guardrails forbid deleting **data resources** — databases,
+            Aetherion's guardrails forbid deleting **data resources**: databases,
             caches, storage. Removing a workload revision that shouldn't be serving
             is an ordinary, reversible rollback, and it is the sanctioned fix here.
 
@@ -153,7 +153,7 @@ Challenge 7.
         **Severity is the whole match.** The environment pre-provisions
         `aetherion-major-incident` at **Sev1**, so a plan filtered to anything else
         catches nothing and a broader plan fires on everything. Leave the title
-        filters empty — they are an extra way to miss the alert, not an extra
+        filters empty. They are an extra way to miss the alert, not an extra
         safeguard.
 
         !!! tip "Why not route it to your AKS specialist?"
@@ -173,7 +173,7 @@ Challenge 7.
         !!! warning "Turn the cooldown off for this workshop"
             **Alert reinvestigation cooldown** defaults to enabled at 3 hours: the
             plan skips reinvestigation if the same plan already started one inside
-            that window. Sensible in production, wrong here — re-run Challenge 7
+            that window. Sensible in production, wrong here. Re-run Challenge 7
             and the plan silently will not fire the second time.
 
         **Autonomy level is per plan**, separate from the agent's own run mode.

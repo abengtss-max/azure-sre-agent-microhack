@@ -31,7 +31,7 @@ its guardrails intact.
     ./scripts/start-challenge.ps1 5   # open / set up this challenge
     ```
 
-    Challenge 5 injects no fault — the board stays green while you build.
+    Challenge 5 injects no fault, so the board stays green while you build.
 
 ### Tasks
 
@@ -55,7 +55,7 @@ its guardrails intact.
     subagent. The main agent simply adopts the persona and does the work itself,
     and the answer looks convincing enough that you'd never notice.
 
-    Delegating explicitly — *"delegate this to your `aks-triage` subagent"* — does
+    Delegating explicitly, by saying *"delegate this to your `aks-triage` subagent"*, does
     invoke it. You'll see a **Parallel subagent execution** step in the thread,
     and asking *"which agent produced the answer"* gives you a straight answer to
     check against. There is no slash-command syntax; delegation is natural
@@ -69,7 +69,7 @@ its guardrails intact.
 
 !!! success "Verify your work"
 
-    Both questions are yours to answer honestly — nothing here changes the platform,
+    Both questions are yours to answer honestly. Nothing here changes the platform,
     so the check asks you to confirm what you built:
 
     ```powershell
@@ -88,7 +88,7 @@ broad. Judge it by whether its output would actually speed up a real AKS inciden
 
 For the skill, reuse the exact steps from Challenge 4 as the backbone and bake in
 the guardrails (diagnose which layer is saturated, repair the query path, never
-delete or restart the database). Be careful not to encode "scale it" as the answer —
+delete or restart the database). Be careful not to encode "scale it" as the answer,
 Challenge 4 is precisely the case where scaling cannot work.
 
 Skills encode a procedure the agent can draw on; subagents are delegated to and
@@ -102,7 +102,7 @@ investigate. You'll want both in the final incident.
     ??? note "Task 1 · Build the specialist"
         Both the subagent and the skill are created from the same place: in the
         agent, open **Builder** in the left-hand menu, then **Agent Canvas**. The
-        canvas shows what your agent is made of — incident response plans,
+        canvas shows what your agent is made of: incident response plans,
         subagents, and the tools attached to them.
 
         Click **+ Create subagent**. The **Create a custom agent** dialog opens.
@@ -114,7 +114,7 @@ investigate. You'll want both in the final incident.
         aks-triage
         ```
 
-        **Instructions** — this is the remit, and it is the field that decides
+        **Instructions**. This is the remit, and it is the field that decides
         whether the specialist is worth having. Paste this, then adjust to taste:
 
         ```text
@@ -123,7 +123,7 @@ investigate. You'll want both in the final incident.
         Scope: Azure Kubernetes Service only. Investigate pod status, container
         restarts, Kubernetes events, deployment rollout history and the health of
         dependencies as seen from inside the cluster. Do not investigate API
-        Management or the database yourself — if the evidence points outside AKS,
+        Management or the database yourself. If the evidence points outside AKS,
         say so and hand back.
 
         Method: gather evidence before concluding. Prefer `kubectl` output,
@@ -144,20 +144,20 @@ investigate. You'll want both in the final incident.
         green; the specialist earns write access later, once you have seen it
         reason well.
 
-        **Skills** — leave inherited. Do not select anything here.
+        **Skills**: leave inherited. Do not select anything here.
 
-        **Tools** — leave inherited. Do not select anything here either. This is
+        **Tools**: leave inherited. Do not select anything here either. This is
         the one that will catch you out:
 
-        !!! warning "Selecting tools replaces the inherited set — and the picker is incomplete"
+        !!! warning "Selecting tools replaces the inherited set, and the picker is incomplete"
             The dialog says the agent inherits 46 global tools and that selecting
             tools *overrides* the defaults. It means replaces, not adds. Select
             three tools and the specialist has three tools.
 
             That would be fine if the picker showed everything. It doesn't. The
             agent's inherited set includes **`RunKubectlReadCommand`** and
-            **`RunKubectlWriteCommand`** under *Azure Operation* — the tools that
-            give it the cluster — but searching the picker for `kubectl`, `AKS` or
+            **`RunKubectlWriteCommand`** under *Azure Operation*, the two tools that
+            give it the cluster, but searching the picker for `kubectl`, `AKS` or
             `Kubernetes` returns nothing.
 
             So any selection you make in that panel silently drops cluster access,
@@ -186,7 +186,7 @@ investigate. You'll want both in the final incident.
             rejected. The count of enabled tools should match the number the
             dialog quotes.
 
-        **Hooks** — nothing needed for this challenge.
+        **Hooks**: nothing needed for this challenge.
 
         Then select **Create**.
 
@@ -194,19 +194,19 @@ investigate. You'll want both in the final incident.
             The **Form / YAML** toggle edits the same definition, but the YAML view
             shows extra keys worth knowing about:
 
-            - `handoff_description` — when the main agent should delegate to this
+            - `handoff_description`: when the main agent should delegate to this
               specialist. Worth writing, because it is what makes the subagent
               usable in Challenge 7.
-            - `agent_type` — the *kind* of subagent: `Autonomous`, `Orchestrator`
+            - `agent_type` sets the *kind* of subagent: `Autonomous`, `Orchestrator`
               or `Activity`. The portal hardcodes new subagents to `Autonomous`,
-              and it is **not** the Review / Autonomous run mode — that is a
+              and it is **not** the Review / Autonomous run mode. That is a
               separate agent-level setting. Leave it as generated.
-            - `enable_skills` — whether the specialist can load skills, including
+            - `enable_skills`: whether the specialist can load skills, including
               the one you are about to author.
 
         Then invoke the specialist by **delegating to it by name** and ask for a
-        namespace-health summary with likely causes. Confirm it actually ran — the
-        thread shows a *Parallel subagent execution* step — and judge it on one
+        namespace-health summary with likely causes. Confirm it actually ran, which the
+        thread shows as a *Parallel subagent execution* step, then judge it on one
         question: would this have sped up a real AKS incident?
 
         !!! tip "You'll meet this subagent again"
@@ -215,7 +215,7 @@ investigate. You'll want both in the final incident.
             to route a major incident to is a decision you'll make there.
 
     ??? note "Task 2 · Encode the skill"
-        Exactly the same path — **Builder → Agent Canvas** — but click
+        Exactly the same path, **Builder → Agent Canvas**, but click
         **+ Create skill** instead. (**Builder → Skill Builder** in the left-hand
         menu takes you to the same place.)
 
@@ -225,21 +225,21 @@ investigate. You'll want both in the final incident.
         crew-query-path-recovery
         ```
 
-        **Description** — behind the **Edit** link, and the field most people skim.
+        **Description**, behind the **Edit** link, is the field most people skim.
         This description is what the agent matches on when deciding whether the
         skill is relevant, so describe *when to reach for it*, not what it does:
 
         ```text
         Use when crew scheduling is slow or timing out and the pods themselves look
-        healthy and underutilised — the symptom of a saturated shared database
+        healthy and underutilised, the symptom of a saturated shared database
         rather than a saturated workload. Also use when several services sharing one
         database degrade together while unrelated services stay fast.
         ```
 
-        **SKILL.md** — the editor on the right is pre-scaffolded with `name` and
+        **SKILL.md**: the editor on the right is pre-scaffolded with `name` and
         `description` frontmatter and a placeholder comment. The finished file is
-        in the repository you cloned, at
-        `skills/crew-query-path-recovery/SKILL.md` — paste it in, or drag the file
+            in your **lab clone** (the same repository as the `knowledge/` folder,
+            not the application fork), at
         onto the **Files** panel:
 
         ```markdown
@@ -266,7 +266,7 @@ investigate. You'll want both in the final incident.
 
         ## Remedy
 
-        Repair the query path — restore the missing index supporting the crew duty
+        Repair the query path by restoring the missing index supporting the crew duty
         lookup. Build it without taking a disruptive lock on a live table.
 
         Verify by re-measuring crew latency under the same load, not by checking
@@ -281,19 +281,19 @@ investigate. You'll want both in the final incident.
           makes it worse.
         - Any write is proposed for approval first, never applied unilaterally.
         - If the evidence does not show database saturation, this skill does not
-          apply — stop and say so.
+          apply, stop and say so.
         ```
 
-        **Files** — `SKILL.md` on its own is enough. You can attach more files or a
+        **Files**: `SKILL.md` on its own is enough. You can attach more files or a
         folder if you want to split a longer procedure up.
 
-        **Tools** — leave empty. The dialog itself advises configuring tools on the
+        **Tools**: leave empty. The dialog itself advises configuring tools on the
         agent rather than the skill, for more consistent behaviour.
 
         Then select **Create**.
 
         The guardrails are the point of this task. A skill that says "crew is slow,
-        add replicas" would be actively harmful here — Challenge 4 is precisely the
+        add replicas" would be actively harmful here. Challenge 4 is precisely the
         case where scaling cannot work. Encoding *why not* is what makes it worth
         keeping.
 
@@ -306,7 +306,7 @@ investigate. You'll want both in the final incident.
         !!! warning "Don't assume a skill fires on its own"
             Skills are described as loading by context, but in validation this one
             did **not** activate during a live investigation of exactly the
-            incident it was written for — the agent solved it from first
+            incident it was written for. The agent solved it from first
             principles and never referenced the skill.
 
             Asked directly which skills applied, it named

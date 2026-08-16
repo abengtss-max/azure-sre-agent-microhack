@@ -1,4 +1,4 @@
-# :material-flag-checkered: Finish — you kept Aetherion flying
+# :material-flag-checkered: Finish: you kept Aetherion flying
 
 !!! success "MicroHack complete"
     You onboarded a read-only agent, investigated and recovered live incidents under
@@ -14,14 +14,14 @@
 - :material-radar: **Detect & investigate** incidents read-only, with evidence-backed root cause
 - :material-account-check-outline: **Recover safely** under approval or bounded autonomy
 - :material-book-open-variant: **Ground & extend** the agent with runbooks, subagents and skills
-- :material-file-chart-outline: **Close the loop** — RCA handover and a leadership briefing
+- :material-file-chart-outline: **Close the loop**: RCA handover and a leadership briefing
 
 </div>
 
 ### What changed in your estate
 
 Every incident today was an ordinary change made badly. In a real environment,
-these are the five you'd have to undo — and the list is the change-management
+these are the five you'd have to undo, and the list is the change-management
 lesson in miniature:
 
 | Incident | What changed | How it was undone |
@@ -40,7 +40,7 @@ lesson in miniature:
     ```
 
     Pick your microhack from the list; it removes the resource group **and** its
-    load-generator pair — the single biggest cost saver. See
+    load-generator pair, the single biggest cost saver. See
     [Teardown](../reference/commands.md#teardown) for the reset-vs-delete options.
 
 ### Where to go next
@@ -51,4 +51,4 @@ lesson in miniature:
 
 ---
 
-*Want another run? Reopen [Challenge 1](01-onboard-and-baseline.md) — use the **Reset progress** link on the progress bar to start fresh.*
+*Want another run? Reopen [Challenge 1](01-onboard-and-baseline.md) and use the **Reset progress** link on the progress bar to start fresh.*

@@ -56,7 +56,7 @@ approved or bounded actions, and verify recovery service by service.
     catch it; a broader filter fires on everything, a mismatched one catches nothing.
 
     The plan shapes the *experience*, not the grade: `check-challenge.ps1 7` marks
-    the platform's end state, so you can still pass without it — you'll just have
+    the platform's end state, so you can still pass without it. You'll just have
     driven the whole incident by hand.
 
 ![Challenge 7 storyboard: Sam, Aria and Elena restore global check-in before peak departure](../assets/storyboard/img-challenge-7.webp){ .story-panel loading=lazy }
@@ -101,7 +101,7 @@ customer-facing.
 
 Expect the board to get *worse* once the front door is fixed: with traffic flowing
 again, the degradations further back become visible. That is normal in a layered
-incident — restoring the edge doesn't create new faults, it reveals the ones the
+incident. Restoring the edge doesn't create new faults, it reveals the ones the
 outage was masking.
 </details>
 
@@ -112,7 +112,7 @@ outage was masking.
     ??? note "Task 1 · Confirm the Sev1 plan is live"
         - Open **Incidents → Triggers + response plans** and confirm your Sev1 plan
           (from Challenge 6) shows **Status: On** and **Severity: Sev1**.
-        - **Subagent name** should read *Set up* — that means none is bound, which is
+        - **Subagent name** should read *Set up*, meaning none is bound, which is
           what you want. This incident spans four tiers; an AKS-only specialist would
           scope the auto-investigation to one of them.
         - If it's missing, create it **before** running the start command, otherwise
@@ -127,7 +127,7 @@ outage was masking.
             The Operations Center polls each service **directly**, inside the
             cluster. It has no view of API Management. So the board can read fully
             green while every partner and mobile customer is getting a 500 at the
-            edge — which is exactly what happens in this incident.
+            edge, which is exactly what happens in this incident.
 
             Validated: an agent told to "read the whole board" recovered all four
             in-cluster faults, declared the incident stable, and never mentioned the
@@ -138,17 +138,32 @@ outage was masking.
             questions, and always ask the second one. That is Task 5.
 
     ??? note "Task 3 · Check the agent's memory"
-        - Ask the agent whether a similar crew-scheduling / check-in incident has
-          happened before; let session insights surface the earlier RCA and the fix
-          that worked.
+        Ask it directly, in the same thread as the investigation:
+
+        > Have you investigated a crew-scheduling or check-in slowdown on this
+        > platform before? Recall what the root cause was and which fix worked.
+
+        If you saved a hypothesis in Challenge 2 or grounded the runbooks in
+        Challenge 4, session insights should surface the earlier RCA and the fix.
+        That is the point of the exercise: the second incident should cost less
+        than the first.
 
     ??? note "Task 4 · Delegate and recover"
-        - Hand AKS triage to your specialist by **delegating to it by name**
-          ("delegate this to your `aks-triage` subagent"), and **name your crew
-          recovery skill** when you want it applied — crew is failing the same way it
-          did in Challenge 4, so the skill carries. Asking the agent to "act as" a
-          specialist does not invoke the subagent, and a skill does not reliably fire
-          on its own.
+        Name both the subagent and the skill explicitly. Neither fires on its own.
+
+        For the AKS tier:
+
+        > Delegate this to your `aks-triage` subagent: which workloads in the
+        > `aetherion` namespace are unhealthy, and why?
+
+        For the crew tier:
+
+        > Use the `crew-query-path-recovery` skill to restore crew scheduling.
+
+        Crew is failing the same way it did in Challenge 4, so the skill carries.
+        Asking the agent to "act as" a specialist does **not** invoke the subagent,
+        it only adopts the persona.
+
         - Keep actions governed and follow the runbooks: fix the layer that is
           actually saturated, never delete the database.
 

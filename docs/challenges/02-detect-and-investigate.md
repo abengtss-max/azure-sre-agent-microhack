@@ -5,8 +5,8 @@
 
     **Stage:** Foundation → **Operations** → Engineering → Autonomous → Major Incident
 
-**Situation:** Passengers are reporting that online check-in has slowed to a crawl —
-requests that used to be instant now take seconds — and the **booking / check-in**
+**Situation:** Passengers are reporting that online check-in has slowed to a crawl.
+Requests that used to be instant now take seconds, and the **booking / check-in**
 tile has gone amber just as traffic climbs toward a departure peak. Is check-in
 buckling under the surge, or did something change? A change on the passenger path
 mid-surge is what turns a slowdown into an outage. This incident stays **open** into
@@ -35,7 +35,7 @@ without changing anything in production.
 
     Starting Challenge 2 injects the first incident. Give it two or three minutes:
     check-in latency climbs from milliseconds to seconds and stays there, while
-    the service keeps answering every request successfully — which is itself a clue.
+    the service keeps answering every request successfully, which is itself a clue.
 
 ### Tasks
 
@@ -85,7 +85,7 @@ replicas and request load over the same window.
 
 <details markdown="1"><summary>Hint: capacity, or something else?</summary>
 
-A service starved of CPU is *busy*. This one isn't — CPU is low, no pod has
+A service starved of CPU is *busy*. This one isn't. CPU is low, no pod has
 restarted, and every request still succeeds. It is **waiting** on something. Work
 out what `booking` talks to besides its database, and how long each of those calls
 is taking. Then compare the live workload against what the repository's manifest
@@ -102,7 +102,7 @@ not when it's fixed.
     ??? note "Task 1 · Confirm the symptom"
         - Open the **Operations Center** and note the **booking / check-in** tile: its
           p95, its error rate, and how steady the numbers are. Then open the
-          **Grafana** dashboard for the same window — the two together are your
+          **Grafana** dashboard for the same window. The two together are your
           evidence, not the agent's summary.
         - Compare that to the baseline you captured in Challenge 1. Requests that
           took single-digit milliseconds now take seconds, and they all still
@@ -121,12 +121,20 @@ not when it's fixed.
         - Stay read-only, you're gathering evidence, changing nothing.
 
     ??? note "Task 3 · Record your hypothesis"
-        - Ask the agent to write a short summary: the **likely cause**, the **two
-          independent signals** behind it, and the **least-disruptive recovery** you'd
-          propose (do not perform it).
-        - Keep it where Challenge 3 can use it: leave it in the chat thread, or save
-          it to the agent's **memory** (type `/remember …` in the chat box, which
-          becomes `#remember`, or *"save this to your knowledge"*).
+        Paste this into the agent chat:
+
+        > Summarise this investigation in under 200 words: the likely root cause,
+        > the two independent signals that support it, and the least-disruptive
+        > recovery you would propose. Do not perform any remediation.
+
+        Then save it so Challenge 3 can pick it up. Either leave it in this chat
+        thread, or commit it to memory by typing `/remember .` in the chat box
+        (it becomes `#remember`), or by saying *"save this to your knowledge"*.
+
+        **Confirm it stuck.** Ask *"What do you remember about the check-in
+        slowdown?"* in a **new** chat thread. If it repeats your hypothesis back,
+        it saved. If it doesn't, the summary only exists in the old thread, so
+        keep that thread open for Challenge 3.
 
 ### Reference
 

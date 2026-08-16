@@ -1,6 +1,6 @@
 # You are the new reliability team for a global airline platform
 
-![Aetherion AirOps Global Operations Center — Sam and the Aria SRE agent at the start of a shift, every service healthy](../assets/storyboard/img-intro-0.webp){ .story-panel loading=lazy }
+![Aetherion AirOps Global Operations Center: Sam and the Aria SRE agent at the start of a shift, every service healthy](../assets/storyboard/img-intro-0.webp){ .story-panel loading=lazy }
 
 Aetherion AirOps is a fictional, Tier 0 airline operations platform running on
 Microsoft Azure. It is the digital backbone of a global carrier's day-to-day
@@ -18,7 +18,7 @@ baggage, service-level breaches, and reputational damage.
 Today you join Aetherion AirOps as its new Site Reliability Engineering team. You
 will run a shift inside the Global Operations Center, take a series of real
 incidents as they unfold, and use **Azure SRE Agent** to investigate, decide, and
-recover — under the same guardrails a real airline would insist on.
+recover, under the same guardrails a real airline would insist on.
 
 > This is an operational and business platform built for learning. It is **not**
 > safety-of-flight avionics and it does not control real aircraft. Every fault in
@@ -27,7 +27,7 @@ recover — under the same guardrails a real airline would insist on.
 ---
 
 
-## The shift ahead — challenge map
+## The shift ahead: challenge map
 
 | # | Challenge | What you practice |
 |---|-----------|-------------------|
@@ -52,7 +52,7 @@ reason about become the approvals you rely on; the knowledge you load changes th
 advice the agent gives; the specialist agent and skill you build are the tools
 you reach for in the final incident.
 
-Challenges unlock **linearly** — you finish one before the next opens. You drive
+Challenges unlock **linearly**: you finish one before the next opens. You drive
 each challenge yourself with two commands:
 
 ```powershell
@@ -64,18 +64,18 @@ each challenge yourself with two commands:
   exercise) **without telling you the root cause**. That is your job to find.
 - `check-challenge.ps1` verifies the real end state against the live cluster and
   API Management, then unlocks the next challenge. A symptom-only or "wait it
-  out" fix will not pass — the underlying fault must genuinely be cleared.
+  out" fix will not pass. The underlying fault must genuinely be cleared.
 
 **Work from evidence.** Each challenge gives you the scenario, the business
-stakes, the signals you can inspect, the guardrails, and progressive hints —
-enough to investigate and solve it yourself. Start read-only, use the least
+stakes, the signals you can inspect, the guardrails, and progressive hints,
+which is enough to investigate and solve it yourself. Start read-only, use the least
 privilege that gets the job done, and let write actions go through approval
 unless a challenge explicitly enables bounded automation. Verify recovery with
 telemetry after every change, and preserve the evidence you will need for the
 incident summary at the end of the shift.
 
-Challenges 2 and 3 are **one ongoing incident** — detection and read-only
-investigation, then controlled recovery — before a change-driven flight-board
+Challenges 2 and 3 are **one ongoing incident**: detection and read-only
+investigation, then controlled recovery, before a change-driven flight-board
 outage is layered on top in Challenge 3.
 
 ---

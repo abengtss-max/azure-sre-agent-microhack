@@ -1,14 +1,14 @@
 # Troubleshooting
 
 Common friction points during setup and delivery. For live application incidents,
-that *is* the hack — start from the [Operations Center](../getting-started/environment.md)
+that *is* the hack. Start from the [Operations Center](../getting-started/environment.md)
 and let the agent investigate.
 
 ## Setup
 
 ??? question "Provisioning fails on a missing resource provider"
     Run `./scripts/00-check-providers.ps1`. It registers the required providers
-    idempotently. Registration can take a few minutes to propagate — re-run the
+    idempotently. Registration can take a few minutes to propagate, so re-run the
     failed script afterwards.
 
 ??? question "`az` commands hit the wrong subscription"
@@ -28,12 +28,12 @@ and let the agent investigate.
 ## During the hack
 
 ??? question "The agent cannot see or act on a resource"
-    This is almost always RBAC. The agent acts through its **own managed identity** —
-    grant Reader broadly and narrow write roles only where remediation is intended.
+    This is almost always RBAC. The agent acts through its **own managed identity**.
+    Grant Reader broadly and narrow write roles only where remediation is intended.
     See [SRE Agent basics](../getting-started/sre-agent-fundamentals.md).
 
 ??? question "The agent proposes a plan but never executes"
-    That is **Review mode** working as designed — it waits for explicit approval.
+    That is **Review mode** working as designed. It waits for explicit approval.
     Approve the plan, or promote the fault class to **Autonomous** once you trust it.
 
 ??? question "A challenge validation keeps failing"

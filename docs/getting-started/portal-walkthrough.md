@@ -7,7 +7,7 @@ button is.
 
 !!! info "Portal UI may vary"
     Azure portal labels and blades occasionally move. When a screen differs from a
-    step here, follow the matching step in the linked official doc — the flow
+    step here, follow the matching step in the linked official doc. The flow
     is the same. Keep the [Azure portal](https://portal.azure.com) open in one tab
     and this page in another.
 
@@ -50,7 +50,7 @@ incident.
    $st = Get-Content ./scripts/.env.aetherion.json | ConvertFrom-Json
    if ($st.httpsUrl) { $st.httpsUrl } else { "http://$($st.gatewayIp)/" }
    ```
-2. Open that URL (HTTPS if configured). Let the page settle — the flight board,
+2. Open that URL (HTTPS if configured). Let the page settle. The flight board,
    service tiles and operational-risk gauge should all render.
 3. **Healthy reference:** every service tile is green and the risk gauge is low.
    This is what you compare against when something breaks.
@@ -71,7 +71,7 @@ incident.
 ## D · Create the SRE Agent { #d-create-agent }
 
 Do this once, in Challenge 1. **Creating** the agent and **setting it up** are two
-separate steps — Create alone grants no access to your app.
+separate steps. Create alone grants no access to your app.
 
 1. In the portal search bar, type **Azure SRE Agent** and select it.
 2. Select **Create**.
@@ -81,7 +81,7 @@ separate steps — Create alone grants no access to your app.
     - **Name:** `aetherion-sre-agent`.
     - **Region:** the closest supported region (e.g. `swedencentral`).
     - **Application Insights:** choose **Create new**. The agent provisions its own
-      App Insights + Log Analytics for *its own* telemetry — this is separate from
+      App Insights + Log Analytics for *its own* telemetry. This is separate from
       the app's `aetherion-law` / `aetherion-appi`.
     - **Model provider:** **Azure OpenAI** is a good default (lower cost, stays in
       the EU data boundary).
@@ -94,7 +94,7 @@ Reference: [Create and set up](https://learn.microsoft.com/en-us/azure/sre-agent
 
 ---
 
-## D2 · Set up your agent — connect context { #d-setup }
+## D2 · Set up your agent: connect context { #d-setup }
 
 In the agent, run **Set up your agent** (**Full setup**) and connect three sources:
 
@@ -109,7 +109,7 @@ In the agent, run **Set up your agent** (**Full setup**) and connect three sourc
     Do **not** choose *Subscription* or *Management group* scope. Resource-group
     scope keeps the agent focused on just this application.
 
-> **Knowledge** is connected later, in Challenge 4 — not here.
+> **Knowledge** is connected later, in Challenge 4, not here.
 
 ---
 
@@ -130,7 +130,7 @@ here only if you skipped the wizard's *Azure resources* step. Reader lets the ag
 
 !!! note "Permissions vs. run mode"
     Creating and setting up the agent grants its identity **Monitoring Contributor**
-    plus a reader bundle — so the identity is *not* strictly read-only. The
+    plus a reader bundle, so the identity is *not* strictly read-only. The
     guarantee that it won't change anything without you comes from the **Review**
     run mode (section F), not from the role.
 
@@ -143,7 +143,7 @@ Reference: [Manage roles and permissions](https://learn.microsoft.com/en-us/azur
 1. Open the **`aetherion-sre-agent`** resource → **Settings** (or the run-mode
    control in the agent console).
 2. **Review** (default): the agent proposes a plan and waits for your approval
-   before any write. Use this for Acts I–III.
+   before any write. Use this for Acts I-III.
 3. **Autonomous:** the agent executes approved classes of action without pausing.
    Only switch a **specific, validated** fault to Autonomous (Challenge 6).
 4. Changing run mode is approved by the **SRE Agent Administrator** role.
@@ -153,12 +153,12 @@ Reference: [Manage roles and permissions](https://learn.microsoft.com/en-us/azur
 ## G · Ask the agent / start a thread { #g-ask }
 
 1. Open the agent resource → the **chat/console**.
-2. Type a specific question — e.g. *"Give an operational baseline for the
+2. Type a specific question, for example *"Give an operational baseline for the
    `aetherion` namespace: services, ready replicas, dependencies, and check-in
    latency."*
 3. When the agent proposes a **write** in Review mode, it shows a plan with an
-   **Approve / Reject** prompt. Read the plan — that plan is your approval
-   artifact — then decide.
+   **Approve / Reject** prompt. Read the plan, because that plan is your approval
+   artifact, then decide.
 
 ---
 
@@ -169,14 +169,14 @@ When a fix needs a change, you have two governed paths:
 === "Approve on-behalf-of (OBO)"
 
     1. Ask the agent for a **remediation plan**.
-    2. When it prompts, select **Approve** — the action runs using *your*
+    2. When it prompts, select **Approve**. The action runs using *your*
        credentials, once, for that step.
     3. Best when you want a human decision on each change.
 
 === "Grant a scoped role"
 
     1. Decide the **narrowest** role that covers the action (e.g. a write role on
-       the AKS cluster only — not the whole subscription).
+       the AKS cluster only, not the whole subscription).
     2. Open the target resource → **Access control (IAM)** → **Add role
        assignment** → pick the role → **Managed identity** →
        `aetherion-sre-agent` → **Review + assign**.
@@ -191,7 +191,7 @@ Reference: [Security overview](https://learn.microsoft.com/en-us/azure/sre-agent
 
 1. In the agent, open **Knowledge** (team onboarding / memory).
 2. Upload the Markdown files from this repo's **`knowledge/`** folder.
-3. Re-ask your remediation question — the advice should now cite Aetherion's own
+3. Re-ask your remediation question. The advice should now cite Aetherion's own
    runbook guardrails instead of generic steps.
 
 Reference: [Team onboarding & memory](https://learn.microsoft.com/en-us/azure/sre-agent/team-onboard)
@@ -201,20 +201,20 @@ Reference: [Team onboarding & memory](https://learn.microsoft.com/en-us/azure/sr
 ## J · Create a specialist subagent { #j-subagent }
 
 1. In the agent, open **Builder → Agent Canvas**, then click **+ Create subagent**.
-2. **Custom agent name** — e.g. `aks-triage`.
-3. **Instructions** — a **narrow remit**: *"AKS reliability triage for the
+2. **Custom agent name**: `aks-triage`.
+3. **Instructions**: a **narrow remit**, *"AKS reliability triage for the
    `aetherion` namespace: pod status, events, rollout history, dependency
    health."* Say how it should behave and what it should do when the evidence
    points outside its scope, not just what it covers.
 4. **Leave Skills and Tools inherited.** Selecting either *overrides* the
    inherited set rather than adding to it, and the picker does not list every
-   inherited tool — `RunKubectlReadCommand` and `RunKubectlWriteCommand` are in
+   inherited tool. `RunKubectlReadCommand` and `RunKubectlWriteCommand` are in
    the agent's inherited set but are not offered in the panel. Any selection you
    make therefore risks dropping cluster access. Scope specialists with
    Instructions.
 5. **Create**, then use it by asking the main agent to **delegate to it by name**
    ("delegate this to your `aks-triage` subagent"). Asking the agent to "act as"
-   a specialist does not invoke the subagent — it just adopts the persona.
+   a specialist does not invoke the subagent. It just adopts the persona.
 
 The **Form / YAML** toggle edits the same definition and exposes
 `handoff_description`, `agent_type` and `enable_skills`.
@@ -230,7 +230,7 @@ Reference: [Subagents & extensibility](https://learn.microsoft.com/en-us/azure/s
 2. **Name** it, then click **Edit** on **Description** and describe *when the
    skill should be reached for*. The description is what the agent matches the
    situation against, so a vague one means the skill is never considered. Do not
-   assume a skill fires on its own — name it when you want it used.
+   assume a skill fires on its own. Name it when you want it used.
 3. In the pre-scaffolded **SKILL.md**, fill in the `name` / `description`
    frontmatter and encode a well-defined procedure (e.g. the crew query-path
    recovery) as steps, keeping the guardrails (confirm which layer is saturated,
@@ -248,8 +248,8 @@ Reference: [Skills](https://learn.microsoft.com/en-us/azure/sre-agent/skills)
 2. Break usage down by **thread type** and **operational purpose** to see where
    Agent Activity Units go.
 3. Use only real figures from your environment or the official
-   [pricing & billing doc](https://learn.microsoft.com/en-us/azure/sre-agent/pricing-billing)
-   — never invent rates or savings.
+   [pricing & billing doc](https://learn.microsoft.com/en-us/azure/sre-agent/pricing-billing).
+   Never invent rates or savings.
 
 ---
 
@@ -296,7 +296,7 @@ $st = Get-Content ./scripts/.env.aetherion.json | ConvertFrom-Json
 Invoke-WebRequest "$($st.apimGatewayUrl)/aetherion/api/status" `
   -Headers @{ 'Ocp-Apim-Subscription-Key' = $st.apimSubscriptionKey } -UseBasicParsing
 
-# Direct to the service (bypasses APIM) — if this is 200, the service is fine
+# Direct to the service (bypasses APIM). If this is 200, the service is fine
 Invoke-WebRequest "http://$($st.gatewayIp)/api/status" -UseBasicParsing
 ```
 
@@ -305,5 +305,5 @@ policy, not the service.
 
 ---
 
-Return to any challenge — each one tells you exactly which of these procedures to
+Return to any challenge. Each one tells you exactly which of these procedures to
 run, in order.

@@ -34,12 +34,12 @@ applying a reversible rollback, and verifying both from telemetry.
 
 ### Tasks
 
-**Part A — finish the check-in incident**
+**Part A: finish the check-in incident**
 
 1. **Plan the fix.** Ask the agent to turn your hypothesis into a concrete `booking` remediation plan and name the permission it needs.
 2. **Recover under approval.** Keep the agent in Review, approve the least-disruptive fix, then confirm latency is back to baseline.
 
-**Part B — the flight board goes dark**
+**Part B: the flight board goes dark**
 
 3. **Triage the flight board.** Find out how `flight-ops` is failing from pod status and events.
 4. **Correlate and roll back.** Line the outage up with the recent change, apply a reversible rollback, and check the board recovers.
@@ -53,12 +53,12 @@ applying a reversible rollback, and verifying both from telemetry.
     service. Restore it to exactly what the repository's manifest declares rather
     than to a value you choose, and tell me exactly what permission the action
     needs. Then, for `flight-ops`, correlate the outage time with deployment and
-    rollout history — including the recorded change cause — and propose the
+    rollout history, including the recorded change cause, and propose the
     least-disruptive **reversible** rollback for my approval.
 
 ### Success criteria
 
-- Check-in is remediated with a least-disruptive action you approved in **Review** mode (not ungoverned automation); `booking` is healthy, latency is back to baseline, and **the setting the change altered matches what the repository declares** — compensating around it is not a fix.
+- Check-in is remediated with a least-disruptive action you approved in **Review** mode (not ungoverned automation); `booking` is healthy, latency is back to baseline, and **the setting the change altered matches what the repository declares**. Compensating around it is not a fix.
 - `flight-ops`'s failure mode is identified and linked to a recent change/rollout; the recovery is reversible and doesn't touch unrelated resources, and the service is back on its previous image.
 - Both tiles are green, `/api/flights` responds, and `check-challenge.ps1 3` passes.
 
@@ -86,7 +86,7 @@ went red with deployment and rollout history. Closeness in time is your stronges
 lead, and returning to the last good state is usually the fix.
 
 Not every change arrives through git. This one was applied straight to the cluster,
-so the rollout history *is* the change record — which is exactly why teams insist
+so the rollout history *is* the change record, which is exactly why teams insist
 changes go through a pipeline that leaves one.
 </details>
 
@@ -109,7 +109,7 @@ changes go through a pipeline that leaves one.
           asks first.
 
         Then verify `booking` latency is back to baseline, and confirm the change was
-        actually reverted rather than worked around — the running configuration
+        actually reverted rather than worked around. The running configuration
         should match what the repository's manifest declares, with no leftover
         override on the deployment.
 

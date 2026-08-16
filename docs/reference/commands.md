@@ -14,7 +14,7 @@ repository root, signed in with `az login` and the correct subscription selected
 | `./scripts/03-deploy-app.ps1 -ResourceGroup <your-rg>` | Deploys the app + k6 to AKS and wires APIM to the gateway |
 | `./scripts/03b-setup-https.ps1` | Configures HTTPS on the gateway (Let's Encrypt) |
 | `./scripts/04-validate.ps1` | Validates the estate is healthy and generating traffic (reads the resource group from local state) |
-| `./scripts/provision-environment.ps1` | End-to-end provisioning wrapper — always provisions into a **uniquely named** `rg-aetherion-microhack-<suffix>` and prints the name (safe for multiple microhacks in one subscription) |
+| `./scripts/provision-environment.ps1` | End-to-end provisioning wrapper. Always provisions into a **uniquely named** `rg-aetherion-microhack-<suffix>` and prints the name (safe for multiple microhacks in one subscription) |
 
 ## Running the hack
 
@@ -29,6 +29,6 @@ repository root, signed in with `az login` and the correct subscription selected
 | Command | What it does |
 |---------|--------------|
 | `./scripts/reset-environment.ps1` | Restores a clean, healthy baseline between runs (add `-ResetProgress` to also re-lock challenges for a fresh run) |
-| `./scripts/99-teardown.ps1` | Lists the microhack(s) in your subscription and lets you pick which to delete — removes the hack resource group **and** its `-loadgen` pair |
+| `./scripts/99-teardown.ps1` | Lists the microhack(s) in your subscription and lets you pick which to delete. Removes the hack resource group **and** its `-loadgen` pair |
 | `./scripts/99-teardown.ps1 -ResourceGroup <rg>` | Deletes a specific microhack (and its `-loadgen` pair) non-interactively |
 | `./scripts/99-teardown.ps1 -All` | Deletes every Aetherion microhack in the subscription |

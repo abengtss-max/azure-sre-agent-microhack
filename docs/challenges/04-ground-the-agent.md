@@ -7,7 +7,7 @@
 
 **Situation.** Crew scheduling is failing (the `crew-scheduling` tile is red) and duty
 managers can't confirm who is legal to fly the evening wave. The services that share
-its database are wobbling too, so "the database is down" is the obvious call — and
+its database are wobbling too, so "the database is down" is the obvious call, and
 it's wrong. Out of the box the agent gives generic advice, and a generic "restart the
 database" is exactly what Aetherion's runbooks forbid. The fastest path to the right
 answer is to ground the agent in your own knowledge.
@@ -53,9 +53,9 @@ non-destructive remediation and verify service is restored.
 
 ### Success criteria
 
-- You can name the **origin** — the service whose queries are saturating the shared database — and explain why its neighbours are suffering without being at fault.
+- You can name the **origin**, the service whose queries are saturating the shared database, and explain why its neighbours are suffering without being at fault.
 - The grounded agent cites the runbook guardrail (repair the query path, never delete the database) and you apply that non-destructive fix under approval.
-- `/api/crew` is back **inside the 400 ms latency budget while the roster rush is still running** — that is what `check-challenge.ps1 4` grades. A tile that is merely answering again is not a pass.
+- `/api/crew` is back **inside the 400 ms latency budget while the roster rush is still running**. That is what `check-challenge.ps1 4` grades. A tile that is merely answering again is not a pass.
 
 !!! success "Verify your work"
 
@@ -69,7 +69,7 @@ non-destructive remediation and verify service is restored.
 
 <details markdown="1"><summary>Hint: how wide is the blast radius?</summary>
 
-More than one service is unhappy, but they are not equally unhappy — and they have
+More than one service is unhappy, but they are not equally unhappy, and they have
 something in common. Ask what they share, then ask which of them is *using* that
 shared thing hardest. The one generating the load is the origin; the rest are
 collateral.
@@ -94,7 +94,7 @@ work to the part that is already at its limit.
     ??? note "Task 1 · Find the origin"
         - Read the Operations Center: `crew-scheduling` is red, and its
           database-backed peers (`booking`, `telemetry-ingest`) are slower than
-          their baseline. `baggage`, which touches no database, is untouched — that
+          their baseline. `baggage`, which touches no database, is untouched. That
           contrast is the clue.
         - Compare the layers: pod CPU (`kubectl top pods -n aetherion`) against the
           PostgreSQL server's CPU in the portal. The pods are comfortable and the
@@ -109,14 +109,21 @@ work to the part that is already at its limit.
           runbooks). The application fork does not contain them.
         - Bulk upload can partially fail. Check every file shows **Indexed**, then
           confirm the agent can actually quote a runbook line before relying on it.
-        - Re-ask the remediation question. The advice should now **cite Aetherion's
-          runbook** instead of generic guidance.
+        - Now ask the same remediation question again, word for word:
+
+            > `crew-scheduling` is slow while its pods sit idle and the shared
+            > PostgreSQL server is saturated. What is the sanctioned fix, and what
+            > am I not allowed to do?
+
+          The advice should now **cite Aetherion's runbook** by name instead of
+          offering generic Kubernetes guidance. If it still answers generically,
+          the knowledge source is not indexed yet.
 
     ??? note "Task 3 · Apply the sanctioned fix"
         - Follow the runbook: **repair the query path**. Do **not** delete or restart
           the database.
         - Note what the autoscaler is doing. It is not adding replicas, because pod
-          CPU is below target — the pods are waiting, not working. That rules out
+          CPU is below target: the pods are waiting, not working. That rules out
           scaling as the remedy, and widening the connection pool with it.
         - The remedy is a schema change, so apply it under approval (keep the agent
           in **Review** and approve the write). Then verify `/api/crew` is fast

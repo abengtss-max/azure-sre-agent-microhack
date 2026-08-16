@@ -8,10 +8,10 @@ configuration. All services run in the AKS namespace `aetherion`.
 | Service | Role | Depends on | Represents |
 |---------|------|------------|------------|
 | `gateway` | Ingress / Envoy gateway for the estate | AKS services | The public front door in front of APIM |
-| `flight-ops` | Flight status and operational decisions | — | Live departures/arrivals view |
+| `flight-ops` | Flight status and operational decisions | none | Live departures/arrivals view |
 | `crew-scheduling` | Crew assignment | PostgreSQL | Roster and duty-time logic |
 | `booking` | Booking and passenger check-in | PostgreSQL, Redis | Ticket sales and check-in |
-| `baggage` | Baggage routing | — | Bag tracking and sortation |
+| `baggage` | Baggage routing | none | Bag tracking and sortation |
 | `telemetry-ingest` | Aircraft telemetry ingestion | PostgreSQL | Maintenance signal pipeline |
 
 ## Platform services
@@ -33,5 +33,5 @@ configuration. All services run in the AKS namespace `aetherion`.
 
 A disruption immediately affects flight departures/arrivals, passenger check-in,
 crew assignment, baggage routing, regulatory reporting and revenue-generating
-bookings — which is why the Operations Center leads with **business impact**, not
+bookings, which is why the Operations Center leads with **business impact**, not
 just service health.
