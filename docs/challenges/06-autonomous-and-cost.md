@@ -135,7 +135,11 @@ Challenge 7.
         2. **Connect an incident platform** → **Azure Monitor** → **Save**. It
            configures itself from your agent's scope, so there is nothing to fill in.
            You'll see **Azure Monitor is connected** in the top right when it's done.
-        3. **+ Create a response plan**.
+        3. **Delete the quickstart plan.** Connecting a platform automatically
+           creates a default **quickstart** response plan. Leave it there and it
+           runs alongside yours, which can route the incident to the wrong agent
+           or process it twice. Select it and delete it before you continue.
+        4. **+ Create a response plan**.
 
         Fill it in as follows:
 
@@ -145,7 +149,7 @@ Challenge 7.
         | **Severity** | **Sev1** |
         | Title contains / does not contain | leave empty |
         | **Response subagent** | **leave empty** |
-        | **Agent autonomy level** | **Review** |
+        | **Agent autonomy level** | **Autonomous** |
         | **Alert reinvestigation cooldown** | **disable it** |
 
         Then **Next** to see **Incidents preview**, and create.
@@ -176,9 +180,23 @@ Challenge 7.
             that window. Sensible in production, wrong here. Re-run Challenge 7
             and the plan silently will not fire the second time.
 
-        **Autonomy level is per plan**, separate from the agent's own run mode.
-        Choose **Review** so the auto-triggered investigation proposes rather than
-        acts: Challenge 7 puts you in command, and you decide what gets approved.
+        !!! danger "Choose Autonomous, and understand what you are choosing"
+            Selecting **Autonomous** shows an information icon. Open it and read the
+            **Autonomous mode acknowledgment** before you accept: it covers the
+            agent's boundaries, the model's limitations, and the fact that scoping
+            its access and reviewing its outcomes remain your responsibility.
+
+            In production you would start at **Review** and only promote a plan to
+            **Autonomous** once you trust its tool selection. You are promoting it
+            after one supervised autonomous recovery in this challenge, which is
+            faster than you should move on a real platform. That is a deliberate
+            trade so Challenge 7 can show you what unattended response looks like.
+
+        **Autonomy level is per plan**, separate from the agent's own run mode. At
+        **Autonomous**, the auto-triggered investigation can mitigate without waiting
+        for you. It will not fix everything: it acts where the fix is unambiguous and
+        reversible, and leaves the judgement calls. Challenge 7 is built around that
+        split, and your first job there is to audit what it decided to do alone.
 
         Do this **now**. Challenge 7 depends on it auto-triggering.
 
@@ -189,7 +207,7 @@ Challenge 7.
 - [Incident response plans](https://learn.microsoft.com/en-us/azure/sre-agent/incident-response-plans)
 
 !!! success "Up next: the final major incident"
-    Your Sev1 response plan is armed, so when everything breaks at once, the agent triggers itself and you commandeer the incident.
+    Your Sev1 plan is armed at **Autonomous**. When everything breaks at once, the agent triggers itself and starts working the incident before anyone pages you. You arrive second, and your first job is to audit what it already did.
 
     [Proceed to Challenge 7 · Final Major Incident →](07-major-incident.md){ .md-button .md-button--primary }
 

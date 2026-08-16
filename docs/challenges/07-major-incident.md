@@ -10,6 +10,11 @@ a passenger surge: the flight board is dark, crew scheduling is timing out, chec
 has slowed to a crawl, and the API front door is failing legitimate partner and
 mobile traffic. The risk gauge is pinned. Everything you built today is now in play.
 
+**You are not first on scene.** The Sev1 plan you armed in Challenge 6 matched the
+alert before anyone paged you, and the agent has been working the incident
+unattended. Your first job is not to fix something. It is to find out what has
+already been changed in your absence.
+
 | Time | Event |
 |------|-------|
 | 18:07 | A change rolls out to flight-ops |
@@ -17,16 +22,20 @@ mobile traffic. The risk gauge is pinned. Everything you built today is now in p
 | 18:14 | Crew scheduling starts timing out under load |
 | 18:17 | The live flight board goes dark for all stations |
 | 18:21 | The API front door starts failing partner traffic |
+| 18:23 | `aetherion-major-incident` fires at **Sev1** and auto-triggers the agent |
 | 18:25 | Major incident declared. You are incident commander |
+| 18:26 | The agent is already acting on its own in a thread it opened itself |
 
-**Mission.** Bring Aetherion AirOps back to full health before peak departure:
-triage by business tier, remediate each fault within the runbook guardrails using
-approved or bounded actions, and verify recovery service by service.
+**Mission.** Take handover from the agent, then bring Aetherion AirOps back to full
+health before peak departure: verify what it changed without you, triage the rest by
+business tier, remediate within the runbook guardrails, and verify recovery service
+by service.
 
 **Why this matters**
 
 <div class="grid cards why-cards" markdown>
 
+- :material-clipboard-account-outline: **Take handover**: audit what an autonomous agent changed while you were away
 - :material-clipboard-list-outline: **Triage by impact**: order by business tier, not the loudest alert
 - :material-history: **Agent memory**: recall the earlier RCA to resolve faster
 - :material-account-group-outline: **Delegate & reuse**: your specialist subagent and crew recovery skill
@@ -42,8 +51,8 @@ approved or bounded actions, and verify recovery service by service.
 
 ### Tasks
 
-1. **Confirm the Sev1 plan is live.** Check the response plan from Challenge 6 is active so the alert auto-triggers. If you skipped it, create it **before** you start.
-2. **Read the whole board.** Order the work by business impact (situational awareness and legal-to-fly first), not the loudest alert.
+1. **Take handover from the agent.** Find the thread the Sev1 alert opened by itself, read what the agent has already changed unattended, and verify it independently before you trust it.
+2. **Read the whole board.** Order the remaining work by business impact (situational awareness and legal-to-fly first), not the loudest alert.
 3. **Check the agent's memory.** Ask whether a similar incident has happened and let session insights surface the earlier RCA.
 4. **Delegate and recover.** Hand AKS triage to your specialist subagent and reuse your crew recovery skill, keeping every action governed.
 5. **Localize the front door.** Use the direct-vs-APIM comparison and treat the policy change as customer-facing.
@@ -55,24 +64,27 @@ approved or bounded actions, and verify recovery service by service.
     plan matches incoming alerts **by severity**, so your filter must be `Sev1` to
     catch it; a broader filter fires on everything, a mismatched one catches nothing.
 
-    The plan shapes the *experience*, not the grade: `check-challenge.ps1 7` marks
-    the platform's end state, so you can still pass without it. You'll just have
-    driven the whole incident by hand.
+    **This one is graded.** `check-challenge.ps1 7` marks the platform's end state
+    *and* confirms a Sev1 major-incident alert actually fired since you started the
+    challenge. Driving the whole incident by hand is not enough on its own.
 
 ![Challenge 7 storyboard: Sam, Aria and Elena restore global check-in before peak departure](../assets/storyboard/img-challenge-7.webp){ .story-panel loading=lazy }
 
 ### Suggested Azure SRE Agent prompt
 
 !!! quote "Paste into the agent chat"
-    Read the whole Aetherion board and give me an incident-command triage: list every
-    failing service, order remediation by business tier (situational awareness and
+    You picked this incident up before I did. First, list every action you already
+    took without my approval and how I can verify each one. Then read the whole
+    Aetherion board and give me an incident-command triage: list every service still
+    failing, order remediation by business tier (situational awareness and
     legal-to-fly first), and for each name the sanctioned, reversible fix. Have we
     seen a similar crew-scheduling / check-in incident before. Pull the earlier RCA
     from session memory.
 
 ### Success criteria
 
-- All failing services are triaged by priority and restored with sanctioned, reversible actions.
+- You can state exactly what the agent changed without your approval, and you verified it from the cluster rather than from its summary.
+- All remaining failing services are triaged by priority and restored with sanctioned, reversible actions.
 - The API front door serves legitimate traffic again, and every fix is verified from telemetry/health before closing.
 - The platform is healthy and `check-challenge.ps1 7` passes.
 
@@ -109,14 +121,39 @@ outage was masking.
     Give each task a genuine attempt first, and skim the hints above. When you want
     the exact clicks, open the matching task below.
 
-    ??? note "Task 1 · Confirm the Sev1 plan is live"
-        - Open **Incidents → Triggers + response plans** and confirm your Sev1 plan
-          (from Challenge 6) shows **Status: On** and **Severity: Sev1**.
-        - **Subagent name** should read *Set up*, meaning none is bound, which is
-          what you want. This incident spans four tiers; an AKS-only specialist would
-          scope the auto-investigation to one of them.
-        - If it's missing, create it **before** running the start command, otherwise
-          the alert won't auto-trigger the investigation.
+    ??? note "Task 1 · Take handover from the agent"
+        The agent started before you did. Treat this exactly like taking handover
+        from a colleague who has been on the incident for ten minutes.
+
+        **Find the thread it opened by itself.** In the agent's chat list, look for
+        a thread whose title starts with `[Sev1] aetherion-major-incident`. You did
+        not create it. The response plan did, off the alert.
+
+        **Read what it already changed.** Ask it directly, in that thread:
+
+        > You picked this incident up before I did. List every action you have
+        > already taken without my approval, what each one changed, and how I can
+        > verify it. Then list what you deliberately did not act on, and why.
+
+        **Verify it yourself. Do not take its word for it.** The whole point of
+        autonomy is that you audit the outcome, not the intention:
+
+        ```powershell
+        kubectl -n aetherion rollout history deployment/flight-ops
+        kubectl -n aetherion get deploy flight-ops -o jsonpath='{.spec.template.spec.containers[0].image}{"\n"}'
+        ```
+
+        Expect it to have acted on **some** tiers and not others. It moves where the
+        fix is unambiguous and reversible, and holds where the call is a judgement.
+        Those held tiers are your work.
+
+        !!! tip "If no thread was auto-created"
+            The plan did not match. Open **Incidents → Triggers + response plans**
+            and confirm your Sev1 plan shows **Status: On** and **Severity: Sev1**,
+            that **Subagent name** reads *Set up* (none bound), and that no leftover
+            **quickstart** plan is competing with it. Fix it, then re-run the start
+            command so the alert fires again. You can still command the incident by
+            hand, but the alert has to fire for this challenge to pass.
 
     ??? note "Task 2 · Read the whole board"
         - Open the Operations Center and list every failing service. Order remediation

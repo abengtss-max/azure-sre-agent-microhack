@@ -61,6 +61,29 @@ if (Test-Path $envFile) {
     if (-not (Set-AetherionApimProductPolicy -ResourceGroup $state.resourceGroup -ApimName $state.apimName -PolicyXml $policy)) {
         Write-Host "  WARNING: APIM product policy reset failed (a backend override from Challenge 7 may persist)." -ForegroundColor Yellow
     }
+
+    # The db-firewall fault deletes this rule. Without it every service loses the
+    # database, so restore it before anything else is declared healthy.
+    if ($state.pgServerName) {
+        Write-Host "Restoring PostgreSQL 'AllowAllAzureServices' firewall rule..." -ForegroundColor Cyan
+        $existing = az postgres flexible-server firewall-rule list -g $state.resourceGroup --server-name $state.pgServerName `
+            --query "[?name=='AllowAllAzureServices'].name" -o tsv --only-show-errors 2>$null
+        if (-not $existing) {
+            az postgres flexible-server firewall-rule create -g $state.resourceGroup --server-name $state.pgServerName `
+                --name AllowAllAzureServices --start-ip-address 0.0.0.0 --end-ip-address 0.0.0.0 `
+                --only-show-errors 2>$null | Out-Null
+            if ($LASTEXITCODE -ne 0) {
+                Write-Host "  WARNING: could not restore the PostgreSQL firewall rule - services will stay cut off from the database." -ForegroundColor Yellow
+            }
+            else {
+                # The pods are holding failed pools; recycle them so they reconnect.
+                foreach ($svc in @('crew-scheduling', 'booking', 'flight-ops', 'baggage')) {
+                    kubectl delete pod -n $ns -l app=$svc --wait=$false 2>$null | Out-Null
+                }
+                Write-Host "  Database path restored." -ForegroundColor Gray
+            }
+        }
+    }
 }
 
 # Optionally reset the linear challenge unlock gate for a fresh run.

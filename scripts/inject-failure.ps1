@@ -6,6 +6,7 @@
 #   ./inject-failure.ps1 -Service booking        -Fault cpu-starve
 #   ./inject-failure.ps1 -Service flight-ops     -Fault badimage
 #   ./inject-failure.ps1 -Service apim           -Fault bad-backend
+#   ./inject-failure.ps1 -Service postgres       -Fault db-firewall   (facilitator hard mode)
 #
 # The change faults leave no synthetic marker: each one is an ordinary operator
 # mistake applied the way a real one would be. The legacy profile faults are
@@ -13,11 +14,11 @@
 
 param(
     [Parameter(Mandatory = $true)]
-    [ValidateSet("flight-ops", "crew-scheduling", "booking", "baggage", "telemetry-ingest", "gateway", "apim")]
+    [ValidateSet("flight-ops", "crew-scheduling", "booking", "baggage", "telemetry-ingest", "gateway", "apim", "postgres")]
     [string]$Service,
 
     [Parameter(Mandatory = $true)]
-    [ValidateSet("bad-backend", "badimage", "cpu-starve", "canary", "slow-query", "cache-endpoint")]
+    [ValidateSet("bad-backend", "badimage", "cpu-starve", "canary", "slow-query", "cache-endpoint", "db-firewall")]
     [string]$Fault
 )
 
@@ -43,6 +44,34 @@ if ($Service -eq "apim") {
     else {
         throw "Failed to publish the APIM backend override."
     }
+    return
+}
+
+if ($Service -eq "postgres") {
+    if ($Fault -ne "db-firewall") { throw "For service 'postgres', only -Fault db-firewall is supported." }
+    if (-not (Test-Path $envFile)) { throw "State file not found. Deploy first." }
+    $state = Get-Content $envFile -Raw | ConvertFrom-Json
+
+    # Every workload reaches PostgreSQL through the AllowAllAzureServices rule, so
+    # deleting it severs the data path without touching a single deployment. There
+    # is no rollout, no image change and no recent commit to correlate against,
+    # which is the whole point: the answer is not in the application layer.
+    Write-Host "Removing the 'AllowAllAzureServices' firewall rule from $($state.pgServerName)..." -ForegroundColor Yellow
+    az postgres flexible-server firewall-rule delete -g $state.resourceGroup --server-name $state.pgServerName `
+        --name AllowAllAzureServices --yes --only-show-errors 2>$null | Out-Null
+    if ($LASTEXITCODE -ne 0) {
+        throw "Failed to delete the PostgreSQL firewall rule."
+    }
+
+    # Firewall rules only gate NEW connections and the pools are already open, so
+    # the fault stays dormant until the pods reconnect. Deleting pods recycles them
+    # without creating a new deployment revision, so rollout history stays clean and
+    # there is still no application change to correlate against.
+    Write-Host "Recycling database-backed pods to force reconnection..." -ForegroundColor Yellow
+    foreach ($svc in @('crew-scheduling', 'booking', 'flight-ops', 'baggage')) {
+        kubectl delete pod -n $ns -l app=$svc --wait=$false 2>$null | Out-Null
+    }
+    Write-Host "Database path severed. Reverse with ./scripts/reset-environment.ps1." -ForegroundColor Green
     return
 }
 

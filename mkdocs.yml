@@ -114,6 +114,8 @@ nav:
       - Act V · Major Incident:
           - 07 · Final Major Incident: challenges/07-major-incident.md
           - 08 · Leadership Briefing: challenges/08-leadership-briefing.md
+      - Bonus track:
+          - Enforce the Guardrails · Hooks & Policies: challenges/bonus-hooks-and-policies.md
       - Finish: challenges/finish.md
   - Reference:
       - Architecture: reference/architecture.md

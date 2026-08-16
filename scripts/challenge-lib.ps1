@@ -278,19 +278,31 @@ function Test-MajorIncidentAlertFired([datetime]$Since) {
     $st   = Get-AetherionState
     $sub  = Get-AetherionSubscriptionId
     $rule = $st.incidentAlertName; if (-not $rule) { $rule = 'aetherion-major-incident' }
-    $hours = [Math]::Max(1, [int][Math]::Ceiling(([DateTime]::UtcNow - $Since).TotalHours) + 1)
+    # timeRange only accepts a fixed set of values, so pick the smallest that covers $Since.
+    $age = ((Get-Date).ToUniversalTime() - $Since).TotalHours
+    $range = if ($age -le 1) { '1h' } elseif ($age -le 8) { '8h' } elseif ($age -le 24) { '1d' } else { '7d' }
     $uri = "https://management.azure.com/subscriptions/$sub" +
            "/providers/Microsoft.AlertsManagement/alerts" +
-           "?api-version=2019-05-05-preview&timeRange=${hours}h"
-    $j = az rest --method get --uri $uri -o json 2>$null
-    if (-not $j) { return $false }
-    foreach ($al in ($j | ConvertFrom-Json).value) {
+           "?api-version=2019-05-05-preview&timeRange=$range"
+
+    # az emits JSON as a string[]; piping that into ConvertFrom-Json corrupts fields.
+    $tmp = Join-Path ([IO.Path]::GetTempPath()) "aeth-alerts-$PID.json"
+    az rest --method get --uri $uri -o json 2>$null > $tmp
+    if (-not (Test-Path $tmp)) { return $false }
+    $raw = Get-Content $tmp -Raw
+    Remove-Item $tmp -ErrorAction SilentlyContinue
+    if ([string]::IsNullOrWhiteSpace($raw)) { return $false }
+
+    $styles = [Globalization.DateTimeStyles]::AdjustToUniversal -bor `
+              [Globalization.DateTimeStyles]::AssumeUniversal
+    foreach ($al in ($raw | ConvertFrom-Json).value) {
         $e = $al.properties.essentials
         if ($e.alertRule -notmatch [regex]::Escape($rule)) { continue }
         if ($e.severity -ne 'Sev1') { continue }
-        $started = $null
-        if ([datetime]::TryParse($e.startDateTime, [ref]$started)) {
-            if ($started.ToUniversalTime() -ge $Since) { return $true }
+        [datetime]$started = [datetime]::MinValue
+        if ([datetime]::TryParse($e.startDateTime, [Globalization.CultureInfo]::InvariantCulture,
+                                 $styles, [ref]$started)) {
+            if ($started -ge $Since) { return $true }
         }
     }
     return $false
@@ -461,7 +473,7 @@ $script:Challenges = [ordered]@{
                 Write-Host "  Azure Monitor is not connected as an incident platform, so no response plan can exist." -ForegroundColor Yellow
                 Write-Host "  Incidents -> Triggers + response plans -> Connect an incident platform -> Azure Monitor." -ForegroundColor Yellow
             }
-            $plan = $conn -and (Confirm-SelfAttest 'Is your Sev1 response plan listed under Incidents -> Triggers + response plans with Status On and Severity Sev1?')
+            $plan = $conn -and (Confirm-SelfAttest 'Is your Sev1 response plan listed under Incidents -> Triggers + response plans with Status On, Severity Sev1 and autonomy Autonomous?')
             @{ Pass = ($ok -and $err -eq 0 -and (-not $canary) -and $auto -and $cost -and $plan); Detail = "baggage healthy=$ok errorRate=$err% canaryStillServing=$canary autonomous=$auto cost-model=$cost platformConnected=$conn responsePlan=$plan" }
         }
     }
@@ -479,8 +491,11 @@ $script:Challenges = [ordered]@{
             Write-Host "before peak departures. The flight board is dark, crew and check-in are degraded,"
             Write-Host "and the API front door is failing legitimate traffic. Triage by impact and recover."
             Write-Host ""
-            Write-Host "  Your Sev1 response plan from Challenge 6 should already be armed - within a couple" -ForegroundColor Gray
-            Write-Host "  of minutes the 'aetherion-major-incident' alert fires and auto-triggers the agent." -ForegroundColor Gray
+            Write-Host "  YOU ARE NOT FIRST ON SCENE. Your Sev1 plan from Challenge 6 is armed at" -ForegroundColor Yellow
+            Write-Host "  AUTONOMOUS, so within a couple of minutes 'aetherion-major-incident' fires," -ForegroundColor Yellow
+            Write-Host "  auto-triggers the agent, and it starts changing things without asking you." -ForegroundColor Yellow
+            Write-Host "  Find the thread it opened by itself and audit what it did before you touch" -ForegroundColor Yellow
+            Write-Host "  anything. It will act on some tiers and deliberately hold on others." -ForegroundColor Yellow
             Write-Host ""
             Write-Host "  Incident timeline (as customers experienced it):" -ForegroundColor Gray
             Write-Host "    18:07  A change rolls out to flight-ops"                 -ForegroundColor Gray
@@ -488,7 +503,9 @@ $script:Challenges = [ordered]@{
             Write-Host "    18:14  Crew scheduling starts timing out under load"      -ForegroundColor Gray
             Write-Host "    18:17  The live flight board goes dark for all stations"  -ForegroundColor Gray
             Write-Host "    18:21  The API front door starts failing partner traffic" -ForegroundColor Gray
+            Write-Host "    18:23  'aetherion-major-incident' fires at Sev1 and auto-triggers the agent" -ForegroundColor Gray
             Write-Host "    18:25  Major incident declared - you are incident commander" -ForegroundColor Gray
+            Write-Host "    18:26  The agent is already acting on its own, unattended" -ForegroundColor Gray
         }
         Check = {
             $tagFlight = Get-ImageTag 'flight-ops'
@@ -520,6 +537,10 @@ $script:Challenges = [ordered]@{
             Write-Host "Produce an engineering RCA handover (with change evidence) and a leadership briefing"
             Write-Host "(impact, root cause, recovery, risk, lessons), then have the agent render the briefing as a PDF with a"
             Write-Host "timeline chart. Distinguish symptom, root cause, mitigation and corrective action."
+            Write-Host ""
+            Write-Host "  Then close the loop for real: add the GitHub Connector (Builder -> Connectors)" -ForegroundColor Gray
+            Write-Host "  and have the agent publish the RCA as an issue on your fork. It has been reading" -ForegroundColor Gray
+            Write-Host "  that repo all day without ever being able to write to it." -ForegroundColor Gray
         }
         Check = {
             $s = Get-AetherionStatus
@@ -527,7 +548,8 @@ $script:Challenges = [ordered]@{
             foreach ($p in $s.services.PSObject.Properties) { if (-not $p.Value.ok) { $allOk = $false } }
             if (-not $allOk) { return @{ Pass = $false; Detail = "platform not fully healthy yet (overall=$($s.overall)) - resolve challenge 7 first" } }
             $done = Confirm-SelfAttest 'Have you produced an executive leadership briefing AND an engineering RCA handover for the major incident?'
-            @{ Pass = ($allOk -and $done); Detail = "platform healthy=$allOk, briefing + handover produced=$done" }
+            $pub  = Confirm-SelfAttest 'Did the agent publish the RCA as an issue on your fork of aetherion-airops-platform?'
+            @{ Pass = ($allOk -and $done -and $pub); Detail = "platform healthy=$allOk, briefing + handover produced=$done, RCA published to repo=$pub" }
         }
     }
 }
