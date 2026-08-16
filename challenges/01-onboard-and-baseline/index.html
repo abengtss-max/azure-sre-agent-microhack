@@ -1846,6 +1846,20 @@ access. Choose <strong>Full setup</strong> and connect:</p>
   resource group</strong> at the <strong><abbr title="The built-in Azure role that grants read-only access — see everything, change nothing.">Reader</abbr></strong> level. Do <strong>not</strong> pick <em>Subscription</em>
   or <em>Management group</em>.</li>
 </ul>
+<div class="admonition warning">
+<p class="admonition-title">The portal drops you into a chat before setup is finished</p>
+<p>Once the agent deploys, the portal opens a <strong>Team onboarding</strong> chat
+thread and invites you to start talking to it. That is not a
+confirmation that setup completed. You can reach a working chat window
+with <strong>Code</strong> and <strong>Logs</strong> still unconnected, and the agent will answer
+anyway, just without the context it needs.</p>
+<p>The failure is silent and it surfaces two challenges later: without
+<strong>Code</strong> the agent cannot correlate the Challenge 3 rollback to a
+commit, and without <strong><code>aetherion-law</code></strong> it cannot read container logs.</p>
+<p>Before moving on, go back to the agent resource and confirm all three
+sources show as connected. If you skipped past the wizard, reopen it
+from the agent's <strong>Overview</strong> and finish the connections you missed.</p>
+</div>
 <p><strong>Keep <abbr title="SRE Agent run mode where it proposes a plan and waits for your approval before any write.">Review mode</abbr></strong> so the agent proposes actions and waits for approval.
 Its identity is granted Monitoring Contributor plus a reader bundle at
 setup, so the "won't change anything" guarantee comes from <strong><abbr title="SRE Agent run mode where it proposes a plan and waits for your approval before any write.">Review mode</abbr></strong>,
@@ -1862,6 +1876,13 @@ report that <abbr title="Role-Based Access Control — Azure's permission model;
 <p><strong>Confirm scope.</strong> Ask <em>"List the resources in my resource group and
 summarize what this application does."</em> Then ask it to <strong>restart a
 deployment</strong>. In <abbr title="SRE Agent run mode where it proposes a plan and waits for your approval before any write.">Review mode</abbr> it must ask for approval, not act.</p>
+<p><strong>Confirm the connections took.</strong> Ask the agent:</p>
+<blockquote>
+<p>Which log sources and code repositories are you connected to right now?</p>
+</blockquote>
+<p>It should name <code>aetherion-law</code> and your fork. If it names neither, the
+<strong>Code</strong> and <strong>Logs</strong> connections did not save, and Challenges 3 and 4 will
+underperform for reasons that look like agent weakness rather than setup.</p>
 </details>
 <details class="note">
 <summary>Task 4 · Capture the baseline</summary>
