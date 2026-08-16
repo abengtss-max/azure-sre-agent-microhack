@@ -195,13 +195,37 @@ read-only check so the agent watches for drift on its own.
         - If the board was recently degraded, reset and let telemetry settle first,
           or the baseline will record the fault as "normal".
 
+        !!! tip "Check the configuration values, not just the metrics"
+            Measured values come straight from telemetry and are reliable. The
+            numbers most likely to be wrong are **configuration** values such as
+            CPU requests, limits and replica counts, because the agent is
+            summarising many deployments at once and can attribute one service's
+            setting to another.
+
+            A wrong config value is hard to spot, because the metric it is compared
+            against is real. "96m against a 100m request" reads as a service about
+            to saturate; if the request is actually 250m, the same service is fine.
+            Confirm any capacity claim before you act on it:
+
+            ```powershell
+            kubectl get deploy gateway -n aetherion -o jsonpath='{.spec.template.spec.containers[0].resources}'
+            ```
+
+            This is the point of the task. The agent does the heavy correlation
+            well, and you stay responsible for the conclusions.
+
     ??? note "Task 5 · Put it on a schedule"
         You can schedule the baseline two ways, by asking in chat or from the
         **Scheduled tasks** page in the portal.
 
         **Option A: Ask the agent.** In the chat, say *"Schedule this baseline to
-        run every morning at 08:00 and alert me on drift from normal."* It creates
-        the scheduled task, resolves the timezone/cron, and sets the conditions.
+        run every morning at 08:00 UTC and alert me on drift from normal."* It
+        creates the scheduled task, converts that to a cron expression, and sets
+        the drift conditions from the baseline it just measured.
+
+        Include the time zone. If you leave it out the agent will not guess: it
+        stops and asks *"At which time zone should the daily 08:00 baseline check
+        run?"* and waits. Answer it and the task is created normally.
 
         **Option B: Configure it in the portal, step by step:**
 
