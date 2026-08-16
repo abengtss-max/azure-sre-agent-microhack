@@ -40,7 +40,7 @@ investigation, before you reach Challenge 7.
 2. **Decide the bounds, then hand over.** Judge whether this incident is safe to automate, switch to **Autonomous** mode, let the agent fix it end-to-end, then review the action log.
 3. **See where AAUs go.** Inspect the agent's consumption by thread type and purpose.
 4. **Design a cost-aware model.** Name concrete reductions without losing reliability or investigation quality.
-5. **Arm the Sev1 response plan.** Bind the pre-provisioned `aetherion-major-incident` alert so the next major incident auto-triggers. Do this now, before Challenge 7.
+5. **Arm the Sev1 response plan.** Connect Azure Monitor as an incident platform, then bind a **Sev1** plan to the pre-provisioned `aetherion-major-incident` alert so the next major incident auto-triggers. Do this now, before Challenge 7.
 
 ![Challenge 6 storyboard: Sam, Priya and Aria review autonomous recovery and cost governance](../assets/storyboard/img-challenge-6.webp){ .story-panel loading=lazy }
 
@@ -117,7 +117,7 @@ Challenge 7.
             is an ordinary, reversible rollback, and it is the sanctioned fix here.
 
     ??? note "Task 3 · See where AAUs go"
-        - In the agent, open **Settings → Agent consumption** and read the breakdown
+        - In the agent, open **Settings → Agent Consumption** and read the breakdown
           by thread type (Chats, Incidents, Scheduled tasks, Triggers) and by thread.
 
     ??? note "Task 4 · Design a cost-aware model"
@@ -128,10 +128,58 @@ Challenge 7.
           real figures.
 
     ??? note "Task 5 · Arm the Sev1 response plan"
-        - **Builder → Incident response plans → New.** Filter by severity **Sev1** so
-          it matches the pre-provisioned `aetherion-major-incident` alert exactly, and
-          route it to your agent.
-        - Do this **now**. Challenge 7 depends on it auto-triggering.
+        **Connect an incident platform first.** Response plans do not exist until
+        you do, and this catches people out.
+
+        1. **Incidents** in the left-hand menu → **Triggers + response plans**.
+        2. **Connect an incident platform** → **Azure Monitor** → **Save**. It
+           configures itself from your agent's scope, so there is nothing to fill in.
+        3. **Add a response plan**.
+
+        Fill it in as follows:
+
+        | Field | Value |
+        |---|---|
+        | Incident response plan name | `aetherion-major-incident-sev1` |
+        | **Severity** | **Sev1** |
+        | Title contains / does not contain | leave empty |
+        | **Response subagent** | **leave empty** |
+        | **Agent autonomy level** | **Review** |
+        | **Alert reinvestigation cooldown** | **disable it** |
+
+        Then **Next** to see **Incidents preview**, and create.
+
+        **Severity is the whole match.** The environment pre-provisions
+        `aetherion-major-incident` at **Sev1**, so a plan filtered to anything else
+        catches nothing and a broader plan fires on everything. Leave the title
+        filters empty — they are an extra way to miss the alert, not an extra
+        safeguard.
+
+        !!! tip "Why not route it to your AKS specialist?"
+            The **Response subagent** dropdown is populated by the subagent you
+            built in Challenge 5, so it is tempting to select `aks-triage` here.
+            Don't.
+
+            Challenge 7's incident spans AKS, API Management **and** PostgreSQL.
+            Handing the auto-triggered investigation to an AKS-only specialist
+            scopes it to one tier of a four-tier incident. Leave it empty so the
+            main agent commands the whole board, and delegate to the specialist
+            *within* the incident instead.
+
+            Deciding *not* to use a tool you just built is a real operational
+            judgement, and this is the moment to make it.
+
+        !!! warning "Turn the cooldown off for this workshop"
+            **Alert reinvestigation cooldown** defaults to enabled at 3 hours: the
+            plan skips reinvestigation if the same plan already started one inside
+            that window. Sensible in production, wrong here — re-run Challenge 7
+            and the plan silently will not fire the second time.
+
+        **Autonomy level is per plan**, separate from the agent's own run mode.
+        Choose **Review** so the auto-triggered investigation proposes rather than
+        acts: Challenge 7 puts you in command, and you decide what gets approved.
+
+        Do this **now**. Challenge 7 depends on it auto-triggering.
 
 ### Reference
 

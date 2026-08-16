@@ -209,6 +209,11 @@ investigate. You'll want both in the final incident.
         thread shows a *Parallel subagent execution* step — and judge it on one
         question: would this have sped up a real AKS incident?
 
+        !!! tip "You'll meet this subagent again"
+            In Challenge 6 the response plan's **Response subagent** dropdown is
+            populated by exactly what you build here. Whether it is the right thing
+            to route a major incident to is a decision you'll make there.
+
     ??? note "Task 2 · Encode the skill"
         Exactly the same path — **Builder → Agent Canvas** — but click
         **+ Create skill** instead. (**Builder → Skill Builder** in the left-hand
