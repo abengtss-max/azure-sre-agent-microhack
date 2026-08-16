@@ -136,6 +136,21 @@ read-only check so the agent watches for drift on its own.
           resource group** at the **Reader** level. Do **not** pick *Subscription*
           or *Management group*.
 
+        !!! warning "The portal drops you into a chat before setup is finished"
+            Once the agent deploys, the portal opens a **Team onboarding** chat
+            thread and invites you to start talking to it. That is not a
+            confirmation that setup completed. You can reach a working chat window
+            with **Code** and **Logs** still unconnected, and the agent will answer
+            anyway, just without the context it needs.
+
+            The failure is silent and it surfaces two challenges later: without
+            **Code** the agent cannot correlate the Challenge 3 rollback to a
+            commit, and without **`aetherion-law`** it cannot read container logs.
+
+            Before moving on, go back to the agent resource and confirm all three
+            sources show as connected. If you skipped past the wizard, reopen it
+            from the agent's **Overview** and finish the connections you missed.
+
         **Keep Review mode** so the agent proposes actions and waits for approval.
         Its identity is granted Monitoring Contributor plus a reader bundle at
         setup, so the "won't change anything" guarantee comes from **Review mode**,
@@ -157,6 +172,14 @@ read-only check so the agent watches for drift on its own.
         **Confirm scope.** Ask *"List the resources in my resource group and
         summarize what this application does."* Then ask it to **restart a
         deployment**. In Review mode it must ask for approval, not act.
+
+        **Confirm the connections took.** Ask the agent:
+
+        > Which log sources and code repositories are you connected to right now?
+
+        It should name `aetherion-law` and your fork. If it names neither, the
+        **Code** and **Logs** connections did not save, and Challenges 3 and 4 will
+        underperform for reasons that look like agent weakness rather than setup.
 
     ??? note "Task 4 · Capture the baseline"
         - With the board green, paste the baseline prompt (the **Suggested Azure

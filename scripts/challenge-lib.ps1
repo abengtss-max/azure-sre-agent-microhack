@@ -238,6 +238,17 @@ function Test-IncidentPlatformConnected {
     return ($a.properties.incidentManagementConfiguration.type -eq 'AzMonitor')
 }
 
+# Creating the agent drops you into a chat before setup finishes, so these two
+# connections are commonly left empty and only bite in challenges 3 and 4.
+function Get-AgentContextGaps {
+    $a = Get-AgentResource
+    if (-not $a) { return @('agent') }
+    $gaps = @()
+    if (-not $a.properties.gitHubConfiguration) { $gaps += 'code/GitHub' }
+    if (-not $a.properties.logConfiguration.logAnalyticsConfiguration) { $gaps += 'logs/Log Analytics' }
+    return $gaps
+}
+
 # The agent can diagnose the APIM fault in challenge 7 but not remediate it
 # without this role, so catch a missing grant here rather than mid-incident.
 function Test-AgentApimAccess {
@@ -324,9 +335,15 @@ $script:Challenges = [ordered]@{
                 Write-Host "  The agent cannot manage API Management, so challenge 7 would be unfixable." -ForegroundColor Yellow
                 Write-Host "  Run: ./scripts/grant-agent-apim-access.ps1" -ForegroundColor Yellow
             }
+            $gaps = if ($agent) { Get-AgentContextGaps } else { @('agent') }
+            $ctx  = ($gaps.Count -eq 0)
+            if ($agent -and -not $ctx) {
+                Write-Host "  Agent setup is incomplete, not connected to: $($gaps -join ', ')." -ForegroundColor Yellow
+                Write-Host "  Reopen the agent's setup wizard and finish those connections." -ForegroundColor Yellow
+            }
             $conn = $agent -and (Confirm-SelfAttest 'Is your SRE Agent scoped to the resource group and running in Review mode?')
             $base = Confirm-SelfAttest 'Have you recorded a healthy baseline AND created a scheduled daily health check?'
-            @{ Pass = ($allOk -and $agent -and $apim -and $conn -and $base); Detail = "platform healthy=$allOk, agentExists=$agent, apimAccess=$apim, agent connected=$conn, baseline+schedule=$base" }
+            @{ Pass = ($allOk -and $agent -and $apim -and $ctx -and $conn -and $base); Detail = "platform healthy=$allOk, agentExists=$agent, apimAccess=$apim, context=$(if($ctx){'connected'}else{"missing $($gaps -join '+')"}), agent connected=$conn, baseline+schedule=$base" }
         }
     }
 
