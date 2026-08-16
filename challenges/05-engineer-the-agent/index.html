@@ -1848,7 +1848,7 @@ guardrails intact.</p>
 <ol>
 <li><strong>Build the specialist.</strong> Create an <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> triage subagent for the <code>aetherion</code> namespace, <strong>scope it to the eight tools it needs</strong>, verify what it actually got, then invoke it to summarize namespace health and likely causes.</li>
 <li><strong>Encode the skill.</strong> Capture the crew query-path recovery from Challenge 4 as a reusable skill, guardrails intact, and confirm it loads.</li>
-<li><strong>Know when to use which.</strong> Be able to say when you'd reach for the subagent (delegate to it to investigate) versus the skill (a procedure the agent can draw on).</li>
+<li><strong>Know when to use which.</strong> Decide whether the new skill belongs to the specialist or the main agent, act on that decision, and be able to say when you'd reach for the subagent (delegate to it to investigate) versus the skill (a procedure the agent can draw on).</li>
 </ol>
 <p><img alt="Challenge 5 storyboard: Sam and Aria engineer a specialist subagent and reusable skill" class="story-panel" loading="lazy" src="../../assets/storyboard/img-challenge-5.webp" /></p>
 <h3 id="suggested-azure-sre-agent-prompt">Suggested Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent prompt<a class="headerlink" href="#suggested-azure-sre-agent-prompt" title="Permanent link">&para;</a></h3>
@@ -1876,6 +1876,7 @@ language.</p>
 <li>A custom <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr>-specialist subagent exists, is <strong>scoped to a deliberate tool set rather than inheriting all 46</strong>, and you verified via the API that <code>RunKubectlReadCommand</code> is present and <code>RunKubectlWriteCommand</code> is not.</li>
 <li>You've invoked it for a scoped investigation that produces genuinely useful triage.</li>
 <li>A reusable skill captures the sanctioned recovery, loads/applies correctly, and matches the runbook guardrails.</li>
+<li>You decided <strong>who owns that skill</strong> and acted on it: it stays with the main agent, not the read-only <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> specialist, and you can give the reason.</li>
 <li>You can explain when to reach for the subagent versus the skill, and <code>check-challenge.ps1 5</code> passes.</li>
 </ul>
 <div class="admonition success">
@@ -1945,8 +1946,9 @@ whether the specialist is worth having. Paste this, then adjust to taste:</p>
 </code></pre></div>
 <p>The last line is a <em>request</em>. On its own, nothing enforces it. You are
 about to make it real.</p>
-<p><strong>Skills</strong>: leave inherited. Scoping skills is the same idea as scoping
-tools, and one axis is enough to learn it on.</p>
+<p><strong>Skills</strong>: leave inherited <strong>for now</strong>. The skill you are about to author
+does not exist yet, so there is nothing to decide here. You will come back to
+this panel in Task 3, and the answer is not the obvious one.</p>
 <p><strong>Tools</strong>: this is where the specialist actually becomes a specialist.</p>
 <div class="admonition danger">
 <p class="admonition-title">A subagent that inherits everything is not a specialist</p>
@@ -2221,6 +2223,50 @@ keeping.</p>
 <li>A <strong>skill</strong> encodes a <em>procedure</em> (the query-path recovery) that the
   agent can draw on when the situation matches its description.</li>
 </ul>
+<p><strong>Now answer the question this challenge sets up.</strong> You built both in the
+same challenge, so the natural assumption is that they go together: should
+the <code>crew-query-path-recovery</code> skill belong to your <code>aks-triage</code> specialist?</p>
+<p>Go back to <strong>Builder → Agent Canvas</strong>, open <code>aks-triage</code>, and look at the
+<strong>Skills</strong> panel. Left inherited, it now holds the crew recovery skill,
+because it inherits every skill the main agent has.</p>
+<p><strong>Take it away.</strong> Scope its skills the way you scoped its tools, and leave
+the crew recovery skill with the main agent.</p>
+<p>Three reasons, and they are worth being able to recite:</p>
+<table>
+<thead>
+<tr>
+<th>Reason</th>
+<th>Detail</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Remit</strong></td>
+<td>Its own instructions say <em>do not investigate the database yourself</em>. The crew problem is a database query path. The skill is outside its lane by definition</td>
+</tr>
+<tr>
+<td><strong>Capability</strong></td>
+<td>You removed <code>RunKubectlWriteCommand</code>. The skill's remedy is to <strong>apply</strong> an index. It cannot execute the procedure it would be holding</td>
+</tr>
+<tr>
+<td><strong>Ownership</strong></td>
+<td>The main agent commands the whole board and holds the write tools. A procedure belongs where it can actually be carried out</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition tip">
+<p class="admonition-title">The pairing rule, in one line</p>
+<p><strong>A skill belongs to whichever agent has both the remit and the tools to
+execute it.</strong></p>
+<p>That is why these two do not pair. Build a <code>crew-recovery</code> subagent
+instead — scoped to the database tier, holding <code>RunKubectlWriteCommand</code>
+— and this exact skill would belong to it and to nothing else. Same
+skill, different owner, because the owner's remit and tools changed.</p>
+</div>
+<p>The trap is assuming that things built together belong together. Challenge 7
+uses both, through deliberately different paths: you <strong>delegate</strong> to the
+subagent for <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> triage, and you <strong>name</strong> the skill to the main agent for the
+crew fix.</p>
 <div class="admonition warning">
 <p class="admonition-title">Don't assume a skill fires on its own</p>
 <p>Skills are described as loading by context, but in validation this one
