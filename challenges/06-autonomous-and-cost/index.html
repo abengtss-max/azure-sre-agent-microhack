@@ -1876,7 +1876,10 @@ or your environment. Don't claim that stopping an agent ends all billing.</p>
 </div>
 <div class="admonition success">
 <p class="admonition-title">Verify your work</p>
-<p>Run this when you're done. It grades the real end state:</p>
+<p>Run this when you're done. It grades the real end state, then walks your
+response plan setting by setting. Answer those honestly: a plan that looks
+right and never fires is the one failure that doesn't surface until
+Challenge 7 is already open.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="n">check-challenge</span><span class="p">.</span><span class="n">ps1</span> <span class="n">6</span>
 </code></pre></div>
 </div>
@@ -2037,7 +2040,10 @@ trade so Challenge 7 can show you what unattended response looks like.</p>
 for you. It will not fix everything: it acts where the fix is unambiguous and
 reversible, and leaves the judgement calls. Challenge 7 is built around that
 split, and your first job there is to audit what it decided to do alone.</p>
-<p>Do this <strong>now</strong>. Challenge 7 depends on it auto-triggering.</p>
+<p>Do this <strong>now</strong>. Challenge 7 depends on it auto-triggering, and
+<code>check-challenge.ps1 6</code> will ask you about each of the six settings above
+one at a time. Every one of them is a way to end up with a plan that is
+listed, looks correct, and quietly matches nothing.</p>
 </details>
 </div>
 <h3 id="reference">Reference<a class="headerlink" href="#reference" title="Permanent link">&para;</a></h3>
