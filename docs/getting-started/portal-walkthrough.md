@@ -164,14 +164,22 @@ Reference: [Manage roles and permissions](https://learn.microsoft.com/en-us/azur
 
 ## H · Approve a write, or grant a narrow write role { #h-write }
 
-When a fix needs a change, you have two governed paths:
+When a fix needs a change, you have two governed paths.
 
-=== "Approve on-behalf-of (OBO)"
+=== "Approve it in Review mode"
 
-    1. Ask the agent for a **remediation plan**.
-    2. When it prompts, select **Approve**. The action runs using *your*
-       credentials, once, for that step.
-    3. Best when you want a human decision on each change.
+    1. Ask the agent for a **remediation plan**, and read it.
+    2. A plan on its own queues nothing. Tell the agent to **apply** it — the
+       approval card appears when it attempts the write, not when it finishes
+       thinking.
+    3. Read the exact command on the card, then select **Approve action**.
+
+    The card states **"Agent permissions will be used to complete this action."**
+    The write runs as the agent's own managed identity, so the change is
+    attributed in the Activity Log to the agent rather than to you. Your approval
+    is recorded in the thread, not on the resource.
+
+    Best when you want a human decision on each change.
 
 === "Grant a scoped role"
 
@@ -180,8 +188,14 @@ When a fix needs a change, you have two governed paths:
     2. Open the target resource → **Access control (IAM)** → **Add role
        assignment** → pick the role → **Managed identity** →
        `aetherion-sre-agent` → **Review + assign**.
-    3. Best when you want the agent to act with its **own** identity, auditable in
-       the Activity Log.
+    3. Best when the agent needs to reach something it currently cannot, rather
+       than when you want a decision point.
+
+!!! note "On-behalf-of (OBO)"
+    The docs describe an OBO path where an action runs using *your* credentials.
+    It is not available in this environment — attempts return *"OBO flow is not
+    supported with CliInAdc enabled"*. Everything the agent does here runs as its
+    own identity, which is why scoping that identity matters.
 
 Reference: [Security overview](https://learn.microsoft.com/en-us/azure/sre-agent/security-overview)
 

@@ -59,8 +59,8 @@ minute* are the core; everything below rounds out the picture.
 **Two independent controls.**
 
 1. **Permissions (Azure RBAC):** what the agent's identity is *allowed* to do (for
-   example Reader vs a narrower write role). When it lacks permission it can fall
-   back to **on-behalf-of (OBO)** and ask you to approve using *your* credentials.
+   example Reader vs a narrower write role). Approved writes run as the **agent's**
+   identity, not yours, so the Activity Log attributes them to the agent.
 2. **Run mode:** *how* it acts. **Review** (proposes, waits for approval) vs
    **Autonomous** (acts within its permissions and guardrails).
 

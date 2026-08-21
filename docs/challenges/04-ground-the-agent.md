@@ -33,6 +33,9 @@ non-destructive remediation and verify service is restored.
     ./scripts/start-challenge.ps1 4   # open the incident
     ```
 
+    Give it two or three minutes. The database has to come under load before crew
+    latency moves, and the Ops Center averages over a rolling window on top of that.
+
 ### Tasks
 
 1. **Find the origin.** Several database-backed services look unhappy. Work out which one is *causing* it and which are just sharing the damage.
@@ -43,13 +46,17 @@ non-destructive remediation and verify service is restored.
 
 ### Suggested Azure SRE Agent prompt
 
-!!! quote "Paste into the agent chat"
-    `crew-scheduling` is timing out and the other database-backed services are
-    slower than usual, but the pods themselves are not CPU-bound and the database
-    is not down. Work out which service's queries are saturating the shared
-    database. Then, using the Aetherion runbooks I've loaded: what is the
-    sanctioned remediation? Cite the guardrail and give me a plan I can approve. Do
-    not delete or restart the database.
+This challenge uses **two** prompts, and the order matters. Ask the first one
+**before** you load anything, so you have something to compare against.
+
+!!! quote "Task 1 · ask this first, ungrounded"
+    `crew-scheduling` is timing out. The pods aren't CPU-bound and the database is
+    not down. Work out what is saturating the shared database, and tell me what
+    you would do about it.
+
+Keep that answer. It is your control group: whatever the agent recommends here, it
+is reasoning from general practice and from your source code, because that is all
+it has. Task 2 gives it Aetherion's own operating rules and asks again.
 
 ### Success criteria
 
@@ -96,9 +103,11 @@ work to the part that is already at its limit.
           database-backed peers (`booking`, `telemetry-ingest`) are slower than
           their baseline. `baggage`, which touches no database, is untouched. That
           contrast is the clue.
-        - Compare the layers: pod CPU (`kubectl top pods -n aetherion`) against the
-          PostgreSQL server's CPU in the portal. The pods are comfortable and the
-          database is not, so the constraint is the work being sent to it.
+        - Compare the layers. Ask the agent to put pod CPU next to the PostgreSQL
+          server's CPU. If the pods are comfortable and the database is not, the
+          constraint is the work being sent to it, not the workload itself.
+          (`kubectl top pods -n aetherion` and the server's metrics in the portal
+          will confirm it independently, if you want to see it yourself.)
         - Now ask which service is sending that work. Only one is running a request
           rush against a table it can no longer read efficiently.
 
@@ -107,17 +116,32 @@ work to the part that is already at its limit.
           runbooks from your **lab clone's** `knowledge/` folder (architecture,
           escalation, ops guide, platform standards, and the AKS / APIM / database
           runbooks). The application fork does not contain them.
-        - Bulk upload can partially fail. Check every file shows **Indexed**, then
-          confirm the agent can actually quote a runbook line before relying on it.
-        - Now ask the same remediation question again, word for word:
 
-            > `crew-scheduling` is slow while its pods sit idle and the shared
-            > PostgreSQL server is saturated. What is the sanctioned fix, and what
-            > am I not allowed to do?
+        !!! warning "Upload them one at a time, and don't trust the tick"
+            Uploading all seven at once can lose the last file: the indexer starts
+            before the final upload lands, and the file it drops is
+            `runbook-database.md` — the one this challenge needs. The Knowledge
+            Sources page will still show it as **Indexed**.
 
-          The advice should now **cite Aetherion's runbook** by name instead of
-          offering generic Kubernetes guidance. If it still answers generically,
-          the knowledge source is not indexed yet.
+            Add them individually, or add the others first and
+            `runbook-database.md` on its own at the end. If the agent later answers
+            without ever citing a runbook, delete that file and re-add it alone.
+
+        - Now ask the remediation question again, in a **new chat thread**. A fresh
+          thread matters: in the old one the agent can simply restate its earlier
+          answer and look grounded when nothing has changed.
+
+            > `crew-scheduling` is timing out. The pods aren't CPU-bound and the
+            > database is not down. Work out what is saturating the shared database,
+            > and tell me what you would do about it. Use the Aetherion runbooks I
+            > have loaded, cite the guardrail you are following, and do not delete or
+            > restart the database.
+
+          Compare it against the answer you kept from Task 1. You are looking for
+          the things only Aetherion knows: what you are forbidden from doing, what
+          the escalation path is, and why the obvious remedies are wrong here. If the
+          two answers are identical, the knowledge isn't reaching the agent — check
+          the indexing warning above before you go further.
 
     ??? note "Task 3 · Apply the sanctioned fix"
         - Follow the runbook: **repair the query path**. Do **not** delete or restart
@@ -128,6 +152,16 @@ work to the part that is already at its limit.
         - The remedy is a schema change, so apply it under approval (keep the agent
           in **Review** and approve the write). Then verify `/api/crew` is fast
           again, not merely answering.
+
+        !!! note "Expect two approvals, not one"
+            The fix runs as a Kubernetes Job, so you approve the Job itself **and**
+            the container image it pulls (`postgres:16-alpine`) as a separate step.
+            The second card is not a duplicate of the first — running someone else's
+            image against your database is its own decision, and the agent is right
+            to ask twice.
+
+        Remember that the agent will describe the plan and wait. Tell it to apply
+        before you expect an approval card.
 
 ### Reference
 

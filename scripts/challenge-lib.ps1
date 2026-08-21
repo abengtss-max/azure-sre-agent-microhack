@@ -611,6 +611,9 @@ function Start-AetherionChallenge([int]$Number) {
     Write-Host ""
     Write-Host "=== Challenge $Number : $($ch.Title) ===" -ForegroundColor Cyan
     Write-Host ""
+    # The agent's identity is created with the agent, so this cannot live in Bicep.
+    # Idempotent and silent when the agent does not exist yet.
+    & (Join-Path $PSScriptRoot 'grant-agent-apim-access.ps1') -IfPresent
     Set-ChallengeStartTime $Number
     & $ch.Start
     Write-Host ""

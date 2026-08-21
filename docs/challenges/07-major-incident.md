@@ -49,6 +49,9 @@ by service.
     ./scripts/start-challenge.ps1 7   # open the incident
     ```
 
+    Four faults land at once and the board takes two or three minutes to reflect
+    all of them. Don't start triaging from a half-drawn picture.
+
 ### Tasks
 
 1. **Take handover from the agent.** Find the thread the Sev1 alert opened by itself, read what the agent has already changed unattended, and verify it independently before you trust it.
@@ -73,13 +76,12 @@ by service.
 ### Suggested Azure SRE Agent prompt
 
 !!! quote "Paste into the agent chat"
-    You picked this incident up before I did. First, list every action you already
-    took without my approval and how I can verify each one. Then read the whole
-    Aetherion board and give me an incident-command triage: list every service still
-    failing, order remediation by business tier (situational awareness and
-    legal-to-fly first), and for each name the sanctioned, reversible fix. Have we
-    seen a similar crew-scheduling / check-in incident before. Pull the earlier RCA
-    from session memory.
+    You picked this incident up before I did. List every action you have already
+    taken without my approval, and how I can verify each one. Then tell me what is
+    still broken, and what you recommend I deal with first.
+
+The second half is the part you own. It will give you an order; your job is to
+decide whether it's the right one for an airline at peak departure.
 
 ### Success criteria
 
@@ -115,6 +117,22 @@ Expect the board to get *worse* once the front door is fixed: with traffic flowi
 again, the degradations further back become visible. That is normal in a layered
 incident. Restoring the edge doesn't create new faults, it reveals the ones the
 outage was masking.
+</details>
+
+<details markdown="1"><summary>Hint: how an experienced incident commander would have scoped it</summary>
+
+If the agent's account is scattered, this is how someone who has run a major
+incident would ask for it:
+
+> Read the whole Aetherion board and give me an incident-command triage: list every
+> service still failing, order remediation by business tier (situational awareness
+> and legal-to-fly first), and for each name the sanctioned, reversible fix. Have we
+> seen a similar crew-scheduling / check-in incident before? Pull the earlier RCA
+> from session memory.
+
+Two things in there are doing the work: **order by business tier**, which stops you
+fixing whatever is loudest, and **pull the earlier RCA from memory**, which is the
+difference between solving crew scheduling for the first time and the second.
 </details>
 
 !!! question "Stuck? Step-by-step for each task"
@@ -215,6 +233,17 @@ outage was masking.
           against the same call **through APIM**. If direct returns 200 but APIM
           fails, the fault is the **edge policy**, not the service; treat the change
           as customer-facing.
+
+        !!! note "Why it can fix this at all"
+            Everywhere else today the agent has held write access to Kubernetes and
+            nothing else. It can repair the front door because its identity also
+            holds **API Management Service Contributor**, scoped to the API
+            Management service alone rather than the resource group.
+
+            Narrow enough to fix this, too narrow to touch anything else. That is
+            what least privilege looks like when it is actually load-bearing: had it
+            been scoped to the resource group, the same repair would have carried the
+            authority to change every resource in the environment.
 
     ??? note "Task 6 · Verify every service"
         - Confirm each fix from telemetry / health before closing, then check the

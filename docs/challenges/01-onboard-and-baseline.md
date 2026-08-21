@@ -53,7 +53,7 @@ check.
 1. **Check the board.** Read the Operations Center once while it's green. That's your reference for the rest of the day.
 2. **Confirm telemetry is flowing.** Open Grafana and check that AKS and Application Insights are reporting.
 3. **Connect the agent.** Create the SRE Agent in your resource group and give it read access to your code, logs, and Azure resources, in Review mode.
-4. **Capture the baseline.** Ask the agent for a baseline of the `aetherion` namespace, then sanity-check a few of its numbers against the Ops Center and Grafana.
+4. **Capture the baseline.** Ask the agent for a baseline of the `aetherion` namespace, then spot-check its numbers. Trust the measured latency; verify the configuration.
 5. **Put it on a schedule.** Have the agent re-run that health check every morning so drift shows up before it turns into an incident.
 
 ![Challenge 1 storyboard: Sam and Aria onboard the SRE Agent and read the baseline](../assets/storyboard/img-challenge-1.webp){ .story-panel loading=lazy }
@@ -130,29 +130,32 @@ read-only check so the agent watches for drift on its own.
         access. Choose **Full setup** and connect:
 
         - **Code** → **GitHub** → sign in → add **your fork** of `aetherion-airops-platform`.
-        - **Logs** → **Log Analytics Workspace** → pick the app's **`aetherion-law`**
-          (not the agent's own auto-created workspace).
+        - **Logs** → **Log Analytics Workspace** → pick the app's **`aetherion-law`**.
+          The agent created its own workspace when you deployed it, named
+          `workspace<random>`; that one holds the agent's telemetry, not the
+          application's.
         - **Azure resources** → **Resource group** → select **only your app
           resource group** at the **Reader** level. Do **not** pick *Subscription*
-          or *Management group*.
+          or *Management group*. You'll also see an `MC_...` group that AKS created
+          for the cluster's nodes — leave it out, nothing here needs it.
 
-        !!! warning "The portal drops you into a chat before setup is finished"
-            Once the agent deploys, the portal opens a **Team onboarding** chat
-            thread and invites you to start talking to it. That is not a
-            confirmation that setup completed. You can reach a working chat window
-            with **Code** and **Logs** still unconnected, and the agent will answer
-            anyway, just without the context it needs.
+        Two of the five cards are deliberately left for later. **Incidents** is
+        connected in Challenge 6; connecting it now also creates a quickstart
+        response plan you would have to clean up before the final incident.
+        **Knowledge files** are loaded in Challenge 4.
 
-            The failure is silent and it surfaces two challenges later: without
-            **Code** the agent cannot correlate the Challenge 3 rollback to a
-            commit, and without **`aetherion-law`** it cannot read container logs.
+        !!! tip "Finish setup before you start chatting"
+            When the agent finishes deploying, the portal opens a **Team onboarding**
+            chat and invites you to start talking to it. You can chat before the
+            context connections are done — it will answer, just with less to work
+            with.
 
-            Verify both before moving on:
+            Give it the full picture first, so Challenge 3 can correlate a rollback
+            to a commit and Challenge 4 can read container logs:
 
-            - **Builder → Code Access** should list `github.com` as **Connected**
-              and your `aetherion-airops-platform` fork as **Ready**, with a recent
-              sync time.
-            - **Builder → Connectors** should show a **Log Analytics** connector.
+            - **Builder → Code Access** lists `github.com` as **Connected** and your
+              `aetherion-airops-platform` fork as **Ready**, with a recent sync time.
+            - **Builder → Connectors** shows a **Log Analytics** connector.
 
             If either is missing, reopen the setup wizard from the agent's
             **Overview** and finish the connection you skipped.
@@ -162,22 +165,13 @@ read-only check so the agent watches for drift on its own.
         setup, so the "won't change anything" guarantee comes from **Review mode**,
         not from the role being read-only.
 
-        **Grant one extra permission.** Setup leaves the agent with read-only
-        access to API Management, which is enough to diagnose an edge fault but not
-        to repair one. Run this once, after the agent exists:
+        **Confirm scope.** Ask:
 
-        ```powershell
-        ./scripts/grant-agent-apim-access.ps1
-        ```
+        > List the resources in my resource group and summarize what this
+        > application does.
 
-        It grants **API Management Service Contributor** scoped to the API
-        Management service alone, never the resource group. Skip it and the agent
-        will correctly localise the front-door failure in Challenge 7 and then
-        report that RBAC blocks the fix.
-
-        **Confirm scope.** Ask *"List the resources in my resource group and
-        summarize what this application does."* Then ask it to **restart a
-        deployment**. In Review mode it must ask for approval, not act.
+        Then ask it to **restart a deployment**. In Review mode it must ask for
+        approval, not act.
 
         **Confirm the connections took.** Ask the agent:
 
@@ -195,32 +189,30 @@ read-only check so the agent watches for drift on its own.
         - If the board was recently degraded, reset and let telemetry settle first,
           or the baseline will record the fault as "normal".
 
-        !!! tip "Check the configuration values, not just the metrics"
-            Measured values come straight from telemetry and are reliable. The
-            numbers most likely to be wrong are **configuration** values such as
-            CPU requests, limits and replica counts, because the agent is
-            summarising many deployments at once and can attribute one service's
-            setting to another.
+        !!! tip "Verify config, trust metrics"
+            Measured values come straight from telemetry and are reliable.
+            Configuration values — CPU requests, limits, replica counts — are the
+            ones that can get attributed to the wrong deployment when the agent is
+            summarising several at once.
 
-            A wrong config value is hard to spot, because the metric it is compared
-            against is real. "96m against a 100m request" reads as a service about
-            to saturate; if the request is actually 250m, the same service is fine.
-            Confirm any capacity claim before you act on it:
+            That's hard to catch, because the metric beside it is real. "96m against
+            a 100m request" reads as a service about to saturate; if the request is
+            actually 250m, it's fine. Confirm before you act:
 
             ```powershell
             kubectl get deploy gateway -n aetherion -o jsonpath='{.spec.template.spec.containers[0].resources}'
             ```
 
-            This is the point of the task. The agent does the heavy correlation
-            well, and you stay responsible for the conclusions.
-
     ??? note "Task 5 · Put it on a schedule"
         You can schedule the baseline two ways, by asking in chat or from the
         **Scheduled tasks** page in the portal.
 
-        **Option A: Ask the agent.** In the chat, say *"Schedule this baseline to
-        run every morning at 08:00 UTC and alert me on drift from normal."* It
-        creates the scheduled task, converts that to a cron expression, and sets
+        **Option A: Ask the agent.** In the chat:
+
+        > Schedule this baseline to run every morning at 08:00 UTC and alert me on
+        > drift from normal.
+
+        It creates the scheduled task, converts that to a cron expression, and sets
         the drift conditions from the baseline it just measured.
 
         Include the time zone. If you leave it out the agent will not guess: it

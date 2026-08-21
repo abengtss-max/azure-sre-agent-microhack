@@ -74,6 +74,13 @@ unless a challenge explicitly enables bounded automation. Verify recovery with
 telemetry after every change, and preserve the evidence you will need for the
 incident summary at the end of the shift.
 
+**Use the agent to do the work; use `kubectl` to check the agent.** You have a
+terminal, and some of these incidents would be faster to fix by hand. Resist it.
+The point of the day is to find out where an agent earns its place and where it
+doesn't, and you learn nothing about that by racing it. Where a challenge does ask
+you to run something directly, it is to verify a claim the agent made — auditing an
+agent through the agent tells you nothing.
+
 Challenges 2 and 3 are **one ongoing incident**: detection and read-only
 investigation, then controlled recovery, before a change-driven flight-board
 outage is layered on top in Challenge 3.

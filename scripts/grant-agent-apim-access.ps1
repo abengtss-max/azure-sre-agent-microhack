@@ -8,12 +8,17 @@
 # incident in Challenge 7 has no reachable fix.
 
 param(
-    [string]$AgentName
+    [string]$AgentName,
+    # Called automatically from start-challenge, where the agent may not exist yet.
+    [switch]$IfPresent
 )
 
 $ErrorActionPreference = 'Stop'
 $envFile = Join-Path $PSScriptRoot '.env.aetherion.json'
-if (-not (Test-Path $envFile)) { throw "State file not found. Run 01-deploy-infra.ps1 first." }
+if (-not (Test-Path $envFile)) {
+    if ($IfPresent) { return }
+    throw "State file not found. Run 01-deploy-infra.ps1 first."
+}
 $state = Get-Content $envFile -Raw | ConvertFrom-Json
 $rg = $state.resourceGroup
 
@@ -21,25 +26,29 @@ if (-not $AgentName) {
     $agents = az resource list -g $rg --resource-type 'Microsoft.App/agents' --query "[].name" -o tsv
     $AgentName = @($agents)[0]
     if (-not $AgentName) {
+        if ($IfPresent) { return }
         throw "No Microsoft.App/agents resource found in '$rg'. Create the SRE Agent first (Challenge 1), then re-run."
     }
 }
 
-Write-Host "Agent: $AgentName"
+if (-not $IfPresent) { Write-Host "Agent: $AgentName" }
 
 $identityId = az resource show -g $rg -n $AgentName --resource-type Microsoft.App/agents `
     --api-version 2026-01-01 --query "properties.actionConfiguration.identity" -o tsv
-if (-not $identityId) { throw "The agent has no managed identity set. Complete the agent setup first." }
+if (-not $identityId) {
+    if ($IfPresent) { return }
+    throw "The agent has no managed identity set. Complete the agent setup first."
+}
 
 $principalId = az identity show --ids $identityId --query principalId -o tsv
-Write-Host "Identity principal: $principalId"
+if (-not $IfPresent) { Write-Host "Identity principal: $principalId" }
 
 $scope = az resource show -g $rg -n $state.apimName --resource-type Microsoft.ApiManagement/service --query id -o tsv
 
 $existing = az role assignment list --assignee-object-id $principalId --scope $scope `
     --query "[?roleDefinitionName=='API Management Service Contributor'] | length(@)" -o tsv
 if ([int]$existing -gt 0) {
-    Write-Host "  already granted - nothing to do."
+    if (-not $IfPresent) { Write-Host "  already granted - nothing to do." }
     return
 }
 

@@ -48,12 +48,13 @@ without changing anything in production.
 ### Suggested Azure SRE Agent prompt
 
 !!! quote "Paste into the agent chat"
-    Analyze the check-in / booking path read-only. Correlate `booking` request
-    duration with CPU, replica count, dependency call durations and request load
-    over the last 30 minutes, and check recent deployments and rollout history for
-    changes in the same window. Compare the live workload against what the
-    repository's manifest declares. Give me the most likely cause with supporting
-    evidence, and change nothing.
+    Check-in has slowed to a crawl. Investigate read-only and tell me the most
+    likely cause, with the evidence behind it. Change nothing.
+
+That is deliberately thin, because it is what you would actually type at 18:12.
+The agent's first answer will be broader than you need. Push back on it, and
+notice which follow-up finally moves it forward: that is the skill this challenge
+is really teaching.
 
 !!! tip "Optional: feed the agent a HAR trace or screenshot"
     If a partner reports the failure from their side, capture a **HAR** (HTTP
@@ -95,6 +96,23 @@ You're done when you can describe the symptom precisely and defend a hypothesis,
 not when it's fixed.
 </details>
 
+<details markdown="1"><summary>Hint: how an experienced operator would have scoped it</summary>
+
+Still going in circles? This is the prompt someone who has worked this failure
+class before would write:
+
+> Analyze the check-in / booking path read-only. Correlate `booking` request
+> duration with CPU, replica count, dependency call durations and request load
+> over the last 30 minutes, and check recent deployments and rollout history for
+> changes in the same window. Compare the live workload against what the
+> repository's manifest declares. Give me the most likely cause with supporting
+> evidence, and change nothing.
+
+Read it before you paste it. Every clause is a decision: which window, which
+signals, and the one that does most of the work here, comparing what is *running*
+against what the repository *declares*.
+</details>
+
 !!! question "Stuck? Step-by-step for each task"
     Give each task a genuine attempt first and skim the hints above. When you want
     the exact clicks, open the matching task below.
@@ -131,10 +149,12 @@ not when it's fixed.
         thread, or commit it to memory by typing `/remember .` in the chat box
         (it becomes `#remember`), or by saying *"save this to your knowledge"*.
 
-        **Confirm it stuck.** Ask *"What do you remember about the check-in
-        slowdown?"* in a **new** chat thread. If it repeats your hypothesis back,
-        it saved. If it doesn't, the summary only exists in the old thread, so
-        keep that thread open for Challenge 3.
+        **Confirm it stuck.** In a **new** chat thread, ask:
+
+        > What do you remember about the check-in slowdown?
+
+        If it repeats your hypothesis back, it saved. If it doesn't, the summary
+        only exists in the old thread, so keep that thread open for Challenge 3.
 
 ### Reference
 

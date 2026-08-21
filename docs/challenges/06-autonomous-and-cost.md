@@ -34,6 +34,9 @@ investigation, before you reach Challenge 7.
     ./scripts/start-challenge.ps1 6   # open the incident
     ```
 
+    Give it a couple of minutes. The errors only show up once enough traffic has
+    hit the affected slice for the board to average it.
+
 ### Tasks
 
 1. **Confirm the symptom.** Verify the baggage errors in the Ops Center and telemetry so you know what "recovered" looks like.
@@ -105,8 +108,11 @@ Challenge 7.
     ??? note "Task 1 · Confirm the symptom"
         - Check the **baggage** tile and telemetry (Application Insights failed
           requests) so you know the current error rate and what "recovered" means.
-        - Some requests succeed and some fail, so look at *which* pods are behind the
-          service: `kubectl get pods -n aetherion -l app=baggage --show-labels`.
+        - Some requests succeed and some fail. Ask the agent what is different about
+          the ones that fail — the answer is in what sits behind the Service, not in
+          the Service itself.
+        - `kubectl get pods -n aetherion -l app=baggage --show-labels` shows the same
+          thing directly, if you want to confirm the agent's account.
 
     ??? note "Task 2 · Decide the bounds, then hand over"
         - Write down the bounds first: what may the agent change, what must it never
