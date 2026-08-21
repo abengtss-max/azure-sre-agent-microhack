@@ -2237,8 +2237,10 @@ run mode (section F), not from the role.</p>
 <hr />
 <h2 id="i-knowledge">I · Load the <abbr title="Markdown/text files that ground the agent in Aetherion's own architecture and runbooks.">knowledge base</abbr> (ground the agent)<a class="headerlink" href="#i-knowledge" title="Permanent link">&para;</a></h2>
 <ol>
-<li>In the agent, open <strong>Knowledge</strong> (team onboarding / memory).</li>
-<li>Upload the Markdown files from this repo's <strong><code>knowledge/</code></strong> folder.</li>
+<li>In the agent, open <strong>Builder → Knowledge Sources</strong>.</li>
+<li>Upload the Markdown files from your <strong>lab clone's</strong> <code>knowledge/</code> folder. The
+   application fork does not contain them.</li>
+<li>Check every file reaches <strong>Indexed</strong>. Bulk upload can partially fail.</li>
 <li>Re-ask your remediation question. The advice should now cite Aetherion's own
    runbook guardrails instead of generic steps.</li>
 </ol>
@@ -2252,12 +2254,14 @@ run mode (section F), not from the role.</p>
    <code>aetherion</code> namespace: pod status, events, rollout history, dependency
    health."</em> Say how it should behave and what it should do when the evidence
    points outside its scope, not just what it covers.</li>
-<li><strong>Leave Skills and Tools inherited.</strong> Selecting either <em>overrides</em> the
-   inherited set rather than adding to it, and the picker does not list every
-   inherited tool. <code>RunKubectlReadCommand</code> and <code>RunKubectlWriteCommand</code> are in
-   the agent's inherited set but are not offered in the panel. Any selection you
-   make therefore risks dropping cluster access. Scope specialists with
-   Instructions.</li>
+<li><strong>Scope the Tools panel deliberately.</strong> Left alone the subagent inherits all
+   46 tools, which makes it a persona rather than a specialist. Selecting tools
+   <em>replaces</em> the inherited set instead of adding to it, so your list has to be
+   complete, not a highlight reel. Challenge 5 gives the exact eight tools and
+   the reason for each. Instructions are advisory; the tool list is what is
+   actually enforced.</li>
+<li><strong>Leave Skills inherited while you build.</strong> Who owns which skill is a
+   deliberate decision you make in Challenge 5, Task 3.</li>
 <li><strong>Create</strong>, then use it by asking the main agent to <strong>delegate to it by name</strong>
    ("delegate this to your <code>aks-triage</code> subagent"). Asking the agent to "act as"
    a specialist does not invoke the subagent. It just adopts the persona.</li>
@@ -2284,10 +2288,9 @@ run mode (section F), not from the role.</p>
 <hr />
 <h2 id="l-consumption">L · Review agent consumption (AAUs)<a class="headerlink" href="#l-consumption" title="Permanent link">&para;</a></h2>
 <ol>
-<li>Open the <strong><code>aetherion-sre-agent</code></strong> resource → <strong>Metrics</strong> / <strong>Cost</strong> (or the
-   consumption view in the console).</li>
-<li>Break usage down by <strong>thread type</strong> and <strong>operational purpose</strong> to see where
-   Agent Activity Units go.</li>
+<li>In the agent, open <strong>Settings → Agent Consumption</strong>.</li>
+<li>Break usage down by <strong>thread type</strong> (Chats, Incidents, Scheduled tasks,
+   Triggers) and by thread, to see where Azure Agent Units (AAUs) go.</li>
 <li>Use only real figures from your environment or the official
    <a href="https://learn.microsoft.com/en-us/azure/sre-agent/pricing-billing">pricing &amp; billing doc</a>.
    Never invent rates or savings.</li>

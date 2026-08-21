@@ -1850,8 +1850,13 @@ minute</em> are the core; everything below rounds out the picture.</p>
 </ol>
 <p><strong>Other essentials.</strong></p>
 <ul>
-<li><strong>Skills load automatically</strong>; <strong>custom subagents are invoked explicitly</strong> (for
-  example with <code>/agent</code>). Skills are capped at <strong>5 concurrent active</strong> at a time.</li>
+<li><strong>Subagents are invoked explicitly</strong>, in natural language, by naming the one you
+  want (<em>"delegate this to your <code>aks-triage</code> subagent"</em>). There is no slash-command
+  syntax, and asking the agent to <em>act as</em> a specialist does not invoke one, it just
+  adopts the persona.</li>
+<li><strong>Skills</strong> are matched against their description rather than guaranteed to fire.
+  Name the skill when you want it used. Skills are capped at <strong>5 concurrent active</strong>
+  at a time.</li>
 <li>Only a user with the <strong>Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent Administrator</strong> role can approve proposed
   actions.</li>
 <li>The <strong><abbr title="Markdown/text files that ground the agent in Aetherion's own architecture and runbooks.">knowledge base</abbr></strong> accepts Markdown/text files (this repo's <code>knowledge/</code>),
