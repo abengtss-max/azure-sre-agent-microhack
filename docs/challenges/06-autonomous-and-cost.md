@@ -66,7 +66,10 @@ investigation, before you reach Challenge 7.
 
 !!! success "Verify your work"
 
-    Run this when you're done. It grades the real end state:
+    Run this when you're done. It grades the real end state, then walks your
+    response plan setting by setting. Answer those honestly: a plan that looks
+    right and never fires is the one failure that doesn't surface until
+    Challenge 7 is already open.
 
     ```powershell
     ./scripts/check-challenge.ps1 6
@@ -198,7 +201,10 @@ Challenge 7.
         reversible, and leaves the judgement calls. Challenge 7 is built around that
         split, and your first job there is to audit what it decided to do alone.
 
-        Do this **now**. Challenge 7 depends on it auto-triggering.
+        Do this **now**. Challenge 7 depends on it auto-triggering, and
+        `check-challenge.ps1 6` will ask you about each of the six settings above
+        one at a time. Every one of them is a way to end up with a plan that is
+        listed, looks correct, and quietly matches nothing.
 
 ### Reference
 

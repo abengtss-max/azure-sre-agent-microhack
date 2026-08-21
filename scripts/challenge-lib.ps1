@@ -484,7 +484,28 @@ $script:Challenges = [ordered]@{
                 Write-Host "  Azure Monitor is not connected as an incident platform, so no response plan can exist." -ForegroundColor Yellow
                 Write-Host "  Incidents -> Triggers + response plans -> Connect an incident platform -> Azure Monitor." -ForegroundColor Yellow
             }
-            $plan = $conn -and (Confirm-SelfAttest 'Is your Sev1 response plan listed under Incidents -> Triggers + response plans with Status On, Severity Sev1 and autonomy Autonomous?')
+            # Response plans have no ARM surface, so these are self-attested. They are asked
+            # one at a time on purpose: each is a documented way to build a plan that looks
+            # correct and never fires, and Challenge 7 cannot pass without it firing.
+            $plan = $false
+            if ($conn) {
+                Write-Host ""
+                Write-Host "  Open Incidents -> Triggers + response plans and check your plan against each" -ForegroundColor Gray
+                Write-Host "  of these. Challenge 7 is graded on the alert actually firing." -ForegroundColor Gray
+                $pOn    = Confirm-SelfAttest 'Is your plan listed with Status On and Severity Sev1 (matching the pre-provisioned aetherion-major-incident alert)?'
+                $pTitle = Confirm-SelfAttest 'Are both title filters (contains / does not contain) empty?'
+                $pSub   = Confirm-SelfAttest 'Does Subagent name read "Set up", i.e. no subagent is bound to the plan?'
+                $pAuto  = Confirm-SelfAttest 'Is the agent autonomy level on the plan set to Autonomous?'
+                $pCool  = Confirm-SelfAttest 'Is alert reinvestigation cooldown disabled (it defaults to 3 hours and will silently block a re-run)?'
+                $pQuick = Confirm-SelfAttest 'Have you deleted the default quickstart plan that was created when you connected Azure Monitor?'
+                $plan = ($pOn -and $pTitle -and $pSub -and $pAuto -and $pCool -and $pQuick)
+                if (-not $plan) {
+                    Write-Host ""
+                    Write-Host "  Fix the plan now. Every 'no' above is a way for the Sev1 alert to fire and" -ForegroundColor Yellow
+                    Write-Host "  your plan to ignore it, which you would not discover until Challenge 7 is" -ForegroundColor Yellow
+                    Write-Host "  already open and the board is red." -ForegroundColor Yellow
+                }
+            }
             @{ Pass = ($ok -and $err -eq 0 -and (-not $canary) -and $auto -and $cost -and $plan); Detail = "baggage healthy=$ok errorRate=$err% canaryStillServing=$canary autonomous=$auto cost-model=$cost platformConnected=$conn responsePlan=$plan" }
         }
     }
