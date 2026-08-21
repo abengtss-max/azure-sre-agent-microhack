@@ -1842,6 +1842,10 @@ applying a reversible rollback, and verifying both from telemetry.
 <p class="admonition-title">Start this challenge</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="nb">start-challenge</span><span class="p">.</span><span class="n">ps1</span> <span class="n">3</span>   <span class="c"># open the incident</span>
 </code></pre></div>
+<p>Give it two or three minutes. The flight board only goes dark once the old
+pods have drained, and the Ops Center averages over a rolling window on top of
+that. You'll see the tile flap between degraded and down while it happens,
+which is exactly how a bad release looks from the outside.</p>
 </div>
 <h3 id="tasks">Tasks<a class="headerlink" href="#tasks" title="Permanent link">&para;</a></h3>
 <p><strong>Part A: finish the check-in incident</strong></p>
@@ -1858,13 +1862,11 @@ applying a reversible rollback, and verifying both from telemetry.
 <h3 id="suggested-azure-sre-agent-prompt">Suggested Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent prompt<a class="headerlink" href="#suggested-azure-sre-agent-prompt" title="Permanent link">&para;</a></h3>
 <div class="admonition quote">
 <p class="admonition-title">Paste into the agent chat</p>
-<p>Turn my check-in hypothesis into a concrete remediation plan for the <code>booking</code>
-service. Restore it to exactly what the repository's manifest declares rather
-than to a value you choose, and tell me exactly what permission the action
-needs. Then, for <code>flight-ops</code>, correlate the outage time with deployment and
-rollout history, including the recorded change cause, and propose the
-least-disruptive <strong>reversible</strong> rollback for my approval.</p>
+<p>Check-in is still slow, and the flight board has gone dark for every station.
+Investigate both and propose fixes. Don't change anything yet.</p>
 </div>
+<p>Two incidents, one instruction, no steer. Whatever it comes back with, make it
+name the permission each action needs before you let it near production.</p>
 <h3 id="success-criteria">Success criteria<a class="headerlink" href="#success-criteria" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Check-in is remediated with a least-disruptive action you approved in <strong>Review</strong> mode (not ungoverned automation); <code>booking</code> is healthy, latency is back to baseline, and <strong>the setting the change altered matches what the repository declares</strong>. Compensating around it is not a fix.</li>
@@ -1880,9 +1882,26 @@ least-disruptive <strong>reversible</strong> rollback for my approval.</p>
 <h3 id="hints">Hints<a class="headerlink" href="#hints" title="Permanent link">&para;</a></h3>
 <details>
 <summary>Hint: recover check-in safely</summary>
-<p>Ask the agent for a remediation <em>plan</em> first. It tells you the permission the
-action needs. The safe fix restores what the last change took away and leaves the
-autoscaler to absorb the surge; it shouldn't touch the database, Redis, or nodes.</p>
+<p>Ask the agent for a remediation <em>plan</em> before any action. The plan names the
+permission the write needs, and it is what you are approving.</p>
+<p>The safe fix puts back exactly what the last change took away, rather than a value
+someone picks now. It shouldn't need to restart the cache, touch the database, or
+go near the nodes.</p>
+</details>
+<details>
+<summary>Hint: how an experienced operator would have scoped it</summary>
+<p>If the agent is wandering, this is how someone who has done this before would
+ask:</p>
+<blockquote>
+<p>Turn my check-in hypothesis into a concrete remediation plan for the <code>booking</code>
+service. Restore it to exactly what the repository's manifest declares rather
+than to a value you choose, and tell me exactly what permission the action
+needs. Then, for <code>flight-ops</code>, correlate the outage time with deployment and
+rollout history, including the recorded change cause, and propose the
+least-disruptive <strong>reversible</strong> rollback.</p>
+</blockquote>
+<p>Note what it refuses to leave open: <em>restore to what the repository declares, not
+a value you choose</em>. Compensating around a bad change looks like a fix and isn't.</p>
 </details>
 <details>
 <summary>Hint: restore the flight board</summary>
@@ -1902,20 +1921,45 @@ the exact clicks, open the matching task below.</p>
 <ul>
 <li>In the agent chat, paste the <strong>suggested prompt</strong> above (or ask it to turn
   your check-in hypothesis into a concrete <code>booking</code> remediation plan).</li>
-<li>The plan is your <strong>approval artifact</strong>: it should say exactly what it will
-  change and the <strong>permission</strong> the action needs.</li>
+<li>Read what it proposes: it should say exactly what it will change and the
+  <strong>permission</strong> the action needs. That is what you are about to approve.</li>
 </ul>
+<div class="admonition warning">
+<p class="admonition-title">A plan is not a pending action</p>
+<p>The agent will write you a plan and then stop, and no <strong>Approve</strong> button
+appears. That is correct behaviour, not a broken setup: in <abbr title="SRE Agent run mode where it proposes a plan and waits for your approval before any write.">Review mode</abbr>
+the approval card only appears when the agent <strong>attempts a write</strong>. Read
+commands run on their own; nothing is queued until you say so.</p>
+<p>When you're happy with the plan, tell it to go:</p>
+<blockquote>
+<p>Apply the booking remediation now.</p>
+</blockquote>
+<p>The approval appears then. The agent may also describe a plan as
+"ready for approval" while nothing is actually queued, so treat that
+phrasing as "I've finished thinking", not "your turn to click".</p>
+</div>
 </details>
 <details class="note">
 <summary>Task 2 · Recover under approval</summary>
 <ul>
-<li>Keep the agent in <strong>Review</strong>. When it proposes the write, select <strong>Approve</strong>:
-  it runs once, with your approval, and the action is recorded.</li>
+<li>Keep the agent in <strong>Review</strong>. When the approval card appears, read the exact
+  command on it, then select <strong>Approve action</strong>: it runs once, and the action
+  is recorded.</li>
 <li>Note <em>what</em> gated that write. The recovery is a Kubernetes operation, so it
   was your <strong>run mode</strong> that held it for approval, not the agent's Azure role.
   Permissions decide what the agent can reach; run mode decides whether it
   asks first.</li>
 </ul>
+<div class="admonition note">
+<p class="admonition-title">Read the small print on the approval card</p>
+<p>It says <strong>"Agent permissions will be used to complete this action."</strong>
+The write runs as the agent's own <abbr title="An Azure identity for a workload (here, the agent) so it can authenticate without stored secrets.">managed identity</abbr>, not as you. So the
+change is attributed in the <abbr title="Azure's record of control-plane changes (who changed what, and when).">Activity Log</abbr> to the agent, not to the person
+who approved it. Worth remembering in Challenge 8, when you're asked to
+produce change evidence and explain who did what.</p>
+</div>
+<p>One instruction queues <strong>one</strong> action. Approving the check-in fix does not
+queue the flight board rollback; you'll ask for that separately in Task 4.</p>
 <p>Then verify <code>booking</code> latency is back to baseline, and confirm the change was
 actually reverted rather than worked around. The running configuration
 should match what the repository's manifest declares, with no leftover
@@ -1924,23 +1968,41 @@ override on the deployment.</p>
 <details class="note">
 <summary>Task 3 · Triage the flight board</summary>
 <ul>
-<li>Check <code>flight-ops</code> pod status and recent events:
-  <code>kubectl get pods -n aetherion -l app=flight-ops</code> and
-  <code>kubectl describe deploy/flight-ops -n aetherion</code>.</li>
+<li>Ask the agent how <code>flight-ops</code> is failing, from pod status and recent
+  events. This is what it is fastest at, and it will correlate the events
+  with the rollout in the same pass.</li>
 <li>Decide the failure mode (crash-looping, failed probe, bad image) before you
   change anything.</li>
+<li>If you want to see the raw evidence for yourself, <code>kubectl get pods -n
+  aetherion -l app=flight-ops</code> and <code>kubectl describe deploy/flight-ops -n
+  aetherion</code> will show it. Use that to <em>check</em> the agent, not to replace it.</li>
 </ul>
 </details>
 <details class="note">
 <summary>Task 4 · Correlate and roll back</summary>
 <ul>
-<li>Line the outage time up with <strong>deployment / rollout history</strong>:
-  <code>kubectl rollout history deploy/flight-ops -n aetherion</code> shows the new
-  revision and the change cause recorded with it.</li>
-<li>Apply a <strong>reversible</strong> rollback to the last good revision (for example
-  <code>kubectl rollout undo deploy/flight-ops -n aetherion</code>), then confirm the
-  board updates and <code>/api/flights</code> responds.</li>
+<li>Have the agent line the outage time up with <strong>deployment / rollout
+  history</strong>, including the change cause recorded against the new revision,
+  and propose a <strong>reversible</strong> rollback to the last good revision.</li>
+<li>Approve it, then confirm the board updates and <code>/api/flights</code> responds.</li>
 </ul>
+<div class="admonition tip">
+<p class="admonition-title">Two clocks</p>
+<p>The agent reasons in <strong>UTC</strong>; the Ops Center and the Azure portal render
+<strong>your local time</strong>. Before you correlate anything, decide which clock
+you are working in — a two-hour offset will line the wrong change up with
+the outage and look convincing.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Check the change record afterwards</p>
+<p>Run <code>kubectl rollout history deploy/booking -n aetherion</code> once check-in
+is fixed. The revision that <em>caused</em> the incident and the revision that
+<em>fixed</em> it carry the same change cause, because the remediation didn't
+set a new one.</p>
+<p>Nothing is broken. It's what happens when a fix is applied without
+recording why, and it's the reason your change log stops being evidence.
+You'll want this in the Challenge 8 handover.</p>
+</div>
 </details>
 </div>
 <h3 id="reference">Reference<a class="headerlink" href="#reference" title="Permanent link">&para;</a></h3>

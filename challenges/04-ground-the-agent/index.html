@@ -1842,6 +1842,8 @@ non-destructive remediation and verify service is restored.</p>
 <p class="admonition-title">Start this challenge</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="nb">start-challenge</span><span class="p">.</span><span class="n">ps1</span> <span class="n">4</span>   <span class="c"># open the incident</span>
 </code></pre></div>
+<p>Give it two or three minutes. The database has to come under load before crew
+latency moves, and the Ops Center averages over a rolling window on top of that.</p>
 </div>
 <h3 id="tasks">Tasks<a class="headerlink" href="#tasks" title="Permanent link">&para;</a></h3>
 <ol>
@@ -1851,15 +1853,17 @@ non-destructive remediation and verify service is restored.</p>
 </ol>
 <p><img alt="Challenge 4 storyboard: Marco, Sam and Aria ground the agent in Aetherion's runbooks" class="story-panel" loading="lazy" src="../../assets/storyboard/img-challenge-4.webp" /></p>
 <h3 id="suggested-azure-sre-agent-prompt">Suggested Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent prompt<a class="headerlink" href="#suggested-azure-sre-agent-prompt" title="Permanent link">&para;</a></h3>
+<p>This challenge uses <strong>two</strong> prompts, and the order matters. Ask the first one
+<strong>before</strong> you load anything, so you have something to compare against.</p>
 <div class="admonition quote">
-<p class="admonition-title">Paste into the agent chat</p>
-<p><code>crew-scheduling</code> is timing out and the other database-backed services are
-slower than usual, but the pods themselves are not CPU-bound and the database
-is not down. Work out which service's queries are saturating the shared
-database. Then, using the Aetherion runbooks I've loaded: what is the
-sanctioned remediation? Cite the guardrail and give me a plan I can approve. Do
-not delete or restart the database.</p>
+<p class="admonition-title">Task 1 · ask this first, ungrounded</p>
+<p><code>crew-scheduling</code> is timing out. The pods aren't CPU-bound and the database is
+not down. Work out what is saturating the shared database, and tell me what
+you would do about it.</p>
 </div>
+<p>Keep that answer. It is your control group: whatever the agent recommends here, it
+is reasoning from general practice and from your source code, because that is all
+it has. Task 2 gives it Aetherion's own operating rules and asks again.</p>
 <h3 id="success-criteria">Success criteria<a class="headerlink" href="#success-criteria" title="Permanent link">&para;</a></h3>
 <ul>
 <li>You can name the <strong>origin</strong>, the service whose queries are saturating the shared database, and explain why its neighbours are suffering without being at fault.</li>
@@ -1900,9 +1904,11 @@ the exact clicks, open the matching task below.</p>
   database-backed peers (<code>booking</code>, <code>telemetry-ingest</code>) are slower than
   their baseline. <code>baggage</code>, which touches no database, is untouched. That
   contrast is the clue.</li>
-<li>Compare the layers: pod CPU (<code>kubectl top pods -n aetherion</code>) against the
-  PostgreSQL server's CPU in the portal. The pods are comfortable and the
-  database is not, so the constraint is the work being sent to it.</li>
+<li>Compare the layers. Ask the agent to put pod CPU next to the PostgreSQL
+  server's CPU. If the pods are comfortable and the database is not, the
+  constraint is the work being sent to it, not the workload itself.
+  (<code>kubectl top pods -n aetherion</code> and the server's metrics in the portal
+  will confirm it independently, if you want to see it yourself.)</li>
 <li>Now ask which service is sending that work. Only one is running a request
   rush against a table it can no longer read efficiently.</li>
 </ul>
@@ -1914,20 +1920,36 @@ the exact clicks, open the matching task below.</p>
   runbooks from your <strong>lab clone's</strong> <code>knowledge/</code> folder (architecture,
   escalation, ops guide, platform standards, and the <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> / <abbr title="Azure API Management — the API &quot;front door&quot; that authenticates and rate-limits traffic to the services.">APIM</abbr> / database
   runbooks). The application fork does not contain them.</li>
-<li>Bulk upload can partially fail. Check every file shows <strong>Indexed</strong>, then
-  confirm the agent can actually quote a runbook line before relying on it.</li>
+</ul>
+<div class="admonition warning">
+<p class="admonition-title">Upload them one at a time, and don't trust the tick</p>
+<p>Uploading all seven at once can lose the last file: the indexer starts
+before the final upload lands, and the file it drops is
+<code>runbook-database.md</code> — the one this challenge needs. The Knowledge
+Sources page will still show it as <strong>Indexed</strong>.</p>
+<p>Add them individually, or add the others first and
+<code>runbook-database.md</code> on its own at the end. If the agent later answers
+without ever citing a runbook, delete that file and re-add it alone.</p>
+</div>
+<ul>
 <li>
-<p>Now ask the same remediation question again, word for word:</p>
+<p>Now ask the remediation question again, in a <strong>new chat thread</strong>. A fresh
+  thread matters: in the old one the agent can simply restate its earlier
+  answer and look grounded when nothing has changed.</p>
 <blockquote>
-<p><code>crew-scheduling</code> is slow while its pods sit idle and the shared
-PostgreSQL server is saturated. What is the sanctioned fix, and what
-am I not allowed to do?</p>
+<p><code>crew-scheduling</code> is timing out. The pods aren't CPU-bound and the
+database is not down. Work out what is saturating the shared database,
+and tell me what you would do about it. Use the Aetherion runbooks I
+have loaded, cite the guardrail you are following, and do not delete or
+restart the database.</p>
 </blockquote>
 </li>
 </ul>
-<p>The advice should now <strong>cite Aetherion's runbook</strong> by name instead of
-  offering generic Kubernetes guidance. If it still answers generically,
-  the knowledge source is not indexed yet.</p>
+<p>Compare it against the answer you kept from Task 1. You are looking for
+  the things only Aetherion knows: what you are forbidden from doing, what
+  the escalation path is, and why the obvious remedies are wrong here. If the
+  two answers are identical, the knowledge isn't reaching the agent — check
+  the indexing warning above before you go further.</p>
 </details>
 <details class="note">
 <summary>Task 3 · Apply the sanctioned fix</summary>
@@ -1941,6 +1963,16 @@ am I not allowed to do?</p>
   in <strong>Review</strong> and approve the write). Then verify <code>/api/crew</code> is fast
   again, not merely answering.</li>
 </ul>
+<div class="admonition note">
+<p class="admonition-title">Expect two approvals, not one</p>
+<p>The fix runs as a Kubernetes Job, so you approve the Job itself <strong>and</strong>
+the container image it pulls (<code>postgres:16-alpine</code>) as a separate step.
+The second card is not a duplicate of the first — running someone else's
+image against your database is its own decision, and the agent is right
+to ask twice.</p>
+</div>
+<p>Remember that the agent will describe the plan and wait. Tell it to apply
+before you expect an approval card.</p>
 </details>
 </div>
 <h3 id="reference">Reference<a class="headerlink" href="#reference" title="Permanent link">&para;</a></h3>

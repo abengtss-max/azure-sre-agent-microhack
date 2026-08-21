@@ -1856,13 +1856,13 @@ the service keeps answering every request successfully, which is itself a clue.<
 <h3 id="suggested-azure-sre-agent-prompt">Suggested Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent prompt<a class="headerlink" href="#suggested-azure-sre-agent-prompt" title="Permanent link">&para;</a></h3>
 <div class="admonition quote">
 <p class="admonition-title">Paste into the agent chat</p>
-<p>Analyze the check-in / booking path read-only. Correlate <code>booking</code> request
-duration with CPU, <abbr title="One running copy (pod) of a service; more replicas share the load.">replica</abbr> count, dependency call durations and request load
-over the last 30 minutes, and check recent deployments and rollout history for
-changes in the same window. Compare the live workload against what the
-repository's manifest declares. Give me the most likely cause with supporting
-evidence, and change nothing.</p>
+<p>Check-in has slowed to a crawl. Investigate read-only and tell me the most
+likely cause, with the evidence behind it. Change nothing.</p>
 </div>
+<p>That is deliberately thin, because it is what you would actually type at 18:12.
+The agent's first answer will be broader than you need. Push back on it, and
+notice which follow-up finally moves it forward: that is the skill this challenge
+is really teaching.</p>
 <div class="admonition tip">
 <p class="admonition-title">Optional: feed the agent a HAR trace or screenshot</p>
 <p>If a partner reports the failure from their side, capture a <strong>HAR</strong> (HTTP
@@ -1897,6 +1897,22 @@ is taking. Then compare the live workload against what the repository's manifest
 declares; the gap between them is the finding.</p>
 <p>You're done when you can describe the symptom precisely and defend a hypothesis,
 not when it's fixed.</p>
+</details>
+<details>
+<summary>Hint: how an experienced operator would have scoped it</summary>
+<p>Still going in circles? This is the prompt someone who has worked this failure
+class before would write:</p>
+<blockquote>
+<p>Analyze the check-in / booking path read-only. Correlate <code>booking</code> request
+duration with CPU, <abbr title="One running copy (pod) of a service; more replicas share the load.">replica</abbr> count, dependency call durations and request load
+over the last 30 minutes, and check recent deployments and rollout history for
+changes in the same window. Compare the live workload against what the
+repository's manifest declares. Give me the most likely cause with supporting
+evidence, and change nothing.</p>
+</blockquote>
+<p>Read it before you paste it. Every clause is a decision: which window, which
+signals, and the one that does most of the work here, comparing what is <em>running</em>
+against what the repository <em>declares</em>.</p>
 </details>
 <div class="admonition question">
 <p class="admonition-title">Stuck? Step-by-step for each task</p>
@@ -1940,10 +1956,12 @@ recovery you would propose. Do not perform any remediation.</p>
 <p>Then save it so Challenge 3 can pick it up. Either leave it in this chat
 thread, or commit it to memory by typing <code>/remember .</code> in the chat box
 (it becomes <code>#remember</code>), or by saying <em>"save this to your knowledge"</em>.</p>
-<p><strong>Confirm it stuck.</strong> Ask <em>"What do you remember about the check-in
-slowdown?"</em> in a <strong>new</strong> chat thread. If it repeats your hypothesis back,
-it saved. If it doesn't, the summary only exists in the old thread, so
-keep that thread open for Challenge 3.</p>
+<p><strong>Confirm it stuck.</strong> In a <strong>new</strong> chat thread, ask:</p>
+<blockquote>
+<p>What do you remember about the check-in slowdown?</p>
+</blockquote>
+<p>If it repeats your hypothesis back, it saved. If it doesn't, the summary
+only exists in the old thread, so keep that thread open for Challenge 3.</p>
 </details>
 </div>
 <h3 id="reference">Reference<a class="headerlink" href="#reference" title="Permanent link">&para;</a></h3>

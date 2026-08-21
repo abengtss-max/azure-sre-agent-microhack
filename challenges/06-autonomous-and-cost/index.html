@@ -1843,6 +1843,8 @@ investigation, before you reach Challenge 7.</p>
 <p class="admonition-title">Start this challenge</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="nb">start-challenge</span><span class="p">.</span><span class="n">ps1</span> <span class="n">6</span>   <span class="c"># open the incident</span>
 </code></pre></div>
+<p>Give it a couple of minutes. The errors only show up once enough traffic has
+hit the affected slice for the board to average it.</p>
 </div>
 <h3 id="tasks">Tasks<a class="headerlink" href="#tasks" title="Permanent link">&para;</a></h3>
 <ol>
@@ -1911,8 +1913,11 @@ the exact clicks, open the matching task below.</p>
 <ul>
 <li>Check the <strong>baggage</strong> tile and telemetry (<abbr title="Azure application-performance monitoring — requests, dependencies, exceptions, latency.">Application Insights</abbr> failed
   requests) so you know the current error rate and what "recovered" means.</li>
-<li>Some requests succeed and some fail, so look at <em>which</em> pods are behind the
-  service: <code>kubectl get pods -n aetherion -l app=baggage --show-labels</code>.</li>
+<li>Some requests succeed and some fail. Ask the agent what is different about
+  the ones that fail — the answer is in what sits behind the Service, not in
+  the Service itself.</li>
+<li><code>kubectl get pods -n aetherion -l app=baggage --show-labels</code> shows the same
+  thing directly, if you want to confirm the agent's account.</li>
 </ul>
 </details>
 <details class="note">

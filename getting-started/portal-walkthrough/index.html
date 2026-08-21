@@ -2209,16 +2209,22 @@ run mode (section F), not from the role.</p>
 </ol>
 <hr />
 <h2 id="h-write">H · Approve a write, or grant a narrow write role<a class="headerlink" href="#h-write" title="Permanent link">&para;</a></h2>
-<p>When a fix needs a change, you have two governed paths:</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Approve on-behalf-of (<abbr title="On-behalf-of — the agent performs an action using your credentials after you approve it.">OBO</abbr>)</label><label for="__tabbed_1_2">Grant a scoped role</label></div>
+<p>When a fix needs a change, you have two governed paths.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Approve it in <abbr title="SRE Agent run mode where it proposes a plan and waits for your approval before any write.">Review mode</abbr></label><label for="__tabbed_1_2">Grant a scoped role</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <ol>
-<li>Ask the agent for a <strong>remediation plan</strong>.</li>
-<li>When it prompts, select <strong>Approve</strong>. The action runs using <em>your</em>
-   credentials, once, for that step.</li>
-<li>Best when you want a human decision on each change.</li>
+<li>Ask the agent for a <strong>remediation plan</strong>, and read it.</li>
+<li>A plan on its own queues nothing. Tell the agent to <strong>apply</strong> it — the
+   approval card appears when it attempts the write, not when it finishes
+   thinking.</li>
+<li>Read the exact command on the card, then select <strong>Approve action</strong>.</li>
 </ol>
+<p>The card states <strong>"Agent permissions will be used to complete this action."</strong>
+The write runs as the agent's own <abbr title="An Azure identity for a workload (here, the agent) so it can authenticate without stored secrets.">managed identity</abbr>, so the change is
+attributed in the <abbr title="Azure's record of control-plane changes (who changed what, and when).">Activity Log</abbr> to the agent rather than to you. Your approval
+is recorded in the thread, not on the resource.</p>
+<p>Best when you want a human decision on each change.</p>
 </div>
 <div class="tabbed-block">
 <ol>
@@ -2227,11 +2233,18 @@ run mode (section F), not from the role.</p>
 <li>Open the target resource → <strong>Access control (IAM)</strong> → <strong>Add role
    assignment</strong> → pick the role → <strong>Managed identity</strong> →
    <code>aetherion-sre-agent</code> → <strong>Review + assign</strong>.</li>
-<li>Best when you want the agent to act with its <strong>own</strong> identity, auditable in
-   the <abbr title="Azure's record of control-plane changes (who changed what, and when).">Activity Log</abbr>.</li>
+<li>Best when the agent needs to reach something it currently cannot, rather
+   than when you want a decision point.</li>
 </ol>
 </div>
 </div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">On-behalf-of (<abbr title="On-behalf-of — the agent performs an action using your credentials after you approve it.">OBO</abbr>)</p>
+<p>The docs describe an <abbr title="On-behalf-of — the agent performs an action using your credentials after you approve it.">OBO</abbr> path where an action runs using <em>your</em> credentials.
+It is not available in this environment — attempts return <em>"<abbr title="On-behalf-of — the agent performs an action using your credentials after you approve it.">OBO</abbr> flow is not
+supported with CliInAdc enabled"</em>. Everything the agent does here runs as its
+own identity, which is why scoping that identity matters.</p>
 </div>
 <p>Reference: <a href="https://learn.microsoft.com/en-us/azure/sre-agent/security-overview">Security overview</a></p>
 <hr />

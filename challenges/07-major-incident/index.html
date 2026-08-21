@@ -1888,6 +1888,8 @@ by service.</p>
 <p class="admonition-title">Start this challenge</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="nb">start-challenge</span><span class="p">.</span><span class="n">ps1</span> <span class="n">7</span>   <span class="c"># open the incident</span>
 </code></pre></div>
+<p>Four faults land at once and the board takes two or three minutes to reflect
+all of them. Don't start triaging from a half-drawn picture.</p>
 </div>
 <h3 id="tasks">Tasks<a class="headerlink" href="#tasks" title="Permanent link">&para;</a></h3>
 <ol>
@@ -1912,14 +1914,12 @@ challenge. Driving the whole incident by hand is not enough on its own.</p>
 <h3 id="suggested-azure-sre-agent-prompt">Suggested Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent prompt<a class="headerlink" href="#suggested-azure-sre-agent-prompt" title="Permanent link">&para;</a></h3>
 <div class="admonition quote">
 <p class="admonition-title">Paste into the agent chat</p>
-<p>You picked this incident up before I did. First, list every action you already
-took without my approval and how I can verify each one. Then read the whole
-Aetherion board and give me an incident-command triage: list every service still
-failing, order remediation by business tier (situational awareness and
-legal-to-fly first), and for each name the sanctioned, reversible fix. Have we
-seen a similar crew-scheduling / check-in incident before. Pull the earlier RCA
-from session memory.</p>
+<p>You picked this incident up before I did. List every action you have already
+taken without my approval, and how I can verify each one. Then tell me what is
+still broken, and what you recommend I deal with first.</p>
 </div>
+<p>The second half is the part you own. It will give you an order; your job is to
+decide whether it's the right one for an airline at peak departure.</p>
 <h3 id="success-criteria">Success criteria<a class="headerlink" href="#success-criteria" title="Permanent link">&para;</a></h3>
 <ul>
 <li>You can state exactly what the agent changed without your approval, and you verified it from the cluster rather than from its summary.</li>
@@ -1949,6 +1949,21 @@ customer-facing.</p>
 again, the degradations further back become visible. That is normal in a layered
 incident. Restoring the edge doesn't create new faults, it reveals the ones the
 outage was masking.</p>
+</details>
+<details>
+<summary>Hint: how an experienced incident commander would have scoped it</summary>
+<p>If the agent's account is scattered, this is how someone who has run a major
+incident would ask for it:</p>
+<blockquote>
+<p>Read the whole Aetherion board and give me an incident-command triage: list every
+service still failing, order remediation by business tier (situational awareness
+and legal-to-fly first), and for each name the sanctioned, reversible fix. Have we
+seen a similar crew-scheduling / check-in incident before? Pull the earlier RCA
+from session memory.</p>
+</blockquote>
+<p>Two things in there are doing the work: <strong>order by business tier</strong>, which stops you
+fixing whatever is loudest, and <strong>pull the earlier RCA from memory</strong>, which is the
+difference between solving crew scheduling for the first time and the second.</p>
 </details>
 <div class="admonition question">
 <p class="admonition-title">Stuck? Step-by-step for each task</p>
@@ -2051,6 +2066,17 @@ it only adopts the persona.</p>
   fails, the fault is the <strong>edge policy</strong>, not the service; treat the change
   as customer-facing.</li>
 </ul>
+<div class="admonition note">
+<p class="admonition-title">Why it can fix this at all</p>
+<p>Everywhere else today the agent has held write access to Kubernetes and
+nothing else. It can repair the <abbr title="The single public entry point (API Management) through which all client traffic passes.">front door</abbr> because its identity also
+holds <strong>API Management Service Contributor</strong>, scoped to the API
+Management service alone rather than the resource group.</p>
+<p>Narrow enough to fix this, too narrow to touch anything else. That is
+what least privilege looks like when it is actually load-bearing: had it
+been scoped to the resource group, the same repair would have carried the
+authority to change every resource in the environment.</p>
+</div>
 </details>
 <details class="note">
 <summary>Task 6 · Verify every service</summary>

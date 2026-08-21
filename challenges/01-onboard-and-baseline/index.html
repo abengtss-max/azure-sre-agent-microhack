@@ -1860,7 +1860,7 @@ capture anything.</p>
 <li><strong>Check the board.</strong> Read the Operations Center once while it's green. That's your reference for the rest of the day.</li>
 <li><strong>Confirm telemetry is flowing.</strong> Open <abbr title="Dashboarding tool used here to visualise AKS and Application Insights metrics.">Grafana</abbr> and check that <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> and <abbr title="Azure application-performance monitoring — requests, dependencies, exceptions, latency.">Application Insights</abbr> are reporting.</li>
 <li><strong>Connect the agent.</strong> Create the <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent in your resource group and give it read access to your code, logs, and Azure resources, in <abbr title="SRE Agent run mode where it proposes a plan and waits for your approval before any write.">Review mode</abbr>.</li>
-<li><strong>Capture the baseline.</strong> Ask the agent for a baseline of the <code>aetherion</code> namespace, then sanity-check a few of its numbers against the Ops Center and <abbr title="Dashboarding tool used here to visualise AKS and Application Insights metrics.">Grafana</abbr>.</li>
+<li><strong>Capture the baseline.</strong> Ask the agent for a baseline of the <code>aetherion</code> namespace, then spot-check its numbers. Trust the measured latency; verify the configuration.</li>
 <li><strong>Put it on a schedule.</strong> Have the agent re-run that health check every morning so drift shows up before it turns into an incident.</li>
 </ol>
 <p><img alt="Challenge 1 storyboard: Sam and Aria onboard the SRE Agent and read the baseline" class="story-panel" loading="lazy" src="../../assets/storyboard/img-challenge-1.webp" /></p>
@@ -1937,28 +1937,31 @@ provisions its own, separate from the app's. For <strong>model provider</strong>
 access. Choose <strong>Full setup</strong> and connect:</p>
 <ul>
 <li><strong>Code</strong> → <strong>GitHub</strong> → sign in → add <strong>your fork</strong> of <code>aetherion-airops-platform</code>.</li>
-<li><strong>Logs</strong> → <strong><abbr title="Azure service that stores and queries container and platform logs.">Log Analytics</abbr> Workspace</strong> → pick the app's <strong><code>aetherion-law</code></strong>
-  (not the agent's own auto-created workspace).</li>
+<li><strong>Logs</strong> → <strong><abbr title="Azure service that stores and queries container and platform logs.">Log Analytics</abbr> Workspace</strong> → pick the app's <strong><code>aetherion-law</code></strong>.
+  The agent created its own workspace when you deployed it, named
+  <code>workspace&lt;random&gt;</code>; that one holds the agent's telemetry, not the
+  application's.</li>
 <li><strong>Azure resources</strong> → <strong>Resource group</strong> → select <strong>only your app
   resource group</strong> at the <strong><abbr title="The built-in Azure role that grants read-only access — see everything, change nothing.">Reader</abbr></strong> level. Do <strong>not</strong> pick <em>Subscription</em>
-  or <em>Management group</em>.</li>
+  or <em>Management group</em>. You'll also see an <code>MC_...</code> group that <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> created
+  for the cluster's nodes — leave it out, nothing here needs it.</li>
 </ul>
-<div class="admonition warning">
-<p class="admonition-title">The portal drops you into a chat before setup is finished</p>
-<p>Once the agent deploys, the portal opens a <strong>Team onboarding</strong> chat
-thread and invites you to start talking to it. That is not a
-confirmation that setup completed. You can reach a working chat window
-with <strong>Code</strong> and <strong>Logs</strong> still unconnected, and the agent will answer
-anyway, just without the context it needs.</p>
-<p>The failure is silent and it surfaces two challenges later: without
-<strong>Code</strong> the agent cannot correlate the Challenge 3 rollback to a
-commit, and without <strong><code>aetherion-law</code></strong> it cannot read container logs.</p>
-<p>Verify both before moving on:</p>
+<p>Two of the five cards are deliberately left for later. <strong>Incidents</strong> is
+connected in Challenge 6; connecting it now also creates a quickstart
+response plan you would have to clean up before the final incident.
+<strong>Knowledge files</strong> are loaded in Challenge 4.</p>
+<div class="admonition tip">
+<p class="admonition-title">Finish setup before you start chatting</p>
+<p>When the agent finishes deploying, the portal opens a <strong>Team onboarding</strong>
+chat and invites you to start talking to it. You can chat before the
+context connections are done — it will answer, just with less to work
+with.</p>
+<p>Give it the full picture first, so Challenge 3 can correlate a rollback
+to a commit and Challenge 4 can read container logs:</p>
 <ul>
-<li><strong>Builder → Code Access</strong> should list <code>github.com</code> as <strong>Connected</strong>
-  and your <code>aetherion-airops-platform</code> fork as <strong>Ready</strong>, with a recent
-  sync time.</li>
-<li><strong>Builder → Connectors</strong> should show a <strong><abbr title="Azure service that stores and queries container and platform logs.">Log Analytics</abbr></strong> connector.</li>
+<li><strong>Builder → Code Access</strong> lists <code>github.com</code> as <strong>Connected</strong> and your
+  <code>aetherion-airops-platform</code> fork as <strong>Ready</strong>, with a recent sync time.</li>
+<li><strong>Builder → Connectors</strong> shows a <strong><abbr title="Azure service that stores and queries container and platform logs.">Log Analytics</abbr></strong> connector.</li>
 </ul>
 <p>If either is missing, reopen the setup wizard from the agent's
 <strong>Overview</strong> and finish the connection you skipped.</p>
@@ -1967,18 +1970,13 @@ commit, and without <strong><code>aetherion-law</code></strong> it cannot read c
 Its identity is granted Monitoring Contributor plus a reader bundle at
 setup, so the "won't change anything" guarantee comes from <strong><abbr title="SRE Agent run mode where it proposes a plan and waits for your approval before any write.">Review mode</abbr></strong>,
 not from the role being read-only.</p>
-<p><strong>Grant one extra permission.</strong> Setup leaves the agent with read-only
-access to API Management, which is enough to diagnose an edge fault but not
-to repair one. Run this once, after the agent exists:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="nb">grant-agent</span><span class="n">-apim-access</span><span class="p">.</span><span class="n">ps1</span>
-</code></pre></div>
-<p>It grants <strong>API Management Service Contributor</strong> scoped to the API
-Management service alone, never the resource group. Skip it and the agent
-will correctly localise the front-door failure in Challenge 7 and then
-report that <abbr title="Role-Based Access Control — Azure's permission model; roles decide what an identity may do.">RBAC</abbr> blocks the fix.</p>
-<p><strong>Confirm scope.</strong> Ask <em>"List the resources in my resource group and
-summarize what this application does."</em> Then ask it to <strong>restart a
-deployment</strong>. In <abbr title="SRE Agent run mode where it proposes a plan and waits for your approval before any write.">Review mode</abbr> it must ask for approval, not act.</p>
+<p><strong>Confirm scope.</strong> Ask:</p>
+<blockquote>
+<p>List the resources in my resource group and summarize what this
+application does.</p>
+</blockquote>
+<p>Then ask it to <strong>restart a deployment</strong>. In <abbr title="SRE Agent run mode where it proposes a plan and waits for your approval before any write.">Review mode</abbr> it must ask for
+approval, not act.</p>
 <p><strong>Confirm the connections took.</strong> Ask the agent:</p>
 <blockquote>
 <p>Which log sources and code repositories are you connected to right now?</p>
@@ -1998,29 +1996,28 @@ underperform for reasons that look like agent weakness rather than setup.</p>
   or the baseline will record the fault as "normal".</li>
 </ul>
 <div class="admonition tip">
-<p class="admonition-title">Check the configuration values, not just the metrics</p>
-<p>Measured values come straight from telemetry and are reliable. The
-numbers most likely to be wrong are <strong>configuration</strong> values such as
-CPU requests, limits and <abbr title="One running copy (pod) of a service; more replicas share the load.">replica</abbr> counts, because the agent is
-summarising many deployments at once and can attribute one service's
-setting to another.</p>
-<p>A wrong config value is hard to spot, because the metric it is compared
-against is real. "96m against a 100m request" reads as a service about
-to saturate; if the request is actually 250m, the same service is fine.
-Confirm any capacity claim before you act on it:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">kubectl</span> <span class="n">get</span> <span class="n">deploy</span> <span class="n">gateway</span> <span class="n">-n</span> <span class="n">aetherion</span> <span class="n">-o</span> <span class="n">jsonpath</span><span class="p">=</span><span class="s1">&#39;{.spec.template.spec.containers[0].resources}&#39;</span>
+<p class="admonition-title">Verify config, trust metrics</p>
+<p>Measured values come straight from telemetry and are reliable.
+Configuration values — CPU requests, limits, <abbr title="One running copy (pod) of a service; more replicas share the load.">replica</abbr> counts — are the
+ones that can get attributed to the wrong deployment when the agent is
+summarising several at once.</p>
+<p>That's hard to catch, because the metric beside it is real. "96m against
+a 100m request" reads as a service about to saturate; if the request is
+actually 250m, it's fine. Confirm before you act:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">kubectl</span> <span class="n">get</span> <span class="n">deploy</span> <span class="n">gateway</span> <span class="n">-n</span> <span class="n">aetherion</span> <span class="n">-o</span> <span class="n">jsonpath</span><span class="p">=</span><span class="s1">&#39;{.spec.template.spec.containers[0].resources}&#39;</span>
 </code></pre></div>
-<p>This is the point of the task. The agent does the heavy correlation
-well, and you stay responsible for the conclusions.</p>
 </div>
 </details>
 <details class="note">
 <summary>Task 5 · Put it on a schedule</summary>
 <p>You can schedule the baseline two ways, by asking in chat or from the
 <strong>Scheduled tasks</strong> page in the portal.</p>
-<p><strong>Option A: Ask the agent.</strong> In the chat, say <em>"Schedule this baseline to
-run every morning at 08:00 UTC and alert me on drift from normal."</em> It
-creates the scheduled task, converts that to a cron expression, and sets
+<p><strong>Option A: Ask the agent.</strong> In the chat:</p>
+<blockquote>
+<p>Schedule this baseline to run every morning at 08:00 UTC and alert me on
+drift from normal.</p>
+</blockquote>
+<p>It creates the scheduled task, converts that to a cron expression, and sets
 the drift conditions from the baseline it just measured.</p>
 <p>Include the time zone. If you leave it out the agent will not guess: it
 stops and asks <em>"At which time zone should the daily 08:00 baseline check

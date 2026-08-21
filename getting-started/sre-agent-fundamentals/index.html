@@ -1843,8 +1843,8 @@ minute</em> are the core; everything below rounds out the picture.</p>
 <p><strong>Two independent controls.</strong></p>
 <ol>
 <li><strong>Permissions (Azure <abbr title="Role-Based Access Control — Azure's permission model; roles decide what an identity may do.">RBAC</abbr>):</strong> what the agent's identity is <em>allowed</em> to do (for
-   example <abbr title="The built-in Azure role that grants read-only access — see everything, change nothing.">Reader</abbr> vs a narrower write role). When it lacks permission it can fall
-   back to <strong>on-behalf-of (<abbr title="On-behalf-of — the agent performs an action using your credentials after you approve it.">OBO</abbr>)</strong> and ask you to approve using <em>your</em> credentials.</li>
+   example <abbr title="The built-in Azure role that grants read-only access — see everything, change nothing.">Reader</abbr> vs a narrower write role). Approved writes run as the <strong>agent's</strong>
+   identity, not yours, so the <abbr title="Azure's record of control-plane changes (who changed what, and when).">Activity Log</abbr> attributes them to the agent.</li>
 <li><strong>Run mode:</strong> <em>how</em> it acts. <strong>Review</strong> (proposes, waits for approval) vs
    <strong>Autonomous</strong> (acts within its permissions and guardrails).</li>
 </ol>
