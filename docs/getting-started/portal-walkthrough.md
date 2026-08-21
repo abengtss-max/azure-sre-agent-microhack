@@ -189,9 +189,11 @@ Reference: [Security overview](https://learn.microsoft.com/en-us/azure/sre-agent
 
 ## I · Load the knowledge base (ground the agent) { #i-knowledge }
 
-1. In the agent, open **Knowledge** (team onboarding / memory).
-2. Upload the Markdown files from this repo's **`knowledge/`** folder.
-3. Re-ask your remediation question. The advice should now cite Aetherion's own
+1. In the agent, open **Builder → Knowledge Sources**.
+2. Upload the Markdown files from your **lab clone's** `knowledge/` folder. The
+   application fork does not contain them.
+3. Check every file reaches **Indexed**. Bulk upload can partially fail.
+4. Re-ask your remediation question. The advice should now cite Aetherion's own
    runbook guardrails instead of generic steps.
 
 Reference: [Team onboarding & memory](https://learn.microsoft.com/en-us/azure/sre-agent/team-onboard)
@@ -206,13 +208,15 @@ Reference: [Team onboarding & memory](https://learn.microsoft.com/en-us/azure/sr
    `aetherion` namespace: pod status, events, rollout history, dependency
    health."* Say how it should behave and what it should do when the evidence
    points outside its scope, not just what it covers.
-4. **Leave Skills and Tools inherited.** Selecting either *overrides* the
-   inherited set rather than adding to it, and the picker does not list every
-   inherited tool. `RunKubectlReadCommand` and `RunKubectlWriteCommand` are in
-   the agent's inherited set but are not offered in the panel. Any selection you
-   make therefore risks dropping cluster access. Scope specialists with
-   Instructions.
-5. **Create**, then use it by asking the main agent to **delegate to it by name**
+4. **Scope the Tools panel deliberately.** Left alone the subagent inherits all
+   46 tools, which makes it a persona rather than a specialist. Selecting tools
+   *replaces* the inherited set instead of adding to it, so your list has to be
+   complete, not a highlight reel. Challenge 5 gives the exact eight tools and
+   the reason for each. Instructions are advisory; the tool list is what is
+   actually enforced.
+5. **Leave Skills inherited while you build.** Who owns which skill is a
+   deliberate decision you make in Challenge 5, Task 3.
+6. **Create**, then use it by asking the main agent to **delegate to it by name**
    ("delegate this to your `aks-triage` subagent"). Asking the agent to "act as"
    a specialist does not invoke the subagent. It just adopts the persona.
 
@@ -243,10 +247,9 @@ Reference: [Skills](https://learn.microsoft.com/en-us/azure/sre-agent/skills)
 
 ## L · Review agent consumption (AAUs) { #l-consumption }
 
-1. Open the **`aetherion-sre-agent`** resource → **Metrics** / **Cost** (or the
-   consumption view in the console).
-2. Break usage down by **thread type** and **operational purpose** to see where
-   Agent Activity Units go.
+1. In the agent, open **Settings → Agent Consumption**.
+2. Break usage down by **thread type** (Chats, Incidents, Scheduled tasks,
+   Triggers) and by thread, to see where Azure Agent Units (AAUs) go.
 3. Use only real figures from your environment or the official
    [pricing & billing doc](https://learn.microsoft.com/en-us/azure/sre-agent/pricing-billing).
    Never invent rates or savings.

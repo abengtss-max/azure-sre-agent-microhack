@@ -66,8 +66,13 @@ minute* are the core; everything below rounds out the picture.
 
 **Other essentials.**
 
-- **Skills load automatically**; **custom subagents are invoked explicitly** (for
-  example with `/agent`). Skills are capped at **5 concurrent active** at a time.
+- **Subagents are invoked explicitly**, in natural language, by naming the one you
+  want (*"delegate this to your `aks-triage` subagent"*). There is no slash-command
+  syntax, and asking the agent to *act as* a specialist does not invoke one, it just
+  adopts the persona.
+- **Skills** are matched against their description rather than guaranteed to fire.
+  Name the skill when you want it used. Skills are capped at **5 concurrent active**
+  at a time.
 - Only a user with the **Azure SRE Agent Administrator** role can approve proposed
   actions.
 - The **knowledge base** accepts Markdown/text files (this repo's `knowledge/`),

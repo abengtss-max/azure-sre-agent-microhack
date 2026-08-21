@@ -299,9 +299,10 @@ investigate. You'll want both in the final incident.
 
         **SKILL.md**: the editor on the right is pre-scaffolded with `name` and
         `description` frontmatter and a placeholder comment. The finished file is
-            in your **lab clone** (the same repository as the `knowledge/` folder,
-            not the application fork), at
-        onto the **Files** panel:
+        already in your **lab clone** (the same repository as the `knowledge/`
+        folder, not the application fork), at
+        `skills/crew-query-path-recovery/SKILL.md`. Paste it into the editor, or
+        drag that file onto the **Files** panel:
 
         ```markdown
         ---
