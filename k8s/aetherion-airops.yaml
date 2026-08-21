@@ -280,8 +280,6 @@ metadata: { name: crew-scheduling, namespace: aetherion }
 spec:
   scaleTargetRef: { apiVersion: apps/v1, kind: Deployment, name: crew-scheduling }
   minReplicas: 2
-  # Capped at 3: crew scheduling shares a database tier, so the platform team
-  # limits how far it may scale out.
   maxReplicas: 3
   metrics:
     - type: Resource

@@ -55,6 +55,14 @@ spec:
         Write-Warning "Database maintenance job '$jobName' did not complete. Logs:"
         kubectl logs "job/$jobName" -n $ns --tail=20 2>$null
     }
+
+    # Remove the job AND its events. Events outlive the job by about an hour, and a
+    # one-off job sitting a minute before an incident is a far more attractive
+    # explanation than the real cause - an investigator will stop there.
+    $pods = (kubectl get pods -n $ns -l "job-name=$jobName" -o jsonpath='{.items[*].metadata.name}' 2>$null) -split '\s+' | Where-Object { $_ }
     kubectl delete "job/$jobName" -n $ns --ignore-not-found 2>$null | Out-Null
+    foreach ($obj in (@($jobName) + $pods)) {
+        kubectl delete events -n $ns --field-selector "involvedObject.name=$obj" --ignore-not-found 2>$null | Out-Null
+    }
     return $ok
 }

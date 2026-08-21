@@ -1,14 +1,4 @@
-# Crew roster index maintenance.
-#
-# The crew duty lookup filters on `assigned` and returns the roster ordered by
-# flight and crew member. `crew_roster` retains every past season's duty
-# records, so without a supporting index that lookup degrades into a sequential
-# scan over the whole table and saturates the database under load.
-#
-# Run with `kubectl create -f` (not `apply`) so each run gets its own job name:
-#   kubectl create -f k8s/maintenance/crew-roster-index.yaml
-#
-# CREATE INDEX CONCURRENTLY keeps the table writable while the index is built.
+# One-off crew roster index maintenance.
 apiVersion: batch/v1
 kind: Job
 metadata:

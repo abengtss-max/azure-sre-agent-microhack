@@ -64,7 +64,10 @@ crew-scheduling degradation to date.
    approval**, and expect latency to recover within a minute.
 2. Do **not** scale pods or widen `PG_POOL_MAX` to escape this. Pool capacity
    already exceeds what the server can absorb, so more concurrency pushes more
-   work at a saturated database and can make it worse.
+   work at a saturated database and can make it worse. `crew-scheduling` is
+   deliberately capped at **3 replicas** for this reason: it shares a database
+   tier with `booking` and `telemetry-ingest`, so scaling it out spends the shared
+   budget rather than adding capacity. Do not raise that cap as a remedy.
 3. Only if the query path is confirmed healthy and pressure persists, scale the
    compute tier (Burstable -> General Purpose). Never restart the database
    server.

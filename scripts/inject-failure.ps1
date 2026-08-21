@@ -130,7 +130,7 @@ if ($Fault -eq "slow-query") {
     # own, and leaving it behind would silently prevent the incident.
     $dropAll = 'DO $do$ DECLARE r record; BEGIN FOR r IN SELECT indexname FROM pg_indexes WHERE tablename = ''crew_roster'' AND indexname <> ''crew_roster_pkey'' LOOP EXECUTE ''DROP INDEX IF EXISTS '' || quote_ident(r.indexname); END LOOP; END $do$;'
     Write-Host "Dropping the crew roster duty index..." -ForegroundColor Yellow
-    if (Invoke-AetherionDbSql -Sql $dropAll -Name 'crew-roster-reindex') {
+    if (Invoke-AetherionDbSql -Sql $dropAll -Name 'aetherion-db-task') {
         Write-Host "Crew duty lookup is now unindexed." -ForegroundColor Green
     }
     else {
