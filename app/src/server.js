@@ -260,6 +260,8 @@ function registerGatewayRoutes() {
   // wildly on a service that is steadily degraded. Keep a short window per
   // service and report percentiles, the way an operator would read a dashboard.
   const WINDOW = 12;
+  // Aetherion's latency budget for a passenger-facing path.
+  const LATENCY_BUDGET_MS = 400;
   const history = {};
   const latest = {};
 
@@ -311,8 +313,7 @@ function registerGatewayRoutes() {
     const values = Object.values(health);
     const total = values.length || 1;
     const down = values.filter((h) => !h.ok).length;
-    // Aetherion's latency budget for a passenger-facing path is 400ms.
-    const slow = values.filter((h) => h.ok && h.p95Ms > 400).length;
+    const slow = values.filter((h) => h.ok && h.p95Ms > LATENCY_BUDGET_MS).length;
     const flaky = values.filter((h) => h.ok && h.errorRatePct > 0).length;
 
     const score = Math.min(100, down * 32 + slow * 20 + flaky * 12 + (down + slow + flaky ? 6 : 4));
@@ -331,7 +332,7 @@ function registerGatewayRoutes() {
         incidents.push({ sev: CORE[name] || 'SEV-2', title: `${label} unavailable`, status: 'Investigating', service: name });
       } else if (h.errorRatePct > 0) {
         incidents.push({ sev: 'SEV-3', title: `${label} intermittent errors`, status: 'Investigating', service: name });
-      } else if (h.p95Ms > 400) {
+      } else if (h.p95Ms > LATENCY_BUDGET_MS) {
         incidents.push({ sev: 'SEV-3', title: `${label} elevated latency`, status: 'Monitoring', service: name });
       }
     }
@@ -366,7 +367,11 @@ function registerGatewayRoutes() {
     for (const name of Object.keys(services)) {
       health[name] = summarise(name) || { ok: false, status: 0, latencyMs: 0, p50Ms: 0, p95Ms: 0, errorRatePct: 100, samples: 0 };
     }
-    const healthy = Object.values(health).every((h) => h.ok);
+    // A service that answers every request twenty times slower than budget is not
+    // "operational", so the headline reads from the same thresholds as the tiles.
+    const healthy = Object.values(health).every(
+      (h) => h.ok && h.errorRatePct === 0 && h.p95Ms <= LATENCY_BUDGET_MS
+    );
     const derived = deriveSignals(health);
     trackEvent('ops_status_poll', { healthy: String(healthy), risk: derived.risk.level });
     res.json({

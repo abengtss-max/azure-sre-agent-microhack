@@ -126,6 +126,18 @@ if ($LASTEXITCODE -ne 0) {
     Write-Host "  az aks enable-addons -g $ResourceGroup -n $($state.aksName) -a monitoring --workspace-resource-id $($state.logAnalyticsId)" -ForegroundColor Gray
 }
 
+# Container Insights records pod state but no CPU time series, so challenges that
+# ask the agent to correlate CPU over a window have nothing to read. The CLI wires
+# up the data collection rule and endpoint that managed Prometheus needs.
+Write-Host "Enabling managed Prometheus metrics on AKS..." -ForegroundColor Cyan
+az aks update --resource-group $ResourceGroup --name $state.aksName `
+    --enable-azure-monitor-metrics --azure-monitor-workspace-resource-id $state.azureMonitorWorkspaceId `
+    --only-show-errors 2>$null
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "  Managed Prometheus not enabled yet - enable later with:" -ForegroundColor Yellow
+    Write-Host "  az aks update -g $ResourceGroup -n $($state.aksName) --enable-azure-monitor-metrics --azure-monitor-workspace-resource-id $($state.azureMonitorWorkspaceId)" -ForegroundColor Gray
+}
+
 Write-Host "  ACR:     $($state.acrLoginServer)" -ForegroundColor Gray
 Write-Host "  AKS:     $($state.aksName)" -ForegroundColor Gray
 Write-Host "  APIM:    $($state.apimGatewayUrl)" -ForegroundColor Gray

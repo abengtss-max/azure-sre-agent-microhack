@@ -22,6 +22,8 @@ $providers = @(
     "Microsoft.OperationalInsights",
     "Microsoft.OperationsManagement",
     "Microsoft.Insights",
+    "Microsoft.Monitor",
+    "Microsoft.AlertsManagement",
     "Microsoft.Dashboard",
     "Microsoft.Authorization",
     "Microsoft.Network",

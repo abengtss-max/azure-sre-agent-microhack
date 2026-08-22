@@ -5,7 +5,8 @@
 
     **Stage:** Foundation → **Operations** → Engineering → Autonomous → Major Incident
 
-**Situation.** Crew scheduling is failing (the `crew-scheduling` tile is red) and duty
+**Situation.** Crew scheduling is failing (the `crew-scheduling` tile is amber and the
+board reports **Service Degradation Detected**) and duty
 managers can't confirm who is legal to fly the evening wave. The services that share
 its database are wobbling too, so "the database is down" is the obvious call, and
 it's wrong. Out of the box the agent gives generic advice, and a generic "restart the

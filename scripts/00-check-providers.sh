@@ -13,15 +13,17 @@ PROVIDERS=(
   Microsoft.ContainerService
   Microsoft.ContainerRegistry
   Microsoft.DBforPostgreSQL
-  Microsoft.Cache
   Microsoft.ApiManagement
   Microsoft.OperationalInsights
   Microsoft.OperationsManagement
   Microsoft.Insights
+  Microsoft.Monitor
+  Microsoft.AlertsManagement
   Microsoft.Dashboard
   Microsoft.Authorization
   Microsoft.Network
   Microsoft.Compute
+  Microsoft.ContainerInstance
   Microsoft.Storage
 )
 

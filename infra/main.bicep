@@ -53,6 +53,7 @@ var appiName = '${namePrefix}-appi'
 var pgName = toLower('${namePrefix}-pg-${suffix}')
 var apimName = toLower('${namePrefix}-apim-${suffix}')
 var grafanaName = take(toLower('${namePrefix}graf${suffix}'), 23)
+var amwName = take(toLower('${namePrefix}-amw-${suffix}'), 44)
 
 var acrPullRoleId = '7f951dda-4ed3-4680-a7ca-43fe172d538d'
 var monitoringReaderRoleId = '43d0d8ad-25c7-4714-9337-8ba259a9fe05'
@@ -77,6 +78,15 @@ resource appi 'Microsoft.Insights/components@2020-02-02' = {
     WorkspaceResourceId: law.id
     IngestionMode: 'LogAnalytics'
   }
+}
+
+// Container Insights gives pod state but not a CPU time series, and several
+// challenges ask the agent to correlate CPU over a window. Managed Prometheus
+// is linked to the cluster in 01-deploy-infra.ps1.
+resource amw 'Microsoft.Monitor/accounts@2023-04-03' = {
+  name: amwName
+  location: location
+  properties: {}
 }
 
 resource acr 'Microsoft.ContainerRegistry/registries@2023-07-01' = {
@@ -159,6 +169,30 @@ resource pgFirewallAzure 'Microsoft.DBforPostgreSQL/flexibleServers/firewallRule
     startIpAddress: '0.0.0.0'
     endIpAddress: '0.0.0.0'
   }
+}
+
+// Query Store turns "this query is probably slow" into per-query runtime evidence,
+// which is the next thing an SRE reaches for after seeing the server saturated.
+// Chained on the firewall rule and on each other: the server rejects concurrent
+// configuration writes.
+resource pgQueryStore 'Microsoft.DBforPostgreSQL/flexibleServers/configurations@2024-08-01' = {
+  parent: pg
+  name: 'pg_qs.query_capture_mode'
+  properties: {
+    value: 'TOP'
+    source: 'user-override'
+  }
+  dependsOn: [pgFirewallAzure]
+}
+
+resource pgWaitSampling 'Microsoft.DBforPostgreSQL/flexibleServers/configurations@2024-08-01' = {
+  parent: pg
+  name: 'pgms_wait_sampling.query_capture_mode'
+  properties: {
+    value: 'ALL'
+    source: 'user-override'
+  }
+  dependsOn: [pgQueryStore]
 }
 
 var openApiSpec = {
@@ -324,6 +358,7 @@ output apimGatewayUrl string = apim.properties.gatewayUrl
 output appInsightsName string = appi.name
 output logAnalyticsName string = law.name
 output logAnalyticsId string = law.id
+output azureMonitorWorkspaceId string = amw.id
 output grafanaName string = grafana.name
 output grafanaEndpoint string = grafana.properties.endpoint
 output incidentAlertName string = incidentAlert.name

@@ -15,8 +15,9 @@ crew-scheduling degradation to date.
   lookup filters on `assigned` and orders by flight and crew member. Without an
   index supporting that access path, every request scans the whole table.
 - **Symptoms:**
-  - `/api/crew` latency climbs from tens of milliseconds into seconds, then
-    requests start timing out; the tile goes amber, then red.
+  - `/api/crew` latency climbs from tens of milliseconds into seconds; the tile
+    goes amber and the board headline reports degradation. It only turns red if
+    requests start timing out outright.
   - PostgreSQL CPU is high (70-100%) while the application pods are not.
   - Adding replicas does not help, and the autoscaler may refuse to add any
     because pod CPU is below target - the pods are waiting on the database.

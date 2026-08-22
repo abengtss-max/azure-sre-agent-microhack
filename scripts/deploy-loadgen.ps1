@@ -20,7 +20,9 @@ param(
     [string]$Location = "",
     [ValidateSet("normal", "surge", "crew-burst", "major")]
     [string]$Mode = "normal",
-    [int]$Vus = 0
+    [int]$Vus = 0,
+    # How long to wait for the container to actually start before handing control back.
+    [int]$TimeoutSeconds = 120
 )
 
 $ErrorActionPreference = "Stop"
@@ -87,9 +89,29 @@ az container create `
     --secure-environment-variables API_KEY="$apiKey" `
     --secrets "k6-load.js.gz=$scriptB64" `
     --secrets-mount-path /scripts `
+    --no-wait `
     --only-show-errors | Out-Null
 
-Write-Host "k6 load generator running in '$LoadGenResourceGroup' - hidden from the SRE Agent." -ForegroundColor Green
+# ACI can sit in "Waiting to run" for minutes on a slow control plane or a Docker Hub
+# pull. The fault is already applied and the gateway's own poller feeds the Ops Center,
+# so the incident is live without k6 - never hold the challenge open on this.
+$deadline = (Get-Date).AddSeconds($TimeoutSeconds)
+$containerState = ''
+while ((Get-Date) -lt $deadline) {
+    $containerState = az container show -g $LoadGenResourceGroup -n aetherion-k6 `
+        --query 'containers[0].instanceView.currentState.state' -o tsv --only-show-errors 2>$null
+    if ($containerState -eq 'Running') { break }
+    Start-Sleep -Seconds 5
+}
+
+if ($containerState -eq 'Running') {
+    Write-Host "k6 load generator running in '$LoadGenResourceGroup' - hidden from the SRE Agent." -ForegroundColor Green
+} else {
+    Write-Host "k6 load generator is still starting in '$LoadGenResourceGroup' (state: $(if ($containerState) { $containerState } else { 'pending' }))." -ForegroundColor Yellow
+    Write-Host "  Continuing anyway - this only adds background traffic. The incident is already live" -ForegroundColor Yellow
+    Write-Host "  and visible in the Operations Center. Check later with:" -ForegroundColor Yellow
+    Write-Host "    az container show -g $LoadGenResourceGroup -n aetherion-k6 --query containers[0].instanceView.currentState" -ForegroundColor Gray
+}
 Write-Host "  Partner  : $baseUrl" -ForegroundColor Gray
 if ($directUrl) { Write-Host "  Internal : $directUrl ($internalVus mixed$(if ($crewVus -gt 0) { ", $crewVus crew sign-on, $checkInVus check-in" }))" -ForegroundColor Gray }
 Write-Host "  Mode     : $Mode ($vus VUs)" -ForegroundColor Gray
