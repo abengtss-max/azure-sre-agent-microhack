@@ -12,13 +12,13 @@
         <meta name="author" content="Aetherion AirOps Reliability Engineering">
       
       
-        <link rel="canonical" href="https://abengtss-max.github.io/azure-sre-agent-microhack/challenges/06-autonomous-and-cost/">
+        <link rel="canonical" href="https://abengtss-max.github.io/azure-sre-agent-microhack/reference/privacy/">
       
       
-        <link rel="prev" href="../05-engineer-the-agent/">
+        <link rel="prev" href="../glossary/">
       
       
-        <link rel="next" href="../07-major-incident/">
+        <link rel="next" href="../../getting-started/overview/">
       
       
         
@@ -29,7 +29,7 @@
     
     
       
-        <title>06 · Autonomous Recovery & Cost Governance - Azure SRE Agent MicroHack</title>
+        <title>Privacy & browser storage - Azure SRE Agent MicroHack</title>
       
     
     
@@ -71,14 +71,14 @@
   
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Azure SRE Agent MicroHack">
-  <meta property="og:title" content="06 · Autonomous Recovery & Cost Governance · Azure SRE Agent MicroHack">
+  <meta property="og:title" content="Privacy & browser storage · Azure SRE Agent MicroHack">
   <meta property="og:description" content="Hands-on MicroHack: use the Azure SRE Agent to detect, investigate and recover live incidents on the Aetherion AirOps Tier-0 aviation platform.">
   <meta property="og:image" content="https://abengtss-max.github.io/azure-sre-agent-microhack/assets/og-cover.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:url" content="https://abengtss-max.github.io/azure-sre-agent-microhack/challenges/06-autonomous-and-cost/">
+  <meta property="og:url" content="https://abengtss-max.github.io/azure-sre-agent-microhack/reference/privacy/">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="06 · Autonomous Recovery & Cost Governance · Azure SRE Agent MicroHack">
+  <meta name="twitter:title" content="Privacy & browser storage · Azure SRE Agent MicroHack">
   <meta name="twitter:description" content="Hands-on MicroHack: use the Azure SRE Agent to detect, investigate and recover live incidents on the Aetherion AirOps Tier-0 aviation platform.">
   <meta name="twitter:image" content="https://abengtss-max.github.io/azure-sre-agent-microhack/assets/og-cover.jpg">
   <link rel="icon" type="image/png" sizes="16x16" href="../../assets/aetherion-airops-favicon-16.png">
@@ -105,7 +105,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#challenge-6-autonomous-recovery-and-cost-aware-governance" class="md-skip">
+        <a href="#privacy-and-browser-storage" class="md-skip">
           Skip to content
         </a>
       
@@ -140,7 +140,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              06 · Autonomous Recovery & Cost Governance
+              Privacy & browser storage
             
           </span>
         </div>
@@ -288,8 +288,6 @@
   
   
   
-    
-  
   
     
     
@@ -297,13 +295,11 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../01-onboard-and-baseline/" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../../challenges/01-onboard-and-baseline/" class="md-tabs__link">
           
   
   
@@ -324,11 +320,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../../reference/architecture/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../architecture/" class="md-tabs__link">
           
   
   
@@ -450,10 +448,8 @@
       
   
   
-    
   
   
-  
     
     
       
@@ -475,22 +471,19 @@
     
     
       
-        
-        
-      
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
         
           
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
             
   
   
@@ -508,7 +501,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -536,20 +529,17 @@
       
       
         
-          
-          
-        
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1" >
         
           
-          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="">
+          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
             
   
   
@@ -585,7 +575,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../01-onboard-and-baseline/" class="md-nav__link">
+      <a href="../../challenges/01-onboard-and-baseline/" class="md-nav__link">
         
   
   
@@ -635,20 +625,17 @@
       
       
         
-          
-          
-        
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
         
           
-          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="">
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
             
   
   
@@ -684,7 +671,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../02-detect-and-investigate/" class="md-nav__link">
+      <a href="../../challenges/02-detect-and-investigate/" class="md-nav__link">
         
   
   
@@ -712,7 +699,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../03-controlled-recovery/" class="md-nav__link">
+      <a href="../../challenges/03-controlled-recovery/" class="md-nav__link">
         
   
   
@@ -740,7 +727,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../04-ground-the-agent/" class="md-nav__link">
+      <a href="../../challenges/04-ground-the-agent/" class="md-nav__link">
         
   
   
@@ -786,20 +773,17 @@
       
       
         
-          
-          
-        
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" >
         
           
-          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="">
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
             
   
   
@@ -835,7 +819,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../05-engineer-the-agent/" class="md-nav__link">
+      <a href="../../challenges/05-engineer-the-agent/" class="md-nav__link">
         
   
   
@@ -868,10 +852,8 @@
                 
   
   
-    
   
   
-  
     
     
       
@@ -883,20 +865,17 @@
       
       
         
-          
-          
-        
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4" >
         
           
-          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="">
+          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="0">
             
   
   
@@ -914,7 +893,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3_4">
             <span class="md-nav__icon md-icon"></span>
             
@@ -929,37 +908,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    06 · Autonomous Recovery & Cost Governance
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../challenges/06-autonomous-and-cost/" class="md-nav__link">
         
   
   
@@ -975,81 +927,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#tasks" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Tasks
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#suggested-azure-sre-agent-prompt" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Suggested Azure SRE Agent prompt
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#success-criteria" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Success criteria
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#hints" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Hints
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#reference" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Reference
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1082,20 +959,17 @@
       
       
         
-          
-          
-        
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_5" >
         
           
-          <label class="md-nav__link" for="__nav_3_5" id="__nav_3_5_label" tabindex="">
+          <label class="md-nav__link" for="__nav_3_5" id="__nav_3_5_label" tabindex="0">
             
   
   
@@ -1131,7 +1005,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../07-major-incident/" class="md-nav__link">
+      <a href="../../challenges/07-major-incident/" class="md-nav__link">
         
   
   
@@ -1159,7 +1033,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../08-leadership-briefing/" class="md-nav__link">
+      <a href="../../challenges/08-leadership-briefing/" class="md-nav__link">
         
   
   
@@ -1207,20 +1081,17 @@
       
       
         
-          
-          
-        
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_6" >
         
           
-          <label class="md-nav__link" for="__nav_3_6" id="__nav_3_6_label" tabindex="">
+          <label class="md-nav__link" for="__nav_3_6" id="__nav_3_6_label" tabindex="0">
             
   
   
@@ -1256,7 +1127,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../bonus-hooks-and-policies/" class="md-nav__link">
+      <a href="../../challenges/bonus-hooks-and-policies/" class="md-nav__link">
         
   
   
@@ -1284,7 +1155,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../bonus-extend-and-be-proactive/" class="md-nav__link">
+      <a href="../../challenges/bonus-extend-and-be-proactive/" class="md-nav__link">
         
   
   
@@ -1320,7 +1191,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../finish/" class="md-nav__link">
+      <a href="../../challenges/finish/" class="md-nav__link">
         
   
   
@@ -1352,8 +1223,10 @@
       
   
   
+    
   
   
+  
     
     
       
@@ -1377,19 +1250,22 @@
     
     
       
+        
+        
+      
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
         
           
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
             
   
   
@@ -1407,7 +1283,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1425,7 +1301,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/architecture/" class="md-nav__link">
+      <a href="../architecture/" class="md-nav__link">
         
   
   
@@ -1453,7 +1329,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/service-catalog/" class="md-nav__link">
+      <a href="../service-catalog/" class="md-nav__link">
         
   
   
@@ -1481,7 +1357,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/integrations/" class="md-nav__link">
+      <a href="../integrations/" class="md-nav__link">
         
   
   
@@ -1509,7 +1385,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/commands/" class="md-nav__link">
+      <a href="../commands/" class="md-nav__link">
         
   
   
@@ -1537,7 +1413,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/troubleshooting/" class="md-nav__link">
+      <a href="../troubleshooting/" class="md-nav__link">
         
   
   
@@ -1565,7 +1441,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/glossary/" class="md-nav__link">
+      <a href="../glossary/" class="md-nav__link">
         
   
   
@@ -1590,10 +1466,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../reference/privacy/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Privacy & browser storage
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1609,6 +1512,70 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-is-stored" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What is stored
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#your-choice" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Your choice
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#removing-the-data-yourself" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Removing the data yourself
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-rest-of-the-workshop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The rest of the workshop
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1635,17 +1602,20 @@
       
       
         
+          
+          
+        
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
       
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_8" >
         
           
-          <label class="md-nav__link" for="__nav_4_8" id="__nav_4_8_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_8" id="__nav_4_8_label" tabindex="">
             
   
   
@@ -1800,10 +1770,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#tasks" class="md-nav__link">
+  <a href="#what-is-stored" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Tasks
+        What is stored
       
     </span>
   </a>
@@ -1811,10 +1781,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#suggested-azure-sre-agent-prompt" class="md-nav__link">
+  <a href="#your-choice" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Suggested Azure SRE Agent prompt
+        Your choice
       
     </span>
   </a>
@@ -1822,10 +1792,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#success-criteria" class="md-nav__link">
+  <a href="#removing-the-data-yourself" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Success criteria
+        Removing the data yourself
       
     </span>
   </a>
@@ -1833,21 +1803,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#hints" class="md-nav__link">
+  <a href="#the-rest-of-the-workshop" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Hints
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#reference" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Reference
+        The rest of the workshop
       
     </span>
   </a>
@@ -1874,271 +1833,78 @@
   
 
 
-<h1 id="challenge-6-autonomous-recovery-and-cost-aware-governance">Challenge 6 · Autonomous Recovery and Cost-Aware Governance<a class="headerlink" href="#challenge-6-autonomous-recovery-and-cost-aware-governance" title="Permanent link">&para;</a></h1>
-<div class="admonition abstract">
-<p class="admonition-title">Challenge 06 of 08 · Act IV: Autonomous &amp; Cost</p>
-<p><strong>Run mode:</strong> Autonomous (bounded) · <strong>Governance:</strong> bounded <abbr title="How much of the system an incident (or a fix) can affect — kept as small as possible.">blast radius</abbr>, no per-action approval</p>
-<p><strong>Stage:</strong> Foundation → Operations → Engineering → <strong>Autonomous</strong> → Major Incident</p>
-</div>
-<p><strong>Situation.</strong> Every write so far has waited for your approval. Now a minor issue
-appears: the <strong>baggage</strong> service returns intermittent errors to a slice of traffic.
-Bags still move, no flight is grounded, and the fix is one you've already seen:
-small <abbr title="How much of the system an incident (or a fix) can affect — kept as small as possible.">blast radius</abbr>, well-understood remedy. That's exactly when it's safe to let the
-agent run <strong>autonomously</strong> while you supervise, then make it sustainable at scale
-and arm it to trigger itself on the next major incident.</p>
-<p><strong>Mission.</strong> Let the agent recover the baggage service autonomously within
-guardrails, design a cost-aware operating model for its Azure Agent Unit (<abbr title="Agent Activity Unit — the consumption/billing unit for Azure SRE Agent usage.">AAU</abbr>)
-usage, and arm a <strong>Sev1</strong> response plan so the next major incident auto-triggers an
-investigation, before you reach Challenge 7.</p>
-<p><strong>Why this matters</strong></p>
-<div class="grid cards why-cards">
-<ul>
-<li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10.5 15.5c0 .37-.1.7-.28 1-.34-.59-.98-1-1.72-1s-1.38.41-1.72 1c-.17-.3-.28-.63-.28-1 0-1.1.9-2 2-2s2 .9 2 2M23 15v3c0 .55-.45 1-1 1h-1v1c0 1.11-.89 2-2 2H5a2 2 0 0 1-2-2v-1H2c-.55 0-1-.45-1-1v-3c0-.55.45-1 1-1h1c0-3.87 3.13-7 7-7h1V5.73c-.6-.34-1-.99-1-1.73 0-1.1.9-2 2-2s2 .9 2 2c0 .74-.4 1.39-1 1.73V7h1c3.87 0 7 3.13 7 7h1c.55 0 1 .45 1 1m-2 1h-2v-2c0-2.76-2.24-5-5-5h-4c-2.76 0-5 2.24-5 5v2H3v1h2v3h14v-3h2zm-5.5-2.5c-1.1 0-2 .9-2 2 0 .37.11.7.28 1 .34-.59.98-1 1.72-1s1.38.41 1.72 1c.18-.3.28-.63.28-1a2 2 0 0 0-2-2"/></svg></span> <strong>Bounded autonomy</strong>: let the agent fix a small, safe issue end-to-end</li>
-<li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5 6h18v12H5zm9 3a3 3 0 0 1 3 3 3 3 0 0 1-3 3 3 3 0 0 1-3-3 3 3 0 0 1 3-3M9 8a2 2 0 0 1-2 2v4a2 2 0 0 1 2 2h10a2 2 0 0 1 2-2v-4a2 2 0 0 1-2-2zm-8 2h2v10h16v2H1z"/></svg></span> <strong>Cost-aware</strong>: see where Azure Agent Units actually go</li>
-<li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8 13c-1.86 0-3.41 1.28-3.86 3H2v2h2.14c.45 1.72 2 3 3.86 3s3.41-1.28 3.86-3H22v-2H11.86c-.45-1.72-2-3-3.86-3m0 6c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2M19.86 6c-.45-1.72-2-3-3.86-3s-3.41 1.28-3.86 3H2v2h10.14c.45 1.72 2 3 3.86 3s3.41-1.28 3.86-3H22V6zM16 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2"/></svg></span> <strong>Right-sized</strong>: cut waste without losing reliability</li>
-<li><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2a2 2 0 0 0-2 2 2 2 0 0 0 0 .29C7.12 5.14 5 7.82 5 11v6l-2 2v1h18v-1l-2-2v-6c0-3.18-2.12-5.86-5-6.71A2 2 0 0 0 14 4a2 2 0 0 0-2-2m0 4a5 5 0 0 1 5 5v7H7v-7a5 5 0 0 1 5-5m9 1v6h2V7zm0 8v2h2v-2zm-11 6a2 2 0 0 0 2 2 2 2 0 0 0 2-2z"/></svg></span> <strong>Armed for Sev1</strong>: auto-trigger the agent on the next major incident</li>
-</ul>
-</div>
-<div class="admonition example">
-<p class="admonition-title">Start this challenge</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="nb">start-challenge</span><span class="p">.</span><span class="n">ps1</span> <span class="n">6</span>   <span class="c"># open the incident</span>
-</code></pre></div>
-<p>Give it a couple of minutes. The errors only show up once enough traffic has
-hit the affected slice for the board to average it.</p>
-</div>
-<h3 id="tasks">Tasks<a class="headerlink" href="#tasks" title="Permanent link">&para;</a></h3>
-<ol>
-<li><strong>Confirm the symptom.</strong> Verify the baggage errors in the Ops Center and telemetry so you know what "recovered" looks like.</li>
-<li><strong>Decide the bounds, then hand over.</strong> Judge whether this incident is safe to automate, switch to <strong>Autonomous</strong> mode, let the agent fix it end-to-end, then review the action log.</li>
-<li><strong>See where AAUs go.</strong> Inspect the agent's consumption by thread type and purpose.</li>
-<li><strong>Design a cost-aware model.</strong> Name concrete reductions without losing reliability or investigation quality.</li>
-<li><strong>Arm the Sev1 response plan.</strong> Connect Azure Monitor as an incident platform, then bind a <strong>Sev1</strong> plan to the pre-provisioned <code>aetherion-major-incident</code> alert so the next major incident auto-triggers. Do this now, before Challenge 7.</li>
-</ol>
-<p><img alt="Challenge 6 storyboard: Sam, Priya and Aria review autonomous recovery and cost governance" class="story-panel" loading="lazy" src="../../assets/storyboard/img-challenge-6.webp" /></p>
-<h3 id="suggested-azure-sre-agent-prompt">Suggested Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent prompt<a class="headerlink" href="#suggested-azure-sre-agent-prompt" title="Permanent link">&para;</a></h3>
-<div class="admonition quote">
-<p class="admonition-title">Paste into the agent chat</p>
-<p>The <code>baggage</code> service is returning intermittent errors to a slice of traffic
-while other requests succeed. Detect the fault, decide the sanctioned reversible
-fix, apply it autonomously, and report exactly what you changed and why it was
-safe to automate.</p>
-</div>
-<h3 id="success-criteria">Success criteria<a class="headerlink" href="#success-criteria" title="Permanent link">&para;</a></h3>
-<ul>
-<li>The agent detects the baggage errors, executes a sanctioned fix autonomously, the service returns to healthy, and you can explain why it was safe to automate: small <abbr title="How much of the system an incident (or a fix) can affect — kept as small as possible.">blast radius</abbr>, a reversible and well-understood remedy, a service that is degraded rather than down, and a run mode you chose deliberately.</li>
-<li>You've reviewed real consumption data and produced a written, defensibly balanced operating model: the two largest consumers with their actual figures, at least three named levers each with a trade-off, and an explicit reliability floor. Cost-aware, not merely cheapest.</li>
-<li>A <strong>Sev1 major-incident response plan</strong> is active on the agent (bound to the pre-provisioned <code>aetherion-major-incident</code> alert), ready to auto-trigger the agent when the next major incident fires.</li>
-<li><code>check-challenge.ps1 6</code> passes.</li>
-</ul>
-<div class="admonition warning">
-<p class="admonition-title">Ground truth only</p>
-<p>Don't invent <abbr title="Agent Activity Unit — the consumption/billing unit for Azure SRE Agent usage.">AAU</abbr> rates, prices, or savings figures. Use only values present in
-the <a href="https://learn.microsoft.com/en-us/azure/sre-agent/pricing-billing">official docs</a>
-or your environment. Don't claim that stopping an agent ends all billing.</p>
-</div>
-<div class="admonition success">
-<p class="admonition-title">Verify your work</p>
-<p>Run this when you're done. It grades the real end state, then walks your
-response plan setting by setting. Answer those honestly: a plan that looks
-right and never fires is the one failure that doesn't surface until
-Challenge 7 is already open.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="n">check-challenge</span><span class="p">.</span><span class="n">ps1</span> <span class="n">6</span>
-</code></pre></div>
-</div>
-<h3 id="hints">Hints<a class="headerlink" href="#hints" title="Permanent link">&para;</a></h3>
-<details>
-<summary>Hint: make autonomy safe</summary>
-<p>Confirm the symptom first; you can't judge an autonomous recovery without knowing
-what healthy looks like.</p>
-<p>What makes this one safe to automate isn't a permission setting. It's the shape of
-the incident: one degraded (not down) service, a remedy you can undo in seconds, and
-a <abbr title="How much of the system an incident (or a fix) can affect — kept as small as possible.">blast radius</abbr> you can describe in a sentence. Decide that <em>before</em> you switch mode,
-then switch to Autonomous and resist helping.</p>
-</details>
-<details>
-<summary>Hint: cost model and the Sev1 plan</summary>
-<p>Optimize what you can measure: look at real consumption by thread type and purpose:
-consolidation, deleting unused pilots, model fit, and plan/schedule noise are the
-biggest levers. Aim for a <em>balanced</em> model, not the cheapest. Then wire the <strong>Sev1</strong>
-response plan now, matching the pre-provisioned <code>aetherion-major-incident</code> alert's
-severity exactly, or you'll be wiring it by hand while the board is red in
-Challenge 7.</p>
-</details>
-<div class="admonition question">
-<p class="admonition-title">Stuck? Step-by-step for each task</p>
-<p>Give each task a genuine attempt first, and skim the hints above. When you want
-the exact clicks, open the matching task below.</p>
-<details class="note">
-<summary>Task 1 · Confirm the symptom</summary>
-<ul>
-<li>Check the <strong>baggage</strong> tile and telemetry (<abbr title="Azure application-performance monitoring — requests, dependencies, exceptions, latency.">Application Insights</abbr> failed
-  requests) so you know the current error rate and what "recovered" means.</li>
-<li>Some requests succeed and some fail. Ask the agent what is different about
-  the ones that fail — the answer is in what sits behind the Service, not in
-  the Service itself.</li>
-<li><code>kubectl get pods -n aetherion -l app=baggage --show-labels</code> shows the same
-  thing directly, if you want to confirm the agent's account.</li>
-</ul>
-</details>
-<details class="note">
-<summary>Task 2 · Decide the bounds, then hand over</summary>
-<ul>
-<li>Write down the bounds first: what may the agent change, what must it never
-  touch, and how would you undo it? That judgement is the governance here.</li>
-<li>Set the run mode to <strong>Autonomous</strong> (on the response plan / task), then let
-  the agent detect → decide → fix on its own. Review the action log after.</li>
-</ul>
-<div class="admonition note">
-<p class="admonition-title">\"Never delete\" applies to data, not to a bad revision</p>
-<p>Aetherion's guardrails forbid deleting <strong>data resources</strong>: databases,
-caches, storage. Removing a workload revision that shouldn't be serving
-is an ordinary, reversible rollback, and it is the sanctioned fix here.</p>
-</div>
-</details>
-<details class="note">
-<summary>Task 3 · See where AAUs go</summary>
-<ul>
-<li>In the agent, open <strong>Settings → Agent Consumption</strong> and read the breakdown
-  by thread type (Chats, Incidents, Scheduled tasks, Triggers) and by thread.</li>
-<li><strong>Write down the two largest consumers and their actual figures.</strong> Task 4
-  is only worth doing against real numbers, and "incidents cost more than
-  chats" is a guess until you have looked.</li>
-</ul>
-</details>
-<details class="note">
-<summary>Task 4 · Design a cost-aware model</summary>
-<p>Produce something a finance partner could actually review, not an essay.
-Ask the agent for it, then correct it against what you saw in Task 3:</p>
-<blockquote>
-<p>Using my agent consumption figures, draft a cost-aware operating model
-as a table: each row a named lever, what it would save, and what it
-costs us in reliability, ownership, isolation or investigation quality.
-Add one line stating the floor we will not go below. Use only the
-figures I give you and do not invent numbers.</p>
-</blockquote>
-<p><strong>It has to contain, at minimum:</strong></p>
-<ul>
-<li><strong>Three named levers</strong> with a real figure attached to each — for example
-  consolidating workloads under one agent, deleting unused pilot agents,
-  matching the model to the task, or trimming noisy response plans and
-  schedules.</li>
-<li><strong>A reliability floor</strong> stated explicitly: the thing you will not trade
-  away to save AAUs. Cheapest is not the target.</li>
-</ul>
-<p>Keep it. Challenge 8 asks you to defend it to a director, and
-<code>check-challenge.ps1 6</code> asks you about both parts.</p>
-</details>
-<details class="note">
-<summary>Task 5 · Arm the Sev1 response plan</summary>
-<p><strong>Connect an incident platform first.</strong> Response plans do not exist until
-you do, and this catches people out.</p>
-<ol>
-<li><strong>Incidents</strong> in the left-hand menu → <strong>Triggers + response plans</strong>.</li>
-<li><strong>Connect an incident platform</strong> → <strong>Azure Monitor</strong> → <strong>Save</strong>. It
-   configures itself from your agent's scope, so there is nothing to fill in.
-   You'll see <strong>Azure Monitor is connected</strong> in the top right when it's done.</li>
-<li><strong>Delete the quickstart plan.</strong> Connecting a platform automatically
-   creates a default <strong>quickstart</strong> response plan. Leave it there and it
-   runs alongside yours, which can route the incident to the wrong agent
-   or process it twice. Select it and delete it before you continue.</li>
-<li><strong>+ Create a response plan</strong>.</li>
-</ol>
-<p>Fill it in as follows:</p>
+<h1 id="privacy-and-browser-storage">Privacy and browser storage<a class="headerlink" href="#privacy-and-browser-storage" title="Permanent link">&para;</a></h1>
+<p>This workshop site is static documentation published on GitHub Pages. There is no
+account to create, no server-side profile, no advertising and no third-party
+analytics or tracking product. Nothing you do here is sent to us.</p>
+<p>The one thing the site does keep is your <strong>challenge progress</strong>, and it keeps it in
+your own browser using <code>localStorage</code> rather than cookies.</p>
+<h2 id="what-is-stored">What is stored<a class="headerlink" href="#what-is-stored" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th>Field</th>
-<th>Value</th>
+<th>Name</th>
+<th>Category</th>
+<th>Purpose</th>
+<th>Retention</th>
+<th>Set by</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Incident response plan name</td>
-<td><code>aetherion-major-incident-sev1</code></td>
+<td><code>srehack:consent:v1</code></td>
+<td>Strictly necessary</td>
+<td>Records the choice you made below, so you are not asked on every page</td>
+<td>Until you clear it, or until the notice changes</td>
+<td>This site</td>
 </tr>
 <tr>
-<td><strong>Severity</strong></td>
-<td><strong>Sev1</strong></td>
+<td><code>srehack:progress:v1</code></td>
+<td>Functional</td>
+<td>Which challenges you have marked complete, so the progress bar survives a reload</td>
+<td>Until you clear it</td>
+<td>This site</td>
 </tr>
 <tr>
-<td>Title contains / does not contain</td>
-<td>leave empty</td>
+<td><code>srehack:seen-intro</code></td>
+<td>Functional</td>
+<td>Whether you have dismissed the one-time "New here?" hint</td>
+<td>Until you clear it</td>
+<td>This site</td>
 </tr>
 <tr>
-<td><strong>Response subagent</strong></td>
-<td><strong>leave empty</strong></td>
-</tr>
-<tr>
-<td><strong>Agent autonomy level</strong></td>
-<td><strong>Autonomous</strong></td>
-</tr>
-<tr>
-<td><strong>Alert reinvestigation cooldown</strong></td>
-<td><strong>disable it</strong></td>
+<td><code>__palette</code></td>
+<td>Functional</td>
+<td>Your light/dark preference, if you use the theme toggle</td>
+<td>Until you clear it</td>
+<td>Material for MkDocs theme</td>
 </tr>
 </tbody>
 </table>
-<p>Then <strong>Next</strong> to see <strong>Incidents preview</strong>, and create.</p>
-<p><strong>Severity is the whole match.</strong> The environment pre-provisions
-<code>aetherion-major-incident</code> at <strong>Sev1</strong>, so a plan filtered to anything else
-catches nothing and a broader plan fires on everything. Leave the title
-filters empty. They are an extra way to miss the alert, not an extra
-safeguard.</p>
-<div class="admonition tip">
-<p class="admonition-title">Why not route it to your <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> specialist?</p>
-<p>The <strong>Response subagent</strong> dropdown is populated by the subagent you
-built in Challenge 5, so it is tempting to select <code>aks-triage</code> here.
-Don't.</p>
-<p>Challenge 7's incident spans <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr>, API Management <strong>and</strong> PostgreSQL.
-Handing the auto-triggered investigation to an <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr>-only specialist
-scopes it to one tier of a four-tier incident. Leave it empty so the
-main agent commands the whole board, and delegate to the specialist
-<em>within</em> the incident instead.</p>
-<p>Deciding <em>not</em> to use a tool you just built is a real operational
-judgement, and this is the moment to make it.</p>
-</div>
-<div class="admonition warning">
-<p class="admonition-title">Turn the cooldown off for this workshop</p>
-<p><strong>Alert reinvestigation cooldown</strong> defaults to enabled at 3 hours: the
-plan skips reinvestigation if the same plan already started one inside
-that window. Sensible in production, wrong here. Re-run Challenge 7
-and the plan silently will not fire the second time.</p>
-</div>
-<div class="admonition danger">
-<p class="admonition-title">Choose Autonomous, and understand what you are choosing</p>
-<p>Selecting <strong>Autonomous</strong> shows an information icon. Open it and read the
-<strong><abbr title="SRE Agent run mode where it executes approved classes of action without pausing for each step.">Autonomous mode</abbr> acknowledgment</strong> before you accept: it covers the
-agent's boundaries, the model's limitations, and the fact that scoping
-its access and reviewing its outcomes remain your responsibility.</p>
-<p>In production you would start at <strong>Review</strong> and only promote a plan to
-<strong>Autonomous</strong> once you trust its tool selection. You are promoting it
-after one supervised autonomous recovery in this challenge, which is
-faster than you should move on a real platform. That is a deliberate
-trade so Challenge 7 can show you what unattended response looks like.</p>
-</div>
-<p><strong>Autonomy level is per plan</strong>, separate from the agent's own run mode. At
-<strong>Autonomous</strong>, the auto-triggered investigation can mitigate without waiting
-for you. It will not fix everything: it acts where the fix is unambiguous and
-reversible, and leaves the judgement calls. Challenge 7 is built around that
-split, and your first job there is to audit what it decided to do alone.</p>
-<p>Do this <strong>now</strong>. Challenge 7 depends on it auto-triggering, and
-<code>check-challenge.ps1 6</code> will ask you about each of the six settings above
-one at a time. Every one of them is a way to end up with a plan that is
-listed, looks correct, and quietly matches nothing.</p>
-</details>
-</div>
-<h3 id="reference">Reference<a class="headerlink" href="#reference" title="Permanent link">&para;</a></h3>
-<ul>
-<li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/run-modes">Run modes</a></li>
-<li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/pricing-billing">Pricing and billing</a></li>
-<li><a href="https://learn.microsoft.com/en-us/azure/sre-agent/incident-response-plans">Incident response plans</a></li>
-</ul>
-<div class="admonition success">
-<p class="admonition-title">Up next: the final major incident</p>
-<p>Your Sev1 plan is armed at <strong>Autonomous</strong>. When everything breaks at once, the agent triggers itself and starts working the incident before anyone pages you. You arrive second, and your first job is to audit what it already did.</p>
-<p><a class="md-button md-button--primary" href="../07-major-incident/">Proceed to Challenge 7 · Final Major Incident →</a></p>
-</div>
-<hr />
+<p>The theme prefixes its own entry with the site path, so it appears in your browser
+as something like <code>/azure-sre-agent-microhack/.__palette</code>.</p>
+<p>Search is handled entirely in the browser by the theme and does not store a
+search history.</p>
+<h2 id="your-choice">Your choice<a class="headerlink" href="#your-choice" title="Permanent link">&para;</a></h2>
+<p>Choosing <strong>Reject non-essential</strong> removes the functional entries above and stops
+them being written again. The site remains fully usable: you can still read every
+page, mark challenges complete and watch the progress bar fill — that state simply
+lives in the current tab and is gone when you close it.</p>
+<p><button type="button" class="aet-consent-btn" data-aet-consent-open>Review or change your choice</button></p>
+<h2 id="removing-the-data-yourself">Removing the data yourself<a class="headerlink" href="#removing-the-data-yourself" title="Permanent link">&para;</a></h2>
+<p>You do not need us to clear anything for you. Either use <strong>Reject non-essential</strong>
+above, or clear site data for this domain in your browser: in Chrome or Edge,
+<strong>Developer tools → Application → Local storage</strong>, then delete the entries listed
+above. Private or incognito windows discard all of it automatically when closed.</p>
+<p>If your browser blocks storage entirely, the site detects that and falls back to
+keeping progress for the current tab only.</p>
+<h2 id="the-rest-of-the-workshop">The rest of the workshop<a class="headerlink" href="#the-rest-of-the-workshop" title="Permanent link">&para;</a></h2>
+<p>Everything you deploy during the hack — the <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> cluster, the database, the <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr>
+Agent and its threads — lives in <strong>your own Azure subscription</strong> and is governed by
+your organisation's agreements with Microsoft, not by this page. The teardown
+script removes it:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="n">99-teardown</span><span class="p">.</span><span class="n">ps1</span>
+</code></pre></div>
 
 
 
@@ -2174,7 +1940,7 @@ listed, looks correct, and quietly matches nothing.</p>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../05-engineer-the-agent/" class="md-footer__link md-footer__link--prev" aria-label="Previous: 05 · Engineer the Agent (Subagent + Skill)">
+          <a href="../glossary/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Glossary">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -2184,20 +1950,20 @@ listed, looks correct, and quietly matches nothing.</p>
                 Previous
               </span>
               <div class="md-ellipsis">
-                05 · Engineer the Agent (Subagent + Skill)
+                Glossary
               </div>
             </div>
           </a>
         
         
           
-          <a href="../07-major-incident/" class="md-footer__link md-footer__link--next" aria-label="Next: 07 · Final Major Incident">
+          <a href="../../getting-started/overview/" class="md-footer__link md-footer__link--next" aria-label="Next: The scenario in depth">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                07 · Final Major Incident
+                The scenario in depth
               </div>
             </div>
             <div class="md-footer__button md-icon">

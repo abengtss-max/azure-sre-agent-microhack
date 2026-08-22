@@ -5,18 +5,31 @@
   var TOTAL = 8;
   var KEY = "srehack:progress:v1";
 
+  // Progress is non-essential storage, so it is only persisted once the reader
+  // has agreed. Without agreement it lives in memory for this tab only.
+  var sessionOnly = null;
+  function mayPersist() {
+    return !!(window.aetConsent && window.aetConsent.allows("functional"));
+  }
+
   function load() {
+    if (!mayPersist()) return new Set(sessionOnly || []);
     try { return new Set(JSON.parse(localStorage.getItem(KEY) || "[]")); }
     catch (e) { return new Set(); }
   }
   function save(set) {
+    var sorted = Array.from(set).sort(function (a, b) { return a - b; });
+    if (!mayPersist()) { sessionOnly = sorted; return; }
     try {
-      localStorage.setItem(KEY, JSON.stringify(Array.from(set).sort(function (a, b) { return a - b; })));
+      localStorage.setItem(KEY, JSON.stringify(sorted));
     } catch (e) { /* storage disabled — session-only */ }
   }
   function pct(set) { return Math.round((set.size / TOTAL) * 100); }
 
-  function seenIntro() { try { return localStorage.getItem("srehack:seen-intro") === "1"; } catch (e) { return false; } }
+  function seenIntro() {
+    if (!mayPersist()) return false;
+    try { return localStorage.getItem("srehack:seen-intro") === "1"; } catch (e) { return false; }
+  }
 
   function currentChallenge() {
     var m = location.pathname.match(/challenges\/(\d{2})-/);
@@ -196,7 +209,9 @@
             '<button type="button" class="aet-coach-close">Got it</button></div>';
           sb.parentNode.insertBefore(coach, sb.nextSibling);
           coach.querySelector(".aet-coach-close").addEventListener("click", function () {
-            try { localStorage.setItem("srehack:seen-intro", "1"); } catch (e) {}
+            if (mayPersist()) {
+              try { localStorage.setItem("srehack:seen-intro", "1"); } catch (e) {}
+            }
             coach.remove();
           });
         }
@@ -274,5 +289,12 @@
   ready();
   if (window.document$ && typeof window.document$.subscribe === "function") {
     window.document$.subscribe(boot);
+  }
+  // Agreeing part-way through a session promotes the in-memory progress to storage.
+  if (window.aetConsent && typeof window.aetConsent.onChange === "function") {
+    window.aetConsent.onChange(function () {
+      if (mayPersist() && sessionOnly && sessionOnly.length) save(new Set(sessionOnly));
+      boot();
+    });
   }
 })();
