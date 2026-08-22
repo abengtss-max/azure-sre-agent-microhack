@@ -1842,8 +1842,10 @@ non-destructive remediation and verify service is restored.</p>
 <p class="admonition-title">Start this challenge</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="nb">start-challenge</span><span class="p">.</span><span class="n">ps1</span> <span class="n">4</span>   <span class="c"># open the incident</span>
 </code></pre></div>
-<p>Give it two or three minutes. The database has to come under load before crew
-latency moves, and the Ops Center averages over a rolling window on top of that.</p>
+<p>Crew scheduling degrades within two or three minutes. Its database-backed
+neighbours take longer — the server rides out the first few minutes on burst
+credits before the pressure starts spreading. Read the whole board before you
+draw the <abbr title="How much of the system an incident (or a fix) can affect — kept as small as possible.">blast radius</abbr>.</p>
 </div>
 <h3 id="tasks">Tasks<a class="headerlink" href="#tasks" title="Permanent link">&para;</a></h3>
 <ol>
@@ -1883,6 +1885,9 @@ it has. Task 2 gives it Aetherion's own operating rules and asks again.</p>
 something in common. Ask what they share, then ask which of them is <em>using</em> that
 shared thing hardest. The one generating the load is the origin; the rest are
 collateral.</p>
+<p>Don't judge the neighbours on a single glance. They spike rather than sit
+uniformly slow, so one reading tells you very little — compare a few, against the
+baseline you took in Challenge 1.</p>
 <p>A database that is busy is not the same as a database that is broken.</p>
 </details>
 <details>
@@ -1900,10 +1905,16 @@ the exact clicks, open the matching task below.</p>
 <details class="note">
 <summary>Task 1 · Find the origin</summary>
 <ul>
-<li>Read the Operations Center: <code>crew-scheduling</code> is red, and its
-  database-backed peers (<code>booking</code>, <code>telemetry-ingest</code>) are slower than
-  their baseline. <code>baggage</code>, which touches no database, is untouched. That
-  contrast is the clue.</li>
+<li>Read the Operations Center. <code>crew-scheduling</code> is in seconds, not
+  milliseconds. Its database-backed neighbours — <code>flight-ops</code>, <code>booking</code>,
+  <code>telemetry-ingest</code> — are still serving, but compare them against the
+  baseline you took in Challenge 1 and you'll find them spiking well above
+  it. <code>baggage</code>, the one service that touches no database, is flat.</li>
+<li>That is the shape of a shared-dependency problem: one service in real
+  trouble, its neighbours wobbling, and anything that doesn't share the
+  dependency completely unaffected. The wobble is what tells you the
+  database is involved; the fact that only one service is <em>in trouble</em>
+  tells you the database is not the culprit.</li>
 <li>Compare the layers. Ask the agent to put pod CPU next to the PostgreSQL
   server's CPU. If the pods are comfortable and the database is not, the
   constraint is the work being sent to it, not the workload itself.
@@ -1912,6 +1923,14 @@ the exact clicks, open the matching task below.</p>
 <li>Now ask which service is sending that work. Only one is running a request
   rush against a table it can no longer read efficiently.</li>
 </ul>
+<div class="admonition tip">
+<p class="admonition-title">Give it time before you judge the neighbours</p>
+<p>The neighbours don't degrade immediately. The database is a Burstable
+tier, so it absorbs the first few minutes on CPU credits and only starts
+spreading the pain once those run down. If you look within a couple of
+minutes of starting the challenge you'll see one red service and three
+healthy ones — which is a different, and wrong, conclusion.</p>
+</div>
 </details>
 <details class="note">
 <summary>Task 2 · Ground the agent</summary>
