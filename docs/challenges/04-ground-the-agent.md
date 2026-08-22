@@ -185,18 +185,24 @@ work to the part that is already at its limit.
 
         !!! warning "This step needs Code Access from Challenge 1"
             The agent applies the fix by pointing `kubectl` at the manifest **in
-            your fork**. It cannot pipe a manifest it wrote itself: the managed
-            `kubectl` channel rejects `apply -f -`, `-f /dev/stdin` and heredocs,
-            and its identity deliberately has no cluster-admin credential to fall
-            back on.
+            your fork**, fetched over HTTPS at a pinned commit. Every other route
+            fails, which is worth knowing before you watch it try them:
 
-            So if **Builder → Code Access** is not connected and synced, this task
-            dead-ends. You will see the agent produce the correct diagnosis and the
-            correct manifest, then report something like *"the managed Kubernetes
-            channel drops manifests and the identity lacks
-            `listClusterAdminCredential`"*. That is the symptom of a missing
-            Challenge 1 step, not a broken remediation — go back and connect the
-            repo rather than granting the agent cluster-admin.
+            ```text
+            [Failed]    kubectl create -f -                      # stdin is rejected
+            [Failed]    kubectl create -f .../codeRefs/...       # its own checked-out copy is rejected
+            [Completed] kubectl create -f https://raw.githubusercontent.com/<you>/...
+            ```
+
+            It has no cluster-admin credential to fall back on, by design. So if
+            **Builder → Code Access** is not connected and synced, this task
+            dead-ends: the agent produces the correct diagnosis and the correct
+            manifest, then reports something like *"the managed Kubernetes channel
+            drops manifests and the identity lacks `listClusterAdminCredential`"*.
+
+            That is the symptom of a missing Challenge 1 step, not a broken
+            remediation. Go back and connect the repo rather than granting the
+            agent cluster-admin.
 
         !!! note "It may offer to fix the runbook, unprompted"
             Somewhere around here the agent often volunteers something like:
