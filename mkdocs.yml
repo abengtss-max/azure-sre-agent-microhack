@@ -62,6 +62,7 @@ extra_css:
   - stylesheets/extra.css
 
 extra_javascript:
+  - javascripts/consent.js
   - javascripts/progress.js
 
 markdown_extensions:
@@ -116,6 +117,7 @@ nav:
           - 08 · Leadership Briefing: challenges/08-leadership-briefing.md
       - Bonus track:
           - Enforce the Guardrails · Hooks & Policies: challenges/bonus-hooks-and-policies.md
+          - Extend & Be Proactive · Custom Tools & the Alert Gap: challenges/bonus-extend-and-be-proactive.md
       - Finish: challenges/finish.md
   - Reference:
       - Architecture: reference/architecture.md
@@ -124,6 +126,7 @@ nav:
       - Commands: reference/commands.md
       - Troubleshooting: reference/troubleshooting.md
       - Glossary: reference/glossary.md
+      - Privacy & browser storage: reference/privacy.md
       - Primers (optional):
           - The scenario in depth: getting-started/overview.md
           - Meet the SRE Agent: getting-started/sre-agent-fundamentals.md

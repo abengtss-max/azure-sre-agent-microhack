@@ -156,6 +156,17 @@ against what the repository *declares*.
         If it repeats your hypothesis back, it saved. If it doesn't, the summary
         only exists in the old thread, so keep that thread open for Challenge 3.
 
+        !!! tip "Write down one number before you move on"
+            Note the wall-clock time from when you ran `start-challenge.ps1 2` to
+            the moment you could defend a hypothesis. Just the number of minutes,
+            on paper or in the thread.
+
+            You are investigating this failure class cold, with an agent that
+            knows nothing about Aetherion yet. In Challenge 7 you meet the same
+            class again, by which point the agent has your runbooks, a specialist
+            subagent and a memory of today. Challenge 8 asks you what that was
+            worth, and this is the only chance to capture the *before* number.
+
 ### Reference
 
 - [Run a deep investigation](https://learn.microsoft.com/en-us/azure/sre-agent/deep-investigation)

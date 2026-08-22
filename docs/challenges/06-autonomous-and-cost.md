@@ -58,7 +58,7 @@ investigation, before you reach Challenge 7.
 ### Success criteria
 
 - The agent detects the baggage errors, executes a sanctioned fix autonomously, the service returns to healthy, and you can explain why it was safe to automate: small blast radius, a reversible and well-understood remedy, a service that is degraded rather than down, and a run mode you chose deliberately.
-- You've reviewed real consumption data and produced a written, defensibly balanced operating model, cost-aware, not merely cheapest.
+- You've reviewed real consumption data and produced a written, defensibly balanced operating model: the two largest consumers with their actual figures, at least three named levers each with a trade-off, and an explicit reliability floor. Cost-aware, not merely cheapest.
 - A **Sev1 major-incident response plan** is active on the agent (bound to the pre-provisioned `aetherion-major-incident` alert), ready to auto-trigger the agent when the next major incident fires.
 - `check-challenge.ps1 6` passes.
 
@@ -128,13 +128,31 @@ Challenge 7.
     ??? note "Task 3 · See where AAUs go"
         - In the agent, open **Settings → Agent Consumption** and read the breakdown
           by thread type (Chats, Incidents, Scheduled tasks, Triggers) and by thread.
+        - **Write down the two largest consumers and their actual figures.** Task 4
+          is only worth doing against real numbers, and "incidents cost more than
+          chats" is a guess until you have looked.
 
     ??? note "Task 4 · Design a cost-aware model"
-        - Write a short operating model naming concrete levers: consolidate workloads
-          under one agent, delete unused pilot agents, pick a model that fits the
-          task, and trim noisy response plans / schedules, without losing
-          reliability, ownership, RBAC, isolation, or investigation quality. Use only
-          real figures.
+        Produce something a finance partner could actually review, not an essay.
+        Ask the agent for it, then correct it against what you saw in Task 3:
+
+        > Using my agent consumption figures, draft a cost-aware operating model
+        > as a table: each row a named lever, what it would save, and what it
+        > costs us in reliability, ownership, isolation or investigation quality.
+        > Add one line stating the floor we will not go below. Use only the
+        > figures I give you and do not invent numbers.
+
+        **It has to contain, at minimum:**
+
+        - **Three named levers** with a real figure attached to each — for example
+          consolidating workloads under one agent, deleting unused pilot agents,
+          matching the model to the task, or trimming noisy response plans and
+          schedules.
+        - **A reliability floor** stated explicitly: the thing you will not trade
+          away to save AAUs. Cheapest is not the target.
+
+        Keep it. Challenge 8 asks you to defend it to a director, and
+        `check-challenge.ps1 6` asks you about both parts.
 
     ??? note "Task 5 · Arm the Sev1 response plan"
         **Connect an incident platform first.** Response plans do not exist until

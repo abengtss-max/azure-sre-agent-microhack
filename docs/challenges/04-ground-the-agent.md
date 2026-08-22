@@ -183,6 +183,27 @@ work to the part that is already at its limit.
         Remember that the agent will describe the plan and wait. Tell it to apply
         before you expect an approval card.
 
+        !!! note "It may offer to fix the runbook, unprompted"
+            Somewhere around here the agent often volunteers something like:
+
+            > **Runbook gap** — *Should I add preflight checks and post-index
+            > verification steps to the crew roster maintenance runbook?*
+            > **1. Update runbook** · **2. Skip**
+
+            Nobody asked it to. It noticed that the runbook it just followed was
+            missing steps it had to work out for itself, and offered to close the
+            gap while the context was fresh.
+
+            Either answer is fine here. **Skip** keeps today's runbook stable for
+            the rest of the lab, which is the tidier choice; **Update runbook**
+            shows you what it would write. Answering "Skip" only declines the
+            runbook edit — your remediation plan is unaffected.
+
+            Worth noticing either way: this is Challenge 8's closing set piece —
+            *open a pull request that fixes the runbook that failed you* — arriving
+            four challenges early, on the agent's own initiative. The formal
+            version, with the change reviewed on your fork, is Task 6 there.
+
 ### Reference
 
 - [Connect knowledge](https://learn.microsoft.com/en-us/azure/sre-agent/connect-knowledge)

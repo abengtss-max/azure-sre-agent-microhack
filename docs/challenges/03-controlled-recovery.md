@@ -193,6 +193,21 @@ changes go through a pipeline that leaves one.
             recording why, and it's the reason your change log stops being evidence.
             You'll want this in the Challenge 8 handover.
 
+        !!! tip "Optional · ask it to draw what it just told you"
+            Once the board is back, try:
+
+            > Visualize this incident as a diagram: the timeline, the causal chain
+            > from the change to the outage, and the request path a passenger hit.
+
+            The agent writes the image in its Python sandbox and hands it back. It
+            takes seconds, and it is the artefact that works on a bridge call: the
+            people who join late understand the shape of the incident without
+            reading a single line of your investigation.
+
+            You will render a formal PDF in Challenge 8. This is the version you
+            produce **while the incident is still open**, which is usually when it
+            is worth the most.
+
 ### Reference
 
 - [Review and approve mitigations](https://learn.microsoft.com/en-us/azure/sre-agent/execute-mitigations)

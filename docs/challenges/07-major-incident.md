@@ -228,6 +228,17 @@ difference between solving crew scheduling for the first time and the second.
         - Keep actions governed and follow the runbooks: fix the layer that is
           actually saturated, never delete the database.
 
+        !!! tip "Time the crew tier specifically"
+            Note the minutes from starting on crew scheduling to the point it is
+            healthy again. This is the same failure class you worked cold in
+            Challenge 2 and diagnosed in Challenge 4 — but now the agent has your
+            runbooks, a skill written for exactly this, and a memory of the earlier
+            incident.
+
+            Compare it with the number you wrote down in Challenge 2. Whatever the
+            gap is, that is the finding you take to Challenge 8. If it is smaller
+            than you expected, that is worth reporting honestly too.
+
     ??? note "Task 5 · Localize the front door"
         - Compare backend health **directly** (`http://<gateway-ip>/api/status`)
           against the same call **through APIM**. If direct returns 200 but APIM

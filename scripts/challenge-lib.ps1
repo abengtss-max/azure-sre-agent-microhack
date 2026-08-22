@@ -478,7 +478,17 @@ $script:Challenges = [ordered]@{
             $err    = Get-ServiceErrorRate 'baggage'
             $canary = Test-CanaryPresent 'baggage'
             $auto = Confirm-SelfAttest 'Did the agent remediate baggage while running in Autonomous mode (you supervised, did not fix it by hand)?'
-            $cost = Confirm-SelfAttest 'Have you reviewed agent consumption and produced a cost-aware operating model (not just the cheapest option)?'
+            # "Did you write a cost model" was answerable yes by anyone who had read the
+            # task. Asking for the parts that make it reviewable is still self-attested,
+            # but it cannot be satisfied without having actually looked at the figures.
+            $cFig  = Confirm-SelfAttest 'Did you read Settings -> Agent Consumption and write down the two largest consumers with their real figures?'
+            $cLev  = Confirm-SelfAttest 'Does your operating model name at least three concrete levers, each with a figure and a stated trade-off?'
+            $cFloor = Confirm-SelfAttest 'Does it state an explicit reliability floor you will not trade away for cost?'
+            $cost = ($cFig -and $cLev -and $cFloor)
+            if (-not $cost) {
+                Write-Host "  A cost model with no figures and no floor is an opinion. Challenge 8 asks you to" -ForegroundColor Yellow
+                Write-Host "  defend this one to a director - go back to Tasks 3 and 4 before you do." -ForegroundColor Yellow
+            }
             $conn = Test-IncidentPlatformConnected
             if (-not $conn) {
                 Write-Host "  Azure Monitor is not connected as an incident platform, so no response plan can exist." -ForegroundColor Yellow

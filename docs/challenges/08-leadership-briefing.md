@@ -116,6 +116,26 @@ the repository, where the whole team, and the next agent, can find it.
         Judge it the way the director would. If a sentence needs a platform
         engineer to translate it, send it back.
 
+        !!! tip "Answer the question the director will actually ask"
+            *"What did this buy us?"* You have two numbers for it: the minutes to a
+            defensible hypothesis in Challenge 2, working cold, and the minutes to
+            recover the crew tier in Challenge 7, with runbooks, a skill and the
+            agent's memory of the earlier incident in place.
+
+            Add them to the briefing yourself — the agent cannot know them:
+
+            > Add a short section titled "What the agent changed about our
+            > response". Our time to a defensible hypothesis on the first
+            > incident was **X minutes**; on the same failure class later in the
+            > day, with your runbooks and skill in place, recovery took **Y
+            > minutes**. State the difference plainly, and be clear that this is
+            > one day's sample from one team, not a benchmark.
+
+            Also open the agent's own **Track incident value** view and sanity-check
+            your narrative against what it recorded. An anecdote is worth little
+            when you get back to your own organisation; a number with an honest
+            caveat is worth a great deal.
+
     ??? note "Task 3 · Write the engineering RCA handover"
         Paste this into the agent chat:
 
