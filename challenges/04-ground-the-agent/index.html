@@ -2056,17 +2056,20 @@ before you expect an approval card.</p>
 <div class="admonition warning">
 <p class="admonition-title">This step needs Code Access from Challenge 1</p>
 <p>The agent applies the fix by pointing <code>kubectl</code> at the manifest <strong>in
-your fork</strong>. It cannot pipe a manifest it wrote itself: the managed
-<code>kubectl</code> channel rejects <code>apply -f -</code>, <code>-f /dev/stdin</code> and heredocs,
-and its identity deliberately has no cluster-admin credential to fall
-back on.</p>
-<p>So if <strong>Builder → Code Access</strong> is not connected and synced, this task
-dead-ends. You will see the agent produce the correct diagnosis and the
-correct manifest, then report something like <em>"the managed Kubernetes
-channel drops manifests and the identity lacks
-<code>listClusterAdminCredential</code>"</em>. That is the symptom of a missing
-Challenge 1 step, not a broken remediation — go back and connect the
-repo rather than granting the agent cluster-admin.</p>
+your fork</strong>, fetched over HTTPS at a pinned commit. Every other route
+fails, which is worth knowing before you watch it try them:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>[Failed]    kubectl create -f -                      # stdin is rejected
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>[Failed]    kubectl create -f .../codeRefs/...       # its own checked-out copy is rejected
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>[Completed] kubectl create -f https://raw.githubusercontent.com/&lt;you&gt;/...
+</code></pre></div>
+<p>It has no cluster-admin credential to fall back on, by design. So if
+<strong>Builder → Code Access</strong> is not connected and synced, this task
+dead-ends: the agent produces the correct diagnosis and the correct
+manifest, then reports something like <em>"the managed Kubernetes channel
+drops manifests and the identity lacks <code>listClusterAdminCredential</code>"</em>.</p>
+<p>That is the symptom of a missing Challenge 1 step, not a broken
+remediation. Go back and connect the repo rather than granting the
+agent cluster-admin.</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">It may offer to fix the runbook, unprompted</p>
