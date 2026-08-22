@@ -2050,13 +2050,19 @@ agent, differing only by a prompt. That is a persona, not a specialist.</p>
 <p>Your instructions say <em>read-only</em>. Scoping the tools is what makes that
 true rather than requested.</p>
 </div>
-<p><strong>Select exactly these eight tools.</strong> They are what an <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> triage
-investigation actually used across Challenges 2 to 4, and nothing more:</p>
+<p><strong>Scope it with the YAML tab, not the Tools picker.</strong> The dialog has a
+<strong>Form</strong> and a <strong>YAML</strong> tab. Use YAML: four of the eight tools below come
+from the built-in MCP server and <strong>do not appear in the Form picker at
+all</strong>, so a Form-only attempt silently produces a half-scoped specialist.</p>
+<p>The finished definition ships in your lab clone at
+<code>agents/aks-triage.agent.yaml</code>. Open the <strong>YAML</strong> tab and paste it, or copy
+it from the file. These are the eight tools it grants, which are what an <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr>
+triage investigation actually used across Challenges 2 to 4:</p>
 <table>
 <thead>
 <tr>
 <th>Tool</th>
-<th>Category</th>
+<th>Source</th>
 <th>Why the specialist needs it</th>
 </tr>
 </thead>
@@ -2073,23 +2079,23 @@ investigation actually used across Challenges 2 to 4, and nothing more:</p>
 </tr>
 <tr>
 <td><code>system-mcp-monitor_monitor_metrics_query</code></td>
-<td><em>(uncategorised)</em></td>
+<td><strong>MCP</strong></td>
 <td>CPU, memory, restart counts</td>
 </tr>
 <tr>
-<td><code>system-mcp-monitor_monitor_metrics_definitions</code></td>
-<td><em>(uncategorised)</em></td>
-<td>Discover which metrics exist before querying</td>
-</tr>
-<tr>
 <td><code>system-mcp-monitor_monitor_resource_log_query</code></td>
-<td><em>(uncategorised)</em></td>
+<td><strong>MCP</strong></td>
 <td>Container logs</td>
 </tr>
 <tr>
 <td><code>system-mcp-monitor_monitor_activitylog_list</code></td>
-<td><em>(uncategorised)</em></td>
+<td><strong>MCP</strong></td>
 <td>Correlate platform-level changes</td>
+</tr>
+<tr>
+<td><code>QueryLogAnalyticsSearch</code></td>
+<td>Log Query</td>
+<td>Search the workspace when metrics are not enough</td>
 </tr>
 <tr>
 <td><code>SearchIncidentKnowledge</code></td>
@@ -2146,14 +2152,13 @@ stop. There is no partial inheritance.</p>
 reel, and why you must verify it afterwards.</p>
 </div>
 <div class="admonition tip">
-<p class="admonition-title">If you cannot find a tool in the picker</p>
-<p>Search for the <strong>exact tool name</strong> as written above, not the technology.
-Searching <code>kubectl</code>, <code>AKS</code> or <code>Kubernetes</code> does not reliably match
-<code>RunKubectlReadCommand</code>. If search comes up empty, browse the
-<strong>Azure Operation</strong> category directly.</p>
-<p>The Monitor tools are prefixed <code>system-mcp-monitor_</code> because they come
-from a built-in MCP server that ships with the agent. You have been using
-MCP tools since Challenge 1 without knowing it.</p>
+<p class="admonition-title">Why the Form picker is not enough</p>
+<p>Search the Form picker for <code>kubectl</code>, <code>AKS</code> or <code>Kubernetes</code> and you get
+nothing useful — the tool is named <code>RunKubectlReadCommand</code>. Worse, the
+four <code>system-mcp-monitor_*</code> tools are not offered there at all, because
+they come from a built-in MCP server rather than the native catalogue.</p>
+<p>That is why this task uses YAML. You have been using MCP tools since
+Challenge 1 without knowing it; this is the first time it matters.</p>
 </div>
 <p><strong>Verify what the specialist actually got. Do not trust the dialog.</strong>
 The picker is not the source of truth. Ask the agent's own API:</p>
@@ -2220,6 +2225,34 @@ skill is relevant, so describe <em>when to reach for it</em>, not what it does:<
 <a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>rather than a saturated workload. Also use when several services sharing one
 <a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>database degrade together while unrelated services stay fast.
 </code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">There are two descriptions, and they are not the same field</p>
+<p>The one above is the <strong>Description</strong> field on the left of the dialog.
+The <code>SKILL.md</code> editor on the right <em>also</em> has a <code>description:</code> line in
+its frontmatter. Fill in both:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Says</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Description</strong> (left panel, behind <strong>Edit</strong>)</td>
+<td><em>When</em> to reach for the skill \u2014 this is the matching signal</td>
+</tr>
+<tr>
+<td><code>description:</code> (SKILL.md frontmatter)</td>
+<td><em>What</em> the skill does</td>
+</tr>
+</tbody>
+</table>
+<p>Do not try to edit the frontmatter line by hand and leave the rest of
+the scaffold in place. Select everything in the editor and replace it
+with the whole file below \u2014 that fills the frontmatter and removes the
+<code>&lt;!-- Add your skill instructions here --&gt;</code> placeholder in one go.</p>
+</div>
 <p><strong>SKILL.md</strong>: the editor on the right is pre-scaffolded with <code>name</code> and
 <code>description</code> frontmatter and a placeholder comment. The finished file is
 already in your <strong>lab clone</strong> (the same repository as the <code>knowledge/</code>
@@ -2290,8 +2323,14 @@ the <code>crew-query-path-recovery</code> skill belong to your <code>aks-triage<
 <p>Go back to <strong>Builder → Agent Canvas</strong>, open <code>aks-triage</code>, and look at the
 <strong>Skills</strong> panel. Left inherited, it now holds the crew recovery skill,
 because it inherits every skill the main agent has.</p>
-<p><strong>Take it away.</strong> Scope its skills the way you scoped its tools, and leave
-the crew recovery skill with the main agent.</p>
+<p><strong>Take it away.</strong> There is no "off" switch — Skills behaves exactly like
+Tools: selecting <em>overrides</em> the inherited set. So select the skills a
+read-only <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> specialist should keep, and the rest fall away with them:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>aks_general
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>diagnostic_cpu
+</code></pre></div>
+<p>Save, and the panel should read <code>aks_general, diagnostic_cpu</code> — with
+<code>crew-query-path-recovery</code> no longer among them.</p>
 <p>Three reasons, and they are worth being able to recite:</p>
 <table>
 <thead>
