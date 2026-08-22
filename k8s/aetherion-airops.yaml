@@ -74,8 +74,14 @@ spec:
         - name: gateway
           image: REPLACE_ACR/aetherion-airops:latest
           ports: [{ containerPort: 8080 }]
+          # Redis is how the gateway replicas agree on a platform-wide request
+          # rate; each pod only sees its own share. Throughput falls back to the
+          # pod's own measurement if the cache is unavailable.
+          envFrom: [{ configMapRef: { name: aetherion-config } }]
           env:
             - { name: ROLE, value: "gateway" }
+            - name: REDIS_PASSWORD
+              valueFrom: { secretKeyRef: { name: aetherion-secrets, key: REDIS_PASSWORD } }
             - name: APPLICATIONINSIGHTS_CONNECTION_STRING
               valueFrom: { secretKeyRef: { name: aetherion-secrets, key: APPLICATIONINSIGHTS_CONNECTION_STRING } }
           readinessProbe: { httpGet: { path: /health/ready, port: 8080 }, initialDelaySeconds: 5, periodSeconds: 10, timeoutSeconds: 5, failureThreshold: 6 }

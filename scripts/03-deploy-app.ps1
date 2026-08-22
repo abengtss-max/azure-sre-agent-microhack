@@ -31,12 +31,19 @@ kubectl create secret generic aetherion-secrets -n $ns `
     --dry-run=client -o yaml | kubectl apply -f -
 
 Write-Host "Applying application manifests..." -ForegroundColor Cyan
-Write-Host "Applying application manifests..." -ForegroundColor Cyan
 $manifest = Get-Content (Join-Path $repoRoot "k8s/aetherion-airops.yaml") -Raw
 $manifest = $manifest.Replace("REPLACE_ACR", $state.acrLoginServer)
 $tmp = Join-Path $env:TEMP "aetherion-airops.rendered.yaml"
 $manifest | Set-Content -Path $tmp -Encoding UTF8
 kubectl apply -f $tmp
+
+# The image tag is :latest, so a rebuild leaves the pod spec identical and nothing
+# restarts - the cluster would quietly keep serving the previous build. Force a
+# fresh pull for the application workloads (redis is a stock image, leave it).
+Write-Host "Restarting workloads so the rebuilt image is picked up..." -ForegroundColor Cyan
+foreach ($d in @('gateway', 'flight-ops', 'crew-scheduling', 'booking', 'baggage', 'telemetry-ingest')) {
+    kubectl rollout restart deploy/$d -n $ns 2>$null | Out-Null
+}
 
 Write-Host "Waiting for deployments to become available..." -ForegroundColor Cyan
 kubectl rollout status deploy/gateway -n $ns --timeout=300s

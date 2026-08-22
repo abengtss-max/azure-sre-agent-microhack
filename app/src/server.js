@@ -301,15 +301,77 @@ function registerGatewayRoutes() {
     );
   }
 
+  // Real throughput. Every request to the platform passes through a gateway pod,
+  // but each pod only counts its own share, so the pods publish their rate to
+  // Redis and the dashboard sums them. Without Redis we report this pod's own
+  // measured rate rather than inventing a number.
+  const POD_ID = process.env.HOSTNAME || `gw-${process.pid}`;
+  const RATE_WINDOW_MS = 60000;
+  const RATE_KEY = 'ops:gwrates';
+  const rateSamples = [];
+
+  function recordRateSample() {
+    const now = Date.now();
+    rateSamples.push({ t: now, c: requestCount });
+    while (rateSamples.length > 2 && now - rateSamples[0].t > RATE_WINDOW_MS) rateSamples.shift();
+  }
+
+  function localRatePerMin() {
+    if (rateSamples.length < 2) return null;
+    const first = rateSamples[0];
+    const last = rateSamples[rateSamples.length - 1];
+    const elapsedMs = last.t - first.t;
+    if (elapsedMs < 5000) return null;
+    return Math.max(0, Math.round(((last.c - first.c) / elapsedMs) * 60000));
+  }
+
+  // Published on the timer, not on request: a pod that never serves /api/status
+  // still contributes its share of the traffic.
+  async function publishRate() {
+    const mine = localRatePerMin();
+    if (mine === null) return;
+    try {
+      const rc = await redisLib.getClient();
+      if (!rc) return;
+      await rc.hSet(RATE_KEY, POD_ID, JSON.stringify({ rate: mine, ts: Date.now() }));
+      await rc.expire(RATE_KEY, 120);
+    } catch (e) { /* rate falls back to this pod's own measurement */ }
+  }
+
+  async function platformRatePerMin() {
+    const mine = localRatePerMin();
+    try {
+      const rc = await redisLib.getClient();
+      if (!rc) return mine;
+      const all = await rc.hGetAll(RATE_KEY);
+      let total = 0;
+      let seen = 0;
+      for (const [pod, raw] of Object.entries(all || {})) {
+        try {
+          const entry = JSON.parse(raw);
+          // Drop pods that stopped reporting, so a restart cannot inflate the total.
+          if (Date.now() - entry.ts > 30000) { await rc.hDel(RATE_KEY, pod); continue; }
+          total += entry.rate;
+          seen++;
+        } catch (e) { /* ignore a malformed entry */ }
+      }
+      return seen > 0 ? total : mine;
+    } catch (e) {
+      return mine;
+    }
+  }
+
   // Poll continuously so the board reflects the platform's recent behaviour
   // rather than whatever a single request happened to catch.
   setInterval(() => {
     sampleAll().catch(() => {});
+    recordRateSample();
+    publishRate().catch(() => {});
   }, 5000).unref();
 
   // Derive executive/business/operational signals from the REAL probe results so
   // every panel reflects the live state of the platform.
-  function deriveSignals(health) {
+  function deriveSignals(health, requestsPerMin) {
     const values = Object.values(health);
     const total = values.length || 1;
     const down = values.filter((h) => !h.ok).length;
@@ -321,9 +383,12 @@ function registerGatewayRoutes() {
 
     const latencies = values.map((h) => h.p95Ms || 0).sort((a, b) => a - b);
     const p95Ms = latencies.length ? latencies[Math.min(latencies.length - 1, Math.ceil(latencies.length * 0.95) - 1)] : 0;
-    const errorRatePct = +((down / total) * 100).toFixed(2);
-    const availabilityPct = +Math.max(0, 100 - down * 0.7 - slow * 0.15).toFixed(2);
-    const requestsPerMin = Math.max(0, Math.round(52000 * (1 - down * 0.12 - slow * 0.04)));
+    // Share of probed requests that actually failed, not the share of services
+    // that are down - otherwise an error-rate incident reads as 0%.
+    const sampled = values.reduce((n, h) => n + (h.samples || 0), 0);
+    const failed = values.reduce((n, h) => n + ((h.samples || 0) * (h.errorRatePct || 0)) / 100, 0);
+    const errorRatePct = sampled ? +((failed / sampled) * 100).toFixed(2) : 0;
+    const availabilityPct = +(100 - errorRatePct).toFixed(2);
 
     const incidents = [];
     for (const [name, h] of Object.entries(health)) {
@@ -354,7 +419,7 @@ function registerGatewayRoutes() {
 
     return {
       risk: { score, level },
-      metrics: { p95Ms, errorRatePct, availabilityPct, requestsPerMin },
+      metrics: { p95Ms, errorRatePct, availabilityPct, requestsPerMin: requestsPerMin == null ? 0 : requestsPerMin },
       impact,
       ribbon,
       incidents
@@ -372,7 +437,8 @@ function registerGatewayRoutes() {
     const healthy = Object.values(health).every(
       (h) => h.ok && h.errorRatePct === 0 && h.p95Ms <= LATENCY_BUDGET_MS
     );
-    const derived = deriveSignals(health);
+    const requestsPerMin = await platformRatePerMin();
+    const derived = deriveSignals(health, requestsPerMin);
     trackEvent('ops_status_poll', { healthy: String(healthy), risk: derived.risk.level });
     res.json({
       platform: 'Aetherion AirOps',
