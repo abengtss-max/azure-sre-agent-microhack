@@ -656,8 +656,10 @@ function Test-AetherionChallenge([int]$Number) {
         return $true
     }
     else {
-        Write-Host "  NOT YET - the incident is still active." -ForegroundColor Yellow
-        Write-Host "  Keep investigating with your SRE Agent, then re-run this check." -ForegroundColor Gray
+        # Not every challenge has an incident - challenge 1 is green on purpose - so
+        # point at the line above rather than asserting something is broken.
+        Write-Host "  NOT YET - one or more of the checks above did not pass." -ForegroundColor Yellow
+        Write-Host "  The detail line shows which one. Resolve that, then re-run this check." -ForegroundColor Gray
         Write-Host ""
         return $false
     }

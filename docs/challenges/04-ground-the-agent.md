@@ -183,6 +183,21 @@ work to the part that is already at its limit.
         Remember that the agent will describe the plan and wait. Tell it to apply
         before you expect an approval card.
 
+        !!! warning "This step needs Code Access from Challenge 1"
+            The agent applies the fix by pointing `kubectl` at the manifest **in
+            your fork**. It cannot pipe a manifest it wrote itself: the managed
+            `kubectl` channel rejects `apply -f -`, `-f /dev/stdin` and heredocs,
+            and its identity deliberately has no cluster-admin credential to fall
+            back on.
+
+            So if **Builder → Code Access** is not connected and synced, this task
+            dead-ends. You will see the agent produce the correct diagnosis and the
+            correct manifest, then report something like *"the managed Kubernetes
+            channel drops manifests and the identity lacks
+            `listClusterAdminCredential`"*. That is the symptom of a missing
+            Challenge 1 step, not a broken remediation — go back and connect the
+            repo rather than granting the agent cluster-admin.
+
         !!! note "It may offer to fix the runbook, unprompted"
             Somewhere around here the agent often volunteers something like:
 

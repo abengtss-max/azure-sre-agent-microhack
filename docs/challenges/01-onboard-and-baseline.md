@@ -63,8 +63,9 @@ check.
 !!! quote "Paste into the agent chat"
     Generate an operational baseline for the `aetherion` namespace, including:
     running services and ready replica counts; dependencies (which services use
-    PostgreSQL and Redis, and what sits behind the API); normal
-    check-in and booking latency; and the top operational signals to watch.
+    PostgreSQL and Redis, and what sits behind the API); normal latency for the
+    booking service (which serves check-in) and the flight board; and the top
+    operational signals to watch.
     Support every finding with telemetry evidence, and make no changes.
 
 ### Success criteria
@@ -207,7 +208,9 @@ read-only check so the agent watches for drift on its own.
         You can schedule the baseline two ways, by asking in chat or from the
         **Scheduled tasks** page in the portal.
 
-        **Option A: Ask the agent.** In the chat:
+        **Option A: Ask the agent.** Stay in the **same chat thread** as Task 4 —
+        "this baseline" means the one it just measured, and in a fresh thread it
+        will stop and ask you which numbers you mean:
 
         > Schedule this baseline to run every morning at 08:00 UTC and alert me on
         > drift from normal.
