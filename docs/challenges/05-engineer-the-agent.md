@@ -176,17 +176,24 @@ investigate. You'll want both in the final incident.
             Your instructions say *read-only*. Scoping the tools is what makes that
             true rather than requested.
 
-        **Select exactly these eight tools.** They are what an AKS triage
-        investigation actually used across Challenges 2 to 4, and nothing more:
+        **Scope it with the YAML tab, not the Tools picker.** The dialog has a
+        **Form** and a **YAML** tab. Use YAML: four of the eight tools below come
+        from the built-in MCP server and **do not appear in the Form picker at
+        all**, so a Form-only attempt silently produces a half-scoped specialist.
 
-        | Tool | Category | Why the specialist needs it |
+        The finished definition ships in your lab clone at
+        `agents/aks-triage.agent.yaml`. Open the **YAML** tab and paste it, or copy
+        it from the file. These are the eight tools it grants, which are what an AKS
+        triage investigation actually used across Challenges 2 to 4:
+
+        | Tool | Source | Why the specialist needs it |
         |---|---|---|
         | `RunKubectlReadCommand` | Azure Operation | Pods, events, rollout history. The core of the job |
         | `RunAzCliReadCommands` | Azure Operation | Read cluster and workload configuration |
-        | `system-mcp-monitor_monitor_metrics_query` | *(uncategorised)* | CPU, memory, restart counts |
-        | `system-mcp-monitor_monitor_metrics_definitions` | *(uncategorised)* | Discover which metrics exist before querying |
-        | `system-mcp-monitor_monitor_resource_log_query` | *(uncategorised)* | Container logs |
-        | `system-mcp-monitor_monitor_activitylog_list` | *(uncategorised)* | Correlate platform-level changes |
+        | `system-mcp-monitor_monitor_metrics_query` | **MCP** | CPU, memory, restart counts |
+        | `system-mcp-monitor_monitor_resource_log_query` | **MCP** | Container logs |
+        | `system-mcp-monitor_monitor_activitylog_list` | **MCP** | Correlate platform-level changes |
+        | `QueryLogAnalyticsSearch` | Log Query | Search the workspace when metrics are not enough |
         | `SearchIncidentKnowledge` | Knowledge Base | The runbooks you grounded in Challenge 4 |
         | `SearchMemory` | Knowledge Base | Recall earlier incidents. Challenge 7 depends on this |
 
@@ -212,15 +219,14 @@ investigate. You'll want both in the final incident.
             This is why the list above has to be complete rather than a highlight
             reel, and why you must verify it afterwards.
 
-        !!! tip "If you cannot find a tool in the picker"
-            Search for the **exact tool name** as written above, not the technology.
-            Searching `kubectl`, `AKS` or `Kubernetes` does not reliably match
-            `RunKubectlReadCommand`. If search comes up empty, browse the
-            **Azure Operation** category directly.
+        !!! tip "Why the Form picker is not enough"
+            Search the Form picker for `kubectl`, `AKS` or `Kubernetes` and you get
+            nothing useful — the tool is named `RunKubectlReadCommand`. Worse, the
+            four `system-mcp-monitor_*` tools are not offered there at all, because
+            they come from a built-in MCP server rather than the native catalogue.
 
-            The Monitor tools are prefixed `system-mcp-monitor_` because they come
-            from a built-in MCP server that ships with the agent. You have been using
-            MCP tools since Challenge 1 without knowing it.
+            That is why this task uses YAML. You have been using MCP tools since
+            Challenge 1 without knowing it; this is the first time it matters.
 
         **Verify what the specialist actually got. Do not trust the dialog.**
         The picker is not the source of truth. Ask the agent's own API:
@@ -296,6 +302,21 @@ investigate. You'll want both in the final incident.
         rather than a saturated workload. Also use when several services sharing one
         database degrade together while unrelated services stay fast.
         ```
+
+        !!! warning "There are two descriptions, and they are not the same field"
+            The one above is the **Description** field on the left of the dialog.
+            The `SKILL.md` editor on the right *also* has a `description:` line in
+            its frontmatter. Fill in both:
+
+            | Field | Says |
+            |---|---|
+            | **Description** (left panel, behind **Edit**) | *When* to reach for the skill \u2014 this is the matching signal |
+            | `description:` (SKILL.md frontmatter) | *What* the skill does |
+
+            Do not try to edit the frontmatter line by hand and leave the rest of
+            the scaffold in place. Select everything in the editor and replace it
+            with the whole file below \u2014 that fills the frontmatter and removes the
+            `<!-- Add your skill instructions here -->` placeholder in one go.
 
         **SKILL.md**: the editor on the right is pre-scaffolded with `name` and
         `description` frontmatter and a placeholder comment. The finished file is
@@ -373,8 +394,17 @@ investigate. You'll want both in the final incident.
         **Skills** panel. Left inherited, it now holds the crew recovery skill,
         because it inherits every skill the main agent has.
 
-        **Take it away.** Scope its skills the way you scoped its tools, and leave
-        the crew recovery skill with the main agent.
+        **Take it away.** There is no "off" switch — Skills behaves exactly like
+        Tools: selecting *overrides* the inherited set. So select the skills a
+        read-only AKS specialist should keep, and the rest fall away with them:
+
+        ```text
+        aks_general
+        diagnostic_cpu
+        ```
+
+        Save, and the panel should read `aks_general, diagnostic_cpu` — with
+        `crew-query-path-recovery` no longer among them.
 
         Three reasons, and they are worth being able to recite:
 
