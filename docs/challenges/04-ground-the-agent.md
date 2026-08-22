@@ -33,8 +33,10 @@ non-destructive remediation and verify service is restored.
     ./scripts/start-challenge.ps1 4   # open the incident
     ```
 
-    Give it two or three minutes. The database has to come under load before crew
-    latency moves, and the Ops Center averages over a rolling window on top of that.
+    Crew scheduling degrades within two or three minutes. Its database-backed
+    neighbours take longer — the server rides out the first few minutes on burst
+    credits before the pressure starts spreading. Read the whole board before you
+    draw the blast radius.
 
 ### Tasks
 
@@ -81,6 +83,10 @@ something in common. Ask what they share, then ask which of them is *using* that
 shared thing hardest. The one generating the load is the origin; the rest are
 collateral.
 
+Don't judge the neighbours on a single glance. They spike rather than sit
+uniformly slow, so one reading tells you very little — compare a few, against the
+baseline you took in Challenge 1.
+
 A database that is busy is not the same as a database that is broken.
 </details>
 
@@ -99,10 +105,16 @@ work to the part that is already at its limit.
     the exact clicks, open the matching task below.
 
     ??? note "Task 1 · Find the origin"
-        - Read the Operations Center: `crew-scheduling` is red, and its
-          database-backed peers (`booking`, `telemetry-ingest`) are slower than
-          their baseline. `baggage`, which touches no database, is untouched. That
-          contrast is the clue.
+        - Read the Operations Center. `crew-scheduling` is in seconds, not
+          milliseconds. Its database-backed neighbours — `flight-ops`, `booking`,
+          `telemetry-ingest` — are still serving, but compare them against the
+          baseline you took in Challenge 1 and you'll find them spiking well above
+          it. `baggage`, the one service that touches no database, is flat.
+        - That is the shape of a shared-dependency problem: one service in real
+          trouble, its neighbours wobbling, and anything that doesn't share the
+          dependency completely unaffected. The wobble is what tells you the
+          database is involved; the fact that only one service is *in trouble*
+          tells you the database is not the culprit.
         - Compare the layers. Ask the agent to put pod CPU next to the PostgreSQL
           server's CPU. If the pods are comfortable and the database is not, the
           constraint is the work being sent to it, not the workload itself.
@@ -110,6 +122,13 @@ work to the part that is already at its limit.
           will confirm it independently, if you want to see it yourself.)
         - Now ask which service is sending that work. Only one is running a request
           rush against a table it can no longer read efficiently.
+
+        !!! tip "Give it time before you judge the neighbours"
+            The neighbours don't degrade immediately. The database is a Burstable
+            tier, so it absorbs the first few minutes on CPU credits and only starts
+            spreading the pain once those run down. If you look within a couple of
+            minutes of starting the challenge you'll see one red service and three
+            healthy ones — which is a different, and wrong, conclusion.
 
     ??? note "Task 2 · Ground the agent"
         - In the agent, open **Builder → Knowledge Sources** and add Aetherion's

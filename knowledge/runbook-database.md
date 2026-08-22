@@ -21,6 +21,11 @@ crew-scheduling degradation to date.
   - Adding replicas does not help, and the autoscaler may refuse to add any
     because pod CPU is below target - the pods are waiting on the database.
   - Only the services that read `crew_roster` are affected.
+  - The other database-backed services (`flight-ops`, `booking`,
+    `telemetry-ingest`) begin to spike as the server saturates. On the Burstable
+    tier this lags the origin by several minutes, because burst credits absorb the
+    first of the pressure. Services that use no database stay clean throughout,
+    which is how you tell a shared-dependency problem from a platform-wide one.
 
 ### Diagnose
 
@@ -66,8 +71,9 @@ crew-scheduling degradation to date.
    already exceeds what the server can absorb, so more concurrency pushes more
    work at a saturated database and can make it worse. `crew-scheduling` is
    deliberately capped at **3 replicas** for this reason: it shares a database
-   tier with `booking` and `telemetry-ingest`, so scaling it out spends the shared
-   budget rather than adding capacity. Do not raise that cap as a remedy.
+   tier with `flight-ops`, `booking` and `telemetry-ingest`, so scaling it out
+   spends the shared budget rather than adding capacity. Do not raise that cap as
+   a remedy.
 3. Only if the query path is confirmed healthy and pressure persists, scale the
    compute tier (Burstable -> General Purpose). Never restart the database
    server.
