@@ -2053,6 +2053,21 @@ to ask twice.</p>
 </div>
 <p>Remember that the agent will describe the plan and wait. Tell it to apply
 before you expect an approval card.</p>
+<div class="admonition warning">
+<p class="admonition-title">This step needs Code Access from Challenge 1</p>
+<p>The agent applies the fix by pointing <code>kubectl</code> at the manifest <strong>in
+your fork</strong>. It cannot pipe a manifest it wrote itself: the managed
+<code>kubectl</code> channel rejects <code>apply -f -</code>, <code>-f /dev/stdin</code> and heredocs,
+and its identity deliberately has no cluster-admin credential to fall
+back on.</p>
+<p>So if <strong>Builder → Code Access</strong> is not connected and synced, this task
+dead-ends. You will see the agent produce the correct diagnosis and the
+correct manifest, then report something like <em>"the managed Kubernetes
+channel drops manifests and the identity lacks
+<code>listClusterAdminCredential</code>"</em>. That is the symptom of a missing
+Challenge 1 step, not a broken remediation — go back and connect the
+repo rather than granting the agent cluster-admin.</p>
+</div>
 <div class="admonition note">
 <p class="admonition-title">It may offer to fix the runbook, unprompted</p>
 <p>Somewhere around here the agent often volunteers something like:</p>

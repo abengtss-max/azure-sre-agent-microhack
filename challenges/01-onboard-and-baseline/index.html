@@ -1929,8 +1929,9 @@ capture anything.</p>
 <p class="admonition-title">Paste into the agent chat</p>
 <p>Generate an operational baseline for the <code>aetherion</code> namespace, including:
 running services and ready <abbr title="One running copy (pod) of a service; more replicas share the load.">replica</abbr> counts; dependencies (which services use
-PostgreSQL and Redis, and what sits behind the API); normal
-check-in and booking latency; and the top operational signals to watch.
+PostgreSQL and Redis, and what sits behind the API); normal latency for the
+booking service (which serves check-in) and the flight board; and the top
+operational signals to watch.
 Support every finding with telemetry evidence, and make no changes.</p>
 </div>
 <h3 id="success-criteria">Success criteria<a class="headerlink" href="#success-criteria" title="Permanent link">&para;</a></h3>
@@ -2072,7 +2073,9 @@ actually 250m, it's fine. Confirm before you act:</p>
 <summary>Task 5 · Put it on a schedule</summary>
 <p>You can schedule the baseline two ways, by asking in chat or from the
 <strong>Scheduled tasks</strong> page in the portal.</p>
-<p><strong>Option A: Ask the agent.</strong> In the chat:</p>
+<p><strong>Option A: Ask the agent.</strong> Stay in the <strong>same chat thread</strong> as Task 4 —
+"this baseline" means the one it just measured, and in a fresh thread it
+will stop and ask you which numbers you mean:</p>
 <blockquote>
 <p>Schedule this baseline to run every morning at 08:00 UTC and alert me on
 drift from normal.</p>
