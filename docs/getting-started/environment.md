@@ -102,22 +102,8 @@ and fill it in like this:
 Click **Generate token** and **copy it now** — GitHub shows it once. Keep it in
 your password manager until Challenge 8.
 
-!!! warning "Two ways this fails silently"
-    Both look like a broken connector rather than a permissions problem, because
-    the connector shows **Connected** and only fails on the first *write*:
-
-    - **Repository access left on "Public repositories".** Your repo is
-      **private**, so the token cannot see it. Pick it explicitly.
-    - **Read-only permissions.** Contents, Pull requests and Issues must all be
-      **Read and write**, not Read.
-
-    Prefer a classic token? Use
-    **[github.com/settings/tokens/new](https://github.com/settings/tokens/new)**
-    and tick the top-level **`repo`** scope, which covers private repositories.
-
-    If you put the repo in an **organisation** rather than your personal account, a
-    fine-grained token may additionally need **owner approval**, which is not
-    instant. Your personal account avoids that entirely.
+Prefer a classic token? **[github.com/settings/tokens/new](https://github.com/settings/tokens/new)**
+with the top-level **`repo`** scope works too.
 
 ## 3. Check you have access
 
