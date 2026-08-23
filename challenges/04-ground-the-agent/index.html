@@ -1953,7 +1953,7 @@ baseline you took in Challenge 1.</p>
 </details>
 <details>
 <summary>Hint: let the runbooks answer</summary>
-<p>Load the <code>knowledge/</code> Markdown files from your <strong>lab clone</strong> (the application fork
+<p>Load the <code>knowledge/</code> Markdown files from your <strong>lab clone</strong> (the application repo
 doesn't carry them), then re-ask and watch the advice turn Aetherion-specific.</p>
 <p>Before you reach for a remedy, work out <strong>which layer is saturated</strong>. If the pods
 are comfortable and the database is not, adding pods or connections just sends more
@@ -1999,7 +1999,7 @@ healthy ones — which is a different, and wrong, conclusion.</p>
 <li>In the agent, open <strong>Builder → Knowledge Sources</strong> and add Aetherion's
   runbooks from your <strong>lab clone's</strong> <code>knowledge/</code> folder (architecture,
   escalation, ops guide, platform standards, and the <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> / <abbr title="Azure API Management — the API &quot;front door&quot; that authenticates and rate-limits traffic to the services.">APIM</abbr> / database
-  runbooks). The application fork does not contain them.</li>
+  runbooks). The application repo does not contain them.</li>
 </ul>
 <div class="admonition warning">
 <p class="admonition-title">Upload them one at a time, and don't trust the tick</p>
@@ -2056,7 +2056,7 @@ before you expect an approval card.</p>
 <div class="admonition warning">
 <p class="admonition-title">This step needs Code Access from Challenge 1</p>
 <p>The agent applies the fix by pointing <code>kubectl</code> at the manifest <strong>in
-your fork</strong>, fetched over HTTPS at a pinned commit. Every other route
+your copy</strong>, fetched over HTTPS at a pinned commit. Every other route
 fails, which is worth knowing before you watch it try them:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>[Failed]    kubectl create -f -                      # stdin is rejected
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>[Failed]    kubectl create -f .../codeRefs/...       # its own checked-out copy is rejected
@@ -2089,7 +2089,7 @@ runbook edit — your remediation plan is unaffected.</p>
 <p>Worth noticing either way: this is Challenge 8's closing set piece —
 <em>open a pull request that fixes the runbook that failed you</em> — arriving
 four challenges early, on the agent's own initiative. The formal
-version, with the change reviewed on your fork, is Task 6 there.</p>
+version, with the change reviewed on your repo, is Task 6 there.</p>
 </div>
 </details>
 </div>

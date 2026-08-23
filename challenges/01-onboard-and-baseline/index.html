@@ -1997,7 +1997,7 @@ provisions its own, separate from the app's. For <strong>model provider</strong>
 <p><strong>Set up your agent</strong> is a separate step. <strong>Create</strong> alone grants no app
 access. Choose <strong>Full setup</strong> and connect:</p>
 <ul>
-<li><strong>Code</strong> → <strong>GitHub</strong> → sign in → add <strong>your fork</strong> of <code>aetherion-airops-platform</code>.</li>
+<li><strong>Code</strong> → <strong>GitHub</strong> → sign in → add <strong>your copy</strong> of <code>aetherion-airops-platform</code>.</li>
 <li><strong>Logs</strong> → <strong><abbr title="Azure service that stores and queries container and platform logs.">Log Analytics</abbr> Workspace</strong> → pick the app's <strong><code>aetherion-law</code></strong>.
   The agent created its own workspace when you deployed it, named
   <code>workspace&lt;random&gt;</code>; that one holds the agent's telemetry, not the
@@ -2021,7 +2021,7 @@ with.</p>
 to a commit and Challenge 4 can read container logs:</p>
 <ul>
 <li><strong>Builder → Code Access</strong> lists <code>github.com</code> as <strong>Connected</strong> and your
-  <code>aetherion-airops-platform</code> fork as <strong>Ready</strong>, with a recent sync time.</li>
+  <code>aetherion-airops-platform</code> copy as <strong>Ready</strong>, with a recent sync time.</li>
 <li><strong>Builder → Connectors</strong> shows a <strong><abbr title="Azure service that stores and queries container and platform logs.">Log Analytics</abbr></strong> connector.</li>
 </ul>
 <p>If either is missing, reopen the setup wizard from the agent's
@@ -2042,7 +2042,7 @@ approval, not act.</p>
 <blockquote>
 <p>Which log sources and code repositories are you connected to right now?</p>
 </blockquote>
-<p>It should name <code>aetherion-law</code> and your fork. If it names neither, the
+<p>It should name <code>aetherion-law</code> and your repo. If it names neither, the
 <strong>Code</strong> and <strong>Logs</strong> connections did not save, and Challenges 3 and 4 will
 underperform for reasons that look like agent weakness rather than setup.</p>
 </details>

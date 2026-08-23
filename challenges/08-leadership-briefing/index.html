@@ -1911,7 +1911,7 @@ incident starts from what you learned in this one.</p>
 <li><strong>Write the leadership briefing.</strong> Short, impact-first, non-technical, for the operations director.</li>
 <li><strong>Write the engineering RCA handover.</strong> Precise actions, verification, open risks, and change evidence for the next on-call.</li>
 <li><strong>Generate the executive PDF.</strong> Have the agent render the briefing (with a timeline chart) via its Python sandbox.</li>
-<li><strong>Publish the RCA back to the repo.</strong> Add the GitHub Connector and have the agent file the RCA as an issue on your fork.</li>
+<li><strong>Publish the RCA back to the repo.</strong> Add the GitHub Connector and have the agent file the RCA as an issue on your copy of the application repo.</li>
 <li><strong>Connect an MCP server and open the PR.</strong> Add GitHub MCP, manage the tool budget, then have the agent branch, commit and raise a pull request that fixes the runbook that failed you.</li>
 </ol>
 <p><img alt="Challenge 8 storyboard: Sam and Elena brief airline leadership as boarding resumes" class="story-panel" loading="lazy" src="../../assets/storyboard/img-challenge-8.webp" /></p>
@@ -1932,7 +1932,7 @@ sandbox.</p>
 <li>The platform is healthy at close.</li>
 <li>The leadership briefing covers impact, root cause, recovery, cost/risk, and lessons learned; the engineering RCA handover captures actions, verification, remaining risk, and change evidence from rollout history and the <abbr title="Azure's record of control-plane changes (who changed what, and when).">Activity Log</abbr>.</li>
 <li>The agent produced a <strong>downloadable PDF</strong> of the leadership briefing (with a timeline chart) via its Python sandbox.</li>
-<li>The agent <strong>filed the RCA as an issue on your fork</strong>, so the record survives the chat thread.</li>
+<li>The agent <strong>filed the RCA as an issue on your repo</strong>, so the record survives the chat thread.</li>
 <li>An <strong>MCP server is connected</strong>, you scoped its tools against the 80-tool budget, and the agent used those tools to <strong>branch, commit and open a pull request</strong> improving the runbook that failed during Challenge 7.</li>
 <li>Symptom, root cause, contributing factors, immediate mitigation, and permanent corrective action are clearly separated, and <code>check-challenge.ps1 8</code> passes.</li>
 </ul>
@@ -2040,7 +2040,7 @@ again, because the first link can expire.</p>
 </details>
 <details class="note">
 <summary>Task 5 · Publish the RCA back to the repo</summary>
-<p>In Challenge 1 you connected your fork so the agent could <strong>read</strong> it. It has
+<p>In Challenge 1 you connected your repo so the agent could <strong>read</strong> it. It has
 been correlating deployments against that repo all day. It has no tool that
 writes a single character back to it.</p>
 <p>That is not a permissions oversight. GitHub attaches to the agent in three
@@ -2091,7 +2091,7 @@ on.</p>
 <li>The token needs issue and pull-request scope, not just <code>repo</code> read. On a
    fine-grained PAT that is <strong>Issues: Read and write</strong> and
    <strong>Pull requests: Read and write</strong>.</li>
-<li>Select your fork, <code>&lt;your-org&gt;/aetherion-airops-platform</code>.</li>
+<li>Select your copy, <code>&lt;your-account&gt;/aetherion-airops-platform</code>.</li>
 </ol>
 <div class="admonition tip">
 <p class="admonition-title">OAuth tokens keep themselves alive</p>
@@ -2099,19 +2099,18 @@ on.</p>
 refreshes them ahead of expiry on its own. You will not get logged out
 mid-workshop.</p>
 </div>
-<div class="admonition warning">
-<p class="admonition-title">Issues must be enabled on your fork</p>
-<p>GitHub disables Issues on <strong>every new fork</strong>, so this step fails with
-<code>HTTP 410 Issues are disabled for this repository</code> unless you turned it
-on during setup. That is a repository setting, not an agent or token
-problem — the agent will correctly report it and create nothing.</p>
-<p>Fix it in <strong>Settings → General → Features → Issues</strong>, or:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">gh</span> <span class="n">api</span> <span class="n">-X</span> <span class="n">PATCH</span> <span class="n">repos</span><span class="p">/&lt;</span><span class="n">your-org</span><span class="p">&gt;/</span><span class="n">aetherion-airops-platform</span> <span class="o">-F</span> <span class="n">has_issues</span><span class="p">=</span><span class="n">true</span>
-</code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">Issues are already enabled</p>
+<p>You created your repo from a <strong>template</strong>, so Issues came on by default
+and this step just works. Had you forked instead, GitHub would have
+turned Issues off and the agent would report
+<code>HTTP 410 Issues are disabled for this repository</code> — a repository
+setting, not an agent or token problem.</p>
 </div>
-<p><strong>Now have it file the RCA.</strong> Paste this into the agent chat:        &gt; Publish the engineering RCA you just wrote as a GitHub issue on</p>
+<p><strong>Now have it file the RCA.</strong> Paste this into the agent chat:</p>
 <blockquote>
-<p><code>https://github.com/&lt;your-org&gt;/aetherion-airops-platform</code>. Title it
+<p>Publish the engineering RCA you just wrote as a GitHub issue on
+<code>https://github.com/&lt;your-org&gt;/aetherion-airops-platform</code>. Title it
 <code>RCA: major incident - global check-in degradation</code>. In the body include
 the timeline, the root cause per affected service, every action taken and
 how it was verified, and a checklist of the corrective actions you would
@@ -2153,7 +2152,7 @@ for and it is the one that unblocks the PR.</p>
 <div class="admonition warning">
 <p class="admonition-title">The token needs write scope, and a read-only one fails silently at connect time</p>
 <p>This task creates a branch, commits a file and opens a pull request, so
-on a <strong>fine-grained</strong> token scoped to your fork you need:</p>
+on a <strong>fine-grained</strong> token scoped to your copy you need:</p>
 <ul>
 <li><strong>Contents: Read and write</strong> — the branch and the commit</li>
 <li><strong>Pull requests: Read and write</strong> — the PR</li>
@@ -2162,8 +2161,9 @@ on a <strong>fine-grained</strong> token scoped to your fork you need:</p>
 <p>A classic token with <code>repo</code> scope also works. A read-only token
 <strong>connects successfully</strong> and then fails on the first write, which looks
 like a broken connector rather than a permissions problem.</p>
-<p>If your fork lives in an organisation, a fine-grained token may need
-<strong>owner approval</strong> before it works. You were warned about this in
+<p>If you put your copy in an <strong>organisation</strong> rather than your personal
+account, a fine-grained token may need <strong>owner approval</strong> before it
+works. You were warned about this in
 <a href="../../getting-started/environment/">Set up the environment</a>; if you
 skipped it, this is the point where it bites.</p>
 </div>
