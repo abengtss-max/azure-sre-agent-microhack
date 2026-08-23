@@ -17,8 +17,9 @@ baggage, service-level breaches, and reputational damage.
 
 Today you join Aetherion AirOps as its new Site Reliability Engineering team. You
 will run a shift inside the Global Operations Center, take a series of real
-incidents as they unfold, and use **Azure SRE Agent** to investigate, decide, and
-recover, under the same guardrails a real airline would insist on.
+incidents as they unfold, and use **Azure SRE Agent** to investigate, recommend and
+recover — with you deciding what it is allowed to do, and when. The guardrails are
+the same ones a real airline would insist on.
 
 > This is an operational and business platform built for learning. It is **not**
 > safety-of-flight avionics and it does not control real aircraft. Every fault in
@@ -93,6 +94,10 @@ just an operator's call — it is decided by **execution**, **governance**,
 
 
 ## The shift ahead: challenge map
+
+Read down the list and you are also reading the agent's arc: it starts read-only
+and supervised, earns your runbooks, gets specialised, and only then is trusted to
+act on its own — still inside limits you set.
 
 | # | Challenge | What you practice |
 |---|-----------|-------------------|
