@@ -49,8 +49,10 @@ brings them in — you don't need to remember them now.
 
     ---
 
-    **Not a colleague — the agent itself.** The blue hologram beside you in every
-    scene is the thing you connect in Challenge 1 and govern all day.
+    **Your AI teammate for the shift.** The hologram beside you in every scene
+    *is* the Azure SRE Agent. Treat it like a new SRE joining the team: in
+    Challenge 1 you onboard it, scope what it can see, and decide what it is
+    allowed to do.
 
 -   ![Elena Vasquez](../assets/cast/elena.webp){ .cast-portrait loading=lazy }
 

@@ -11,10 +11,10 @@ scheduling, check-in and baggage for a global airline. When it degrades, aircraf
 don't move on time.
 
 You've just taken over the Operations Center and every service tile is green. Beside
-you is **Aria**, the Azure SRE Agent, connected but not yet trusted with anything.
-Before it can help with real incidents, you need to know what *healthy* looks like,
-and connect the agent scoped to a single resource group in **Review** mode, so it
-proposes changes and waits for your approval.
+you is **Aria**, the Azure SRE Agent — a new teammate on their first shift too, with
+no access to anything yet. Before it can help with real incidents, you need to know
+what *healthy* looks like, and connect the agent scoped to a single resource group in
+**Review** mode, so it proposes changes and waits for your approval.
 
 !!! info "New here?"
     [Meet Aetherion](../getting-started/overview.md) introduces the airline, the
