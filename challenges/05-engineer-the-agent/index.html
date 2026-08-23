@@ -1910,6 +1910,39 @@ guardrails intact.</p>
 <li><strong>Encode the skill.</strong> Capture the crew query-path recovery from Challenge 4 as a reusable skill, guardrails intact, and confirm it loads.</li>
 <li><strong>Know when to use which.</strong> Decide whether the new skill belongs to the specialist or the main agent, act on that decision, and be able to say when you'd reach for the subagent (delegate to it to investigate) versus the skill (a procedure the agent can draw on).</li>
 </ol>
+<div class="admonition tip">
+<p class="admonition-title">You don't have to type either of these from scratch</p>
+<p>Both finished definitions ship in your <strong>lab clone</strong> — the repository you cloned
+to run this hack, the one holding <code>knowledge/</code> and <code>scripts/</code>. Not the
+application fork.</p>
+<table>
+<thead>
+<tr>
+<th>What you're building</th>
+<th>File in your lab clone</th>
+<th>Used in</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>The <code>aks-triage</code> subagent</td>
+<td><code>agents/aks-triage.agent.yaml</code></td>
+<td>Task 1 — paste into the dialog's <strong>YAML</strong> tab</td>
+</tr>
+<tr>
+<td>The crew recovery skill</td>
+<td><code>skills/crew-query-path-recovery/SKILL.md</code></td>
+<td>Task 2 — paste into the SKILL.md editor</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">code</span> <span class="p">./</span><span class="n">agents</span><span class="p">/</span><span class="n">aks-triage</span><span class="p">.</span><span class="n">agent</span><span class="p">.</span><span class="n">yaml</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">code</span> <span class="p">./</span><span class="n">skills</span><span class="p">/</span><span class="n">crew-query-path-recovery</span><span class="p">/</span><span class="n">SKILL</span><span class="p">.</span><span class="nb">md</span>
+</code></pre></div>
+<p>Read them before you paste. The point of the challenge is understanding <em>why</em>
+those eight tools and not the other 46, and why the guardrails are worded the
+way they are — not the typing.</p>
+</div>
 <p><img alt="Challenge 5 storyboard: Sam and Aria engineer a specialist subagent and reusable skill" class="story-panel" loading="lazy" src="../../assets/storyboard/img-challenge-5.webp" /></p>
 <h3 id="suggested-azure-sre-agent-prompt">Suggested Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent prompt<a class="headerlink" href="#suggested-azure-sre-agent-prompt" title="Permanent link">&para;</a></h3>
 <div class="admonition quote">
@@ -1943,7 +1976,7 @@ language.</p>
 <p class="admonition-title">Verify your work</p>
 <p>Both questions are yours to answer honestly. Nothing here changes the platform,
 so the check asks you to confirm what you built:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="n">check-challenge</span><span class="p">.</span><span class="n">ps1</span> <span class="n">5</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="n">check-challenge</span><span class="p">.</span><span class="n">ps1</span> <span class="n">5</span>
 </code></pre></div>
 </div>
 <h3 id="hints">Hints<a class="headerlink" href="#hints" title="Permanent link">&para;</a></h3>
@@ -1979,30 +2012,30 @@ subagents, and the tools attached to them.</p>
 <p>Click <strong>+ Create subagent</strong>. The <strong>Create a custom agent</strong> dialog opens.
 Fill it in as follows.</p>
 <p><strong>Custom agent name</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>aks-triage
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>aks-triage
 </code></pre></div>
 <p><strong>Instructions</strong>. This is the remit, and it is the field that decides
 whether the specialist is worth having. Paste this, then adjust to taste:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>You are an AKS reliability specialist for the `aetherion` namespace.
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>Scope: Azure Kubernetes Service only. Investigate pod status, container
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>restarts, Kubernetes events, deployment rollout history and the health of
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>dependencies as seen from inside the cluster. Do not investigate API
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>Management or the database yourself. If the evidence points outside AKS,
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>say so and hand back.
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>Method: gather evidence before concluding. Prefer `kubectl` output,
-<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>Kubernetes events and rollout history over inference. When a workload looks
-<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>unhealthy, always check whether a recent rollout explains it, and report the
-<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>revision and its change cause.
-<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>
-<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>Output: a short namespace health summary, the affected workloads, the
-<a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>evidence you relied on, likely causes ranked by confidence, and the
-<a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a>recommended next step. Distinguish clearly between what you observed and
-<a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a>what you inferred. If required data is unavailable, say what is missing
-<a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a>rather than assuming.
-<a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a>
-<a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a>Constraints: read-only. Propose remediation, never apply it.
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>You are an AKS reliability specialist for the `aetherion` namespace.
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>Scope: Azure Kubernetes Service only. Investigate pod status, container
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>restarts, Kubernetes events, deployment rollout history and the health of
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>dependencies as seen from inside the cluster. Do not investigate API
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>Management or the database yourself. If the evidence points outside AKS,
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>say so and hand back.
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>Method: gather evidence before concluding. Prefer `kubectl` output,
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>Kubernetes events and rollout history over inference. When a workload looks
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>unhealthy, always check whether a recent rollout explains it, and report the
+<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>revision and its change cause.
+<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>
+<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>Output: a short namespace health summary, the affected workloads, the
+<a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a>evidence you relied on, likely causes ranked by confidence, and the
+<a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a>recommended next step. Distinguish clearly between what you observed and
+<a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a>what you inferred. If required data is unavailable, say what is missing
+<a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a>rather than assuming.
+<a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a>
+<a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a>Constraints: read-only. Propose remediation, never apply it.
 </code></pre></div>
 <p>The last line is a <em>request</em>. On its own, nothing enforces it. You are
 about to make it real.</p>
@@ -2054,9 +2087,13 @@ true rather than requested.</p>
 <strong>Form</strong> and a <strong>YAML</strong> tab. Use YAML: four of the eight tools below come
 from the built-in MCP server and <strong>do not appear in the Form picker at
 all</strong>, so a Form-only attempt silently produces a half-scoped specialist.</p>
-<p>The finished definition ships in your lab clone at
-<code>agents/aks-triage.agent.yaml</code>. Open the <strong>YAML</strong> tab and paste it, or copy
-it from the file. These are the eight tools it grants, which are what an <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr>
+<p>The finished definition is already in your <strong>lab clone</strong> (the repository you
+cloned to run this hack, the same one holding <code>knowledge/</code> and <code>scripts/</code> —
+<strong>not</strong> the application fork), at <code>agents/aks-triage.agent.yaml</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">code</span> <span class="p">./</span><span class="n">agents</span><span class="p">/</span><span class="n">aks-triage</span><span class="p">.</span><span class="n">agent</span><span class="p">.</span><span class="n">yaml</span>     <span class="c"># or: Get-Content ./agents/aks-triage.agent.yaml</span>
+</code></pre></div>
+<p>Open the <strong>YAML</strong> tab in the dialog and paste the file's contents over
+whatever is there. These are the eight tools it grants, which are what an <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr>
 triage investigation actually used across Challenges 2 to 4:</p>
 <table>
 <thead>
@@ -2162,18 +2199,18 @@ Challenge 1 without knowing it; this is the first time it matters.</p>
 </div>
 <p><strong>Verify what the specialist actually got. Do not trust the dialog.</strong>
 The picker is not the source of truth. Ask the agent's own API:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nv">$base</span> <span class="p">=</span> <span class="n">az</span> <span class="n">resource</span> <span class="n">show</span> <span class="n">-g</span> <span class="p">&lt;</span><span class="n">resource-group</span><span class="p">&gt;</span> <span class="n">-n</span> <span class="p">&lt;</span><span class="n">agent-name</span><span class="p">&gt;</span> <span class="p">`</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>  <span class="p">-</span><span class="n">-resource-type</span> <span class="n">Microsoft</span><span class="p">.</span><span class="n">App</span><span class="p">/</span><span class="n">agents</span> <span class="p">-</span><span class="n">-api-version</span> <span class="n">2026</span><span class="p">-</span><span class="n">01</span><span class="p">-</span><span class="n">01</span> <span class="p">`</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>  <span class="p">-</span><span class="n">-query</span> <span class="n">properties</span><span class="p">.</span><span class="n">agentEndpoint</span> <span class="n">-o</span> <span class="n">tsv</span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="nv">$tok</span> <span class="p">=</span> <span class="n">az</span> <span class="n">account</span> <span class="nb">get-access</span><span class="n">-token</span> <span class="p">-</span><span class="n">-resource</span> <span class="n">https</span><span class="p">://</span><span class="n">azuresre</span><span class="p">.</span><span class="n">ai</span> <span class="p">`</span>
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>  <span class="p">-</span><span class="n">-query</span> <span class="n">accessToken</span> <span class="n">-o</span> <span class="n">tsv</span>
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>
-<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="nv">$r</span> <span class="p">=</span> <span class="nb">Invoke-RestMethod</span> <span class="s2">&quot;$base/api/v2/agent/tools&quot;</span> <span class="p">`</span>
-<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>  <span class="n">-Headers</span> <span class="p">@{</span> <span class="n">Authorization</span> <span class="p">=</span> <span class="s2">&quot;Bearer $tok&quot;</span> <span class="p">}</span>
-<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>
-<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="nv">$r</span><span class="p">.</span><span class="n">data</span> <span class="p">|</span> <span class="nb">Where-Object</span> <span class="n">enabled</span> <span class="p">|</span> <span class="nb">Select-Object</span> <span class="n">category</span><span class="p">,</span> <span class="n">name</span> <span class="p">|</span>
-<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>  <span class="nb">Sort-Object</span> <span class="n">category</span><span class="p">,</span> <span class="n">name</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nv">$base</span> <span class="p">=</span> <span class="n">az</span> <span class="n">resource</span> <span class="n">show</span> <span class="n">-g</span> <span class="p">&lt;</span><span class="n">resource-group</span><span class="p">&gt;</span> <span class="n">-n</span> <span class="p">&lt;</span><span class="n">agent-name</span><span class="p">&gt;</span> <span class="p">`</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>  <span class="p">-</span><span class="n">-resource-type</span> <span class="n">Microsoft</span><span class="p">.</span><span class="n">App</span><span class="p">/</span><span class="n">agents</span> <span class="p">-</span><span class="n">-api-version</span> <span class="n">2026</span><span class="p">-</span><span class="n">01</span><span class="p">-</span><span class="n">01</span> <span class="p">`</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>  <span class="p">-</span><span class="n">-query</span> <span class="n">properties</span><span class="p">.</span><span class="n">agentEndpoint</span> <span class="n">-o</span> <span class="n">tsv</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="nv">$tok</span> <span class="p">=</span> <span class="n">az</span> <span class="n">account</span> <span class="nb">get-access</span><span class="n">-token</span> <span class="p">-</span><span class="n">-resource</span> <span class="n">https</span><span class="p">://</span><span class="n">azuresre</span><span class="p">.</span><span class="n">ai</span> <span class="p">`</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>  <span class="p">-</span><span class="n">-query</span> <span class="n">accessToken</span> <span class="n">-o</span> <span class="n">tsv</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="nv">$r</span> <span class="p">=</span> <span class="nb">Invoke-RestMethod</span> <span class="s2">&quot;$base/api/v2/agent/tools&quot;</span> <span class="p">`</span>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>  <span class="n">-Headers</span> <span class="p">@{</span> <span class="n">Authorization</span> <span class="p">=</span> <span class="s2">&quot;Bearer $tok&quot;</span> <span class="p">}</span>
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>
+<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="nv">$r</span><span class="p">.</span><span class="n">data</span> <span class="p">|</span> <span class="nb">Where-Object</span> <span class="n">enabled</span> <span class="p">|</span> <span class="nb">Select-Object</span> <span class="n">category</span><span class="p">,</span> <span class="n">name</span> <span class="p">|</span>
+<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>  <span class="nb">Sort-Object</span> <span class="n">category</span><span class="p">,</span> <span class="n">name</span>
 </code></pre></div>
 <p>The token audience must be <code>https://azuresre.ai</code>; an ARM token is rejected.</p>
 <p>This is the check that matters: <strong><code>RunKubectlReadCommand</code> must be present
@@ -2215,15 +2252,15 @@ to route a major incident to is a decision you'll make there.</p>
 <strong>+ Create skill</strong> instead. (<strong>Builder → Skill Builder</strong> in the left-hand
 menu takes you to the same place.)</p>
 <p><strong>Name</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>crew-query-path-recovery
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>crew-query-path-recovery
 </code></pre></div>
 <p><strong>Description</strong>, behind the <strong>Edit</strong> link, is the field most people skim.
 This description is what the agent matches on when deciding whether the
 skill is relevant, so describe <em>when to reach for it</em>, not what it does:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>Use when crew scheduling is slow or timing out and the pods themselves look
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>healthy and underutilised, the symptom of a saturated shared database
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>rather than a saturated workload. Also use when several services sharing one
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>database degrade together while unrelated services stay fast.
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>Use when crew scheduling is slow or timing out and the pods themselves look
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>healthy and underutilised, the symptom of a saturated shared database
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>rather than a saturated workload. Also use when several services sharing one
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>database degrade together while unrelated services stay fast.
 </code></pre></div>
 <div class="admonition warning">
 <p class="admonition-title">There are two descriptions, and they are not the same field</p>
@@ -2257,47 +2294,49 @@ with the whole file below \u2014 that fills the frontmatter and removes the
 <code>description</code> frontmatter and a placeholder comment. The finished file is
 already in your <strong>lab clone</strong> (the same repository as the <code>knowledge/</code>
 folder, not the application fork), at
-<code>skills/crew-query-path-recovery/SKILL.md</code>. Paste it into the editor, or
-drag that file onto the <strong>Files</strong> panel:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>---
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>name: crew-query-path-recovery
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="gu">description: Recover crew scheduling when a saturated shared database, not the workload, is the bottleneck.</span>
-<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="gu">---</span>
-<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>
-<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="gu">## When this applies</span>
-<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>
-<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="sb">`crew-scheduling`</span> is slow or timing out, but its pods are healthy, not
-<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>restarting, and using little CPU. Peer services sharing the same PostgreSQL
-<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>server are also degraded; services that do not share it are unaffected.
-<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>
-<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="gu">## Diagnose before acting</span>
-<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a>
-<a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a><span class="k">1.</span> Confirm the pods are waiting, not working: check pod CPU against requests
-<a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a>   and confirm no restarts.
-<a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a><span class="k">2.</span> Confirm the autoscaler is not the constraint. If CPU is below target the
-<a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a>   autoscaler will refuse to add replicas, and it is right to refuse.
-<a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a><span class="k">3.</span> Confirm the database is the saturated layer: check PostgreSQL CPU.
-<a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a><span class="k">4.</span> Identify the query path behind the crew duty lookup and whether it is
-<a id="__codelineno-7-20" name="__codelineno-7-20" href="#__codelineno-7-20"></a>   supported by an index.
-<a id="__codelineno-7-21" name="__codelineno-7-21" href="#__codelineno-7-21"></a>
-<a id="__codelineno-7-22" name="__codelineno-7-22" href="#__codelineno-7-22"></a><span class="gu">## Remedy</span>
-<a id="__codelineno-7-23" name="__codelineno-7-23" href="#__codelineno-7-23"></a>
-<a id="__codelineno-7-24" name="__codelineno-7-24" href="#__codelineno-7-24"></a>Repair the query path by restoring the missing index supporting the crew duty
-<a id="__codelineno-7-25" name="__codelineno-7-25" href="#__codelineno-7-25"></a>lookup. Build it without taking a disruptive lock on a live table.
-<a id="__codelineno-7-26" name="__codelineno-7-26" href="#__codelineno-7-26"></a>
-<a id="__codelineno-7-27" name="__codelineno-7-27" href="#__codelineno-7-27"></a>Verify by re-measuring crew latency under the same load, not by checking
-<a id="__codelineno-7-28" name="__codelineno-7-28" href="#__codelineno-7-28"></a>that a pod restarted.
-<a id="__codelineno-7-29" name="__codelineno-7-29" href="#__codelineno-7-29"></a>
-<a id="__codelineno-7-30" name="__codelineno-7-30" href="#__codelineno-7-30"></a><span class="gu">## Guardrails</span>
-<a id="__codelineno-7-31" name="__codelineno-7-31" href="#__codelineno-7-31"></a>
-<a id="__codelineno-7-32" name="__codelineno-7-32" href="#__codelineno-7-32"></a><span class="k">-</span><span class="w"> </span>Never delete or restart the database. It is a shared dependency and the
-<a id="__codelineno-7-33" name="__codelineno-7-33" href="#__codelineno-7-33"></a>  blast radius is every service on it.
-<a id="__codelineno-7-34" name="__codelineno-7-34" href="#__codelineno-7-34"></a><span class="k">-</span><span class="w"> </span>Do not scale the layer that is merely waiting. Adding replicas to
-<a id="__codelineno-7-35" name="__codelineno-7-35" href="#__codelineno-7-35"></a>  <span class="sb">`crew-scheduling`</span> adds connections to an already-saturated database and
-<a id="__codelineno-7-36" name="__codelineno-7-36" href="#__codelineno-7-36"></a>  makes it worse.
-<a id="__codelineno-7-37" name="__codelineno-7-37" href="#__codelineno-7-37"></a><span class="k">-</span><span class="w"> </span>Any write is proposed for approval first, never applied unilaterally.
-<a id="__codelineno-7-38" name="__codelineno-7-38" href="#__codelineno-7-38"></a><span class="k">-</span><span class="w"> </span>If the evidence does not show database saturation, this skill does not
-<a id="__codelineno-7-39" name="__codelineno-7-39" href="#__codelineno-7-39"></a>  apply, stop and say so.
+<code>skills/crew-query-path-recovery/SKILL.md</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">code</span> <span class="p">./</span><span class="n">skills</span><span class="p">/</span><span class="n">crew-query-path-recovery</span><span class="p">/</span><span class="n">SKILL</span><span class="p">.</span><span class="nb">md</span>
+</code></pre></div>
+<p>Paste it into the editor, or drag that file onto the <strong>Files</strong> panel:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>---
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>name: crew-query-path-recovery
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="gu">description: Recover crew scheduling when a saturated shared database, not the workload, is the bottleneck.</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="gu">---</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="gu">## When this applies</span>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="sb">`crew-scheduling`</span> is slow or timing out, but its pods are healthy, not
+<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>restarting, and using little CPU. Peer services sharing the same PostgreSQL
+<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a>server are also degraded; services that do not share it are unaffected.
+<a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a>
+<a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a><span class="gu">## Diagnose before acting</span>
+<a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a>
+<a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a><span class="k">1.</span> Confirm the pods are waiting, not working: check pod CPU against requests
+<a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a>   and confirm no restarts.
+<a id="__codelineno-10-16" name="__codelineno-10-16" href="#__codelineno-10-16"></a><span class="k">2.</span> Confirm the autoscaler is not the constraint. If CPU is below target the
+<a id="__codelineno-10-17" name="__codelineno-10-17" href="#__codelineno-10-17"></a>   autoscaler will refuse to add replicas, and it is right to refuse.
+<a id="__codelineno-10-18" name="__codelineno-10-18" href="#__codelineno-10-18"></a><span class="k">3.</span> Confirm the database is the saturated layer: check PostgreSQL CPU.
+<a id="__codelineno-10-19" name="__codelineno-10-19" href="#__codelineno-10-19"></a><span class="k">4.</span> Identify the query path behind the crew duty lookup and whether it is
+<a id="__codelineno-10-20" name="__codelineno-10-20" href="#__codelineno-10-20"></a>   supported by an index.
+<a id="__codelineno-10-21" name="__codelineno-10-21" href="#__codelineno-10-21"></a>
+<a id="__codelineno-10-22" name="__codelineno-10-22" href="#__codelineno-10-22"></a><span class="gu">## Remedy</span>
+<a id="__codelineno-10-23" name="__codelineno-10-23" href="#__codelineno-10-23"></a>
+<a id="__codelineno-10-24" name="__codelineno-10-24" href="#__codelineno-10-24"></a>Repair the query path by restoring the missing index supporting the crew duty
+<a id="__codelineno-10-25" name="__codelineno-10-25" href="#__codelineno-10-25"></a>lookup. Build it without taking a disruptive lock on a live table.
+<a id="__codelineno-10-26" name="__codelineno-10-26" href="#__codelineno-10-26"></a>
+<a id="__codelineno-10-27" name="__codelineno-10-27" href="#__codelineno-10-27"></a>Verify by re-measuring crew latency under the same load, not by checking
+<a id="__codelineno-10-28" name="__codelineno-10-28" href="#__codelineno-10-28"></a>that a pod restarted.
+<a id="__codelineno-10-29" name="__codelineno-10-29" href="#__codelineno-10-29"></a>
+<a id="__codelineno-10-30" name="__codelineno-10-30" href="#__codelineno-10-30"></a><span class="gu">## Guardrails</span>
+<a id="__codelineno-10-31" name="__codelineno-10-31" href="#__codelineno-10-31"></a>
+<a id="__codelineno-10-32" name="__codelineno-10-32" href="#__codelineno-10-32"></a><span class="k">-</span><span class="w"> </span>Never delete or restart the database. It is a shared dependency and the
+<a id="__codelineno-10-33" name="__codelineno-10-33" href="#__codelineno-10-33"></a>  blast radius is every service on it.
+<a id="__codelineno-10-34" name="__codelineno-10-34" href="#__codelineno-10-34"></a><span class="k">-</span><span class="w"> </span>Do not scale the layer that is merely waiting. Adding replicas to
+<a id="__codelineno-10-35" name="__codelineno-10-35" href="#__codelineno-10-35"></a>  <span class="sb">`crew-scheduling`</span> adds connections to an already-saturated database and
+<a id="__codelineno-10-36" name="__codelineno-10-36" href="#__codelineno-10-36"></a>  makes it worse.
+<a id="__codelineno-10-37" name="__codelineno-10-37" href="#__codelineno-10-37"></a><span class="k">-</span><span class="w"> </span>Any write is proposed for approval first, never applied unilaterally.
+<a id="__codelineno-10-38" name="__codelineno-10-38" href="#__codelineno-10-38"></a><span class="k">-</span><span class="w"> </span>If the evidence does not show database saturation, this skill does not
+<a id="__codelineno-10-39" name="__codelineno-10-39" href="#__codelineno-10-39"></a>  apply, stop and say so.
 </code></pre></div>
 <p><strong>Files</strong>: <code>SKILL.md</code> on its own is enough. You can attach more files or a
 folder if you want to split a longer procedure up.</p>
@@ -2326,8 +2365,8 @@ because it inherits every skill the main agent has.</p>
 <p><strong>Take it away.</strong> There is no "off" switch — Skills behaves exactly like
 Tools: selecting <em>overrides</em> the inherited set. So select the skills a
 read-only <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> specialist should keep, and the rest fall away with them:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>aks_general
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>diagnostic_cpu
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>aks_general
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>diagnostic_cpu
 </code></pre></div>
 <p>Save, and the panel should read <code>aks_general, diagnostic_cpu</code> — with
 <code>crew-query-path-recovery</code> no longer among them.</p>
