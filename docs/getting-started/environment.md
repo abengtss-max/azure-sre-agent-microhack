@@ -56,6 +56,9 @@ It is a **template repository**, so you get your own standalone copy in one clic
 3. Choose **your own account** as the owner, keep the name
    `aetherion-airops-platform`, and create it.
 
+It is created **private**, which is correct — leave it that way. The agent reads
+it through the Code Access connection you make in Challenge 1, not anonymously.
+
 You'll connect the SRE Agent to **your copy** in Challenge 1.
 
 !!! tip "Why a template and not a fork"
@@ -88,9 +91,14 @@ OAuth option on that connector.
     - **Pull requests: Read and write** — open the PR
     - **Issues: Read and write** — file the RCA
 
-    A classic token with `repo` scope also works. A read-only token **connects
-    successfully and then fails on the first write**, which looks like a broken
-    connector rather than a permissions problem.
+    Your new repo is **private by default**, so on a fine-grained token set
+    *Repository access* to **Only select repositories** and pick it explicitly.
+    Leaving it on **Public repositories** connects fine and then fails on the
+    first write. A classic token with `repo` scope covers private repos.
+
+    A read-only token fails the same silent way: it **connects successfully and
+    then fails on the first write**, which looks like a broken connector rather
+    than a permissions problem.
 
     If you put the repo in an **organisation** rather than your personal account, a
     fine-grained token may additionally need **owner approval**, which is not
