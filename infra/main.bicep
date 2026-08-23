@@ -106,6 +106,19 @@ resource aks 'Microsoft.ContainerService/managedClusters@2024-05-01' = {
     dnsPrefix: '${namePrefix}-aks'
     kubernetesVersion: kubernetesVersion
     enableRBAC: true
+    // Declared explicitly because ARM reapplies the template as authored: when this
+    // block was omitted, redeploying an existing cluster reset networkPlugin to the
+    // kubenet default. Keep these matching the running cluster.
+    networkProfile: {
+      networkPlugin: 'azure'
+      networkPluginMode: 'overlay'
+      networkPolicy: 'none'
+      serviceCidr: '10.0.0.0/16'
+      dnsServiceIP: '10.0.0.10'
+      podCidr: '10.244.0.0/16'
+      outboundType: 'loadBalancer'
+      loadBalancerSku: 'standard'
+    }
     agentPoolProfiles: [
       {
         name: 'system'

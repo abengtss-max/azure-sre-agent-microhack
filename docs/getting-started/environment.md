@@ -11,15 +11,18 @@ platform on Azure, then hands you straight to Challenge 1.
 | Azure CLI | 2.60 | required |
 | kubectl | any recent | required |
 | Git | any recent | required |
+| GitHub CLI (`gh`) | any recent | optional, but the steps below and Challenge 8 give `gh` one-liners, and the Challenge 8 grader uses it to confirm your work instead of asking you |
 
 ```powershell
 winget install --id Microsoft.PowerShell --exact --accept-source-agreements --accept-package-agreements
 winget install --id Microsoft.AzureCLI --exact --accept-source-agreements --accept-package-agreements
 winget install --id Kubernetes.kubectl --exact --accept-source-agreements --accept-package-agreements
 winget install --id Git.Git --exact --accept-source-agreements --accept-package-agreements
+winget install --id GitHub.cli --exact --accept-source-agreements --accept-package-agreements
 ```
 
-After installs complete, restart your terminal so the commands are available on PATH.
+After installs complete, restart your terminal so the commands are available on
+PATH, and sign in to the GitHub CLI once with `gh auth login`.
 
 !!! warning "Run every command in PowerShell 7 (`pwsh`)"
     Windows PowerShell 5.1 is the default on Windows and is **not** supported: the
@@ -67,6 +70,29 @@ You'll connect the SRE Agent to **your fork** in Challenge 1.
     challenge material** and would spoil every investigation. Connect the agent
     **only to your fork of `aetherion-airops-platform`**.
 
+**c) Create a GitHub Personal Access Token now.** Challenge 8 has the agent write
+back to your fork — it files the incident RCA as an issue and opens a pull request
+— and the GitHub MCP connector it uses for that accepts **a PAT only**. There is no
+OAuth option on that connector.
+
+!!! danger "Do this on day one, not at Challenge 8"
+    In many organisations a fine-grained PAT against an **org-owned** repository
+    needs **owner approval**, which is not instant. If you find that out at
+    Challenge 8 you will not finish the hack that day.
+
+    Create the token against your fork with:
+
+    - **Contents: Read and write** — create a branch and commit to it
+    - **Pull requests: Read and write** — open the PR
+    - **Issues: Read and write** — file the RCA
+
+    A classic token with `repo` scope also works. A read-only token **connects
+    successfully and then fails on the first write**, which looks like a broken
+    connector rather than a permissions problem.
+
+    Forking to your **personal** account instead of an organisation avoids the
+    approval step entirely.
+
 ## 3. Check you have access
 
 - **Azure subscription** with **Owner** (or Contributor + User Access
@@ -87,7 +113,9 @@ az account set --subscription "<subscription-id>"
 
 That's it. It runs preflight → deploy infrastructure → build & push images → deploy the app →
 validate, then opens the Operations Center, Grafana, and the resource group in
-your browser. The script is idempotent and safe to re-run if a step fails.
+your browser. The script is idempotent and safe to re-run if a step fails: it
+resolves the cluster's current Kubernetes version rather than forcing a downgrade,
+and the network configuration is declared explicitly so a re-run cannot reset it.
 
 Each run provisions into a **uniquely named** resource group,
 `rg-aetherion-microhack-<suffix>` (for example `rg-aetherion-microhack-a7c3`), in

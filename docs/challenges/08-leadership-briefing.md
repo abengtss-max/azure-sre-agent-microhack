@@ -260,8 +260,26 @@ the repository, where the whole team, and the next agent, can find it.
         2. Choose the **GitHub** partner card. Transport is **Streamable-HTTP** and
            the URL is prefilled.
         3. Provide a **Personal Access Token**. For partner connectors the auth
-           method is fixed; you supply the credential.
+           method is fixed, so there is no OAuth option here — you supply the
+           credential.
         4. Connect.
+
+        !!! warning "The token needs write scope, and a read-only one fails silently at connect time"
+            This task creates a branch, commits a file and opens a pull request, so
+            on a **fine-grained** token scoped to your fork you need:
+
+            - **Contents: Read and write** — the branch and the commit
+            - **Pull requests: Read and write** — the PR
+            - **Issues: Read and write** — to reference the RCA issue
+
+            A classic token with `repo` scope also works. A read-only token
+            **connects successfully** and then fails on the first write, which looks
+            like a broken connector rather than a permissions problem.
+
+            If your fork lives in an organisation, a fine-grained token may need
+            **owner approval** before it works. You were warned about this in
+            [Set up the environment](../getting-started/environment.md); if you
+            skipped it, this is the point where it bites.
 
         **Watch what happens next, because this is what makes MCP different from a
         hand-built integration.** The agent immediately calls the server's tool
