@@ -52,7 +52,7 @@ check.
 
 1. **Check the board.** Read the Operations Center once while it's green. That's your reference for the rest of the day.
 2. **Confirm telemetry is flowing.** Open Grafana and check that AKS and Application Insights are reporting.
-3. **Connect the agent.** Create the SRE Agent in your resource group and give it read access to your code, logs, and Azure resources, in Review mode.
+3. **Connect the agent.** Create the SRE Agent in your resource group and give it read access to your code, logs, and Azure resources, in Review mode. Point **Code** at your own copy of `aetherion-airops-platform` — **never** at the lab repo.
 4. **Capture the baseline.** Ask the agent for a baseline of the `aetherion` namespace, then spot-check its numbers. Trust the measured latency; verify the configuration.
 5. **Put it on a schedule.** Have the agent re-run that health check every morning so drift shows up before it turns into an incident.
 
@@ -131,6 +131,14 @@ read-only check so the agent watches for drift on its own.
         access. Choose **Full setup** and connect:
 
         - **Code** → **GitHub** → sign in → add **your copy** of `aetherion-airops-platform`.
+
+            !!! danger "Your copy, never the lab repo"
+                The lab repo holds the challenge material: the fault scripts, the
+                answers and the runbooks. Connect the agent to it and it can read
+                how every incident today is caused and cured, which spoils the
+                whole hack. It must only ever see
+                `<your-account>/aetherion-airops-platform`.
+
         - **Logs** → **Log Analytics Workspace** → pick the app's **`aetherion-law`**.
           The agent created its own workspace when you deployed it, named
           `workspace<random>`; that one holds the agent's telemetry, not the

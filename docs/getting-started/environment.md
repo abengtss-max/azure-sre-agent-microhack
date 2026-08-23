@@ -74,11 +74,6 @@ You'll connect the SRE Agent to **your copy** in Challenge 1.
     Kubernetes **rollout history**, and reads the repo only to answer *"what does
     the manifest declare"*.
 
-!!! danger "Connect the agent to your copy, never to the lab repo"
-    **Never connect the Azure SRE Agent to the lab repo because it contains the
-    challenge material** and would spoil every investigation. Connect the agent
-    **only to your copy of `aetherion-airops-platform`**.
-
 **c) Create a GitHub Personal Access Token now.** Challenge 8 has the agent write
 back to your repo — it files the incident RCA as an issue and opens a pull request
 — and the GitHub MCP connector it uses for that accepts **a PAT only**. There is no
