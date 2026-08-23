@@ -40,8 +40,9 @@ brings them in — you don't need to remember them now.
 
     ---
 
-    **This is you.** New to Aetherion, on shift in the Global Operations Center.
-    Every decision in this hack is yours to make.
+    **This is you.** Your first week in Aetherion's Global Operations Center,
+    walking into a shift that will not stay quiet. Every operational decision
+    today is yours to make.
 
 -   ![Aria](../assets/cast/aria.webp){ .cast-portrait loading=lazy }
 
@@ -60,8 +61,8 @@ brings them in — you don't need to remember them now.
 
     ---
 
-    Answers for the airline. Wants it fixed *safely*, with a human in the loop,
-    and wants the incident explained in business terms afterwards.
+    Answers for the airline. Wants incidents resolved *safely*, with a human in
+    the loop, and expects them explained in business terms afterwards.
 
 -   ![Marco Bianchi](../assets/cast/marco.webp){ .cast-portrait loading=lazy }
 
@@ -69,8 +70,9 @@ brings them in — you don't need to remember them now.
 
     ---
 
-    Runs the crew desk. When crew scheduling degrades, he is the one who cannot
-    confirm who is legal to fly.
+    Runs the crew desk. When crew scheduling degrades, Marco cannot verify which
+    crew are rested, qualified and legal to fly — and aircraft do not depart
+    without that answer.
 
 -   ![Priya Nair](../assets/cast/priya.webp){ .cast-portrait loading=lazy }
 
@@ -78,10 +80,14 @@ brings them in — you don't need to remember them now.
 
     ---
 
-    Watches what the platform *and* the agent cost. Autonomy is only a win if it
-    doesn't become runaway spend.
+    Watches what the platform *and* the agent cost. Autonomy only counts as a win
+    if it improves outcomes without turning into runaway spend.
 
 </div>
+
+That spread is deliberate. Whether an agent earns a place in production is never
+just an operator's call — it is decided by **execution**, **governance**,
+**business continuity** and **cost** together. You will hear from all four today.
 
 ---
 
