@@ -43,8 +43,24 @@ source that the Azure SRE Agent connects to for change correlation. Fork it to
 
 1. Open <https://github.com/abengtss-max/aetherion-airops-platform>
 2. Click **Fork** (keep the default name).
+3. In your new fork, go to **Settings → General → Features** and tick
+   **Issues**.
 
 You'll connect the SRE Agent to **your fork** in Challenge 1.
+
+!!! warning "Step 3 is not optional"
+    **GitHub turns Issues off on every new fork**, regardless of the upstream
+    setting. Challenge 8 has the agent file the incident RCA as an issue on your
+    fork; if Issues are disabled the call fails with `HTTP 410 Issues are
+    disabled for this repository` and there is nothing wrong with your agent or
+    your token. Enable it now and you will not meet it eight challenges later.
+
+    Check it from the CLI if you prefer:
+
+    ```powershell
+    gh api repos/<your-org>/aetherion-airops-platform --jq .has_issues   # must be true
+    gh api -X PATCH repos/<your-org>/aetherion-airops-platform -F has_issues=true
+    ```
 
 !!! danger "Connect the agent to your fork, never to the lab repo"
     **Never connect the Azure SRE Agent to the lab repo because it contains the

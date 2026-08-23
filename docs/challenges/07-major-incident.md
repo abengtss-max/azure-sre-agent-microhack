@@ -75,10 +75,18 @@ by service.
 
 ### Suggested Azure SRE Agent prompt
 
-!!! quote "Paste into the agent chat"
+!!! quote "Paste into the `[Sev1] aetherion-major-incident` thread"
     You picked this incident up before I did. List every action you have already
     taken without my approval, and how I can verify each one. Then tell me what is
     still broken, and what you recommend I deal with first.
+
+!!! warning "Paste it into the right thread"
+    This prompt only works **inside the thread the response plan opened by itself**.
+    Started in a fresh chat it has no incident to refer to, so it answers about
+    whatever it worked on last — validated: pasted into a new thread it reported on
+    the *previous* challenge's baggage canary and declared traffic healthy while
+    the flight board was 100% down. Open the `[Sev1] aetherion-major-incident`
+    thread first (Task 1), then ask.
 
 The second half is the part you own. It will give you an order; your job is to
 decide whether it's the right one for an airline at peak departure.
@@ -244,6 +252,24 @@ difference between solving crew scheduling for the first time and the second.
           against the same call **through APIM**. If direct returns 200 but APIM
           fails, the fault is the **edge policy**, not the service; treat the change
           as customer-facing.
+
+        !!! warning "Run the comparison from your machine, not the agent"
+            The agent's sandbox egress can block the public gateway IP and
+            `*.azure-api.net`, so an external probe it runs itself comes back as a
+            proxy-generated `403` before the request ever reaches Azure. Validated:
+            the agent repaired the policy correctly and then reported it could not
+            confirm the fix externally.
+
+            Do the direct-vs-APIM comparison yourself, and treat the agent's
+            "external check failed" as a tooling limit rather than evidence the fix
+            did not land. Confirm from the policy XML plus your own call:
+
+            ```powershell
+            $st = Get-Content ./scripts/.env.aetherion.json -Raw | ConvertFrom-Json
+            (Invoke-WebRequest "http://$($st.gatewayIp)/api/status").StatusCode
+            (Invoke-WebRequest "$($st.apimGatewayUrl)/aetherion/api/status" `
+               -Headers @{ 'Ocp-Apim-Subscription-Key' = $st.apimSubscriptionKey }).StatusCode
+            ```
 
         !!! note "Why it can fix this at all"
             Everywhere else today the agent has held write access to Kubernetes and

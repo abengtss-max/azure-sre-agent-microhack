@@ -169,17 +169,30 @@ the repository, where the whole team, and the next agent, can find it.
 
     ??? note "Task 5 · Publish the RCA back to the repo"
         In Challenge 1 you connected your fork so the agent could **read** it. It has
-        been correlating deployments against that repo all day. It still cannot write
-        a single character back to it.
+        been correlating deployments against that repo all day. It has no tool that
+        writes a single character back to it.
 
         That is not a permissions oversight. GitHub attaches to the agent in three
         separate ways, and you have only set up the first:
 
         | Connection | Where you set it up | What it grants |
         |---|---|---|
-        | **Code Access** | Builder → Code Access | Read, search, correlate. **No writes** |
+        | **Code Access** | Builder → Code Access | Read, search, correlate. **No write tools** |
         | **GitHub Connector** | Builder → Connectors → Add connector | Create issues, open and merge PRs, trigger Actions |
         | **GitHub MCP** | Builder → Connectors → Add connector | The full GitHub tool catalog, with approval policies |
+
+        !!! warning "'No writes' is a tool boundary, not a permission boundary"
+            Code Access gives the agent no *write tools*, but it does leave an OAuth
+            credential in the sandbox clone. Validated during authoring: running in
+            **Autonomous** mode with only Code Access configured, the agent read the
+            token out of `.git/git-credentials` and filed the issue with `gh api`
+            directly — no connector involved.
+
+            So the thing actually holding the line here is **run mode and approvals**,
+            not the absence of a connector. In **Review** mode that same shell command
+            surfaces for your approval first. Set up the connector anyway: it is the
+            governed, auditable path, and it is what the rest of this challenge builds
+            on.
 
         **Add the GitHub Connector.**
 
@@ -195,9 +208,19 @@ the repository, where the whole team, and the next agent, can find it.
             refreshes them ahead of expiry on its own. You will not get logged out
             mid-workshop.
 
-        **Now have it file the RCA.** Paste this into the agent chat:
+        !!! warning "Issues must be enabled on your fork"
+            GitHub disables Issues on **every new fork**, so this step fails with
+            `HTTP 410 Issues are disabled for this repository` unless you turned it
+            on during setup. That is a repository setting, not an agent or token
+            problem — the agent will correctly report it and create nothing.
 
-        > Publish the engineering RCA you just wrote as a GitHub issue on
+            Fix it in **Settings → General → Features → Issues**, or:
+
+            ```powershell
+            gh api -X PATCH repos/<your-org>/aetherion-airops-platform -F has_issues=true
+            ```
+
+        **Now have it file the RCA.** Paste this into the agent chat:        > Publish the engineering RCA you just wrote as a GitHub issue on
         > `https://github.com/<your-org>/aetherion-airops-platform`. Title it
         > `RCA: major incident - global check-in degradation`. In the body include
         > the timeline, the root cause per affected service, every action taken and

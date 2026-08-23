@@ -566,6 +566,14 @@ $script:Challenges = [ordered]@{
                 Write-Host "  Check the Sev1 response plan from challenge 6, then re-run start-challenge 7." -ForegroundColor Yellow
             }
             $pass = ($allOk -and $apimOk -and $tagFlight -eq 'latest' -and $okCrew -and $cpuBook -ge 500 -and $fired)
+            if ($pass -and $s.overall -ne 'operational') {
+                # Expected: this challenge runs an 80-VU 'major' surge, and crew is graded
+                # against an 800 ms incident ceiling while the board uses a 400 ms
+                # steady-state budget. Say so, or 'PASS ... overall=degraded' reads as a bug.
+                Write-Host "  Board still reads '$($s.overall)': every service is serving, but the peak-departure" -ForegroundColor Gray
+                Write-Host "  surge is still running and crew is above the 400ms steady-state budget (graded here" -ForegroundColor Gray
+                Write-Host "  against the 800ms incident ceiling). Challenge 8 drops the load back to normal." -ForegroundColor Gray
+            }
             @{ Pass = $pass; Detail = "overall=$($s.overall) apimOk=$apimOk flight=:$tagFlight crew=${latCrew}ms bookingCpu=${cpuBook}m alertFired=$fired" }
         }
     }
@@ -574,6 +582,11 @@ $script:Challenges = [ordered]@{
         Title = 'Boarding Resumes: Brief Airline Leadership'
         Kind  = 'config'
         Start = {
+            # Peak departure is over: drop the load generator back to steady state so
+            # the board actually reads green while leadership is being briefed.
+            # Without this the challenge-7 'major' surge (80 VUs) keeps running and
+            # the Ops Center stays amber, contradicting "boarding has resumed".
+            Set-Load 'normal'
             Write-Host "The platform is stable and boarding has resumed. Close out the major incident." -ForegroundColor Gray
             Write-Host "Nothing is broken in this challenge; there is no fault to find." -ForegroundColor Gray
             Write-Host "Produce an engineering RCA handover (with change evidence) and a leadership briefing"
