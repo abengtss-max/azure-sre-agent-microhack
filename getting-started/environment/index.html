@@ -2048,19 +2048,25 @@ with the top-level <strong><code>repo</code></strong> scope works too.</p>
 <h2 id="4-run-one-command">4. Run one command<a class="headerlink" href="#4-run-one-command" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="n">provision-environment</span><span class="p">.</span><span class="n">ps1</span>
 </code></pre></div>
-<p>That's it. It runs preflight → deploy infrastructure → build &amp; push images → deploy the app →
-validate, then opens the Operations Center, <abbr title="Dashboarding tool used here to visualise AKS and Application Insights metrics.">Grafana</abbr>, and the resource group in
-your browser. The script is idempotent and safe to re-run if a step fails: it
-resolves the cluster's current Kubernetes version rather than forcing a downgrade,
-and the network configuration is declared explicitly so a re-run cannot reset it.</p>
-<p>Each run provisions into a <strong>uniquely named</strong> resource group,
-<code>rg-aetherion-microhack-&lt;suffix&gt;</code> (for example <code>rg-aetherion-microhack-a7c3</code>), in
-<code>swedencentral</code>. The script <strong>prints the exact name</strong> when it finishes. Use that
-name wherever these docs mention <em>your resource group</em>, and when you scope the
-Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent to it. Because every run is unique, multiple attendees can share a
-single subscription and you can safely re-provision without collisions.</p>
-<p>Override the base name or region with <code>-ResourceGroup</code>, <code>-Location</code>, or
-<code>-NamePrefix</code>; the unique suffix is always appended.</p>
+<p>That's it. It provisions everything, then opens the Operations Center, <abbr title="Dashboarding tool used here to visualise AKS and Application Insights metrics.">Grafana</abbr> and
+the resource group in your browser.</p>
+<p>Each run creates a <strong>uniquely named</strong> resource group,
+<code>rg-aetherion-microhack-&lt;suffix&gt;</code>, in <code>swedencentral</code>. The script <strong>prints the
+exact name when it finishes — note it down</strong>, you need it in Challenge 1 to scope
+the agent.</p>
+<details class="tip">
+<summary>What the script does, and how to change it</summary>
+<p><strong>Steps:</strong> preflight → deploy infrastructure → build &amp; push images → deploy the
+app → validate.</p>
+<p><strong>Safe to re-run</strong> if a step fails: it resolves the cluster's current
+Kubernetes version rather than forcing a downgrade, and the network
+configuration is declared explicitly so a re-run cannot reset it.</p>
+<p><strong>Unique names mean no collisions</strong>, so several attendees can share one
+subscription and you can re-provision without clashing with an earlier run.</p>
+<p><strong>Overrides</strong> — the unique suffix is always appended:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="n">provision-environment</span><span class="p">.</span><span class="n">ps1</span> <span class="n">-ResourceGroup</span> <span class="p">&lt;</span><span class="n">name</span><span class="p">&gt;</span> <span class="n">-Location</span> <span class="p">&lt;</span><span class="n">region</span><span class="p">&gt;</span> <span class="n">-NamePrefix</span> <span class="p">&lt;</span><span class="n">prefix</span><span class="p">&gt;</span>
+</code></pre></div>
+</details>
 <details class="tip">
 <summary>The Kubernetes version is resolved from Azure, not guessed</summary>
 <p>The provisioner asks Azure for the region's current <strong>stable (default) GA</strong>
@@ -2068,7 +2074,7 @@ version at run time and deploys that, so the lab never carries a literal that
 quietly ages out of support. Nothing to configure, and nothing to keep
 up to date.</p>
 <p>Pin one only if you have a reason to:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="n">provision-environment</span><span class="p">.</span><span class="n">ps1</span> <span class="n">-KubernetesVersion</span> <span class="n">1</span><span class="p">.</span><span class="n">34</span><span class="p">.</span><span class="n">5</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="n">provision-environment</span><span class="p">.</span><span class="n">ps1</span> <span class="n">-KubernetesVersion</span> <span class="n">1</span><span class="p">.</span><span class="n">34</span><span class="p">.</span><span class="n">5</span>
 </code></pre></div>
 <p>Left unset on a <strong>re-run</strong>, it also follows a cluster that has already
 auto-upgraded, because a redeploy cannot downgrade a running cluster.</p>
@@ -2082,8 +2088,8 @@ wrong one. If you re-provision, either reuse the environment you already have,
 or tear down the old ones. The teardown script lists every
 <code>rg-aetherion-microhack-*</code> environment (each with its paired <code>-loadgen</code> group)
 and lets you pick which to delete:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="n">99-teardown</span><span class="p">.</span><span class="n">ps1</span>        <span class="c"># pick an environment to delete</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="n">99-teardown</span><span class="p">.</span><span class="n">ps1</span> <span class="n">-All</span>   <span class="c"># delete all lab environments</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="n">99-teardown</span><span class="p">.</span><span class="n">ps1</span>        <span class="c"># pick an environment to delete</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="n">99-teardown</span><span class="p">.</span><span class="n">ps1</span> <span class="n">-All</span>   <span class="c"># delete all lab environments</span>
 </code></pre></div>
 <p>Always scope the Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent to your <strong>current</strong> resource group, using the name
 the provisioner printed when it finished.</p>
@@ -2128,7 +2134,7 @@ observability and the Azure <abbr title="Site Reliability Engineering — runnin
 reports a healthy, traffic-generating estate and the Operations Center loads with
 all tiles green.</p>
 <p>Re-run the check on its own at any time:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="n">04-validate</span><span class="p">.</span><span class="n">ps1</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="n">04-validate</span><span class="p">.</span><span class="n">ps1</span>
 </code></pre></div>
 <p><a class="md-button md-button--primary" href="../../challenges/01-onboard-and-baseline/">Start Challenge 1 →</a></p>
 <hr />
