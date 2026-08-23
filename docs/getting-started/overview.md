@@ -144,3 +144,9 @@ outage is layered on top in Challenge 3.
 
 ---
 
+!!! success "Your shift starts now"
+    The board is green, Aria is waiting, and nothing is on fire yet. Go and find
+    out what *healthy* looks like before something isn't.
+
+    [Start Challenge 1 →](../challenges/01-onboard-and-baseline.md){ .md-button .md-button--primary }
+

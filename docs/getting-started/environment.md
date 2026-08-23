@@ -208,7 +208,7 @@ Re-run the check on its own at any time:
 ./scripts/04-validate.ps1
 ```
 
-[Start Challenge 1 →](../challenges/01-onboard-and-baseline.md){ .md-button .md-button--primary }
+[Meet Aetherion →](overview.md){ .md-button .md-button--primary }
 
 ---
 
