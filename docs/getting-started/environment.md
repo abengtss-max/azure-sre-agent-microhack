@@ -123,21 +123,30 @@ az account set --subscription "<subscription-id>"
 ./scripts/provision-environment.ps1
 ```
 
-That's it. It runs preflight → deploy infrastructure → build & push images → deploy the app →
-validate, then opens the Operations Center, Grafana, and the resource group in
-your browser. The script is idempotent and safe to re-run if a step fails: it
-resolves the cluster's current Kubernetes version rather than forcing a downgrade,
-and the network configuration is declared explicitly so a re-run cannot reset it.
+That's it. It provisions everything, then opens the Operations Center, Grafana and
+the resource group in your browser.
 
-Each run provisions into a **uniquely named** resource group,
-`rg-aetherion-microhack-<suffix>` (for example `rg-aetherion-microhack-a7c3`), in
-`swedencentral`. The script **prints the exact name** when it finishes. Use that
-name wherever these docs mention *your resource group*, and when you scope the
-Azure SRE Agent to it. Because every run is unique, multiple attendees can share a
-single subscription and you can safely re-provision without collisions.
+Each run creates a **uniquely named** resource group,
+`rg-aetherion-microhack-<suffix>`, in `swedencentral`. The script **prints the
+exact name when it finishes — note it down**, you need it in Challenge 1 to scope
+the agent.
 
-Override the base name or region with `-ResourceGroup`, `-Location`, or
-`-NamePrefix`; the unique suffix is always appended.
+??? tip "What the script does, and how to change it"
+    **Steps:** preflight → deploy infrastructure → build & push images → deploy the
+    app → validate.
+
+    **Safe to re-run** if a step fails: it resolves the cluster's current
+    Kubernetes version rather than forcing a downgrade, and the network
+    configuration is declared explicitly so a re-run cannot reset it.
+
+    **Unique names mean no collisions**, so several attendees can share one
+    subscription and you can re-provision without clashing with an earlier run.
+
+    **Overrides** — the unique suffix is always appended:
+
+    ```powershell
+    ./scripts/provision-environment.ps1 -ResourceGroup <name> -Location <region> -NamePrefix <prefix>
+    ```
 
 ??? tip "The Kubernetes version is resolved from Azure, not guessed"
     The provisioner asks Azure for the region's current **stable (default) GA**
