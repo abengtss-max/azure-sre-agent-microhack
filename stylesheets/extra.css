@@ -640,3 +640,10 @@
 .md-typeset .cast-cards > ul > li hr {
   margin: 0.5rem 0 0.6rem;
 }
+
+/* Reference is support material, not part of the walkthrough: keep the header to
+   the four steps of the journey. The pages stay in the sidebar and in-page links,
+   and consent.js still reaches reference/privacy/. */
+.md-tabs__item:has(> .md-tabs__link[href*="reference/"]) {
+  display: none;
+}
