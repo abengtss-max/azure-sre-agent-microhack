@@ -2033,23 +2033,8 @@ and fill it in like this:</p>
 </table>
 <p>Click <strong>Generate token</strong> and <strong>copy it now</strong> — GitHub shows it once. Keep it in
 your password manager until Challenge 8.</p>
-<div class="admonition warning">
-<p class="admonition-title">Two ways this fails silently</p>
-<p>Both look like a broken connector rather than a permissions problem, because
-the connector shows <strong>Connected</strong> and only fails on the first <em>write</em>:</p>
-<ul>
-<li><strong>Repository access left on "Public repositories".</strong> Your repo is
-  <strong>private</strong>, so the token cannot see it. Pick it explicitly.</li>
-<li><strong>Read-only permissions.</strong> Contents, Pull requests and Issues must all be
-  <strong>Read and write</strong>, not Read.</li>
-</ul>
-<p>Prefer a classic token? Use
-<strong><a href="https://github.com/settings/tokens/new">github.com/settings/tokens/new</a></strong>
-and tick the top-level <strong><code>repo</code></strong> scope, which covers private repositories.</p>
-<p>If you put the repo in an <strong>organisation</strong> rather than your personal account, a
-fine-grained token may additionally need <strong>owner approval</strong>, which is not
-instant. Your personal account avoids that entirely.</p>
-</div>
+<p>Prefer a classic token? <strong><a href="https://github.com/settings/tokens/new">github.com/settings/tokens/new</a></strong>
+with the top-level <strong><code>repo</code></strong> scope works too.</p>
 <h2 id="3-check-you-have-access">3. Check you have access<a class="headerlink" href="#3-check-you-have-access" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong>Azure subscription</strong> with <strong>Owner</strong> (or Contributor + User Access
