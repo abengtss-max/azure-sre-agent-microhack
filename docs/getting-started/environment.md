@@ -31,7 +31,14 @@ PATH, and sign in to the GitHub CLI once with `gh auth login`.
 
 ## 2. Get the two repositories
 
-You use **two** repositories in this MicroHack:
+You use **two** repositories in this MicroHack. Keeping them straight matters:
+one drives the hack, the other is the "production" application the agent
+investigates.
+
+| | What it is | You get it by | Used for |
+|---|---|---|---|
+| **Lab clone** | This workshop: challenges, scripts, runbooks, the subagent and skill files | `git clone` | Running `start-challenge` / `check-challenge`, and the `knowledge/` files in Challenge 4 |
+| **Your app repo** | The Aetherion AirOps application source | **Use this template** | The repo you connect the **SRE Agent** to, and the one it writes to in Challenge 8 |
 
 **a) Clone the lab repo.** It drives the hack (challenges + scripts):
 
