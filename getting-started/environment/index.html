@@ -1967,8 +1967,8 @@ It is a <strong>template repository</strong>, so you get your own standalone cop
 <p>It is created <strong>private</strong>, which is correct — leave it that way. The agent reads
 it through the Code Access connection you make in Challenge 1, not anonymously.</p>
 <p>You'll connect the <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent to <strong>your copy</strong> in Challenge 1.</p>
-<div class="admonition tip">
-<p class="admonition-title">Why a template and not a fork</p>
+<details class="tip">
+<summary>Why a template and not a fork</summary>
 <p>A fork would work, but GitHub turns <strong>Issues off on every new fork</strong> and
 Challenge 8 has the agent file the incident RCA as an issue. A template copy
 arrives with Issues already enabled, so that failure never happens.</p>
@@ -1978,7 +1978,7 @@ step in <strong>c)</strong> below.</p>
 in the hack depends on that history: Challenge 3 correlates change from the
 Kubernetes <strong>rollout history</strong>, and reads the repo only to answer <em>"what does
 the manifest declare"</em>.</p>
-</div>
+</details>
 <div class="admonition danger">
 <p class="admonition-title">Connect the agent to your copy, never to the lab repo</p>
 <p><strong>Never connect the Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent to the lab repo because it contains the
@@ -2076,8 +2076,8 @@ Azure <abbr title="Site Reliability Engineering — running services with softwa
 single subscription and you can safely re-provision without collisions.</p>
 <p>Override the base name or region with <code>-ResourceGroup</code>, <code>-Location</code>, or
 <code>-NamePrefix</code>; the unique suffix is always appended.</p>
-<div class="admonition tip">
-<p class="admonition-title">The Kubernetes version is resolved from Azure, not guessed</p>
+<details class="tip">
+<summary>The Kubernetes version is resolved from Azure, not guessed</summary>
 <p>The provisioner asks Azure for the region's current <strong>stable (default) GA</strong>
 version at run time and deploys that, so the lab never carries a literal that
 quietly ages out of support. Nothing to configure, and nothing to keep
@@ -2087,7 +2087,7 @@ up to date.</p>
 </code></pre></div>
 <p>Left unset on a <strong>re-run</strong>, it also follows a cluster that has already
 auto-upgraded, because a redeploy cannot downgrade a running cluster.</p>
-</div>
+</details>
 <div class="admonition warning">
 <p class="admonition-title">Re-provisioning leaves the previous environment running</p>
 <p>Because each run creates a <strong>new</strong> suffixed resource group, re-provisioning
