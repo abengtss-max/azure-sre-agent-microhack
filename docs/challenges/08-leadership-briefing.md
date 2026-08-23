@@ -262,6 +262,10 @@ the repository, where the whole team, and the next agent, can find it.
         4. Connect.
 
         !!! warning "The token needs write scope, and a read-only one fails silently at connect time"
+            You should already have this token from
+            [setup](../getting-started/environment.md). If not, create it now at
+            **[github.com/settings/personal-access-tokens/new](https://github.com/settings/personal-access-tokens/new)**.
+
             This task creates a branch, commits a file and opens a pull request, so
             on a **fine-grained** token scoped to your copy you need:
 
@@ -269,9 +273,13 @@ the repository, where the whole team, and the next agent, can find it.
             - **Pull requests: Read and write** — the PR
             - **Issues: Read and write** — to reference the RCA issue
 
-            A classic token with `repo` scope also works. A read-only token
-            **connects successfully** and then fails on the first write, which looks
-            like a broken connector rather than a permissions problem.
+            Set *Repository access* to **Only select repositories** and pick your
+            repo: it is **private**, so a token limited to public repositories
+            cannot see it. A classic token with `repo` scope works too.
+
+            A read-only or wrongly-scoped token **connects successfully** and then
+            fails on the first write, which looks like a broken connector rather
+            than a permissions problem.
 
             If you put your copy in an **organisation** rather than your personal
             account, a fine-grained token may need **owner approval** before it

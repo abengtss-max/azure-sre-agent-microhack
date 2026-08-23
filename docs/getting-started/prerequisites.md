@@ -44,15 +44,28 @@ request — and for that it needs a credential of its own.
 | GitHub **MCP server** | Challenge 8 Task 6 — branch, commit, open a PR | **Personal Access Token only** — there is no OAuth option |
 
 !!! warning "Create the token on day one, not at Challenge 8"
-    Create it now, or confirm you are able to. It needs, on your copy:
+    Go to
+    **[github.com/settings/personal-access-tokens/new](https://github.com/settings/personal-access-tokens/new)**
+    and create a fine-grained token with:
 
-    - **Contents: Read and write** — create a branch and commit to it
-    - **Pull requests: Read and write** — open the PR
-    - **Issues: Read and write** — file the RCA
+    | Field | Set it to |
+    |---|---|
+    | **Resource owner** | your own account |
+    | **Repository access** | **Only select repositories** → `aetherion-airops-platform` |
+    | **Contents** | **Read and write** |
+    | **Pull requests** | **Read and write** |
+    | **Issues** | **Read and write** |
 
-    A classic token with `repo` scope also works. A token with read-only access
-    **connects successfully and then fails on the first write**, which reads like a
-    broken connector rather than a permissions problem.
+    Copy it when generated — GitHub shows it once.
+
+    Your repo is **private**, so leaving *Repository access* on **Public
+    repositories** means the token cannot see it. That, and read-only
+    permissions, both **connect successfully and then fail on the first write**,
+    which reads like a broken connector rather than a permissions problem.
+
+    A classic token from
+    **[github.com/settings/tokens/new](https://github.com/settings/tokens/new)**
+    with the **`repo`** scope also works and covers private repositories.
 
     Create the repo under your **personal account**. In an organisation a
     fine-grained token can additionally require **owner approval**, which is not

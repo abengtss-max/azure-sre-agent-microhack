@@ -84,21 +84,36 @@ back to your repo — it files the incident RCA as an issue and opens a pull req
 — and the GitHub MCP connector it uses for that accepts **a PAT only**. There is no
 OAuth option on that connector.
 
-!!! warning "Do this on day one, not at Challenge 8"
-    Create the token against your copy with:
+Go straight to
+**[github.com/settings/personal-access-tokens/new](https://github.com/settings/personal-access-tokens/new)**
+(*Settings → Developer settings → Personal access tokens → Fine-grained tokens*)
+and fill it in like this:
 
-    - **Contents: Read and write** — create a branch and commit to it
-    - **Pull requests: Read and write** — open the PR
-    - **Issues: Read and write** — file the RCA
+| Field | Set it to |
+|---|---|
+| **Token name** | `aetherion-microhack` |
+| **Expiration** | 30 days is plenty |
+| **Resource owner** | your own account |
+| **Repository access** | **Only select repositories** → `aetherion-airops-platform` |
+| **Repository permissions → Contents** | **Read and write** — create a branch and commit |
+| **Repository permissions → Pull requests** | **Read and write** — open the PR |
+| **Repository permissions → Issues** | **Read and write** — file the RCA |
 
-    Your new repo is **private by default**, so on a fine-grained token set
-    *Repository access* to **Only select repositories** and pick it explicitly.
-    Leaving it on **Public repositories** connects fine and then fails on the
-    first write. A classic token with `repo` scope covers private repos.
+Click **Generate token** and **copy it now** — GitHub shows it once. Keep it in
+your password manager until Challenge 8.
 
-    A read-only token fails the same silent way: it **connects successfully and
-    then fails on the first write**, which looks like a broken connector rather
-    than a permissions problem.
+!!! warning "Two ways this fails silently"
+    Both look like a broken connector rather than a permissions problem, because
+    the connector shows **Connected** and only fails on the first *write*:
+
+    - **Repository access left on "Public repositories".** Your repo is
+      **private**, so the token cannot see it. Pick it explicitly.
+    - **Read-only permissions.** Contents, Pull requests and Issues must all be
+      **Read and write**, not Read.
+
+    Prefer a classic token? Use
+    **[github.com/settings/tokens/new](https://github.com/settings/tokens/new)**
+    and tick the top-level **`repo`** scope, which covers private repositories.
 
     If you put the repo in an **organisation** rather than your personal account, a
     fine-grained token may additionally need **owner approval**, which is not
