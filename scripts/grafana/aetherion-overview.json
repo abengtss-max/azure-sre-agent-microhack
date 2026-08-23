@@ -46,8 +46,8 @@
     {
       "id": 3,
       "type": "timeseries",
-      "title": "Server response time (avg ms)",
-      "description": "Average server-side request duration.",
+      "title": "Server response time (avg / p95 ms)",
+      "description": "Server-side request duration from Application Insights request telemetry. The pre-aggregated requests/duration platform metric reports ~0 for this workload, so this panel reads the request logs instead.",
       "datasource": { "type": "grafana-azure-monitor-datasource", "uid": "__DS_UID__" },
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 1 },
       "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 10, "lineWidth": 2 }, "unit": "ms" }, "overrides": [] },
@@ -55,15 +55,12 @@
       "targets": [
         {
           "refId": "A",
-          "queryType": "Azure Monitor",
+          "queryType": "Azure Log Analytics",
           "datasource": { "type": "grafana-azure-monitor-datasource", "uid": "__DS_UID__" },
-          "subscription": "__SUB_ID__",
-          "azureMonitor": {
-            "resources": [ { "subscription": "__SUB_ID__", "resourceGroup": "__RG__", "resourceName": "__APPI__", "metricNamespace": "microsoft.insights/components" } ],
-            "metricNamespace": "microsoft.insights/components",
-            "metricName": "requests/duration",
-            "aggregation": "Average",
-            "timeGrain": "auto"
+          "azureLogAnalytics": {
+            "resources": [ "__LAW_ID__" ],
+            "resultFormat": "time_series",
+            "query": "AppRequests | where $__timeFilter(TimeGenerated) | summarize avg=avg(DurationMs), p95=percentile(DurationMs,95) by bin(TimeGenerated, 1m) | order by TimeGenerated asc"
           }
         }
       ]

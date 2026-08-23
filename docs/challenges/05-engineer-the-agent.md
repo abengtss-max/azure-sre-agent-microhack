@@ -41,6 +41,25 @@ guardrails intact.
 2. **Encode the skill.** Capture the crew query-path recovery from Challenge 4 as a reusable skill, guardrails intact, and confirm it loads.
 3. **Know when to use which.** Decide whether the new skill belongs to the specialist or the main agent, act on that decision, and be able to say when you'd reach for the subagent (delegate to it to investigate) versus the skill (a procedure the agent can draw on).
 
+!!! tip "You don't have to type either of these from scratch"
+    Both finished definitions ship in your **lab clone** — the repository you cloned
+    to run this hack, the one holding `knowledge/` and `scripts/`. Not the
+    application fork.
+
+    | What you're building | File in your lab clone | Used in |
+    |---|---|---|
+    | The `aks-triage` subagent | `agents/aks-triage.agent.yaml` | Task 1 — paste into the dialog's **YAML** tab |
+    | The crew recovery skill | `skills/crew-query-path-recovery/SKILL.md` | Task 2 — paste into the SKILL.md editor |
+
+    ```powershell
+    code ./agents/aks-triage.agent.yaml
+    code ./skills/crew-query-path-recovery/SKILL.md
+    ```
+
+    Read them before you paste. The point of the challenge is understanding *why*
+    those eight tools and not the other 46, and why the guardrails are worded the
+    way they are — not the typing.
+
 ![Challenge 5 storyboard: Sam and Aria engineer a specialist subagent and reusable skill](../assets/storyboard/img-challenge-5.webp){ .story-panel loading=lazy }
 
 ### Suggested Azure SRE Agent prompt
@@ -181,9 +200,16 @@ investigate. You'll want both in the final incident.
         from the built-in MCP server and **do not appear in the Form picker at
         all**, so a Form-only attempt silently produces a half-scoped specialist.
 
-        The finished definition ships in your lab clone at
-        `agents/aks-triage.agent.yaml`. Open the **YAML** tab and paste it, or copy
-        it from the file. These are the eight tools it grants, which are what an AKS
+        The finished definition is already in your **lab clone** (the repository you
+        cloned to run this hack, the same one holding `knowledge/` and `scripts/` —
+        **not** the application fork), at `agents/aks-triage.agent.yaml`:
+
+        ```powershell
+        code ./agents/aks-triage.agent.yaml     # or: Get-Content ./agents/aks-triage.agent.yaml
+        ```
+
+        Open the **YAML** tab in the dialog and paste the file's contents over
+        whatever is there. These are the eight tools it grants, which are what an AKS
         triage investigation actually used across Challenges 2 to 4:
 
         | Tool | Source | Why the specialist needs it |
@@ -322,8 +348,13 @@ investigate. You'll want both in the final incident.
         `description` frontmatter and a placeholder comment. The finished file is
         already in your **lab clone** (the same repository as the `knowledge/`
         folder, not the application fork), at
-        `skills/crew-query-path-recovery/SKILL.md`. Paste it into the editor, or
-        drag that file onto the **Files** panel:
+        `skills/crew-query-path-recovery/SKILL.md`:
+
+        ```powershell
+        code ./skills/crew-query-path-recovery/SKILL.md
+        ```
+
+        Paste it into the editor, or drag that file onto the **Files** panel:
 
         ```markdown
         ---

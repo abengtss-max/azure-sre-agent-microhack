@@ -230,6 +230,67 @@ function Get-AgentResource {
     return ($full | ConvertFrom-Json)
 }
 
+# ---------------------------------------------------------------------------
+# SRE Agent data-plane API
+#
+# ARM exposes only a fraction of the agent's configuration. Everything the portal
+# shows - connected repos, scheduled tasks, subagents, skills, response plans -
+# lives behind the agent's own endpoint, which takes a token for the
+# 'https://azuresre.ai' audience (an ARM-audience token is rejected).
+#
+# Every function here returns $null on ANY failure rather than throwing, so a
+# grader can fall back to asking the attendee instead of failing them because a
+# token expired or the API moved.
+# ---------------------------------------------------------------------------
+function Get-SreEndpoint {
+    if ($script:SreEndpointCache) { return $script:SreEndpointCache }
+    $a = Get-AgentResource
+    if (-not $a -or -not $a.properties.agentEndpoint) { return $null }
+    $script:SreEndpointCache = $a.properties.agentEndpoint.TrimEnd('/')
+    return $script:SreEndpointCache
+}
+
+function Get-SreDataToken {
+    if ($script:SreTokenCache -and (Get-Date) -lt $script:SreTokenExpiry) { return $script:SreTokenCache }
+    $t = az account get-access-token --resource 'https://azuresre.ai' --query accessToken -o tsv 2>$null
+    if ([string]::IsNullOrWhiteSpace($t)) { return $null }
+    $script:SreTokenCache = $t
+    $script:SreTokenExpiry = (Get-Date).AddMinutes(40)
+    return $t
+}
+
+# Unknown routes fall through to the SPA's index.html rather than returning 404,
+# so an HTML body means "no such API", not "empty result".
+function Invoke-SreData([string]$Path) {
+    $ep = Get-SreEndpoint;    if (-not $ep) { return $null }
+    $tok = Get-SreDataToken;  if (-not $tok) { return $null }
+    try {
+        $r = Invoke-WebRequest -Uri "$ep$Path" -Headers @{ Authorization = "Bearer $tok" } `
+            -TimeoutSec 45 -UseBasicParsing -ErrorAction Stop
+    }
+    catch { return $null }
+    if (-not $r.Content -or $r.Content -match '<!doctype html>') { return $null }
+    # ConvertFrom-Json turns '[]' into $null, which would be indistinguishable from a
+    # failed call. The comma stops PowerShell unrolling the empty array back to $null.
+    if ($r.Content.Trim() -eq '[]') { return , @() }
+    try { return ($r.Content | ConvertFrom-Json) } catch { return $null }
+}
+
+# Grade objectively when the API answers; ask the attendee when it cannot.
+# $Probe returns $true, $false, or $null meaning "could not determine".
+function Confirm-Verified([string]$Prompt, [scriptblock]$Probe, [string]$Evidence = '') {
+    $result = $null
+    try { $result = & $Probe } catch { $result = $null }
+    if ($null -ne $result) {
+        $mark = if ($result) { 'OK  ' } else { 'MISS' }
+        $colour = if ($result) { 'Green' } else { 'Yellow' }
+        $detail = if ($Evidence) { " ($Evidence)" } else { '' }
+        Write-Host ("  [{0}] {1}{2}" -f $mark, $Prompt, $detail) -ForegroundColor $colour
+        return [bool]$result
+    }
+    return Confirm-SelfAttest $Prompt
+}
+
 # The response plan list is not exposed on the ARM resource, but connecting an
 # incident platform is its hard prerequisite - no connection, no plan, no trigger.
 function Test-IncidentPlatformConnected {
@@ -328,6 +389,129 @@ function Test-MajorIncidentAlertFired([datetime]$Since) {
 #   7  <- old 12      (major incident)
 #   8  <- old 13      (leadership briefing)
 # ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# Objective probes, built on the data-plane API above.
+# Each returns $true / $false, or $null when it cannot tell (API unreachable,
+# route moved, agent not created yet) so the caller can fall back to asking.
+# ---------------------------------------------------------------------------
+
+# Challenge 1: the fork must be attached AND finished cloning. A repo stuck in
+# 'Cloning' looks connected in the portal but silently starves challenge 4.
+function Test-CodeRepoReady {
+    $r = Invoke-SreData '/api/v2/repos'
+    if ($null -eq $r) { return $null }
+    $repos = @($r.value)
+    if ($repos.Count -eq 0) { return $false }
+    return [bool](@($repos | Where-Object {
+                $_.properties.url -match 'aetherion-airops-platform' -and
+                $_.properties.cloneStatus -eq 'Ready'
+            }).Count -gt 0)
+}
+
+function Get-CodeRepoDetail {
+    $r = Invoke-SreData '/api/v2/repos'
+    if ($null -eq $r) { return '' }
+    $m = @($r.value) | Where-Object { $_.properties.url -match 'aetherion-airops-platform' } | Select-Object -First 1
+    if (-not $m) { return 'no aetherion-airops-platform repo attached' }
+    return "$($m.properties.cloneStatus)"
+}
+
+# Challenge 1: a recurring schedule, not a one-off run.
+function Test-ScheduledTaskExists {
+    $r = Invoke-SreData '/api/v1/scheduledtasks'
+    if ($null -eq $r) { return $null }
+    $tasks = @(if ($r.value) { $r.value } elseif ($r.tasks) { $r.tasks } else { $r })
+    return [bool]($tasks.Count -gt 0)
+}
+
+# Challenge 5: the subagent exists, its tools are scoped rather than inherited,
+# and - the point of the exercise - it holds no kubectl write tool.
+function Get-SubagentSummary {
+    $r = Invoke-SreData '/api/v1/extendedAgent/agents?page=1&limit=200'
+    if ($null -eq $r) { return $null }
+    $list = @(if ($r.value) { $r.value } elseif ($r.data) { $r.data } elseif ($r.agents) { $r.agents } else { $r })
+    $sub = $list | Where-Object { "$($_.name)" -match 'aks' -or "$($_.displayName)" -match 'aks' } | Select-Object -First 1
+    if (-not $sub) { return @{ Found = $false } }
+    $blob = ($sub | ConvertTo-Json -Depth 12 -Compress)
+    return @{
+        Found    = $true
+        Name     = "$($sub.name)"
+        HasRead  = [bool]($blob -match 'RunKubectlReadCommand')
+        HasWrite = [bool]($blob -match 'RunKubectlWriteCommand')
+    }
+}
+
+# Challenge 5: the authored skill is registered on the agent.
+function Test-SkillRegistered([string]$Match = 'crew') {
+    $r = Invoke-SreData '/api/v2/agent/skills?limit=200'
+    if ($null -eq $r) { return $null }
+    $blob = ($r | ConvertTo-Json -Depth 12 -Compress)
+    return [bool]($blob -match $Match)
+}
+
+# Challenge 6: the Sev1 response plan, read from the same store the portal reads.
+# 'mergeEnabled' is the alert-reinvestigation cooldown; 'handlingAgent' empty
+# means no subagent is bound, which is what the challenge asks for.
+function Get-ResponsePlanSummary {
+    $r = Invoke-SreData '/api/v1/incidentPlayground/filters'
+    if ($null -eq $r) { return $null }
+    $plans = @($r)
+    if ($plans.Count -eq 0) { return @{ Count = 0 } }
+    $sev1 = $plans | Where-Object { $_.isEnabled -and ($_.priorities -contains 'Sev1') } | Select-Object -First 1
+    return @{
+        Count        = $plans.Count
+        Found        = [bool]$sev1
+        Id           = if ($sev1) { "$($sev1.id)" } else { '' }
+        Autonomous   = [bool]($sev1 -and $sev1.agentMode -eq 'autonomous')
+        NoSubagent   = [bool]($sev1 -and [string]::IsNullOrWhiteSpace($sev1.handlingAgent))
+        TitleFilters = [bool]($sev1 -and [string]::IsNullOrWhiteSpace($sev1.titleContains) -and @($sev1.titleNotContains).Count -eq 0)
+        CooldownOff  = [bool]($sev1 -and -not $sev1.mergeEnabled)
+    }
+}
+
+function Get-AgentRunMode {
+    $a = Get-AgentResource
+    if (-not $a) { return $null }
+    return "$($a.properties.actionConfiguration.mode)"
+}
+
+# Challenge 8: the RCA and the pull request must exist on the attendee's fork.
+# Uses the GitHub CLI because that is what the lab already assumes is installed;
+# returns $null (ask instead) when gh is missing or unauthenticated.
+function Get-ForkRepoSlug {
+    $r = Invoke-SreData '/api/v2/repos'
+    if ($null -ne $r) {
+        $m = @($r.value) | Where-Object { $_.properties.url -match 'aetherion-airops-platform' } | Select-Object -First 1
+        if ($m -and $m.properties.url -match 'github\.com/([^/]+/[^/.]+)') { return $Matches[1] }
+    }
+    return $null
+}
+
+function Invoke-GhJson([string]$Path) {
+    if (-not (Get-Command gh -ErrorAction SilentlyContinue)) { return $null }
+    $out = gh api $Path 2>$null
+    if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($out)) { return $null }
+    $text = ($out | Out-String).Trim()
+    if ($text -eq '[]') { return , @() }
+    try { return ($text | ConvertFrom-Json) } catch { return $null }
+}
+
+function Test-RcaIssueFiled {
+    $slug = Get-ForkRepoSlug
+    if (-not $slug) { return $null }
+    $issues = Invoke-GhJson "repos/$slug/issues?state=all&per_page=100"
+    if ($null -eq $issues) { return $null }
+    return [bool](@($issues | Where-Object { $_.title -match '(?i)rca' -and -not $_.pull_request }).Count -gt 0)
+}
+
+function Test-PullRequestOpened {
+    $slug = Get-ForkRepoSlug
+    if (-not $slug) { return $null }
+    $prs = Invoke-GhJson "repos/$slug/pulls?state=all&per_page=100"
+    if ($null -eq $prs) { return $null }
+    return [bool](@($prs).Count -gt 0)
+}
+
 $script:Challenges = [ordered]@{
     1 = @{
         Title = 'Onboard the Agent and Establish the Baseline'
@@ -358,10 +542,21 @@ $script:Challenges = [ordered]@{
                 Write-Host "  Agent setup is incomplete, not connected to: $($gaps -join ', ')." -ForegroundColor Yellow
                 Write-Host "  Reopen the agent's setup wizard and finish those connections." -ForegroundColor Yellow
             }
-            $conn = $agent -and (Confirm-SelfAttest 'Is your SRE Agent scoped to the resource group and running in Review mode?')
-            $code = $agent -and (Confirm-SelfAttest 'Does Builder -> Code Access list your aetherion-airops-platform fork as Connected and Ready?')
-            $base = Confirm-SelfAttest 'Have you recorded a healthy baseline AND created a scheduled daily health check?'
-            @{ Pass = ($allOk -and $agent -and $apim -and $ctx -and $conn -and $code -and $base); Detail = "platform healthy=$allOk, agentExists=$agent, apimAccess=$apim, logsConnected=$ctx, codeConnected=$code, agent connected=$conn, baseline+schedule=$base" }
+            # Review mode is what makes challenges 1-5 teachable, but challenge 6
+            # deliberately switches to autonomous - so stop demanding review once the
+            # attendee has legitimately got that far, or re-running this check fails.
+            $conn = $agent -and (Confirm-Verified 'Is your SRE Agent scoped to the resource group and running in Review mode?' `
+                {
+                    $m = Get-AgentRunMode
+                    if (-not $m) { $null }
+                    elseif (Get-ChallengeStartTime 6) { $true }
+                    else { $m -eq 'review' }
+                } "run mode: $(Get-AgentRunMode)")
+            $code = $agent -and (Confirm-Verified 'Does Builder -> Code Access list your aetherion-airops-platform fork as Connected and Ready?' `
+                { Test-CodeRepoReady } (Get-CodeRepoDetail))
+            $sched = Confirm-Verified 'Have you created a scheduled daily health check?' { Test-ScheduledTaskExists }
+            $base = Confirm-SelfAttest 'Have you recorded a healthy baseline you could compare a future incident against?'
+            @{ Pass = ($allOk -and $agent -and $apim -and $ctx -and $conn -and $code -and $base -and $sched); Detail = "platform healthy=$allOk, agentExists=$agent, apimAccess=$apim, logsConnected=$ctx, codeConnected=$code, agent connected=$conn, baseline=$base, schedule=$sched" }
         }
     }
 
@@ -378,7 +573,18 @@ $script:Challenges = [ordered]@{
         }
         Check = {
             $done = Confirm-SelfAttest 'Have you confirmed the check-in degradation AND formed a read-only root-cause hypothesis backed by at least two evidence sources (no fix yet)?'
-            @{ Pass = $done; Detail = "symptom observed + read-only hypothesis formed=$done" }
+            # Banked so challenge 7 can show the attendee how much cheaper the same
+            # failure class was the second time, instead of asking them to remember.
+            $mins = $null
+            if ($done) {
+                $t0 = Get-ChallengeStartTime 2
+                if ($t0) {
+                    $mins = [int][math]::Round(([DateTime]::UtcNow - $t0).TotalMinutes)
+                    Set-ProgressValue 'crew-minutes-cold' "$mins"
+                    Write-Host "  Time on this incident: ${mins} min - banked for the comparison in challenge 7." -ForegroundColor Gray
+                }
+            }
+            @{ Pass = $done; Detail = "symptom observed + read-only hypothesis formed=$done, minutes=$mins" }
         }
     }
 
@@ -448,10 +654,17 @@ $script:Challenges = [ordered]@{
             Write-Host "You will lean on both in the final incident."
         }
         Check = {
-            $sub   = Confirm-SelfAttest 'Did you create an AKS-specialist subagent and use it for a scoped investigation?'
-            $scoped = Confirm-SelfAttest 'Did you scope its tools (not inherited) and verify RunKubectlReadCommand is present and RunKubectlWriteCommand is absent?'
-            $skill = Confirm-SelfAttest 'Did you author a reusable recovery skill (crew query path, guardrails intact) and confirm it loads?'
-            $owner = Confirm-SelfAttest 'Did you remove the crew recovery skill from the AKS specialist, leaving it with the main agent, and can you say why?'
+            $sa = Get-SubagentSummary
+            $sub = Confirm-Verified 'Did you create an AKS-specialist subagent and use it for a scoped investigation?' `
+            { if ($null -eq $sa) { $null } else { [bool]$sa.Found } } $(if ($sa -and $sa.Found) { "found '$($sa.Name)'" } else { '' })
+            # The whole lesson: read tool present, write tool absent. A subagent that
+            # merely *says* it is read-only in its instructions has not been scoped.
+            $scoped = Confirm-Verified 'Did you scope its tools (not inherited) and verify RunKubectlReadCommand is present and RunKubectlWriteCommand is absent?' `
+            { if ($null -eq $sa -or -not $sa.Found) { $null } else { $sa.HasRead -and -not $sa.HasWrite } } `
+                $(if ($sa -and $sa.Found) { "read=$($sa.HasRead) write=$($sa.HasWrite)" } else { '' })
+            $skill = Confirm-Verified 'Did you author a reusable recovery skill (crew query path, guardrails intact) and confirm it loads?' `
+            { Test-SkillRegistered 'crew' }
+            $owner = Confirm-SelfAttest 'Did you decide which agent owns the crew recovery skill, and can you say why?'
             @{ Pass = ($sub -and $scoped -and $skill -and $owner); Detail = "AKS specialist created+used=$sub, tools scoped+verified=$scoped, reusable skill authored=$skill, skill ownership decided=$owner" }
         }
     }
@@ -477,7 +690,8 @@ $script:Challenges = [ordered]@{
             $ok     = (Test-ServiceHealthy 'baggage' 400)
             $err    = Get-ServiceErrorRate 'baggage'
             $canary = Test-CanaryPresent 'baggage'
-            $auto = Confirm-SelfAttest 'Did the agent remediate baggage while running in Autonomous mode (you supervised, did not fix it by hand)?'
+            $auto = Confirm-Verified 'Did the agent remediate baggage while running in Autonomous mode (you supervised, did not fix it by hand)?' `
+            { $m = Get-AgentRunMode; if (-not $m) { $null } else { $m -eq 'autonomous' } } "run mode: $(Get-AgentRunMode)"
             # "Did you write a cost model" was answerable yes by anyone who had read the
             # task. Asking for the parts that make it reviewable is still self-attested,
             # but it cannot be satisfied without having actually looked at the figures.
@@ -494,20 +708,25 @@ $script:Challenges = [ordered]@{
                 Write-Host "  Azure Monitor is not connected as an incident platform, so no response plan can exist." -ForegroundColor Yellow
                 Write-Host "  Incidents -> Triggers + response plans -> Connect an incident platform -> Azure Monitor." -ForegroundColor Yellow
             }
-            # Response plans have no ARM surface, so these are self-attested. They are asked
-            # one at a time on purpose: each is a documented way to build a plan that looks
-            # correct and never fires, and Challenge 7 cannot pass without it firing.
+            # Read from the same store the portal reads, so a plan that looks right but
+            # would never fire is caught here rather than in the middle of challenge 7.
             $plan = $false
             if ($conn) {
                 Write-Host ""
-                Write-Host "  Open Incidents -> Triggers + response plans and check your plan against each" -ForegroundColor Gray
-                Write-Host "  of these. Challenge 7 is graded on the alert actually firing." -ForegroundColor Gray
-                $pOn    = Confirm-SelfAttest 'Is your plan listed with Status On and Severity Sev1 (matching the pre-provisioned aetherion-major-incident alert)?'
-                $pTitle = Confirm-SelfAttest 'Are both title filters (contains / does not contain) empty?'
-                $pSub   = Confirm-SelfAttest 'Does Subagent name read "Set up", i.e. no subagent is bound to the plan?'
-                $pAuto  = Confirm-SelfAttest 'Is the agent autonomy level on the plan set to Autonomous?'
-                $pCool  = Confirm-SelfAttest 'Is alert reinvestigation cooldown disabled (it defaults to 3 hours and will silently block a re-run)?'
-                $pQuick = Confirm-SelfAttest 'Have you deleted the default quickstart plan that was created when you connected Azure Monitor?'
+                Write-Host "  Checking your Sev1 response plan. Challenge 7 is graded on the alert firing." -ForegroundColor Gray
+                $rp = Get-ResponsePlanSummary
+                $pOn = Confirm-Verified 'Is your plan listed with Status On and Severity Sev1 (matching the pre-provisioned aetherion-major-incident alert)?' `
+                { if ($null -eq $rp) { $null } else { [bool]$rp.Found } } $(if ($rp -and $rp.Found) { "plan '$($rp.Id)'" } else { '' })
+                $pTitle = Confirm-Verified 'Are both title filters (contains / does not contain) empty?' `
+                { if ($null -eq $rp -or -not $rp.Found) { $null } else { $rp.TitleFilters } }
+                $pSub = Confirm-Verified 'Does Subagent name read "Set up", i.e. no subagent is bound to the plan?' `
+                { if ($null -eq $rp -or -not $rp.Found) { $null } else { $rp.NoSubagent } }
+                $pAuto = Confirm-Verified 'Is the agent autonomy level on the plan set to Autonomous?' `
+                { if ($null -eq $rp -or -not $rp.Found) { $null } else { $rp.Autonomous } }
+                $pCool = Confirm-Verified 'Is alert reinvestigation cooldown disabled (it defaults to 3 hours and will silently block a re-run)?' `
+                { if ($null -eq $rp -or -not $rp.Found) { $null } else { $rp.CooldownOff } }
+                $pQuick = Confirm-Verified 'Have you deleted the default quickstart plan that was created when you connected Azure Monitor?' `
+                { if ($null -eq $rp) { $null } else { $rp.Count -le 1 } } $(if ($rp) { "$($rp.Count) plan(s) defined" } else { '' })
                 $plan = ($pOn -and $pTitle -and $pSub -and $pAuto -and $pCool -and $pQuick)
                 if (-not $plan) {
                     Write-Host ""
@@ -574,6 +793,17 @@ $script:Challenges = [ordered]@{
                 Write-Host "  surge is still running and crew is above the 400ms steady-state budget (graded here" -ForegroundColor Gray
                 Write-Host "  against the 800ms incident ceiling). Challenge 8 drops the load back to normal." -ForegroundColor Gray
             }
+            if ($pass) {
+                $cold = Get-ProgressValue 'crew-minutes-cold'
+                $t0 = Get-ChallengeStartTime 7
+                if ($cold -and $t0) {
+                    $warm = [int][math]::Round(([DateTime]::UtcNow - $t0).TotalMinutes)
+                    Write-Host ""
+                    Write-Host "  Same failure class, second time round: ${cold} min in challenge 2, ${warm} min here." -ForegroundColor Cyan
+                    Write-Host "  That gap is what the runbooks, the skill and the agent's memory bought you." -ForegroundColor Cyan
+                    Write-Host "  Take the number to challenge 8 - it is the one figure leadership will remember." -ForegroundColor Cyan
+                }
+            }
             @{ Pass = $pass; Detail = "overall=$($s.overall) apimOk=$apimOk flight=:$tagFlight crew=${latCrew}ms bookingCpu=${cpuBook}m alertFired=$fired" }
         }
     }
@@ -604,8 +834,10 @@ $script:Challenges = [ordered]@{
             foreach ($p in $s.services.PSObject.Properties) { if (-not $p.Value.ok) { $allOk = $false } }
             if (-not $allOk) { return @{ Pass = $false; Detail = "platform not fully healthy yet (overall=$($s.overall)) - resolve challenge 7 first" } }
             $done = Confirm-SelfAttest 'Have you produced an executive leadership briefing AND an engineering RCA handover for the major incident?'
-            $pub  = Confirm-SelfAttest 'Did the agent publish the RCA as an issue on your fork of aetherion-airops-platform?'
-            $mcp  = Confirm-SelfAttest 'Did you connect an MCP server and have the agent open a pull request on your fork through it?'
+            $pub = Confirm-Verified 'Did the agent publish the RCA as an issue on your fork of aetherion-airops-platform?' `
+            { Test-RcaIssueFiled } $(if ($slug = Get-ForkRepoSlug) { "fork: $slug" } else { '' })
+            $mcp = Confirm-Verified 'Did you connect an MCP server and have the agent open a pull request on your fork through it?' `
+            { Test-PullRequestOpened }
             @{ Pass = ($allOk -and $done -and $pub -and $mcp); Detail = "platform healthy=$allOk, briefing + handover produced=$done, RCA published to repo=$pub, MCP pull request opened=$mcp" }
         }
     }
@@ -662,6 +894,8 @@ function Test-AetherionChallenge([int]$Number) {
     Write-Host ""
     if ($result.Pass) {
         Write-Host "  PASS - challenge $Number resolved." -ForegroundColor Green
+        # Nothing advanced this before, so 'unlocked' sat at 1 for the whole hack.
+        if ((Get-Unlocked) -lt ($Number + 1)) { Set-Unlocked ($Number + 1) }
         if (-not $script:Challenges.Contains($Number + 1)) {
             Write-Host "  That was the final challenge - you have restored Aetherion AirOps. Well flown." -ForegroundColor Green
         }
