@@ -19,7 +19,12 @@ function initTelemetry(role) {
       .setAutoCollectPerformance(true, true)
       .setAutoCollectDependencies(true)
       .setAutoCollectExceptions(true)
-      .setSendLiveMetrics(true)
+      // Off deliberately: the Live Metrics endpoint is not reachable from the
+      // cluster, and QuickPulseSender retries flood every pod's log with
+      // ETIMEDOUT. Those logs are the main investigation surface in this
+      // workshop, so the noise reads as a red herring. Requests, dependencies
+      // and exceptions are unaffected.
+      .setSendLiveMetrics(false)
       .setUseDiskRetryCaching(true);
 
     appInsights.defaultClient.context.tags[appInsights.defaultClient.context.keys.cloudRole] =
