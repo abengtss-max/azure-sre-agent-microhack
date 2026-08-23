@@ -15,6 +15,8 @@ param(
     [string]$NamePrefix = "aetherion",
     [int]$AksNodeCount = 2,
     [string]$AksNodeVmSize = "Standard_D4s_v5",
+    # Empty means "ask Azure for the current stable version". Set it only to pin.
+    [string]$KubernetesVersion = "",
     [ValidateSet("Consumption", "Developer")]
     [string]$ApimSkuName = "Consumption",
     [switch]$SkipProviders,
@@ -114,6 +116,7 @@ Write-Step $step $totalSteps "Deploying infrastructure (a few minutes)"
     -NamePrefix $NamePrefix `
     -AksNodeCount $AksNodeCount `
     -AksNodeVmSize $AksNodeVmSize `
+    -KubernetesVersion $KubernetesVersion `
     -ApimSkuName $ApimSkuName
 if ($LASTEXITCODE -ne 0) { throw "Infrastructure deployment failed." }
 

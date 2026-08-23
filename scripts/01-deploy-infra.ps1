@@ -9,6 +9,8 @@ param(
     [string]$NamePrefix = "aetherion",
     [int]$AksNodeCount = 2,
     [string]$AksNodeVmSize = "Standard_D4s_v5",
+    # Empty means "ask Azure for the current stable version". Set it only to pin.
+    [string]$KubernetesVersion = "",
     [ValidateSet("Consumption", "Developer")]
     [string]$ApimSkuName = "Consumption"
 )
@@ -53,23 +55,41 @@ foreach ($d in $deletedApim) {
 
 $deploymentName = "aetherion-infra-$([DateTime]::UtcNow.ToString('yyyyMMddHHmmss'))"
 
-# Resolve the current stable AKS version for this region as a FULL patch version
-# (e.g. 1.35.6, not just 1.35). Passing the exact patch is what the portal does and
-# removes any ambiguity in how the control plane resolves a minor-only version.
-Write-Host "Resolving current stable AKS version in $Location..." -ForegroundColor Cyan
-$aksVersion = $null
-$verJson = az aks get-versions -l $Location -o json 2>$null | ConvertFrom-Json
-if ($verJson) {
-    $line = $verJson.values | Where-Object { $_.isDefault } | Select-Object -First 1
-    if (-not $line) {
-        $line = $verJson.values | Where-Object { -not $_.isPreview } | Sort-Object { [version]$_.version } -Descending | Select-Object -First 1
+# Ask Azure which version is current rather than carrying a literal that quietly
+# ages out of support. Resolves to a FULL patch version (e.g. 1.35.6, not 1.35),
+# which is what the portal does and removes any ambiguity in how the control
+# plane resolves a minor-only version. Override with -KubernetesVersion to pin.
+$aksVersion = $KubernetesVersion
+if ([string]::IsNullOrWhiteSpace($aksVersion)) {
+    Write-Host "Resolving current stable AKS version in $Location..." -ForegroundColor Cyan
+    $verJson = az aks get-versions -l $Location -o json 2>$null | ConvertFrom-Json
+    if ($verJson) {
+        $line = $verJson.values | Where-Object { $_.isDefault } | Select-Object -First 1
+        if (-not $line) {
+            $line = $verJson.values | Where-Object { -not $_.isPreview } | Sort-Object { [version]$_.version } -Descending | Select-Object -First 1
+        }
+        if ($line -and $line.patchVersions) {
+            $aksVersion = $line.patchVersions.PSObject.Properties.Name | Sort-Object { [version]$_ } -Descending | Select-Object -First 1
+        }
     }
-    if ($line -and $line.patchVersions) {
-        $aksVersion = $line.patchVersions.PSObject.Properties.Name | Sort-Object { [version]$_ } -Descending | Select-Object -First 1
+    if ([string]::IsNullOrWhiteSpace($aksVersion)) {
+        throw "Could not resolve a stable AKS version in '$Location'. Check 'az aks get-versions -l $Location', or pin one with -KubernetesVersion <version>."
+    }
+    Write-Host "  AKS version: $aksVersion (resolved from Azure)" -ForegroundColor Gray
+}
+else {
+    Write-Host "  AKS version: $aksVersion (pinned via -KubernetesVersion)" -ForegroundColor Yellow
+}
+
+# Redeploying an existing cluster with an older version is rejected as a downgrade,
+# so follow the running cluster when it has already auto-upgraded past our default.
+$currentVersion = az aks show -g $ResourceGroup -n "$NamePrefix-aks" --query currentKubernetesVersion -o tsv 2>$null
+if (-not [string]::IsNullOrWhiteSpace($currentVersion) -and [string]::IsNullOrWhiteSpace($KubernetesVersion)) {
+    if ([version]$currentVersion -gt [version]$aksVersion) {
+        Write-Host "  Existing cluster is on $currentVersion - keeping it (a redeploy cannot downgrade)." -ForegroundColor Gray
+        $aksVersion = $currentVersion
     }
 }
-if ([string]::IsNullOrWhiteSpace($aksVersion)) { $aksVersion = '1.35.6' }
-Write-Host "  AKS version: $aksVersion" -ForegroundColor Gray
 
 Write-Host "Deploying infrastructure (a few minutes; APIM Consumption tier provisions fast)..." -ForegroundColor Cyan
 

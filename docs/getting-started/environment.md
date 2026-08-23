@@ -127,6 +127,21 @@ single subscription and you can safely re-provision without collisions.
 Override the base name or region with `-ResourceGroup`, `-Location`, or
 `-NamePrefix`; the unique suffix is always appended.
 
+!!! tip "The Kubernetes version is resolved from Azure, not guessed"
+    The provisioner asks Azure for the region's current **stable (default) GA**
+    version at run time and deploys that, so the lab never carries a literal that
+    quietly ages out of support. Nothing to configure, and nothing to keep
+    up to date.
+
+    Pin one only if you have a reason to:
+
+    ```powershell
+    ./scripts/provision-environment.ps1 -KubernetesVersion 1.34.5
+    ```
+
+    Left unset on a **re-run**, it also follows a cluster that has already
+    auto-upgraded, because a redeploy cannot downgrade a running cluster.
+
 !!! warning "Re-provisioning leaves the previous environment running"
     Because each run creates a **new** suffixed resource group, re-provisioning
     does **not** replace your earlier environment. The previous one keeps running

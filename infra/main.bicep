@@ -35,8 +35,8 @@ param aksNodeCount int = 2
 @description('VM size for AKS worker nodes.')
 param aksNodeVmSize string = 'Standard_D4s_v5'
 
-@description('Kubernetes version for AKS. The deploy script resolves the current stable (default) GA version at runtime and passes it in, so this literal is only a fallback.')
-param kubernetesVersion string = '1.33'
+@description('Kubernetes version for AKS. Leave empty to let AKS pick the current default; the deploy script resolves the stable GA version at runtime and passes it in.')
+param kubernetesVersion string = ''
 
 @description('APIM SKU. Consumption provisions in ~1-2 min (best for a disposable workshop); Developer takes 30-45 min.')
 @allowed([
@@ -102,37 +102,41 @@ resource aks 'Microsoft.ContainerService/managedClusters@2024-05-01' = {
   name: aksName
   location: location
   identity: { type: 'SystemAssigned' }
-  properties: {
-    dnsPrefix: '${namePrefix}-aks'
-    kubernetesVersion: kubernetesVersion
-    enableRBAC: true
-    // Declared explicitly because ARM reapplies the template as authored: when this
-    // block was omitted, redeploying an existing cluster reset networkPlugin to the
-    // kubenet default. Keep these matching the running cluster.
-    networkProfile: {
-      networkPlugin: 'azure'
-      networkPluginMode: 'overlay'
-      networkPolicy: 'none'
-      serviceCidr: '10.0.0.0/16'
-      dnsServiceIP: '10.0.0.10'
-      podCidr: '10.244.0.0/16'
-      outboundType: 'loadBalancer'
-      loadBalancerSku: 'standard'
-    }
-    agentPoolProfiles: [
-      {
-        name: 'system'
-        count: aksNodeCount
-        vmSize: aksNodeVmSize
-        mode: 'System'
-        osType: 'Linux'
-        type: 'VirtualMachineScaleSets'
-        enableAutoScaling: true
-        minCount: aksNodeCount
-        maxCount: aksNodeCount + 2
+  // kubernetesVersion is omitted entirely when not supplied, so the template never
+  // pins a literal that could age out of support or force a downgrade on redeploy.
+  properties: union(
+    {
+      dnsPrefix: '${namePrefix}-aks'
+      enableRBAC: true
+      // Declared explicitly because ARM reapplies the template as authored: when this
+      // block was omitted, redeploying an existing cluster reset networkPlugin to the
+      // kubenet default. Keep these matching the running cluster.
+      networkProfile: {
+        networkPlugin: 'azure'
+        networkPluginMode: 'overlay'
+        networkPolicy: 'none'
+        serviceCidr: '10.0.0.0/16'
+        dnsServiceIP: '10.0.0.10'
+        podCidr: '10.244.0.0/16'
+        outboundType: 'loadBalancer'
+        loadBalancerSku: 'standard'
       }
-    ]
-  }
+      agentPoolProfiles: [
+        {
+          name: 'system'
+          count: aksNodeCount
+          vmSize: aksNodeVmSize
+          mode: 'System'
+          osType: 'Linux'
+          type: 'VirtualMachineScaleSets'
+          enableAutoScaling: true
+          minCount: aksNodeCount
+          maxCount: aksNodeCount + 2
+        }
+      ]
+    },
+    empty(kubernetesVersion) ? {} : { kubernetesVersion: kubernetesVersion }
+  )
 }
 
 resource acrPull 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
