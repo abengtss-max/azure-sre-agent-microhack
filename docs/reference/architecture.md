@@ -2,8 +2,8 @@
 
 Aetherion AirOps is a microservices estate on Azure Kubernetes Service, fronted
 by Azure API Management, backed by PostgreSQL and Redis, and observed through
-Application Insights, Log Analytics and Grafana. The **Azure SRE Agent** reasons
-across every tier, not just the cluster.
+Application Insights, Log Analytics, managed Prometheus and Grafana. The
+**Azure SRE Agent** reasons across every tier, not just the cluster.
 
 ## Environment at a glance
 
@@ -45,5 +45,8 @@ whole estate.
 - **Application Insights** (`aetherion-appi`): requests, dependencies,
   exceptions and the application map.
 - **Log Analytics** (`aetherion-law`): container and node logs for deep-dive KQL.
+- **Managed Prometheus** (Azure Monitor workspace `aetherion-amw-*`): pod and node
+  CPU/memory time series scraped from AKS. This is what makes "is it CPU-bound or
+  is it waiting?" answerable rather than a guess.
 - **Azure Managed Grafana**: metrics, traces and autoscaling correlation.
 - **Azure Activity Log + GitHub**: change history for incident correlation.

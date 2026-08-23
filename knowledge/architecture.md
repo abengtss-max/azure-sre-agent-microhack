@@ -55,6 +55,7 @@ Two front doors sit in front of the cluster:
 | Cache | Redis (in-cluster Deployment + Service, namespace `aetherion`) | Check-in/session state |
 | Telemetry | Application Insights `aetherion-appi` | App traces/metrics/logs |
 | Logs | Log Analytics `aetherion-law` | Central log store (AKS + AppInsights) |
+| Container metrics | Azure Monitor workspace `aetherion-amw-*` (managed Prometheus) | Pod and node CPU/memory time series, scraped from AKS |
 | Dashboards | Managed Grafana `aetherion-grafana-*` | Azure Monitor data source |
 
 ## Microservice roles
