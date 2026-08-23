@@ -621,3 +621,22 @@
 @media (max-width: 40rem) {
   .aet-consent-actions .aet-consent-btn { flex: 1 1 auto; }
 }
+
+/* Cast portraits on the Meet Aetherion page. */
+.md-typeset img.cast-portrait {
+  display: block;
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin: 0 auto 0.6rem;
+  border: 2px solid var(--aet-border);
+}
+
+.md-typeset .cast-cards > ul > li {
+  text-align: center;
+}
+
+.md-typeset .cast-cards > ul > li hr {
+  margin: 0.5rem 0 0.6rem;
+}

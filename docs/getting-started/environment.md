@@ -126,6 +126,11 @@ Each run creates a **uniquely named** resource group,
 exact name when it finishes — note it down**, you need it in Challenge 1 to scope
 the agent.
 
+!!! tip "It takes around 20 minutes. Use them."
+    Leave it running and read **[Meet Aetherion](overview.md)** while it deploys —
+    who you are, what the airline does, and who you'll be working with. You'll
+    arrive at Challenge 1 knowing what you're looking at.
+
 ??? tip "What the script does, and how to change it"
     **Steps:** preflight → deploy infrastructure → build & push images → deploy the
     app → validate.

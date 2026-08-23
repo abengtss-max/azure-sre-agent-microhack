@@ -27,6 +27,63 @@ recover, under the same guardrails a real airline would insist on.
 ---
 
 
+## Who you'll be working with
+
+You share the Operations Center with four others. You meet them as the day
+brings them in — you don't need to remember them now.
+
+<div class="grid cards cast-cards" markdown>
+
+-   ![Sam Rivera](../assets/cast/sam.webp){ .cast-portrait loading=lazy }
+
+    __Sam Rivera__ · Reliability engineer
+
+    ---
+
+    **This is you.** New to Aetherion, on shift in the Global Operations Center.
+    Every decision in this hack is yours to make.
+
+-   ![Aria](../assets/cast/aria.webp){ .cast-portrait loading=lazy }
+
+    __Aria__ · Azure SRE Agent
+
+    ---
+
+    **Not a colleague — the agent itself.** The blue hologram beside you in every
+    scene is the thing you connect in Challenge 1 and govern all day.
+
+-   ![Elena Vasquez](../assets/cast/elena.webp){ .cast-portrait loading=lazy }
+
+    __Elena Vasquez__ · Operations director
+
+    ---
+
+    Answers for the airline. Wants it fixed *safely*, with a human in the loop,
+    and wants the incident explained in business terms afterwards.
+
+-   ![Marco Bianchi](../assets/cast/marco.webp){ .cast-portrait loading=lazy }
+
+    __Marco Bianchi__ · Crew duty manager
+
+    ---
+
+    Runs the crew desk. When crew scheduling degrades, he is the one who cannot
+    confirm who is legal to fly.
+
+-   ![Priya Nair](../assets/cast/priya.webp){ .cast-portrait loading=lazy }
+
+    __Priya Nair__ · FinOps analyst
+
+    ---
+
+    Watches what the platform *and* the agent cost. Autonomy is only a win if it
+    doesn't become runaway spend.
+
+</div>
+
+---
+
+
 ## The shift ahead: challenge map
 
 | # | Challenge | What you practice |

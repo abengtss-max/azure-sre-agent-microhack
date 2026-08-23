@@ -5,11 +5,21 @@
 
     **Stage:** **Foundation** → Operations → Engineering → Autonomous → Major Incident
 
-**Situation:** You've just taken over the Aetherion AirOps Operations Center at the
-start of your shift, and every service tile is green. Before the SRE Agent can help
-with real incidents, you need to know what *healthy* looks like, and connect the
-agent scoped to a single resource group in **Review** mode, so it proposes changes
-and waits for your approval.
+**Situation:** You are **Sam Rivera**, and this is your first shift as a reliability
+engineer at Aetherion AirOps — a Tier 0 platform that runs flight operations, crew
+scheduling, check-in and baggage for a global airline. When it degrades, aircraft
+don't move on time.
+
+You've just taken over the Operations Center and every service tile is green. Beside
+you is **Aria**, the Azure SRE Agent, connected but not yet trusted with anything.
+Before it can help with real incidents, you need to know what *healthy* looks like,
+and connect the agent scoped to a single resource group in **Review** mode, so it
+proposes changes and waits for your approval.
+
+!!! info "New here?"
+    [Meet Aetherion](../getting-started/overview.md) introduces the airline, the
+    platform and the people you'll be working with. Two minutes, and the rest of
+    the day makes more sense.
 
 **Mission:** Connect the SRE Agent scoped to your resource group in Review mode,
 capture a validated operational baseline, and schedule a proactive daily health

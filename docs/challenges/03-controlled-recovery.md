@@ -6,7 +6,8 @@
     **Stage:** Foundation → **Operations** → Engineering → Autonomous → Major Incident
 
 **Situation.** Two things hit in quick succession. Your check-in hypothesis is solid
-and the director wants it fixed **safely**, with a human in the loop. Then the live
+and **Elena Vasquez**, Aetherion's operations director, wants it fixed **safely**,
+with a human in the loop. Then the live
 **flight board** goes dark for every station and `flight-ops` drops straight to red,
 the hallmark of a bad change. The flight board is the picture the whole center flies
 by, so this is a **P1**: restore first, then correlate the change to prevent

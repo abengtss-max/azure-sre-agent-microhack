@@ -6,8 +6,8 @@
     **Stage:** Foundation → **Operations** → Engineering → Autonomous → Major Incident
 
 **Situation.** Crew scheduling is failing (the `crew-scheduling` tile is amber and the
-board reports **Service Degradation Detected**) and duty
-managers can't confirm who is legal to fly the evening wave. The services that share
+board reports **Service Degradation Detected**) and **Marco Bianchi** on the crew desk
+can't confirm who is legal to fly the evening wave. The services that share
 its database are wobbling too, so "the database is down" is the obvious call, and
 it's wrong. Out of the box the agent gives generic advice, and a generic "restart the
 database" is exactly what Aetherion's runbooks forbid. The fastest path to the right

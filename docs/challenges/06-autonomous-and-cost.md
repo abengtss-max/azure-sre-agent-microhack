@@ -12,6 +12,9 @@ small blast radius, well-understood remedy. That's exactly when it's safe to let
 agent run **autonomously** while you supervise, then make it sustainable at scale
 and arm it to trigger itself on the next major incident.
 
+**Priya Nair** from FinOps has been watching the agent's consumption climb all day,
+and wants to know what autonomy costs before you make more of it.
+
 **Mission.** Let the agent recover the baggage service autonomously within
 guardrails, design a cost-aware operating model for its Azure Agent Unit (AAU)
 usage, and arm a **Sev1** response plan so the next major incident auto-triggers an

@@ -101,6 +101,7 @@ plugins:
 nav:
   - Home: index.md
   - Set up: getting-started/environment.md
+  - Meet Aetherion: getting-started/overview.md
   - Challenges:
       - Act I · Foundation:
           - 01 · Onboard & Baseline: challenges/01-onboard-and-baseline.md
