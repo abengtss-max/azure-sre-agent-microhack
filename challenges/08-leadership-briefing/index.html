@@ -2146,9 +2146,27 @@ for and it is the one that unblocks the PR.</p>
 <li>Choose the <strong>GitHub</strong> partner card. Transport is <strong>Streamable-HTTP</strong> and
    the URL is prefilled.</li>
 <li>Provide a <strong>Personal Access Token</strong>. For partner connectors the auth
-   method is fixed; you supply the credential.</li>
+   method is fixed, so there is no OAuth option here — you supply the
+   credential.</li>
 <li>Connect.</li>
 </ol>
+<div class="admonition warning">
+<p class="admonition-title">The token needs write scope, and a read-only one fails silently at connect time</p>
+<p>This task creates a branch, commits a file and opens a pull request, so
+on a <strong>fine-grained</strong> token scoped to your fork you need:</p>
+<ul>
+<li><strong>Contents: Read and write</strong> — the branch and the commit</li>
+<li><strong>Pull requests: Read and write</strong> — the PR</li>
+<li><strong>Issues: Read and write</strong> — to reference the RCA issue</li>
+</ul>
+<p>A classic token with <code>repo</code> scope also works. A read-only token
+<strong>connects successfully</strong> and then fails on the first write, which looks
+like a broken connector rather than a permissions problem.</p>
+<p>If your fork lives in an organisation, a fine-grained token may need
+<strong>owner approval</strong> before it works. You were warned about this in
+<a href="../../getting-started/environment/">Set up the environment</a>; if you
+skipped it, this is the point where it bites.</p>
+</div>
 <p><strong>Watch what happens next, because this is what makes MCP different from a
 hand-built integration.</strong> The agent immediately calls the server's tool
 listing and registers everything it finds. You did not tell it what tools

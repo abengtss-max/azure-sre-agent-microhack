@@ -1902,14 +1902,21 @@ platform on Azure, then hands you straight to Challenge 1.</p>
 <td>any recent</td>
 <td>required</td>
 </tr>
+<tr>
+<td>GitHub CLI (<code>gh</code>)</td>
+<td>any recent</td>
+<td>optional, but the steps below and Challenge 8 give <code>gh</code> one-liners, and the Challenge 8 grader uses it to confirm your work instead of asking you</td>
+</tr>
 </tbody>
 </table>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">winget</span> <span class="n">install</span> <span class="p">-</span><span class="n">-id</span> <span class="n">Microsoft</span><span class="p">.</span><span class="n">PowerShell</span> <span class="p">-</span><span class="o">-exact</span> <span class="p">-</span><span class="n">-accept-source-agreements</span> <span class="p">-</span><span class="n">-accept-package-agreements</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">winget</span> <span class="n">install</span> <span class="p">-</span><span class="n">-id</span> <span class="n">Microsoft</span><span class="p">.</span><span class="n">AzureCLI</span> <span class="p">-</span><span class="o">-exact</span> <span class="p">-</span><span class="n">-accept-source-agreements</span> <span class="p">-</span><span class="n">-accept-package-agreements</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">winget</span> <span class="n">install</span> <span class="p">-</span><span class="n">-id</span> <span class="n">Kubernetes</span><span class="p">.</span><span class="n">kubectl</span> <span class="p">-</span><span class="o">-exact</span> <span class="p">-</span><span class="n">-accept-source-agreements</span> <span class="p">-</span><span class="n">-accept-package-agreements</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">winget</span> <span class="n">install</span> <span class="p">-</span><span class="n">-id</span> <span class="n">Git</span><span class="p">.</span><span class="n">Git</span> <span class="p">-</span><span class="o">-exact</span> <span class="p">-</span><span class="n">-accept-source-agreements</span> <span class="p">-</span><span class="n">-accept-package-agreements</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">winget</span> <span class="n">install</span> <span class="p">-</span><span class="n">-id</span> <span class="n">GitHub</span><span class="p">.</span><span class="nb">cli </span><span class="p">-</span><span class="o">-exact</span> <span class="p">-</span><span class="n">-accept-source-agreements</span> <span class="p">-</span><span class="n">-accept-package-agreements</span>
 </code></pre></div>
-<p>After installs complete, restart your terminal so the commands are available on PATH.</p>
+<p>After installs complete, restart your terminal so the commands are available on
+PATH, and sign in to the GitHub CLI once with <code>gh auth login</code>.</p>
 <div class="admonition warning">
 <p class="admonition-title">Run every command in PowerShell 7 (<code>pwsh</code>)</p>
 <p>Windows PowerShell 5.1 is the default on Windows and is <strong>not</strong> supported: the
@@ -1950,6 +1957,27 @@ your token. Enable it now and you will not meet it eight challenges later.</p>
 challenge material</strong> and would spoil every investigation. Connect the agent
 <strong>only to your fork of <code>aetherion-airops-platform</code></strong>.</p>
 </div>
+<p><strong>c) Create a GitHub Personal Access Token now.</strong> Challenge 8 has the agent write
+back to your fork — it files the incident RCA as an issue and opens a pull request
+— and the GitHub MCP connector it uses for that accepts <strong>a PAT only</strong>. There is no
+OAuth option on that connector.</p>
+<div class="admonition danger">
+<p class="admonition-title">Do this on day one, not at Challenge 8</p>
+<p>In many organisations a fine-grained PAT against an <strong>org-owned</strong> repository
+needs <strong>owner approval</strong>, which is not instant. If you find that out at
+Challenge 8 you will not finish the hack that day.</p>
+<p>Create the token against your fork with:</p>
+<ul>
+<li><strong>Contents: Read and write</strong> — create a branch and commit to it</li>
+<li><strong>Pull requests: Read and write</strong> — open the PR</li>
+<li><strong>Issues: Read and write</strong> — file the RCA</li>
+</ul>
+<p>A classic token with <code>repo</code> scope also works. A read-only token <strong>connects
+successfully and then fails on the first write</strong>, which looks like a broken
+connector rather than a permissions problem.</p>
+<p>Forking to your <strong>personal</strong> account instead of an organisation avoids the
+approval step entirely.</p>
+</div>
 <h2 id="3-check-you-have-access">3. Check you have access<a class="headerlink" href="#3-check-you-have-access" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong>Azure subscription</strong> with <strong>Owner</strong> (or Contributor + User Access
@@ -1965,7 +1993,9 @@ challenge material</strong> and would spoil every investigation. Connect the age
 </code></pre></div>
 <p>That's it. It runs preflight → deploy infrastructure → build &amp; push images → deploy the app →
 validate, then opens the Operations Center, <abbr title="Dashboarding tool used here to visualise AKS and Application Insights metrics.">Grafana</abbr>, and the resource group in
-your browser. The script is idempotent and safe to re-run if a step fails.</p>
+your browser. The script is idempotent and safe to re-run if a step fails: it
+resolves the cluster's current Kubernetes version rather than forcing a downgrade,
+and the network configuration is declared explicitly so a re-run cannot reset it.</p>
 <p>Each run provisions into a <strong>uniquely named</strong> resource group,
 <code>rg-aetherion-microhack-&lt;suffix&gt;</code> (for example <code>rg-aetherion-microhack-a7c3</code>), in
 <code>swedencentral</code>. The script <strong>prints the exact name</strong> when it finishes. Use that
