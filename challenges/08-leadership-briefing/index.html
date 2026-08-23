@@ -2151,6 +2151,9 @@ for and it is the one that unblocks the PR.</p>
 </ol>
 <div class="admonition warning">
 <p class="admonition-title">The token needs write scope, and a read-only one fails silently at connect time</p>
+<p>You should already have this token from
+<a href="../../getting-started/environment/">setup</a>. If not, create it now at
+<strong><a href="https://github.com/settings/personal-access-tokens/new">github.com/settings/personal-access-tokens/new</a></strong>.</p>
 <p>This task creates a branch, commits a file and opens a pull request, so
 on a <strong>fine-grained</strong> token scoped to your copy you need:</p>
 <ul>
@@ -2158,9 +2161,12 @@ on a <strong>fine-grained</strong> token scoped to your copy you need:</p>
 <li><strong>Pull requests: Read and write</strong> — the PR</li>
 <li><strong>Issues: Read and write</strong> — to reference the RCA issue</li>
 </ul>
-<p>A classic token with <code>repo</code> scope also works. A read-only token
-<strong>connects successfully</strong> and then fails on the first write, which looks
-like a broken connector rather than a permissions problem.</p>
+<p>Set <em>Repository access</em> to <strong>Only select repositories</strong> and pick your
+repo: it is <strong>private</strong>, so a token limited to public repositories
+cannot see it. A classic token with <code>repo</code> scope works too.</p>
+<p>A read-only or wrongly-scoped token <strong>connects successfully</strong> and then
+fails on the first write, which looks like a broken connector rather
+than a permissions problem.</p>
 <p>If you put your copy in an <strong>organisation</strong> rather than your personal
 account, a fine-grained token may need <strong>owner approval</strong> before it
 works. You were warned about this in

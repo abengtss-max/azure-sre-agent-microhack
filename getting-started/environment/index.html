@@ -1989,21 +1989,63 @@ challenge material</strong> and would spoil every investigation. Connect the age
 back to your repo — it files the incident RCA as an issue and opens a pull request
 — and the GitHub MCP connector it uses for that accepts <strong>a PAT only</strong>. There is no
 OAuth option on that connector.</p>
+<p>Go straight to
+<strong><a href="https://github.com/settings/personal-access-tokens/new">github.com/settings/personal-access-tokens/new</a></strong>
+(<em>Settings → Developer settings → Personal access tokens → Fine-grained tokens</em>)
+and fill it in like this:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Set it to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Token name</strong></td>
+<td><code>aetherion-microhack</code></td>
+</tr>
+<tr>
+<td><strong>Expiration</strong></td>
+<td>30 days is plenty</td>
+</tr>
+<tr>
+<td><strong>Resource owner</strong></td>
+<td>your own account</td>
+</tr>
+<tr>
+<td><strong>Repository access</strong></td>
+<td><strong>Only select repositories</strong> → <code>aetherion-airops-platform</code></td>
+</tr>
+<tr>
+<td><strong>Repository permissions → Contents</strong></td>
+<td><strong>Read and write</strong> — create a branch and commit</td>
+</tr>
+<tr>
+<td><strong>Repository permissions → Pull requests</strong></td>
+<td><strong>Read and write</strong> — open the PR</td>
+</tr>
+<tr>
+<td><strong>Repository permissions → Issues</strong></td>
+<td><strong>Read and write</strong> — file the RCA</td>
+</tr>
+</tbody>
+</table>
+<p>Click <strong>Generate token</strong> and <strong>copy it now</strong> — GitHub shows it once. Keep it in
+your password manager until Challenge 8.</p>
 <div class="admonition warning">
-<p class="admonition-title">Do this on day one, not at Challenge 8</p>
-<p>Create the token against your copy with:</p>
+<p class="admonition-title">Two ways this fails silently</p>
+<p>Both look like a broken connector rather than a permissions problem, because
+the connector shows <strong>Connected</strong> and only fails on the first <em>write</em>:</p>
 <ul>
-<li><strong>Contents: Read and write</strong> — create a branch and commit to it</li>
-<li><strong>Pull requests: Read and write</strong> — open the PR</li>
-<li><strong>Issues: Read and write</strong> — file the RCA</li>
+<li><strong>Repository access left on "Public repositories".</strong> Your repo is
+  <strong>private</strong>, so the token cannot see it. Pick it explicitly.</li>
+<li><strong>Read-only permissions.</strong> Contents, Pull requests and Issues must all be
+  <strong>Read and write</strong>, not Read.</li>
 </ul>
-<p>Your new repo is <strong>private by default</strong>, so on a fine-grained token set
-<em>Repository access</em> to <strong>Only select repositories</strong> and pick it explicitly.
-Leaving it on <strong>Public repositories</strong> connects fine and then fails on the
-first write. A classic token with <code>repo</code> scope covers private repos.</p>
-<p>A read-only token fails the same silent way: it <strong>connects successfully and
-then fails on the first write</strong>, which looks like a broken connector rather
-than a permissions problem.</p>
+<p>Prefer a classic token? Use
+<strong><a href="https://github.com/settings/tokens/new">github.com/settings/tokens/new</a></strong>
+and tick the top-level <strong><code>repo</code></strong> scope, which covers private repositories.</p>
 <p>If you put the repo in an <strong>organisation</strong> rather than your personal account, a
 fine-grained token may additionally need <strong>owner approval</strong>, which is not
 instant. Your personal account avoids that entirely.</p>
