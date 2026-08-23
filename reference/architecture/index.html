@@ -1882,8 +1882,8 @@
 <h1 id="architecture">Architecture<a class="headerlink" href="#architecture" title="Permanent link">&para;</a></h1>
 <p>Aetherion AirOps is a microservices estate on Azure Kubernetes Service, fronted
 by Azure API Management, backed by PostgreSQL and Redis, and observed through
-<abbr title="Azure application-performance monitoring — requests, dependencies, exceptions, latency.">Application Insights</abbr>, <abbr title="Azure service that stores and queries container and platform logs.">Log Analytics</abbr> and <abbr title="Dashboarding tool used here to visualise AKS and Application Insights metrics.">Grafana</abbr>. The <strong>Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent</strong> reasons
-across every tier, not just the cluster.</p>
+<abbr title="Azure application-performance monitoring — requests, dependencies, exceptions, latency.">Application Insights</abbr>, <abbr title="Azure service that stores and queries container and platform logs.">Log Analytics</abbr>, managed Prometheus and <abbr title="Dashboarding tool used here to visualise AKS and Application Insights metrics.">Grafana</abbr>. The
+<strong>Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent</strong> reasons across every tier, not just the cluster.</p>
 <h2 id="environment-at-a-glance">Environment at a glance<a class="headerlink" href="#environment-at-a-glance" title="Permanent link">&para;</a></h2>
 <p><a href="../../assets/architecture/aetherion-architecture.png"><img alt="Aetherion AirOps: Azure SRE Agent MicroHack environment architecture" class="arch-diagram" loading="lazy" src="../../assets/architecture/aetherion-architecture.png" /></a></p>
 <p><em>Request/data flow runs left to right (solid blue); telemetry and control flow to
@@ -1944,6 +1944,9 @@ whole estate.</p>
 <li><strong><abbr title="Azure application-performance monitoring — requests, dependencies, exceptions, latency.">Application Insights</abbr></strong> (<code>aetherion-appi</code>): requests, dependencies,
   exceptions and the application map.</li>
 <li><strong><abbr title="Azure service that stores and queries container and platform logs.">Log Analytics</abbr></strong> (<code>aetherion-law</code>): container and node logs for deep-dive KQL.</li>
+<li><strong>Managed Prometheus</strong> (Azure Monitor workspace <code>aetherion-amw-*</code>): pod and node
+  CPU/memory time series scraped from <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr>. This is what makes "is it CPU-bound or
+  is it waiting?" answerable rather than a guess.</li>
 <li><strong>Azure Managed <abbr title="Dashboarding tool used here to visualise AKS and Application Insights metrics.">Grafana</abbr></strong>: metrics, traces and autoscaling correlation.</li>
 <li><strong>Azure <abbr title="Azure's record of control-plane changes (who changed what, and when).">Activity Log</abbr> + GitHub</strong>: change history for incident correlation.</li>
 </ul>
