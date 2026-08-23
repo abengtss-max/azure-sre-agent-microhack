@@ -98,7 +98,7 @@ Reference: [Create and set up](https://learn.microsoft.com/en-us/azure/sre-agent
 
 In the agent, run **Set up your agent** (**Full setup**) and connect three sources:
 
-1. **Code** → **GitHub** → sign in → add **your fork** of `aetherion-airops-platform`
+1. **Code** → **GitHub** → sign in → add **your copy** of `aetherion-airops-platform`
    (used for change correlation in Challenge 3).
 2. **Logs** → **Log Analytics Workspace** → pick the app's **`aetherion-law`**
    (not the agent's own auto-created workspace).
@@ -205,7 +205,7 @@ Reference: [Security overview](https://learn.microsoft.com/en-us/azure/sre-agent
 
 1. In the agent, open **Builder → Knowledge Sources**.
 2. Upload the Markdown files from your **lab clone's** `knowledge/` folder. The
-   application fork does not contain them.
+   application repo does not contain them.
 3. Check every file reaches **Indexed**. Bulk upload can partially fail.
 4. Re-ask your remediation question. The advice should now cite Aetherion's own
    runbook guardrails instead of generic steps.

@@ -130,7 +130,7 @@ read-only check so the agent watches for drift on its own.
         **Set up your agent** is a separate step. **Create** alone grants no app
         access. Choose **Full setup** and connect:
 
-        - **Code** → **GitHub** → sign in → add **your fork** of `aetherion-airops-platform`.
+        - **Code** → **GitHub** → sign in → add **your copy** of `aetherion-airops-platform`.
         - **Logs** → **Log Analytics Workspace** → pick the app's **`aetherion-law`**.
           The agent created its own workspace when you deployed it, named
           `workspace<random>`; that one holds the agent's telemetry, not the
@@ -155,7 +155,7 @@ read-only check so the agent watches for drift on its own.
             to a commit and Challenge 4 can read container logs:
 
             - **Builder → Code Access** lists `github.com` as **Connected** and your
-              `aetherion-airops-platform` fork as **Ready**, with a recent sync time.
+              `aetherion-airops-platform` copy as **Ready**, with a recent sync time.
             - **Builder → Connectors** shows a **Log Analytics** connector.
 
             If either is missing, reopen the setup wizard from the agent's
@@ -178,7 +178,7 @@ read-only check so the agent watches for drift on its own.
 
         > Which log sources and code repositories are you connected to right now?
 
-        It should name `aetherion-law` and your fork. If it names neither, the
+        It should name `aetherion-law` and your repo. If it names neither, the
         **Code** and **Logs** connections did not save, and Challenges 3 and 4 will
         underperform for reasons that look like agent weakness rather than setup.
 

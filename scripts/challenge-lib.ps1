@@ -395,7 +395,7 @@ function Test-MajorIncidentAlertFired([datetime]$Since) {
 # route moved, agent not created yet) so the caller can fall back to asking.
 # ---------------------------------------------------------------------------
 
-# Challenge 1: the fork must be attached AND finished cloning. A repo stuck in
+# Challenge 1: the repo must be attached AND finished cloning. A repo stuck in
 # 'Cloning' looks connected in the portal but silently starves challenge 4.
 function Test-CodeRepoReady {
     $r = Invoke-SreData '/api/v2/repos'
@@ -475,10 +475,11 @@ function Get-AgentRunMode {
     return "$($a.properties.actionConfiguration.mode)"
 }
 
-# Challenge 8: the RCA and the pull request must exist on the attendee's fork.
+# Challenge 8: the RCA and the pull request must exist on the attendee's copy of
+# the application repo.
 # Uses the GitHub CLI because that is what the lab already assumes is installed;
 # returns $null (ask instead) when gh is missing or unauthenticated.
-function Get-ForkRepoSlug {
+function Get-AppRepoSlug {
     $r = Invoke-SreData '/api/v2/repos'
     if ($null -ne $r) {
         $m = @($r.value) | Where-Object { $_.properties.url -match 'aetherion-airops-platform' } | Select-Object -First 1
@@ -497,7 +498,7 @@ function Invoke-GhJson([string]$Path) {
 }
 
 function Test-RcaIssueFiled {
-    $slug = Get-ForkRepoSlug
+    $slug = Get-AppRepoSlug
     if (-not $slug) { return $null }
     $issues = Invoke-GhJson "repos/$slug/issues?state=all&per_page=100"
     if ($null -eq $issues) { return $null }
@@ -505,7 +506,7 @@ function Test-RcaIssueFiled {
 }
 
 function Test-PullRequestOpened {
-    $slug = Get-ForkRepoSlug
+    $slug = Get-AppRepoSlug
     if (-not $slug) { return $null }
     $prs = Invoke-GhJson "repos/$slug/pulls?state=all&per_page=100"
     if ($null -eq $prs) { return $null }
@@ -552,7 +553,7 @@ $script:Challenges = [ordered]@{
                     elseif (Get-ChallengeStartTime 6) { $true }
                     else { $m -eq 'review' }
                 } "run mode: $(Get-AgentRunMode)")
-            $code = $agent -and (Confirm-Verified 'Does Builder -> Code Access list your aetherion-airops-platform fork as Connected and Ready?' `
+            $code = $agent -and (Confirm-Verified 'Does Builder -> Code Access list your aetherion-airops-platform repo as Connected and Ready?' `
                 { Test-CodeRepoReady } (Get-CodeRepoDetail))
             $sched = Confirm-Verified 'Have you created a scheduled daily health check?' { Test-ScheduledTaskExists }
             $base = Confirm-SelfAttest 'Have you recorded a healthy baseline you could compare a future incident against?'
@@ -834,8 +835,8 @@ $script:Challenges = [ordered]@{
             foreach ($p in $s.services.PSObject.Properties) { if (-not $p.Value.ok) { $allOk = $false } }
             if (-not $allOk) { return @{ Pass = $false; Detail = "platform not fully healthy yet (overall=$($s.overall)) - resolve challenge 7 first" } }
             $done = Confirm-SelfAttest 'Have you produced an executive leadership briefing AND an engineering RCA handover for the major incident?'
-            $pub = Confirm-Verified 'Did the agent publish the RCA as an issue on your fork of aetherion-airops-platform?' `
-            { Test-RcaIssueFiled } $(if ($slug = Get-ForkRepoSlug) { "fork: $slug" } else { '' })
+            $pub = Confirm-Verified 'Did the agent publish the RCA as an issue on your copy of aetherion-airops-platform?' `
+            { Test-RcaIssueFiled } $(if ($slug = Get-AppRepoSlug) { "repo: $slug" } else { '' })
             $mcp = Confirm-Verified 'Did you connect an MCP server and have the agent open a pull request on your fork through it?' `
             { Test-PullRequestOpened }
             @{ Pass = ($allOk -and $done -and $pub -and $mcp); Detail = "platform healthy=$allOk, briefing + handover produced=$done, RCA published to repo=$pub, MCP pull request opened=$mcp" }

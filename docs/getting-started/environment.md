@@ -40,47 +40,42 @@ git clone https://github.com/abengtss-max/azure-sre-agent-microhack.git
 cd azure-sre-agent-microhack
 ```
 
-**b) Fork the application repo.** This is the Aetherion AirOps *application*
-source that the Azure SRE Agent connects to for change correlation. Fork it to
-**your own account** so the agent can read its history and open pull requests:
+**b) Create your own copy of the application repo.** This is the Aetherion AirOps
+*application* source that the Azure SRE Agent connects to for change correlation.
+It is a **template repository**, so you get your own standalone copy in one click:
 
 1. Open <https://github.com/abengtss-max/aetherion-airops-platform>
-2. Click **Fork** (keep the default name).
-3. In your new fork, go to **Settings → General → Features** and tick
-   **Issues**.
+2. Click **Use this template** → **Create a new repository**.
+3. Choose **your own account** as the owner, keep the name
+   `aetherion-airops-platform`, and create it.
 
-You'll connect the SRE Agent to **your fork** in Challenge 1.
+You'll connect the SRE Agent to **your copy** in Challenge 1.
 
-!!! warning "Step 3 is not optional"
-    **GitHub turns Issues off on every new fork**, regardless of the upstream
-    setting. Challenge 8 has the agent file the incident RCA as an issue on your
-    fork; if Issues are disabled the call fails with `HTTP 410 Issues are
-    disabled for this repository` and there is nothing wrong with your agent or
-    your token. Enable it now and you will not meet it eight challenges later.
+!!! tip "Why a template and not a fork"
+    A fork would work, but GitHub turns **Issues off on every new fork** and
+    Challenge 8 has the agent file the incident RCA as an issue. A template copy
+    arrives with Issues already enabled, so that failure never happens.
 
-    Check it from the CLI if you prefer:
+    Creating it under your **personal account** also avoids the token-approval
+    step in **c)** below.
 
-    ```powershell
-    gh api repos/<your-org>/aetherion-airops-platform --jq .has_issues   # must be true
-    gh api -X PATCH repos/<your-org>/aetherion-airops-platform -F has_issues=true
-    ```
+    The copy starts with a single commit rather than the upstream history. Nothing
+    in the hack depends on that history: Challenge 3 correlates change from the
+    Kubernetes **rollout history**, and reads the repo only to answer *"what does
+    the manifest declare"*.
 
-!!! danger "Connect the agent to your fork, never to the lab repo"
+!!! danger "Connect the agent to your copy, never to the lab repo"
     **Never connect the Azure SRE Agent to the lab repo because it contains the
     challenge material** and would spoil every investigation. Connect the agent
-    **only to your fork of `aetherion-airops-platform`**.
+    **only to your copy of `aetherion-airops-platform`**.
 
 **c) Create a GitHub Personal Access Token now.** Challenge 8 has the agent write
-back to your fork — it files the incident RCA as an issue and opens a pull request
+back to your repo — it files the incident RCA as an issue and opens a pull request
 — and the GitHub MCP connector it uses for that accepts **a PAT only**. There is no
 OAuth option on that connector.
 
-!!! danger "Do this on day one, not at Challenge 8"
-    In many organisations a fine-grained PAT against an **org-owned** repository
-    needs **owner approval**, which is not instant. If you find that out at
-    Challenge 8 you will not finish the hack that day.
-
-    Create the token against your fork with:
+!!! warning "Do this on day one, not at Challenge 8"
+    Create the token against your copy with:
 
     - **Contents: Read and write** — create a branch and commit to it
     - **Pull requests: Read and write** — open the PR
@@ -90,8 +85,9 @@ OAuth option on that connector.
     successfully and then fails on the first write**, which looks like a broken
     connector rather than a permissions problem.
 
-    Forking to your **personal** account instead of an organisation avoids the
-    approval step entirely.
+    If you put the repo in an **organisation** rather than your personal account, a
+    fine-grained token may additionally need **owner approval**, which is not
+    instant. Your personal account avoids that entirely.
 
 ## 3. Check you have access
 

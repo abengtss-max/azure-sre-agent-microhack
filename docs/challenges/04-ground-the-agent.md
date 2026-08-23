@@ -93,7 +93,7 @@ A database that is busy is not the same as a database that is broken.
 
 <details markdown="1"><summary>Hint: let the runbooks answer</summary>
 
-Load the `knowledge/` Markdown files from your **lab clone** (the application fork
+Load the `knowledge/` Markdown files from your **lab clone** (the application repo
 doesn't carry them), then re-ask and watch the advice turn Aetherion-specific.
 
 Before you reach for a remedy, work out **which layer is saturated**. If the pods
@@ -135,7 +135,7 @@ work to the part that is already at its limit.
         - In the agent, open **Builder → Knowledge Sources** and add Aetherion's
           runbooks from your **lab clone's** `knowledge/` folder (architecture,
           escalation, ops guide, platform standards, and the AKS / APIM / database
-          runbooks). The application fork does not contain them.
+          runbooks). The application repo does not contain them.
 
         !!! warning "Upload them one at a time, and don't trust the tick"
             Uploading all seven at once can lose the last file: the indexer starts
@@ -185,7 +185,7 @@ work to the part that is already at its limit.
 
         !!! warning "This step needs Code Access from Challenge 1"
             The agent applies the fix by pointing `kubectl` at the manifest **in
-            your fork**, fetched over HTTPS at a pinned commit. Every other route
+            your copy**, fetched over HTTPS at a pinned commit. Every other route
             fails, which is worth knowing before you watch it try them:
 
             ```text
@@ -223,7 +223,7 @@ work to the part that is already at its limit.
             Worth noticing either way: this is Challenge 8's closing set piece —
             *open a pull request that fixes the runbook that failed you* — arriving
             four challenges early, on the agent's own initiative. The formal
-            version, with the change reviewed on your fork, is Task 6 there.
+            version, with the change reviewed on your repo, is Task 6 there.
 
 ### Reference
 

@@ -44,7 +44,7 @@ guardrails intact.
 !!! tip "You don't have to type either of these from scratch"
     Both finished definitions ship in your **lab clone** — the repository you cloned
     to run this hack, the one holding `knowledge/` and `scripts/`. Not the
-    application fork.
+    application repo.
 
     | What you're building | File in your lab clone | Used in |
     |---|---|---|
@@ -202,7 +202,7 @@ investigate. You'll want both in the final incident.
 
         The finished definition is already in your **lab clone** (the repository you
         cloned to run this hack, the same one holding `knowledge/` and `scripts/` —
-        **not** the application fork), at `agents/aks-triage.agent.yaml`:
+        **not** the application repo), at `agents/aks-triage.agent.yaml`:
 
         ```powershell
         code ./agents/aks-triage.agent.yaml     # or: Get-Content ./agents/aks-triage.agent.yaml
@@ -347,7 +347,7 @@ investigate. You'll want both in the final incident.
         **SKILL.md**: the editor on the right is pre-scaffolded with `name` and
         `description` frontmatter and a placeholder comment. The finished file is
         already in your **lab clone** (the same repository as the `knowledge/`
-        folder, not the application fork), at
+        folder, not the application repo), at
         `skills/crew-query-path-recovery/SKILL.md`:
 
         ```powershell

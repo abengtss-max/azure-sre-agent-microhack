@@ -42,7 +42,7 @@ incident starts from what you learned in this one.
 2. **Write the leadership briefing.** Short, impact-first, non-technical, for the operations director.
 3. **Write the engineering RCA handover.** Precise actions, verification, open risks, and change evidence for the next on-call.
 4. **Generate the executive PDF.** Have the agent render the briefing (with a timeline chart) via its Python sandbox.
-5. **Publish the RCA back to the repo.** Add the GitHub Connector and have the agent file the RCA as an issue on your fork.
+5. **Publish the RCA back to the repo.** Add the GitHub Connector and have the agent file the RCA as an issue on your copy of the application repo.
 6. **Connect an MCP server and open the PR.** Add GitHub MCP, manage the tool budget, then have the agent branch, commit and raise a pull request that fixes the runbook that failed you.
 
 ![Challenge 8 storyboard: Sam and Elena brief airline leadership as boarding resumes](../assets/storyboard/img-challenge-8.webp){ .story-panel loading=lazy }
@@ -64,7 +64,7 @@ incident starts from what you learned in this one.
 - The platform is healthy at close.
 - The leadership briefing covers impact, root cause, recovery, cost/risk, and lessons learned; the engineering RCA handover captures actions, verification, remaining risk, and change evidence from rollout history and the Activity Log.
 - The agent produced a **downloadable PDF** of the leadership briefing (with a timeline chart) via its Python sandbox.
-- The agent **filed the RCA as an issue on your fork**, so the record survives the chat thread.
+- The agent **filed the RCA as an issue on your repo**, so the record survives the chat thread.
 - An **MCP server is connected**, you scoped its tools against the 80-tool budget, and the agent used those tools to **branch, commit and open a pull request** improving the runbook that failed during Challenge 7.
 - Symptom, root cause, contributing factors, immediate mitigation, and permanent corrective action are clearly separated, and `check-challenge.ps1 8` passes.
 
@@ -168,7 +168,7 @@ the repository, where the whole team, and the next agent, can find it.
         again, because the first link can expire.
 
     ??? note "Task 5 · Publish the RCA back to the repo"
-        In Challenge 1 you connected your fork so the agent could **read** it. It has
+        In Challenge 1 you connected your repo so the agent could **read** it. It has
         been correlating deployments against that repo all day. It has no tool that
         writes a single character back to it.
 
@@ -201,26 +201,23 @@ the repository, where the whole team, and the next agent, can find it.
         3. The token needs issue and pull-request scope, not just `repo` read. On a
            fine-grained PAT that is **Issues: Read and write** and
            **Pull requests: Read and write**.
-        4. Select your fork, `<your-org>/aetherion-airops-platform`.
+        4. Select your copy, `<your-account>/aetherion-airops-platform`.
 
         !!! tip "OAuth tokens keep themselves alive"
             GitHub OAuth tokens expire after about eight hours, but the agent
             refreshes them ahead of expiry on its own. You will not get logged out
             mid-workshop.
 
-        !!! warning "Issues must be enabled on your fork"
-            GitHub disables Issues on **every new fork**, so this step fails with
-            `HTTP 410 Issues are disabled for this repository` unless you turned it
-            on during setup. That is a repository setting, not an agent or token
-            problem — the agent will correctly report it and create nothing.
+        !!! note "Issues are already enabled"
+            You created your repo from a **template**, so Issues came on by default
+            and this step just works. Had you forked instead, GitHub would have
+            turned Issues off and the agent would report
+            `HTTP 410 Issues are disabled for this repository` — a repository
+            setting, not an agent or token problem.
 
-            Fix it in **Settings → General → Features → Issues**, or:
+        **Now have it file the RCA.** Paste this into the agent chat:
 
-            ```powershell
-            gh api -X PATCH repos/<your-org>/aetherion-airops-platform -F has_issues=true
-            ```
-
-        **Now have it file the RCA.** Paste this into the agent chat:        > Publish the engineering RCA you just wrote as a GitHub issue on
+        > Publish the engineering RCA you just wrote as a GitHub issue on
         > `https://github.com/<your-org>/aetherion-airops-platform`. Title it
         > `RCA: major incident - global check-in degradation`. In the body include
         > the timeline, the root cause per affected service, every action taken and
@@ -266,7 +263,7 @@ the repository, where the whole team, and the next agent, can find it.
 
         !!! warning "The token needs write scope, and a read-only one fails silently at connect time"
             This task creates a branch, commits a file and opens a pull request, so
-            on a **fine-grained** token scoped to your fork you need:
+            on a **fine-grained** token scoped to your copy you need:
 
             - **Contents: Read and write** — the branch and the commit
             - **Pull requests: Read and write** — the PR
@@ -276,8 +273,9 @@ the repository, where the whole team, and the next agent, can find it.
             **connects successfully** and then fails on the first write, which looks
             like a broken connector rather than a permissions problem.
 
-            If your fork lives in an organisation, a fine-grained token may need
-            **owner approval** before it works. You were warned about this in
+            If you put your copy in an **organisation** rather than your personal
+            account, a fine-grained token may need **owner approval** before it
+            works. You were warned about this in
             [Set up the environment](../getting-started/environment.md); if you
             skipped it, this is the point where it bites.
 
