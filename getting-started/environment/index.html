@@ -1979,12 +1979,6 @@ in the hack depends on that history: Challenge 3 correlates change from the
 Kubernetes <strong>rollout history</strong>, and reads the repo only to answer <em>"what does
 the manifest declare"</em>.</p>
 </details>
-<div class="admonition danger">
-<p class="admonition-title">Connect the agent to your copy, never to the lab repo</p>
-<p><strong>Never connect the Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent to the lab repo because it contains the
-challenge material</strong> and would spoil every investigation. Connect the agent
-<strong>only to your copy of <code>aetherion-airops-platform</code></strong>.</p>
-</div>
 <p><strong>c) Create a GitHub Personal Access Token now.</strong> Challenge 8 has the agent write
 back to your repo — it files the incident RCA as an issue and opens a pull request
 — and the GitHub MCP connector it uses for that accepts <strong>a PAT only</strong>. There is no

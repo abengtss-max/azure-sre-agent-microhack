@@ -1919,7 +1919,7 @@ capture anything.</p>
 <ol>
 <li><strong>Check the board.</strong> Read the Operations Center once while it's green. That's your reference for the rest of the day.</li>
 <li><strong>Confirm telemetry is flowing.</strong> Open <abbr title="Dashboarding tool used here to visualise AKS and Application Insights metrics.">Grafana</abbr> and check that <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> and <abbr title="Azure application-performance monitoring — requests, dependencies, exceptions, latency.">Application Insights</abbr> are reporting.</li>
-<li><strong>Connect the agent.</strong> Create the <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent in your resource group and give it read access to your code, logs, and Azure resources, in <abbr title="SRE Agent run mode where it proposes a plan and waits for your approval before any write.">Review mode</abbr>.</li>
+<li><strong>Connect the agent.</strong> Create the <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent in your resource group and give it read access to your code, logs, and Azure resources, in <abbr title="SRE Agent run mode where it proposes a plan and waits for your approval before any write.">Review mode</abbr>. Point <strong>Code</strong> at your own copy of <code>aetherion-airops-platform</code> — <strong>never</strong> at the lab repo.</li>
 <li><strong>Capture the baseline.</strong> Ask the agent for a baseline of the <code>aetherion</code> namespace, then spot-check its numbers. Trust the measured latency; verify the configuration.</li>
 <li><strong>Put it on a schedule.</strong> Have the agent re-run that health check every morning so drift shows up before it turns into an incident.</li>
 </ol>
@@ -1997,11 +1997,23 @@ provisions its own, separate from the app's. For <strong>model provider</strong>
 <p><strong>Set up your agent</strong> is a separate step. <strong>Create</strong> alone grants no app
 access. Choose <strong>Full setup</strong> and connect:</p>
 <ul>
-<li><strong>Code</strong> → <strong>GitHub</strong> → sign in → add <strong>your copy</strong> of <code>aetherion-airops-platform</code>.</li>
-<li><strong>Logs</strong> → <strong><abbr title="Azure service that stores and queries container and platform logs.">Log Analytics</abbr> Workspace</strong> → pick the app's <strong><code>aetherion-law</code></strong>.
+<li>
+<p><strong>Code</strong> → <strong>GitHub</strong> → sign in → add <strong>your copy</strong> of <code>aetherion-airops-platform</code>.</p>
+<div class="admonition danger">
+<p class="admonition-title">Your copy, never the lab repo</p>
+<p>The lab repo holds the challenge material: the fault scripts, the
+answers and the runbooks. Connect the agent to it and it can read
+how every incident today is caused and cured, which spoils the
+whole hack. It must only ever see
+<code>&lt;your-account&gt;/aetherion-airops-platform</code>.</p>
+</div>
+</li>
+<li>
+<p><strong>Logs</strong> → <strong><abbr title="Azure service that stores and queries container and platform logs.">Log Analytics</abbr> Workspace</strong> → pick the app's <strong><code>aetherion-law</code></strong>.
   The agent created its own workspace when you deployed it, named
   <code>workspace&lt;random&gt;</code>; that one holds the agent's telemetry, not the
-  application's.</li>
+  application's.</p>
+</li>
 <li><strong>Azure resources</strong> → <strong>Resource group</strong> → select <strong>only your app
   resource group</strong> at the <strong><abbr title="The built-in Azure role that grants read-only access — see everything, change nothing.">Reader</abbr></strong> level. Do <strong>not</strong> pick <em>Subscription</em>
   or <em>Management group</em>. You'll also see an <code>MC_...</code> group that <abbr title="Azure Kubernetes Service — the managed Kubernetes cluster that runs the microservices.">AKS</abbr> created
