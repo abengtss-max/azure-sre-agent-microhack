@@ -1973,10 +1973,19 @@ challenge. Driving the whole incident by hand is not enough on its own.</p>
 <p><img alt="Challenge 7 storyboard: Sam, Aria and Elena restore global check-in before peak departure" class="story-panel" loading="lazy" src="../../assets/storyboard/img-challenge-7.webp" /></p>
 <h3 id="suggested-azure-sre-agent-prompt">Suggested Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent prompt<a class="headerlink" href="#suggested-azure-sre-agent-prompt" title="Permanent link">&para;</a></h3>
 <div class="admonition quote">
-<p class="admonition-title">Paste into the agent chat</p>
+<p class="admonition-title">Paste into the <code>[Sev1] aetherion-major-incident</code> thread</p>
 <p>You picked this incident up before I did. List every action you have already
 taken without my approval, and how I can verify each one. Then tell me what is
 still broken, and what you recommend I deal with first.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Paste it into the right thread</p>
+<p>This prompt only works <strong>inside the thread the response plan opened by itself</strong>.
+Started in a fresh chat it has no incident to refer to, so it answers about
+whatever it worked on last — validated: pasted into a new thread it reported on
+the <em>previous</em> challenge's baggage canary and declared traffic healthy while
+the flight board was 100% down. Open the <code>[Sev1] aetherion-major-incident</code>
+thread first (Task 1), then ask.</p>
 </div>
 <p>The second half is the part you own. It will give you an order; your job is to
 decide whether it's the right one for an airline at peak departure.</p>
@@ -2137,6 +2146,22 @@ than you expected, that is worth reporting honestly too.</p>
   fails, the fault is the <strong>edge policy</strong>, not the service; treat the change
   as customer-facing.</li>
 </ul>
+<div class="admonition warning">
+<p class="admonition-title">Run the comparison from your machine, not the agent</p>
+<p>The agent's sandbox egress can block the public gateway IP and
+<code>*.azure-api.net</code>, so an external probe it runs itself comes back as a
+proxy-generated <code>403</code> before the request ever reaches Azure. Validated:
+the agent repaired the policy correctly and then reported it could not
+confirm the fix externally.</p>
+<p>Do the direct-vs-<abbr title="Azure API Management — the API &quot;front door&quot; that authenticates and rate-limits traffic to the services.">APIM</abbr> comparison yourself, and treat the agent's
+"external check failed" as a tooling limit rather than evidence the fix
+did not land. Confirm from the policy XML plus your own call:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nv">$st</span> <span class="p">=</span> <span class="nb">Get-Content</span> <span class="p">./</span><span class="n">scripts</span><span class="p">/.</span><span class="n">env</span><span class="p">.</span><span class="n">aetherion</span><span class="p">.</span><span class="n">json</span> <span class="n">-Raw</span> <span class="p">|</span> <span class="nb">ConvertFrom-Json</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="p">(</span><span class="nb">Invoke-WebRequest</span> <span class="s2">&quot;http://</span><span class="p">$(</span><span class="nv">$st</span><span class="p">.</span><span class="n">gatewayIp</span><span class="p">)</span><span class="s2">/api/status&quot;</span><span class="p">).</span><span class="n">StatusCode</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="p">(</span><span class="nb">Invoke-WebRequest</span> <span class="s2">&quot;</span><span class="p">$(</span><span class="nv">$st</span><span class="p">.</span><span class="n">apimGatewayUrl</span><span class="p">)</span><span class="s2">/aetherion/api/status&quot;</span> <span class="p">`</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>   <span class="n">-Headers</span> <span class="p">@{</span> <span class="s1">&#39;Ocp-Apim-Subscription-Key&#39;</span> <span class="p">=</span> <span class="nv">$st</span><span class="p">.</span><span class="n">apimSubscriptionKey</span> <span class="p">}).</span><span class="n">StatusCode</span>
+</code></pre></div>
+</div>
 <div class="admonition note">
 <p class="admonition-title">Why it can fix this at all</p>
 <p>Everywhere else today the agent has held write access to Kubernetes and

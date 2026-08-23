@@ -1928,8 +1928,22 @@ source that the Azure <abbr title="Site Reliability Engineering — running serv
 <ol>
 <li>Open <a href="https://github.com/abengtss-max/aetherion-airops-platform">https://github.com/abengtss-max/aetherion-airops-platform</a></li>
 <li>Click <strong>Fork</strong> (keep the default name).</li>
+<li>In your new fork, go to <strong>Settings → General → Features</strong> and tick
+   <strong>Issues</strong>.</li>
 </ol>
 <p>You'll connect the <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent to <strong>your fork</strong> in Challenge 1.</p>
+<div class="admonition warning">
+<p class="admonition-title">Step 3 is not optional</p>
+<p><strong>GitHub turns Issues off on every new fork</strong>, regardless of the upstream
+setting. Challenge 8 has the agent file the incident RCA as an issue on your
+fork; if Issues are disabled the call fails with <code>HTTP 410 Issues are
+disabled for this repository</code> and there is nothing wrong with your agent or
+your token. Enable it now and you will not meet it eight challenges later.</p>
+<p>Check it from the CLI if you prefer:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">gh</span> <span class="n">api</span> <span class="n">repos</span><span class="p">/&lt;</span><span class="n">your-org</span><span class="p">&gt;/</span><span class="n">aetherion-airops-platform</span> <span class="p">-</span><span class="n">-jq</span> <span class="p">.</span><span class="n">has_issues</span>   <span class="c"># must be true</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">gh</span> <span class="n">api</span> <span class="n">-X</span> <span class="n">PATCH</span> <span class="n">repos</span><span class="p">/&lt;</span><span class="n">your-org</span><span class="p">&gt;/</span><span class="n">aetherion-airops-platform</span> <span class="o">-F</span> <span class="n">has_issues</span><span class="p">=</span><span class="n">true</span>
+</code></pre></div>
+</div>
 <div class="admonition danger">
 <p class="admonition-title">Connect the agent to your fork, never to the lab repo</p>
 <p><strong>Never connect the Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent to the lab repo because it contains the
@@ -1943,11 +1957,11 @@ challenge material</strong> and would spoil every investigation. Connect the age
   <abbr title="An Azure identity for a workload (here, the agent) so it can authenticate without stored secrets.">managed identity</abbr>.</li>
 <li>This repository cloned locally and opened in VS Code.</li>
 </ul>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">az</span> <span class="n">login</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">az</span> <span class="n">account</span> <span class="nb">set </span><span class="p">-</span><span class="n">-subscription</span> <span class="s2">&quot;&lt;subscription-id&gt;&quot;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">az</span> <span class="n">login</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">az</span> <span class="n">account</span> <span class="nb">set </span><span class="p">-</span><span class="n">-subscription</span> <span class="s2">&quot;&lt;subscription-id&gt;&quot;</span>
 </code></pre></div>
 <h2 id="4-run-one-command">4. Run one command<a class="headerlink" href="#4-run-one-command" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="n">provision-environment</span><span class="p">.</span><span class="n">ps1</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="n">provision-environment</span><span class="p">.</span><span class="n">ps1</span>
 </code></pre></div>
 <p>That's it. It runs preflight → deploy infrastructure → build &amp; push images → deploy the app →
 validate, then opens the Operations Center, <abbr title="Dashboarding tool used here to visualise AKS and Application Insights metrics.">Grafana</abbr>, and the resource group in
@@ -1969,8 +1983,8 @@ wrong one. If you re-provision, either reuse the environment you already have,
 or tear down the old ones. The teardown script lists every
 <code>rg-aetherion-microhack-*</code> environment (each with its paired <code>-loadgen</code> group)
 and lets you pick which to delete:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="n">99-teardown</span><span class="p">.</span><span class="n">ps1</span>        <span class="c"># pick an environment to delete</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="n">99-teardown</span><span class="p">.</span><span class="n">ps1</span> <span class="n">-All</span>   <span class="c"># delete all lab environments</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="n">99-teardown</span><span class="p">.</span><span class="n">ps1</span>        <span class="c"># pick an environment to delete</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="n">99-teardown</span><span class="p">.</span><span class="n">ps1</span> <span class="n">-All</span>   <span class="c"># delete all lab environments</span>
 </code></pre></div>
 <p>Always scope the Azure <abbr title="Site Reliability Engineering — running services with software-engineering discipline.">SRE</abbr> Agent to your <strong>current</strong> resource group, using the name
 the provisioner printed when it finished.</p>
@@ -2015,7 +2029,7 @@ observability and the Azure <abbr title="Site Reliability Engineering — runnin
 reports a healthy, traffic-generating estate and the Operations Center loads with
 all tiles green.</p>
 <p>Re-run the check on its own at any time:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="n">04-validate</span><span class="p">.</span><span class="n">ps1</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="p">./</span><span class="n">scripts</span><span class="p">/</span><span class="n">04-validate</span><span class="p">.</span><span class="n">ps1</span>
 </code></pre></div>
 <p><a class="md-button md-button--primary" href="../../challenges/01-onboard-and-baseline/">Start Challenge 1 →</a></p>
 <hr />

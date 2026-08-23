@@ -2041,8 +2041,8 @@ again, because the first link can expire.</p>
 <details class="note">
 <summary>Task 5 · Publish the RCA back to the repo</summary>
 <p>In Challenge 1 you connected your fork so the agent could <strong>read</strong> it. It has
-been correlating deployments against that repo all day. It still cannot write
-a single character back to it.</p>
+been correlating deployments against that repo all day. It has no tool that
+writes a single character back to it.</p>
 <p>That is not a permissions oversight. GitHub attaches to the agent in three
 separate ways, and you have only set up the first:</p>
 <table>
@@ -2057,7 +2057,7 @@ separate ways, and you have only set up the first:</p>
 <tr>
 <td><strong>Code Access</strong></td>
 <td>Builder → Code Access</td>
-<td>Read, search, correlate. <strong>No writes</strong></td>
+<td>Read, search, correlate. <strong>No write tools</strong></td>
 </tr>
 <tr>
 <td><strong>GitHub Connector</strong></td>
@@ -2071,6 +2071,19 @@ separate ways, and you have only set up the first:</p>
 </tr>
 </tbody>
 </table>
+<div class="admonition warning">
+<p class="admonition-title">'No writes' is a tool boundary, not a permission boundary</p>
+<p>Code Access gives the agent no <em>write tools</em>, but it does leave an OAuth
+credential in the sandbox clone. Validated during authoring: running in
+<strong>Autonomous</strong> mode with only Code Access configured, the agent read the
+token out of <code>.git/git-credentials</code> and filed the issue with <code>gh api</code>
+directly — no connector involved.</p>
+<p>So the thing actually holding the line here is <strong>run mode and approvals</strong>,
+not the absence of a connector. In <strong>Review</strong> mode that same shell command
+surfaces for your approval first. Set up the connector anyway: it is the
+governed, auditable path, and it is what the rest of this challenge builds
+on.</p>
+</div>
 <p><strong>Add the GitHub Connector.</strong></p>
 <ol>
 <li><strong>Builder</strong> → <strong>Connectors</strong> → <strong>Add connector</strong> → <strong>GitHub</strong>.</li>
@@ -2086,10 +2099,19 @@ separate ways, and you have only set up the first:</p>
 refreshes them ahead of expiry on its own. You will not get logged out
 mid-workshop.</p>
 </div>
-<p><strong>Now have it file the RCA.</strong> Paste this into the agent chat:</p>
+<div class="admonition warning">
+<p class="admonition-title">Issues must be enabled on your fork</p>
+<p>GitHub disables Issues on <strong>every new fork</strong>, so this step fails with
+<code>HTTP 410 Issues are disabled for this repository</code> unless you turned it
+on during setup. That is a repository setting, not an agent or token
+problem — the agent will correctly report it and create nothing.</p>
+<p>Fix it in <strong>Settings → General → Features → Issues</strong>, or:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">gh</span> <span class="n">api</span> <span class="n">-X</span> <span class="n">PATCH</span> <span class="n">repos</span><span class="p">/&lt;</span><span class="n">your-org</span><span class="p">&gt;/</span><span class="n">aetherion-airops-platform</span> <span class="o">-F</span> <span class="n">has_issues</span><span class="p">=</span><span class="n">true</span>
+</code></pre></div>
+</div>
+<p><strong>Now have it file the RCA.</strong> Paste this into the agent chat:        &gt; Publish the engineering RCA you just wrote as a GitHub issue on</p>
 <blockquote>
-<p>Publish the engineering RCA you just wrote as a GitHub issue on
-<code>https://github.com/&lt;your-org&gt;/aetherion-airops-platform</code>. Title it
+<p><code>https://github.com/&lt;your-org&gt;/aetherion-airops-platform</code>. Title it
 <code>RCA: major incident - global check-in degradation</code>. In the body include
 the timeline, the root cause per affected service, every action taken and
 how it was verified, and a checklist of the corrective actions you would
