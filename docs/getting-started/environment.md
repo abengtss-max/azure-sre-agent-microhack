@@ -61,7 +61,7 @@ it through the Code Access connection you make in Challenge 1, not anonymously.
 
 You'll connect the SRE Agent to **your copy** in Challenge 1.
 
-!!! tip "Why a template and not a fork"
+??? tip "Why a template and not a fork"
     A fork would work, but GitHub turns **Issues off on every new fork** and
     Challenge 8 has the agent file the incident RCA as an issue. A template copy
     arrives with Issues already enabled, so that failure never happens.
@@ -153,7 +153,7 @@ single subscription and you can safely re-provision without collisions.
 Override the base name or region with `-ResourceGroup`, `-Location`, or
 `-NamePrefix`; the unique suffix is always appended.
 
-!!! tip "The Kubernetes version is resolved from Azure, not guessed"
+??? tip "The Kubernetes version is resolved from Azure, not guessed"
     The provisioner asks Azure for the region's current **stable (default) GA**
     version at run time and deploys that, so the lab never carries a literal that
     quietly ages out of support. Nothing to configure, and nothing to keep
