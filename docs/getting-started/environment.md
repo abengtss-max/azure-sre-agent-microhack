@@ -92,7 +92,7 @@ and fill it in like this:
 | Field | Set it to |
 |---|---|
 | **Token name** | `aetherion-microhack` |
-| **Expiration** | 30 days is plenty |
+| **Expiration** | **Custom** → tomorrow's date. The token only has to outlive today |
 | **Resource owner** | your own account |
 | **Repository access** | **Only select repositories** → `aetherion-airops-platform` |
 | **Repository permissions → Contents** | **Read and write** — create a branch and commit |
