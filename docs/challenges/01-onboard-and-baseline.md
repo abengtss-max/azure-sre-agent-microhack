@@ -142,6 +142,14 @@ read-only check so the agent watches for drift on its own.
 
         - **Code** → **GitHub** → sign in → add **your copy** of `aetherion-airops-platform`.
 
+            The **Add repositories** dialog offers three sign-in methods. Choose
+            **Your account** and sign in. Code Access only *reads* the repo, so
+            OAuth is enough, and it refreshes itself. Don't spend the PAT you
+            created during setup here — that one is for the GitHub MCP connector
+            in Challenge 8, and if it expires overnight this connection dies with
+            it. *Bring your own GitHub App* is for org-managed identities and is
+            not needed.
+
             !!! danger "Your copy, never the lab repo"
                 The lab repo holds the challenge material: the fault scripts, the
                 answers and the runbooks. Connect the agent to it and it can read
