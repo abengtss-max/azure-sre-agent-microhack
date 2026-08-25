@@ -349,8 +349,8 @@ the repository, where the whole team, and the next agent, can find it.
             | **GitHub MCP** | Task 6 | The full tool catalog, including branch and commit |
 
             MCP is the most capable and the least constrained, which is exactly why
-            it is the one you should scope most carefully. The bonus track picks this
-            up: the tool budget you just managed is also a security control.
+            it is the one you should scope most carefully. The tool budget you just
+            managed is also a security control.
 
 ### Reference
 
